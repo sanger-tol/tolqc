@@ -1,0 +1,136 @@
+# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+include:
+  - project: 'tol/tol-core'
+    ref: main
+    file: '/gitlab/main.yml'
+
+stages:
+  - lint
+  - build
+  - unit test
+  - push
+  - deploy
+  - integration test
+
+build-api:
+  extends: .build-template
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ''
+    PART: "tolqc-api"
+    DOCKERFILE: "tolqc-api/Dockerfile"
+    NAME: "tolqc-api"
+
+build-ui:
+  extends: .build-template
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ''
+    PART: "tolqc-ui"
+    DOCKERFILE: 'tolqc-ui/Dockerfile'
+    NAME: "tolqc-ui"
+
+build-ui-test:
+  extends: .build-template
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ''
+    PART: "tolqc-ui"
+    DOCKERFILE: 'tolqc-ui/Dockerfile.dev'
+    NAME: "tolqc-ui-test"
+
+test-ui:
+  image: $DOCKER_IMAGE
+  stage: unit test
+  services:
+    - name: $DIND_IMAGE
+      alias: docker
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ''
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker run -e CI=true $CI_REGISTRY_IMAGE/tolqc-ui-test:$CI_COMMIT_SHA yarn test
+  except:
+    - production
+    - staging
+  allow_failure: true
+
+push-api:
+  extends: .push-template
+  variables:
+    GIT_STRATEGY: none
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ''
+    NAME: tolqc-api
+
+push-ui:
+  extends: .push-template
+  variables:
+    GIT_STRATEGY: none
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ''
+    NAME: tolqc-ui
+
+push-ui-test:
+  extends: .push-template
+  variables:
+    GIT_STRATEGY: none
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ''
+    NAME: tolqc-ui-test
+
+deploy-staging:
+  extends: .swarm-deploy-template
+  environment:
+    name: staging
+    url: https://qc-staging.tol.sanger.ac.uk
+  variables:
+    DOCKER_HOST: "ssh://ubuntu@172.27.21.233"
+    EXTRA_DEPLOY_FILES: "-c docker-compose.gitlab-logging.yml"
+    STACK_NAME: tolqc
+  script:
+    - echo "Deployed to staging"
+  only:
+    - staging
+
+deploy-production:
+  extends: .swarm-deploy-template
+  environment:
+    name: production
+    url: https://qc.tol.sanger.ac.uk/
+  variables:
+    DOCKER_HOST: "ssh://ubuntu@172.27.18.201"
+    EXTRA_DEPLOY_FILES: "-c docker-compose.gitlab-logging.yml"
+    STACK_NAME: tolqc
+  script:
+    - echo "Deployed to production"
+  only:
+    - production
+  when: manual
+
+test-api:
+  extends: .swarm-deploy-template
+  image: $DOCKER_IMAGE
+  stage: integration test
+  resource_group: testing
+  services:
+    - name: $DIND_IMAGE
+      alias: docker
+  environment:
+    name: testing
+    url: http://172.27.19.196:8000
+  variables:
+    DOCKER_HOST: "ssh://ubuntu@172.27.19.196"
+    EXTRA_DEPLOY_FILES: "-c docker-compose.gitlab-test.yml"
+    STACK_NAME: tolqc
+  script:
+    - sleep 60
+    - docker exec $(docker ps -q -f name="tolqc_tolqc-api") bash -c "pytest -v"
+  except:
+    - staging
+    - production

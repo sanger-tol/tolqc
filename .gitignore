@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+.tox/
+venv/
+build/
+dist/
+instance/
+__pycache__
+swagger_server.egg-info/
+__init__.pyc
+launch.json
+.env.dev
+.env.prod

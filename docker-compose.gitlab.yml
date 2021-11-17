@@ -1,0 +1,61 @@
+# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+# This is used for staging and production deployment in CI/CD
+version: '3'
+services: 
+  tolqc-api:
+    image: $CI_REGISTRY_IMAGE/tolqc-api:$CI_COMMIT_SHA
+    restart: always
+    networks:
+      - tolqc
+    deploy:
+      replicas: 1
+    env_file:
+      - ${ENV_FILE}
+    environment:
+      - ENVIRONMENT=${CI_ENVIRONMENT_NAME}
+    ports: 
+      - 5000:80
+  tolqc-ui:
+    image: $CI_REGISTRY_IMAGE/tolqc-ui:$CI_COMMIT_SHA
+    restart: always
+    networks:
+      - tolqc
+    deploy:
+      replicas: 1
+    env_file:
+      - ${ENV_FILE}
+#    entrypoint: /bin/sh -c "envsubst "\\$$STS_API_LOCATION" < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && cat /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+    ports: 
+      - 8000:80
+    volumes:
+      - schema-html:/var/www/schema
+  tolqc-dbutils:
+    image: $CI_REGISTRY/tol/sts/dbutils:1.0.2
+    restart: always
+    networks:
+      - tolqc
+    deploy:
+      replicas: 1
+    env_file:
+      - ${ENV_FILE}
+  tolqc-schema:
+    image: $CI_REGISTRY/tol/sts/schemaspy:0.2.0
+    restart: "no"
+    networks:
+      - tolqc
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    env_file:
+      - ${ENV_FILE}
+    volumes:
+      - schema-html:/output
+networks:
+  tolqc:
+    driver: overlay
+volumes:
+  schema-html:
