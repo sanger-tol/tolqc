@@ -123,9 +123,9 @@ test-api:
       alias: docker
   environment:
     name: testing
-    url: http://172.27.19.196:8000
+    url: http://172.27.25.82:8000
   variables:
-    DOCKER_HOST: "ssh://ubuntu@172.27.19.196"
+    DOCKER_HOST: "ssh://ubuntu@172.27.25.82"
     EXTRA_DEPLOY_FILES: "-c docker-compose.gitlab-test.yml"
     STACK_NAME: tolqc
   script:
