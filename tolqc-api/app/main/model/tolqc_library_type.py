@@ -7,7 +7,7 @@ from .base import Base, db
 
 class TolqcLibraryType(Base):
     __tablename__ = "library_type"
-    library_type_id = db.Column(db.String(), primary_key=True)
+    library_type_id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
     kit = db.Column(db.String())

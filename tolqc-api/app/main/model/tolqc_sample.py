@@ -8,11 +8,11 @@ from .base import Base, db
 class TolqcSample(Base):
     __tablename__ = "sample"
     row_id = db.Column(db.Integer())
-    sample_id = db.Column(db.String(), primary_key=True)
+    sample_id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
-    lims_id = db.Column(db.String())
-    specimen_id = db.Column(db.String())
+    lims_id = db.Column(db.Integer())
+    specimen_id = db.Column(db.Integer())
     accession_id = db.Column(db.String())
-    changed = db.Column(db.String())
-    current = db.Column(db.String())
+    changed = db.Column(db.DateTime())
+    current = db.Column(db.DateTime())
