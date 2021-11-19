@@ -2,13 +2,29 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, inspect
+from flask_restx import fields as flask_fields
 
 db = SQLAlchemy()
 
 
 class Base(db.Model):
     __abstract__ = True
+
+    @classmethod
+    def _column_to_flask_field(self, column):
+        column_type = type(column)
+
+        if column_type == db.Integer:
+            return flask_fields.Integer
+        if column_type == db.String:
+            return flask_fields.String
+    
+    @classmethod
+    def get_api_schema(cls):
+        columns = [column for column in inspect(cls).mapper.column_attrs]
+        schema = {column.name : cls._column_to_flask_field(column) for column in columns}
+        return schema
 
     def to_dict(cls):
         return {"override": "this"}
@@ -39,3 +55,4 @@ class Base(db.Model):
     def bulk_update(data):
         db.session.add_all(data)
         db.session.commit()
+

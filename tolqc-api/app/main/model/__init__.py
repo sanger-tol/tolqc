@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from .base import db, Base  # noqa
+from .. import marshmallow # noqa
 
 from .tolqc_user import TolqcUser  # noqa
 from .tolqc_role import TolqcRole  # noqa

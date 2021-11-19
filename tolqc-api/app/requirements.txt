@@ -8,9 +8,11 @@ python_dateutil == 2.8.1
 setuptools == 53.0.0
 Werkzeug == 1.0.1
 Flask-SQLAlchemy == 2.4.4
+flask-marshmallow == 0.14.0
 psycopg2-binary == 2.8.6
 responses
 jwt
+flask-restx==0.2.0
 
 flask_testing==0.8.0
 coverage>=4.0.3
