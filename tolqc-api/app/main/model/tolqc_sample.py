@@ -16,5 +16,5 @@ class TolqcSample(Base):
     accession_id = db.Column(db.String())
     changed = db.Column(db.DateTime())
     current = db.Column(db.DateTime())
-    specimen = db.relationship("TolqcSpecimen", back_populates="sample")
+    specimen = db.relationship("TolqcSpecimen", back_populates="sample", foreign_keys=[specimen_id])
     seq = db.relationship("TolqcSeq", back_populates="sample")

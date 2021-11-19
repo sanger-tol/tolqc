@@ -16,4 +16,4 @@ class TolqcLibrary(Base):
     changed = db.Column(db.DateTime())
     current = db.Column(db.DateTime())
     seq = db.relationship("TolqcSeq", back_populates="library")
-    library_type = db.relationship("TolqcLibraryType", back_populates="library")
+    library_type = db.relationship("TolqcLibraryType", back_populates="library", foreign_keys=[library_type_id])
