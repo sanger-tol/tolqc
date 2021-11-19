@@ -10,6 +10,7 @@ import connexion
 from main import encoder
 from main.model import db
 
+
 def application():
     app = connexion.App(__name__, specification_dir='./swagger/')
     app.app.json_encoder = encoder.JSONEncoder
@@ -18,14 +19,5 @@ def application():
     app.app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
     app.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app.app)
-
-    ## testing code
-    from main.model.tolqc_centre import TolqcCentre
-    import logging
-    t = TolqcCentre()
-    t.centre_id = 0
-    t.name = "darn"
-    t.hierarchy_name = "gosh darn it"
-    logging.warning(t.to_dict())
-
+    
     return app

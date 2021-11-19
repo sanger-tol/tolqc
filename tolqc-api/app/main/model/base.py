@@ -19,7 +19,7 @@ class Base(db.Model):
             return flask_fields.Integer
         if column_type == db.String:
             return flask_fields.String
-        
+
         # throw not implemented exception
         raise NotImplementedError(
             f"The column type '{column_type}' is not yet implemented."
@@ -28,17 +28,16 @@ class Base(db.Model):
     @classmethod
     def get_api_schema(cls):
         columns = list(cls.__table__.c)
-        return {c.key : cls._column_to_flask_type(c) for c in columns}
-    
+        return {c.key: cls._column_to_flask_type(c) for c in columns}
+
     def _column_to_json_value(self, column):
         type = column.type.python_type
         name = column.name
         return type(getattr(self, name))
 
-
     def to_dict(self):
         columns = list(self.__table__.c)
-        return {c.key : self._column_to_json_value(c) for c in columns}
+        return {c.key: self._column_to_json_value(c) for c in columns}
 
     def add(self):
         db.session.add(self)
@@ -66,4 +65,3 @@ class Base(db.Model):
     def bulk_update(data):
         db.session.add_all(data)
         db.session.commit()
-
