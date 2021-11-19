@@ -31,9 +31,9 @@ class Base(db.Model):
         return {c.key: cls._column_to_flask_type(c) for c in columns}
 
     def _column_to_json_value(self, column):
-        type = column.type.python_type
+        python_type = column.type.python_type
         name = column.name
-        return type(getattr(self, name))
+        return python_type(getattr(self, name))
 
     def to_dict(self):
         columns = list(self.__table__.c)
