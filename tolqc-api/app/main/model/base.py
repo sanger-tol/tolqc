@@ -2,14 +2,30 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_sqlalchemy import SQLAlchemy, inspect
+from abc import ABC, abstractmethod
+
+from flask_sqlalchemy import SQLAlchemy
 from flask_restx import fields as flask_fields
 
 db = SQLAlchemy()
 
 
-class Base(db.Model):
+def populate_once(populate_columns):
+    def wrapper(cls, *args, **kwargs):
+        # check if already populated
+        if cls.populated:
+            return
+        # indicate that population has occured
+        cls.populated = True
+        # populate the model's columns
+        return populate_columns(cls, *args, **kwargs)
+    return wrapper
+
+
+class Base(ABC, db.Model):
     __abstract__ = True
+    schema = {}
+    populated = False
 
     @classmethod
     def _column_to_flask_field(self, column):
@@ -22,9 +38,14 @@ class Base(db.Model):
     
     @classmethod
     def get_api_schema(cls):
-        columns = [column for column in inspect(cls).mapper.column_attrs]
-        schema = {column.name : cls._column_to_flask_field(column) for column in columns}
-        return schema
+        return cls.schema
+    
+    @classmethod
+    def add_column(cls, column_name, *args, in_schema=True, **kwargs):
+        locals()[column_name] = db.Column(*args, **kwargs)
+
+        if in_schema == True:
+            cls.schema[column_name] = cls._column_to_flask_field(args[0])
 
     def to_dict(cls):
         return {"override": "this"}

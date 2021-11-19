@@ -2,11 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .base import Base, db, populate_once
 
 
 class TolqcCentre(Base):
     __tablename__ = "centre"
-    centre_id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String())
-    hierarchy_name = db.Column(db.String())
+
+    @populate_once
+    @classmethod
+    def populate_columns(cls):
+        cls.add_column("centre_id", db.Integer(),
+                       in_schema=False, primary_key=True)
+        cls.add_column("name", db.String())
+        cls.add_column("hierarchy_name", db.String())
+
+TolqcCentre.populate_columns()
