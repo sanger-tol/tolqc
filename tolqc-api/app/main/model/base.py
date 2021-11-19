@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_sqlalchemy import SQLAlchemy, inspect
+from flask_sqlalchemy import SQLAlchemy
 from flask_restx import fields as flask_fields
 
 db = SQLAlchemy()
@@ -12,7 +12,7 @@ class Base(db.Model):
     __abstract__ = True
 
     @classmethod
-    def _column_to_flask_field(self, column):
+    def _column_to_flask_type(self, column):
         column_type = type(column)
 
         if column_type == db.Integer:
@@ -26,31 +26,19 @@ class Base(db.Model):
         )
 
     @classmethod
-    def _get_columns(cls):
-        return inspect(cls).mapper.column_attrs
-    
-    @classmethod
     def get_api_schema(cls):
-        columns = cls._get_columns()
-        return {c.name : cls._column_to_flask_field(c) for c in columns}
+        columns = list(cls.__table__.c)
+        return {c.key : cls._column_to_flask_type(c) for c in columns}
     
-    @classmethod
-    def _column_to_json_field(self, column):
-        column_type = type(column)
+    def _column_to_json_value(self, column):
+        type = column.type.python_type
+        name = column.name
+        return type(getattr(self, name))
 
-        if column_type == db.Integer:
-            return int(column)
-        if column_type == db.String:
-            return str(column)
-        
-        # throw not implemented exception
-        raise NotImplementedError(
-            f"The column type '{column_type}' is not yet implemented."
-        )
 
     def to_dict(self):
-        columns = self._get_columns()
-        return {c.name : self._column_to_json_field(c) for c in columns}
+        columns = list(self.__table__.c)
+        return {c.key : self._column_to_json_value(c) for c in columns}
 
     def add(self):
         db.session.add(self)
