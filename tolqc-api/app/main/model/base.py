@@ -19,16 +19,38 @@ class Base(db.Model):
             return flask_fields.Integer
         if column_type == db.String:
             return flask_fields.String
+        
+        # throw not implemented exception
+        raise NotImplementedError(
+            f"The column type '{column_type}' is not yet implemented."
+        )
+
+    @classmethod
+    def _get_columns(cls):
+        return inspect(cls).mapper.column_attrs
     
     @classmethod
     def get_api_schema(cls):
-        columns = inspect(cls).mapper.column_attrs
-        schema = {c.name : cls._column_to_flask_field(c) for c in columns}
-        
-        return schema
+        columns = cls._get_columns()
+        return {c.name : cls._column_to_flask_field(c) for c in columns}
+    
+    @classmethod
+    def _column_to_json_field(self, column):
+        column_type = type(column)
 
-    def to_dict(cls):
-        return {"override": "this"}
+        if column_type == db.Integer:
+            return int(column)
+        if column_type == db.String:
+            return str(column)
+        
+        # throw not implemented exception
+        raise NotImplementedError(
+            f"The column type '{column_type}' is not yet implemented."
+        )
+
+    def to_dict(self):
+        columns = self._get_columns()
+        return {c.name : self._column_to_json_field(c) for c in columns}
 
     def add(self):
         db.session.add(self)

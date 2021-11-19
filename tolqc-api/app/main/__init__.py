@@ -13,7 +13,7 @@ from main.model import db
 def application():
     app = connexion.App(__name__, specification_dir='./swagger/')
     app.app.json_encoder = encoder.JSONEncoder
-    app.add_api('swagger.yaml', arguments={'title': 'Tree of Life ToLID API'},
+    app.add_api('swagger.yaml', arguments={'title': 'Tree of Life Quality Control API'},
                 pythonic_params=True)
     app.app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
     app.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
