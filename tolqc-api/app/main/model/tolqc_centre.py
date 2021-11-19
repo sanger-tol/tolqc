@@ -10,3 +10,4 @@ class TolqcCentre(Base):
     centre_id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
+    run = db.relationship("TolqcRun", back_populates="centre")

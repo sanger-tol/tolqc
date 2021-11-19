@@ -10,3 +10,4 @@ class TolqcPlatform(Base):
     platform_id = db.Column(db.String(), primary_key=True)
     name = db.Column(db.String())
     model = db.Column(db.String())
+    run = db.relationship("TolqcRun", back_populates="platform")

@@ -12,3 +12,4 @@ class TolqcLibraryType(Base):
     hierarchy_name = db.Column(db.String())
     kit = db.Column(db.String())
     enzyme = db.Column(db.String())
+    library = db.relationship("TolqcLibrary", back_populates="library_type")

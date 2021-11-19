@@ -13,3 +13,4 @@ class TolqcProject(Base):
     description = db.Column(db.String())
     lims_id = db.Column(db.String())
     accession_id = db.Column(db.Integer())
+    allocation = db.relationship("TolqcAllocation", back_populates="project")
