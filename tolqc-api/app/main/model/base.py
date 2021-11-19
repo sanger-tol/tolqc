@@ -10,7 +10,6 @@ db = SQLAlchemy()
 
 class Base(db.Model):
     __abstract__ = True
-    schema = {}
     schema_exclude = []
 
     @classmethod
