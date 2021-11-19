@@ -10,7 +10,6 @@ db = SQLAlchemy()
 
 class Base(db.Model):
     __abstract__ = True
-    api_exclude = []
 
     @classmethod
     def _column_to_flask_field(self, column):
@@ -23,8 +22,7 @@ class Base(db.Model):
     
     @classmethod
     def get_api_schema(cls):
-        # get all columns except those that shouldn't be in the schema
-        columns = [c for c in inspect(cls.mapper.column_attrs) if c not in cls.api_exclude]
+        columns = inspect(cls).mapper.column_attrs
         schema = {c.name : cls._column_to_flask_field(c) for c in columns}
         
         return schema
