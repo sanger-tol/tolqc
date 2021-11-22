@@ -90,7 +90,7 @@ deploy-staging:
     name: staging
     url: https://qc-staging.tol.sanger.ac.uk
   variables:
-    DOCKER_HOST: "ssh://ubuntu@172.27.21.233"
+    DOCKER_HOST: "ssh://ubuntu@172.27.26.124"
     EXTRA_DEPLOY_FILES: "-c docker-compose.gitlab-logging.yml"
     STACK_NAME: tolqc
   script:
@@ -104,7 +104,7 @@ deploy-production:
     name: production
     url: https://qc.tol.sanger.ac.uk/
   variables:
-    DOCKER_HOST: "ssh://ubuntu@172.27.18.201"
+    DOCKER_HOST: "ssh://ubuntu@172.27.26.62"
     EXTRA_DEPLOY_FILES: "-c docker-compose.gitlab-logging.yml"
     STACK_NAME: tolqc
   script:
