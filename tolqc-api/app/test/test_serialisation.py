@@ -15,7 +15,7 @@ class TestSerialisation(BaseTestCase):
 
         expected = dict(
             name = "A good name",
-            hieararchy_name = "A brilliant hierarchy name",
+            hierarchy_name = "A brilliant hierarchy name",
             centre_id = 101
         )
         received = test_tolqc_centre.to_dict()
