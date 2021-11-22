@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from flask_sqlalchemy import SQLAlchemy
-from flask_restx import fields as flask_fields
+from marshmallow_jsonapi import fields
 
 db = SQLAlchemy()
 
@@ -12,13 +12,17 @@ class Base(db.Model):
     __abstract__ = True
 
     @classmethod
+    def _get_columns(cls):
+        return list(cls.__table__.c)
+
+    @classmethod
     def _column_to_flask_type(self, column):
         column_type = type(column)
 
         if column_type == db.Integer:
-            return flask_fields.Integer
+            return fields.Integer
         if column_type == db.String:
-            return flask_fields.String
+            return fields.String
 
         # throw not implemented exception
         raise NotImplementedError(
@@ -27,8 +31,8 @@ class Base(db.Model):
 
     @classmethod
     def get_api_schema(cls):
-        columns = list(cls.__table__.c)
-        return {c.key: cls._column_to_flask_type(c) for c in columns}
+        columns = cls._get_columns()
+        return {c.name: cls._column_to_flask_type(c) for c in columns}
 
     def _column_to_json_value(self, column):
         python_type = column.type.python_type
@@ -36,8 +40,8 @@ class Base(db.Model):
         return python_type(getattr(self, name))
 
     def to_dict(self):
-        columns = list(self.__table__.c)
-        return {c.key: self._column_to_json_value(c) for c in columns}
+        columns = self._get_columns()
+        return {c.name: self._column_to_json_value(c) for c in columns}
 
     def add(self):
         db.session.add(self)
