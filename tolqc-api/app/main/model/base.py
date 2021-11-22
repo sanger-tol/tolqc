@@ -16,7 +16,7 @@ class Base(db.Model):
         return list(cls.__table__.c)
 
     @classmethod
-    def _column_to_flask_type(self, column):
+    def _column_to_flask_type(cls, column):
         column_type = type(column)
 
         if column_type == db.Integer:

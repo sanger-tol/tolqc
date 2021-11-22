@@ -1,5 +1,10 @@
+# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
 from main.model.tolqc_centre import TolqcCentre
 from test import BaseTestCase
+
 
 class TestSerialisation(BaseTestCase):
     def test_tolqc_centre(self):
