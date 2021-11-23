@@ -16,7 +16,7 @@ function Home() {
           <Container>
             <h1 className="masthead-heading mb-0">ToLQC</h1>
             <h2 className="masthead-subheading mb-0">Tree of Life QC</h2>
-            <a href="api/v1/ui/" className="btn btn-primary btn-xl rounded-pill mt-5">Use the API</a>
+            <a href="api/v1/ui" className="btn btn-primary btn-xl rounded-pill mt-5">Use the API</a>
             <a href="https://tolqc.cog.sanger.ac.uk" className="btn btn-primary btn-xl rounded-pill mt-5">View the UI</a>
           </Container>
         </div>
