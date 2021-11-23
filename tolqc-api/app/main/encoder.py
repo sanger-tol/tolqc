@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from connexion.apps.flask_app import FlaskJSONEncoder
+from flask.json import JSONEncoder as FlaskJSONEncoder
 from main.model import Base
 
 
