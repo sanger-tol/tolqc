@@ -12,7 +12,7 @@ class TolqcSpecimen(Base):
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
     species_row_id = db.Column(db.Integer(), db.ForeignKey("species.row_id"),
-                           nullable=False)
+                               nullable=False)
     lims_id = db.Column(db.Integer())
     supplier_name = db.Column(db.String())
     accession_id = db.Column(db.Integer())
@@ -24,5 +24,6 @@ class TolqcSpecimen(Base):
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
     allocation = db.relationship("TolqcAllocation", back_populates="specimen")
-    species = db.relationship("TolqcSpecies", back_populates="specimen", foreign_keys=[species_row_id])
+    species = db.relationship("TolqcSpecies", back_populates="specimen",
+                              foreign_keys=[species_row_id])
     sample = db.relationship("TolqcSample", back_populates="specimen")

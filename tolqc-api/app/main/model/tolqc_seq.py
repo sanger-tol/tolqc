@@ -12,12 +12,12 @@ class TolqcSeq(Base):
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
     sample_row_id = db.Column(db.Integer(), db.ForeignKey("sample.row_id"),
-                          nullable=False)
+                              nullable=False)
     library_row_id = db.Column(db.Integer(), db.ForeignKey("library.row_id"),
-                           nullable=False)
+                               nullable=False)
     accession_id = db.Column(db.Integer())
-    run_row_id = db.Column(db.Integer(), db.ForeignKey("run.row_id"), 
-                       nullable=False)
+    run_row_id = db.Column(db.Integer(), db.ForeignKey("run.row_id"),
+                           nullable=False)
     processed = db.Column(db.Integer())
     tag1_id = db.Column(db.String())
     tag2_id = db.Column(db.String())
