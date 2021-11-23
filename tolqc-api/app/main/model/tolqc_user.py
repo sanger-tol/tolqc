@@ -10,9 +10,9 @@ class TolqcUser(Base):
     user_id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), nullable=False, unique=True)
-    organisation = db.Column(db.String(), nullable=True)
-    api_key = db.Column(db.String(), nullable=True, unique=True)
-    token = db.Column(db.String(), nullable=True, unique=True)
+    organisation = db.Column(db.String())
+    api_key = db.Column(db.String(), unique=True)
+    token = db.Column(db.String(), unique=True)
     roles = db.relationship('TolqcRole', lazy=False, back_populates="user")
 
     def to_dict(cls):

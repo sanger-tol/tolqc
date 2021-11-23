@@ -9,8 +9,8 @@ class TolqcSample(Base):
     __tablename__ = "sample"
     row_id = db.Column(db.Integer(), primary_key=True)
     sample_id = db.Column(db.Integer(), nullable=False)
-    name = db.Column(db.String())
-    hierarchy_name = db.Column(db.String())
+    name = db.Column(db.String(), nullable=False)
+    hierarchy_name = db.Column(db.String(), nullable=False)
     lims_id = db.Column(db.Integer())
     specimen_row_id = db.Column(db.Integer(), db.ForeignKey("specimen.row_id"),
                             nullable=False)

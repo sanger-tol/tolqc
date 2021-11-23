@@ -9,8 +9,8 @@ class TolqcSeq(Base):
     __tablename__ = "seq"
     row_id = db.Column(db.Integer(), primary_key=True)
     seq_id = db.Column(db.Integer(), nullable=False)
-    name = db.Column(db.String())
-    hierarchy_name = db.Column(db.String())
+    name = db.Column(db.String(), nullable=False)
+    hierarchy_name = db.Column(db.String(), nullable=False)
     sample_row_id = db.Column(db.Integer(), db.ForeignKey("sample.row_id"),
                           nullable=False)
     library_row_id = db.Column(db.Integer(), db.ForeignKey("library.row_id"),

@@ -9,8 +9,8 @@ class TolqcSpecies(Base):
     __tablename__ = "species"
     row_id = db.Column(db.Integer(), primary_key=True)
     species_id = db.Column(db.Integer(), nullable=False)
-    name = db.Column(db.String())
-    hierarchy_name = db.Column(db.String())
+    name = db.Column(db.String(), nullable=False)
+    hierarchy_name = db.Column(db.String(), nullable=False)
     strain = db.Column(db.String())
     common_name = db.Column(db.String())
     taxon_id = db.Column(db.Integer())

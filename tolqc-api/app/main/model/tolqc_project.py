@@ -8,8 +8,8 @@ from .base import Base, db
 class TolqcProject(Base):
     __tablename__ = "project"
     project_id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String())
-    hierarchy_name = db.Column(db.String())
+    name = db.Column(db.String(), nullable=False)
+    hierarchy_name = db.Column(db.String(), nullable=False)
     description = db.Column(db.String())
     lims_id = db.Column(db.Integer())
     accession_id = db.Column(db.Integer())

@@ -9,8 +9,8 @@ class TolqcSpecimen(Base):
     __tablename__ = "specimen"
     row_id = db.Column(db.Integer(), primary_key=True)
     specimen_id = db.Column(db.Integer(), nullable=False)
-    name = db.Column(db.String())
-    hierarchy_name = db.Column(db.String())
+    name = db.Column(db.String(), nullable=False)
+    hierarchy_name = db.Column(db.String(), nullable=False)
     species_row_id = db.Column(db.Integer(), db.ForeignKey("species.row_id"),
                            nullable=False)
     lims_id = db.Column(db.Integer())
