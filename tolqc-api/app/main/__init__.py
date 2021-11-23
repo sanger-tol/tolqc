@@ -52,7 +52,7 @@ def _add_resources():
 def application():
     app = Flask(__name__)
     app.config["DEPLOYMENT_ENVIRONMENT"] = _get_environment()
-    blueprint = Blueprint('api', __name__, url_prefix='/api')
+    blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
     _setup_api(blueprint, app)
     _add_resources()
     app.register_blueprint(blueprint)
