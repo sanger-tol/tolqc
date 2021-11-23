@@ -29,6 +29,10 @@ http {
 			proxy_pass ${TOLQC_API_LOCATION};
 		}
 
+		location ^~ /swaggerui {
+			proxy_pass ${TOLQC_API_LOCATION};
+		}
+
 		location = /favicon.ico {
 			log_not_found off;
 			access_log off;
