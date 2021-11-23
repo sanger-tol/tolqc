@@ -8,13 +8,16 @@ from .base import Base, db
 class TolqcSeq(Base):
     __tablename__ = "seq"
     row_id = db.Column(db.Integer(), primary_key=True)
-    seq_id = db.Column(db.Integer())
+    seq_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
-    sample_id = db.Column(db.Integer(), db.ForeignKey("sample.sample_id"))
-    library_id = db.Column(db.Integer(), db.ForeignKey("library.library_id"))
+    sample_row_id = db.Column(db.Integer(), db.ForeignKey("sample.row_id"),
+                          nullable=False)
+    library_row_id = db.Column(db.Integer(), db.ForeignKey("library.row_id"),
+                           nullable=False)
     accession_id = db.Column(db.Integer())
-    run_id = db.Column(db.Integer(), db.ForeignKey("run.run_id"))
+    run_row_id = db.Column(db.Integer(), db.ForeignKey("run.row_id"), 
+                       nullable=False)
     processed = db.Column(db.Integer())
     tag1_id = db.Column(db.String())
     tag2_id = db.Column(db.String())
@@ -26,6 +29,6 @@ class TolqcSeq(Base):
     date = db.Column(db.DateTime())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    sample = db.relationship("TolqcSample", back_populates="seq", foreign_keys=[sample_id])
-    library = db.relationship("TolqcLibrary", back_populates="seq", foreign_keys=[library_id])
-    run = db.relationship("TolqcRun", back_populates="seq", foreign_keys=[run_id])
+    sample = db.relationship("TolqcSample", back_populates="seq", foreign_keys=[sample_row_id])
+    library = db.relationship("TolqcLibrary", back_populates="seq", foreign_keys=[library_row_id])
+    run = db.relationship("TolqcRun", back_populates="seq", foreign_keys=[run_row_id])
