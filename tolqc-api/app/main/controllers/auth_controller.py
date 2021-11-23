@@ -12,7 +12,11 @@ from jwt import (
 from jwt.exceptions import (
     JWTDecodeError,
 )
-from connexion.exceptions import OAuthProblem
+
+
+class OAuthProblem(Exception):
+    # implement this
+    pass
 
 
 def apikey_auth(token, required_scopes):

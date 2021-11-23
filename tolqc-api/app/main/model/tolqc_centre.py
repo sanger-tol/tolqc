@@ -11,3 +11,7 @@ class TolqcCentre(Base):
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
     run = db.relationship("TolqcRun", back_populates="centre")
+
+    @classmethod
+    def find_by_centre_id(cls, _centre_id):
+        return cls.query.filter_by(centre_id=_centre_id).one_or_none()

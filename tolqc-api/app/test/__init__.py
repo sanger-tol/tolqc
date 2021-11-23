@@ -2,13 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-import logging
-
-import connexion
+from main import application
 from flask_testing import TestCase
-import os
-
-from main.encoder import JSONEncoder
 
 from main.model import db, TolqcUser, TolqcRole
 
@@ -37,12 +32,4 @@ class BaseTestCase(TestCase):
         db.session.commit()
 
     def create_app(self):
-        logging.getLogger('connexion').setLevel('ERROR')
-        logging.getLogger('openapi_spec_validator').setLevel('ERROR')
-        app = connexion.App(__name__, specification_dir='../main/swagger/')
-        app.app.json_encoder = JSONEncoder
-        app.add_api('swagger.yaml', pythonic_params=True)
-        app.app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
-        app.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        db.init_app(app.app)
-        return app.app
+        return application()
