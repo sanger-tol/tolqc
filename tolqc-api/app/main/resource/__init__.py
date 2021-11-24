@@ -4,3 +4,4 @@
 
 from .tolqc_centre_resource import TolqcCentreResource, centre_namespace # noqa
 from .tolqc_environment_resource import EnvironmentResource, environment_namespace # noqa
+from .tolqc_run_resource import TolqcRunResource, run_namespace # noqa

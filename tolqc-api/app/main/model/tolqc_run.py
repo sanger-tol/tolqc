@@ -8,7 +8,8 @@ from .tolqc_centre import TolqcCentre
 
 class TolqcRun(Base):
     __tablename__ = "run"
-    row_id = db.Column(db.Integer(), primary_key=True)
+    # the row id
+    id = db.Column(db.Integer(), primary_key=True)
     run_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
@@ -23,3 +24,7 @@ class TolqcRun(Base):
     #seq = db.relationship("TolqcSeq", back_populates="run")
     #platform = db.relationship("TolqcPlatform", back_populates="run")#, foreign_keys="[TolqcPlatform.platform_id]")
     centre = db.relationship(TolqcCentre, back_populates="run", foreign_keys=[centre_id])#, foreign_keys="[TolqcCentre.id]")
+
+    @classmethod
+    def find_by_id(cls, _id):
+        return cls.query.filter_by(id=_id).one_or_none()

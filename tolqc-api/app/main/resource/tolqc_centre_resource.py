@@ -4,8 +4,8 @@
 
 from flask_restx import Resource, Namespace
 
-from main.model.tolqc_centre import TolqcCentre
-from main.schema.tolqc_centre_schema import TolqcCentreSchema
+from main.model import TolqcCentre
+from main.schema import TolqcCentreSchema
 
 
 centre_namespace = Namespace('centre', description='Centre related methods')
