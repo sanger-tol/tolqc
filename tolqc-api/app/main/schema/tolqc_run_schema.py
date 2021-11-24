@@ -2,8 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from marshmallow_jsonapi import fields, Schema
+from .base_schema import BaseSchema
+from main.model import TolqcRun
 
 
-class TolqcRunSchema(Schema):
-    pass
+class TolqcRunSchema(BaseSchema):
+    class Meta:
+        type_ = 'runs'
+        strict = True
+        model = TolqcRun
+        include_fk = True

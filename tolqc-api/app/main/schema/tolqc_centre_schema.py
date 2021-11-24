@@ -11,3 +11,4 @@ class TolqcCentreSchema(BaseSchema):
         type_ = 'centres'
         strict = True
         model = TolqcCentre
+        include_fk = True
