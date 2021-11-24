@@ -39,3 +39,7 @@ class Base(db.Model):
     def bulk_update(data):
         db.session.add_all(data)
         db.session.commit()
+    
+    @classmethod
+    def find_by_id(cls, _id):
+        return cls.query.filter_by(id=_id).one_or_none()

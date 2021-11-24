@@ -2,25 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Resource, Namespace
+from flask_restx import Namespace
 
-from main.model import TolqcCentre
 from main.schema import TolqcCentreSchema
+from .base import BaseResource
 
 
 centre_namespace = Namespace('centre', description='Centre related methods')
 
 
-centre_schema = TolqcCentreSchema()
-
-
-class TolqcCentreResource(Resource):
-    @centre_namespace.doc('Get a Centre by its ID')
-    def get(self, id):
-        _centre = TolqcCentre.find_by_centre_id(id)
-        if _centre is None:
-            return {
-                "error": f"Centre with id '{id}' not found"
-            }, 404
-
-        return centre_schema.dump(_centre), 200
+class TolqcCentreResource(BaseResource):
+    name = 'centre'
+    schema = TolqcCentreSchema()
