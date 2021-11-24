@@ -2,40 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_sqlalchemy import SQLAlchemy
+from .core_base import CoreBase, db
+from sqlalchemy.ext.declarative import declared_attr
 
-db = SQLAlchemy()
-
-
-class Base(db.Model):
+class Base(CoreBase):
     __abstract__ = True
 
-    def to_dict(cls):
-        return {"override": "this"}
-
-    def add(self):
-        db.session.add(self)
-
-    def update(self, data):
-        for key, item in data.items():
-            setattr(self, key, item)
-
-    def delete(self):
-        db.session.delete(self)
-
-    @classmethod
-    def commit(cls):
-        db.session.commit()
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    @staticmethod
-    def rollback():
-        db.session.rollback()
-
-    @staticmethod
-    def bulk_update(data):
-        db.session.add_all(data)
-        db.session.commit()
+    @declared_attr
+    def created_by(cls):
+      return db.Column(db.Integer, db.ForeignKey('user.user_id'),
+                       nullable=False)

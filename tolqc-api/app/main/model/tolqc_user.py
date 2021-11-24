@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .core_base import CoreBase, db
 
 
-class TolqcUser(Base):
+class TolqcUser(CoreBase):
     __tablename__ = "user"
     user_id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
