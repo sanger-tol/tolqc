@@ -7,11 +7,11 @@ from .base import Base, db
 
 class TolqcSpecimen(Base):
     __tablename__ = "specimen"
-    row_id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     specimen_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    species_row_id = db.Column(db.Integer(), db.ForeignKey("species.row_id"),
+    species_instance_id = db.Column(db.Integer(), db.ForeignKey("species.id"),
                                nullable=False)
     lims_id = db.Column(db.Integer())
     supplier_name = db.Column(db.String())
@@ -25,5 +25,5 @@ class TolqcSpecimen(Base):
     current = db.Column(db.Boolean())
     allocation = db.relationship("TolqcAllocation", back_populates="specimen")
     species = db.relationship("TolqcSpecies", back_populates="specimen",
-                              foreign_keys=[species_row_id])
+                              foreign_keys=[species_instance_id])
     sample = db.relationship("TolqcSample", back_populates="specimen")

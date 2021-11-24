@@ -20,7 +20,7 @@ class BaseTestCase(TestCase):
     def setUp(self):
         self.maxDiff = None
         db.create_all()
-        user1 = TolqcUser(user_id=100,
+        user1 = TolqcUser(id=100,
                           name="test_user_admin",
                           email="test_user_admin@sanger.ac.uk",
                           organisation="Sanger Institute",

@@ -11,5 +11,5 @@ class Base(CoreBase):
 
     @declared_attr
     def created_by(cls):
-        return db.Column(db.Integer, db.ForeignKey('user.user_id'),
+        return db.Column(db.Integer, db.ForeignKey('user.id'),
                          nullable=False)
