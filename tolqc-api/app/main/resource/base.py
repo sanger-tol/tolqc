@@ -18,7 +18,7 @@ def check_allowed(function):
     return wrapper
 
 
-class BaseResource(Resource):
+class BaseDetailResource(Resource):
     disallowed_methods = []
 
     @check_allowed
@@ -28,5 +28,4 @@ class BaseResource(Resource):
             return {
                 "error": f"{self.name} with id '{id}' not found"
             }, 404
-
         return self.schema.dump(_obj), 200

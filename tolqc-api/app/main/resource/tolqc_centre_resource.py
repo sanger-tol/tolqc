@@ -5,12 +5,12 @@
 from flask_restx import Namespace
 
 from main.schema import TolqcCentreSchema
-from .base import BaseResource
+from .base import BaseDetailResource
 
 
 centre_namespace = Namespace('centre', description='Centre related methods')
 
 
-class TolqcCentreResource(BaseResource):
+class TolqcCentreResource(BaseDetailResource):
     name = 'centre'
     schema = TolqcCentreSchema()
