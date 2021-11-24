@@ -2,26 +2,32 @@
 #
 # SPDX-License-Identifier: MIT
 
+import logging
+
 from main.ma import ma
 
 
-# every child's Meta class must have a an id attribute
+# every child's Meta class must have an id attribute
 class IdNotSpecifiedException(Exception):
     def __init__(self, cls):
         self._cls = cls
+        logging.error(self._to_str())
 
-    def __repr__(self):
-        return "The schema class for model '%s' does not have a specified id" \
+    def _to_str(self):
+        return "The schema class for model '%s' does not" \
+               "have a specified id in nested class Meta" \
             % self._cls.Meta.model.__tablename__
 
 
-# every child's Meta class must have a an type attribute
+# every child's Meta class must have a type attribute
 class TypeNotSpecifiedException(Exception):
     def __init__(self, cls):
         self._cls = cls
+        logging.error(self._to_str())
 
-    def __repr__(self):
-        return "The schema class for model '%s' does not have a specified type_" \
+    def _to_str(self):
+        return "The schema class for model '%s' does not" \
+               "have a specified type_ in nested class Meta" \
             % self._cls.Meta.model.__tablename__
 
 
