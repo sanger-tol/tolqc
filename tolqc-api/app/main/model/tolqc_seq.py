@@ -16,8 +16,8 @@ class TolqcSeq(Base):
     library_row_id = db.Column(db.Integer(), db.ForeignKey("library.row_id"),
                                nullable=False)
     accession_id = db.Column(db.Integer())
-    run_row_id = db.Column(db.Integer(), db.ForeignKey("run.row_id"),
-                           nullable=False)
+    #run_row_id = db.Column(db.Integer(), db.ForeignKey("run.row_id"),
+    #                       nullable=False)
     processed = db.Column(db.Integer())
     tag1_id = db.Column(db.String())
     tag2_id = db.Column(db.String())
@@ -31,4 +31,4 @@ class TolqcSeq(Base):
     current = db.Column(db.Boolean())
     sample = db.relationship("TolqcSample", back_populates="seq", foreign_keys=[sample_row_id])
     library = db.relationship("TolqcLibrary", back_populates="seq", foreign_keys=[library_row_id])
-    run = db.relationship("TolqcRun", back_populates="seq", foreign_keys=[run_row_id])
+    #run = db.relationship("TolqcRun", back_populates="seq", foreign_keys=[run_row_id])

@@ -2,12 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model.tolqc_run import TolqcRun
-from main.ma import ma
+from marshmallow_jsonapi import fields, Schema
 
 
-class TolqcRunSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = TolqcRun
-        load_instance = True
-        include_fk = True
+class TolqcRunSchema(Schema):
+    pass

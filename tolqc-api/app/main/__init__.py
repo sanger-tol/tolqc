@@ -14,8 +14,6 @@ from main.model import db
 from main.resource import TolqcCentreResource, centre_namespace, \
                           EnvironmentResource, environment_namespace
 
-from .ma import ma
-
 
 def _get_environment():
     deployment_environment = os.getenv("ENVIRONMENT", "")
@@ -60,5 +58,4 @@ def application():
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
-    ma.init_app(app)
     return app
