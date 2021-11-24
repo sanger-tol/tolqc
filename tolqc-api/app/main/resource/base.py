@@ -4,6 +4,8 @@
 
 from flask_restx import Resource
 
+from marshmallow import ValidationError
+
 
 def check_allowed(function):
     def wrapper(obj, *args, **kwargs):
@@ -29,3 +31,17 @@ class BaseDetailResource(Resource):
                 "error": f"{self.name} with id '{id}' not found"
             }, 404
         return self.schema.dump(_obj), 200
+
+
+class BaseListResource(Resource):
+    disallowed_methods = []
+
+    @check_allowed
+    def post(self, data):
+        try:
+            _obj = self.schema.load(data)
+            return self.schema.dump(_obj), 200
+        except ValidationError as v_err:
+            return {
+                "errorMessages": v_err.messages
+            }, 400

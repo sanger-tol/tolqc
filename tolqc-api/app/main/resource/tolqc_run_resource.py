@@ -4,7 +4,7 @@
 
 from flask_restx import Namespace
 
-from .base import BaseDetailResource
+from .base import BaseDetailResource, BaseListResource
 from main.schema import TolqcRunSchema
 
 
@@ -16,4 +16,9 @@ run_namespace = Namespace(
 
 class TolqcRunResource(BaseDetailResource):
     name = "run"
+    schema = TolqcRunSchema()
+
+
+class TolqcRunListResource(BaseListResource):
+    name = "runs"
     schema = TolqcRunSchema()
