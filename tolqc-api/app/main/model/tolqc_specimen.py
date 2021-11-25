@@ -12,7 +12,7 @@ class TolqcSpecimen(Base):
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
     species_instance_id = db.Column(db.Integer(), db.ForeignKey("species.id"),
-                               nullable=False)
+                                    nullable=False)
     lims_id = db.Column(db.Integer())
     supplier_name = db.Column(db.String())
     accession_id = db.Column(db.Integer())
