@@ -25,3 +25,6 @@ class EnvironmentResource(Resource):
     @environment_namespace.doc('Gets the deployment environment string')
     def get(self):
         return {'environment': self._environment}, 200
+
+
+environment_namespace.add_resource(EnvironmentResource, '')

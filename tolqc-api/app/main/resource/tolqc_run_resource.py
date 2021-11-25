@@ -14,7 +14,8 @@ run_namespace = Namespace(
 )
 
 
-class TolqcRunResource(BaseDetailResource):
+class TolqcRunDetailResource(BaseDetailResource):
+    allowed_methods = ['get']
     name = "run"
     schema = TolqcRunSchema()
 
@@ -22,3 +23,7 @@ class TolqcRunResource(BaseDetailResource):
 class TolqcRunListResource(BaseListResource):
     name = "runs"
     schema = TolqcRunSchema()
+
+
+run_namespace.add_resource(TolqcRunDetailResource, '/<int:id>')
+run_namespace.add_resource(TolqcRunListResource, '')

@@ -11,9 +11,8 @@ from flask_restx import Api
 
 from main import encoder
 from main.model import db
-from main.resource import TolqcCentreResource, centre_namespace, \
-                          EnvironmentResource, environment_namespace, \
-                          TolqcRunResource, run_namespace
+from main.resource import centre_namespace, environment_namespace, \
+                          run_namespace
 
 
 def _get_environment():
@@ -44,18 +43,11 @@ def _setup_api(blueprint, app):
     api.add_namespace(environment_namespace)
 
 
-def _add_resources():
-    centre_namespace.add_resource(TolqcCentreResource, '/<int:id>')
-    run_namespace.add_resource(TolqcRunResource, '/<int:id>')
-    environment_namespace.add_resource(EnvironmentResource, '')
-
-
 def application():
     app = Flask(__name__)
     app.config["DEPLOYMENT_ENVIRONMENT"] = _get_environment()
     blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
     _setup_api(blueprint, app)
-    _add_resources()
     app.register_blueprint(blueprint)
     app.json_encoder = encoder.JSONEncoder
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']

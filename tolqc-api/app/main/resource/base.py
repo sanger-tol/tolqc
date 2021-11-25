@@ -11,17 +11,17 @@ def check_allowed(function):
     def wrapper(obj, *args, **kwargs):
         method = function.__name__
         resource = obj.name
-        if method in obj.disallowed_methods:
+        if method not in obj.allowed_methods:
             return {
-                "error": f"Method '{method}' is not an allowed" \
-                         f" method on resource {resource}."
+                "error": f"Method '{method}' is not allowed" \
+                         f" on resource '{resource}'."
             }, 405
         return function(obj, *args, **kwargs)
     return wrapper
 
 
 class BaseDetailResource(Resource):
-    disallowed_methods = []
+    allowed_methods = []
 
     @check_allowed
     def get(self, id):
@@ -31,17 +31,25 @@ class BaseDetailResource(Resource):
                 "error": f"{self.name} with id '{id}' not found"
             }, 404
         return self.schema.dump(_obj), 200
+    
+    @check_allowed
+    def patch(self, id, data):
+        pass
 
 
 class BaseListResource(Resource):
-    disallowed_methods = []
+    allowed_methods = []
+
+    @check_allowed
+    def get(self):
+        pass
 
     @check_allowed
     def post(self, data):
         try:
             _obj = self.schema.load(data)
             return self.schema.dump(_obj), 200
-        except ValidationError as v_err:
+        except ValidationError as validation_error:
             return {
-                "errorMessages": v_err.messages
+                "errorMessages": validation_error.messages
             }, 400

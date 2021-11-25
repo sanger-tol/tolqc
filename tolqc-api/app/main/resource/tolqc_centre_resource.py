@@ -11,7 +11,8 @@ from .base import BaseDetailResource, BaseListResource
 centre_namespace = Namespace('centre', description='Centre related methods')
 
 
-class TolqcCentreResource(BaseDetailResource):
+class TolqcCentreDetailResource(BaseDetailResource):
+    allowed_methods = ['get']
     name = 'centre'
     schema = TolqcCentreSchema()
 
@@ -19,3 +20,7 @@ class TolqcCentreResource(BaseDetailResource):
 class TolqcCentreListResource(BaseListResource):
     name = 'centres'
     schema = TolqcCentreSchema()
+
+
+centre_namespace.add_resource(TolqcCentreDetailResource, '/<int:id>')
+centre_namespace.add_resource(TolqcCentreListResource, '')
