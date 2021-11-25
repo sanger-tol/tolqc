@@ -2,25 +2,25 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Namespace
-
-from .base import BaseDetailResource, BaseListResource
+from .base import BaseDetailResource, BaseListResource, BaseNamespace
 from main.schema import TolqcRunSchema
 
 
-run_namespace = Namespace(
+run_namespace = BaseNamespace(
     'run',
     description='ToLQC-Run related methods',
 )
 
 
 class TolqcRunDetailResource(BaseDetailResource):
+    namespace = run_namespace
     allowed_methods = ['get']
     name = "run"
     schema = TolqcRunSchema()
 
 
 class TolqcRunListResource(BaseListResource):
+    namespace = run_namespace
     name = "runs"
     schema = TolqcRunSchema()
 
