@@ -13,7 +13,7 @@ class TolqcSample(Base):
     hierarchy_name = db.Column(db.String(), nullable=False)
     lims_id = db.Column(db.Integer())
     specimen_instance_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"),
-                                nullable=False)
+                                     nullable=False)
     accession_id = db.Column(db.Integer())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
