@@ -3,23 +3,34 @@
 # SPDX-License-Identifier: MIT
 
 from main.schema import TolqcCentreSchema
-from .base import BaseDetailResource, BaseListResource, BaseNamespace
+from flask_restx import Namespace, Resource
 
 
-centre_namespace = BaseNamespace('centre', description='Centre related methods')
+centre_namespace = Namespace('centre', description='Centre related methods')
+
+get_centre_model = centre_namespace.model(
+    'GET Centre Model',
+    TolqcCentreSchema.to_api_model_dict()
+)
+
+post_centre_model = centre_namespace.model(
+    'POST Centre Model',
+    TolqcCentreSchema.to_api_model_dict(
+        exclude_fields=['id']
+    )
+)
 
 
-class TolqcCentreDetailResource(BaseDetailResource):
-    namespace = centre_namespace
-    allowed_methods = ['get']
+class TolqcCentreDetailResource(Resource):
     name = 'centre'
-    schema = TolqcCentreSchema()
 
 
-class TolqcCentreListResource(BaseListResource):
-    namespace = centre_namespace
+class TolqcCentreListResource(Resource):
     name = 'centres'
-    schema = TolqcCentreSchema()
+
+    @centre_namespace.expect(post_centre_model)
+    def post(self, data):
+        pass
 
 
 centre_namespace.add_resource(TolqcCentreDetailResource, '/<int:id>')

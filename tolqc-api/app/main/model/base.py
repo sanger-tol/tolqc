@@ -43,3 +43,12 @@ class Base(db.Model):
     @classmethod
     def find_by_id(cls, _id):
         return cls.query.filter_by(id=_id).one_or_none()
+
+    @classmethod
+    def get_columns(cls):
+        return list(cls.__table__.c)
+    
+    @classmethod
+    def get_column_python_type(cls, column_name):
+        column = getattr(cls, column_name)
+        return column.type.python_type
