@@ -11,10 +11,12 @@ def check_allowed(function):
     def wrapper(obj, *args, **kwargs):
         method = function.__name__
         resource = obj.name
-        if method not in obj.allowed_methods:
+        allowed_methods = obj.allowed_methods
+        if method not in allowed_methods:
             return {
-                "error": f"Method '{method}' is not allowed" \
-                         f" on resource '{resource}'."
+                "error": f"Method '{method}' is not allowed"
+                         f" on resource '{resource}' - allowed "
+                         f"methods are '{', '.join(allowed_methods)}'."
             }, 405
         return function(obj, *args, **kwargs)
     return wrapper
