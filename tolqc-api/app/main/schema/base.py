@@ -8,6 +8,29 @@ from marshmallow_jsonapi import Schema, SchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema , \
                                    SQLAlchemyAutoSchemaOpts
 
+
+class DictFieldNotSpecifiedException(Exception):
+    def __init__(self):
+        print("dict_field was not specified in kwargs")
+
+
+class DictField(fields.Raw):
+    """Provides a field class that marshals to a dict"""
+    def __init__(self, *args, dict_field=None, **kwargs):
+        if dict_field is None:
+            raise DictFieldNotSpecifiedException()
+        self._dict_field = dict_field
+        super().__init__(*args, **kwargs)
+    def output(self, key, obj, *args, **kwargs):
+        return self._dict_field
+
+
+class IdExcludedOnJsonapiDictException(Exception):
+    def __init__(self, schema):
+        print("The field 'id' cannot be excluded" \
+              f", on schema {schema.Meta.type_}, " \
+              "for a JSON:API resource model dict.")
+
 class CombinedOpts(SQLAlchemyAutoSchemaOpts, SchemaOpts):
     pass
 
@@ -39,7 +62,7 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
         if python_type == int:
             return fields.Integer
         if python_type == str:
-            return fields.String
+            return fields.String(field)
         if python_type == bool:
             return fields.Boolean
         if python_type == datetime:
@@ -54,15 +77,42 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
 
 
     @classmethod
-    def to_api_model_dict(cls, exclude_fields=None):
-        fields = cls._get_fields(exclude_fields)
+    def to_dict(cls, exclude_fields=None):
+        fields = cls._get_fields(
+            exclude_fields=exclude_fields
+        )
         return {
             f: cls._get_field_model_type(f)
             for f in fields
         }
     
     @classmethod
-    def to_api_model_dict_exclude_id(cls):
-        return cls.to_api_model_dict(
+    def to_dict_exclude_id(cls):
+        return cls.to_dict(
             exclude_fields=['id']
         )
+    
+    @classmethod
+    def to_jsonapi_model_dict(cls, exclude_fields=None):
+        dict_schema = cls.to_dict(
+            exclude_fields=exclude_fields
+        )
+        id_field = dict_schema.pop('id', None)
+        if id_field == None:
+            raise IdExcludedOnJsonapiDictException(
+                cls
+            )
+        return {
+            "data": DictField(
+                dict_field={
+                    "type": cls.Meta.type_,
+                    "attributes": dict_schema,
+                    "id": id_field
+                }
+            )
+        }
+    
+    @classmethod
+    def get_by_id(cls, id):
+        model = cls.Meta.model
+        return model.find_by_id(id)
