@@ -72,6 +72,5 @@ class TolqcCentreListResource(Resource):
         ), 200
 
 
-
 centre_namespace.add_resource(TolqcCentreDetailResource, '/<int:id>')
 centre_namespace.add_resource(TolqcCentreListResource, '')

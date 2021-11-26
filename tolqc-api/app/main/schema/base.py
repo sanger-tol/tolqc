@@ -26,20 +26,20 @@ class RequestCombinedOpts(SQLAlchemyAutoSchemaOpts, SchemaOpts):
 
 class BaseRequestSchema(SQLAlchemyAutoSchema, Schema):
     """Used for request/input"""
-    
+
     OPTIONS_CLASS = RequestCombinedOpts
 
     def save_and_get_model(self, data):
         model = self.Meta.model(**data)
         model.save()
         return model
-    
+
     def get_by_id(self, id):
         model = self.Meta.model.find_by_id(id)
         if model is None:
             return None
         return self.dump(model)
-    
+
     @classmethod
     def _get_field_model_type(cls, field):
         model = cls.Meta.model
@@ -138,7 +138,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         raise NotImplementedError(
             "Type f'{python_type}' has not been implemented yet."
         )
-    
+
     # this is a lot of duplication, make a common class
     @classmethod
     def _get_fields(cls, exclude_fields=None):
@@ -153,7 +153,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             in all_fields
             if f not in exclude_fields
         ]
-    
+
     @classmethod
     def to_model_dict(cls, exclude_fields=None):
         """Returns a dict for a SchemaModel in JSON:API format"""
