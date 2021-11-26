@@ -5,15 +5,16 @@
 from datetime import datetime
 from flask_restx import fields
 from marshmallow_jsonapi import Schema, SchemaOpts
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema , \
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
 
 
 class IdExcludedOnJsonapiDictException(Exception):
     def __init__(self, schema):
-        print("The field 'id' cannot be excluded" \
-              f", on schema {schema.Meta.type_}, " \
+        print("The field 'id' cannot be excluded"
+              f", on schema {schema.Meta.type_}, "
               "for a JSON:API resource model dict.")
+
 
 class CombinedOpts(SQLAlchemyAutoSchemaOpts, SchemaOpts):
     pass
@@ -53,10 +54,9 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
             return fields.DateTime
         if python_type == float:
             return fields.Float
-        
+
         raise NotImplementedError(
-            "Type '%s' has not been implemented yet."
-                % python_type
+            f"Type '{python_type}' has not been implemented yet."
         )
 
     @classmethod
@@ -88,10 +88,9 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
                 'type': 'number',
                 'format': 'float'
             }
-        
+
         raise NotImplementedError(
-            "Type '%s' has not been implemented yet."
-                % python_type
+            "Type f'{python_type}' has not been implemented yet."
         )
 
     @classmethod
@@ -105,14 +104,14 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
             f: cls._get_field_model_type(f)
             for f in fields
         }
-    
+
     @classmethod
     def to_model_dict_exclude_id(cls):
         """Returns a dict for a Model excluding the ID"""
         return cls.to_model_dict(
             exclude_fields=['id']
         )
-    
+
     @classmethod
     def to_jsonapi_schema_model_dict(cls, exclude_fields=None):
         """Returns a dict for a SchemaModel in JSON:API format"""
@@ -124,9 +123,9 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
         }
 
         id_field = dict_schema.pop('id', None)
-        if id_field == None:
+        if id_field is None:
             raise IdExcludedOnJsonapiDictException(cls)
-        
+
         model_dict = {
             'required': ['data'],
             'properties': {
@@ -150,7 +149,7 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
             'type': 'object',
         }
         return model_dict
-    
+
     @classmethod
     def get_by_id(cls, id):
         model = cls.Meta.model
