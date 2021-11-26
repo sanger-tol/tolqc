@@ -42,4 +42,4 @@ def apikey_auth(token, required_scopes):
         except JWTDecodeError as e:
             raise OAuthProblem('Invalid Elixir token: '+e.args[0])
         print(payload)
-    return {"user": user.name, "uid": user.user_id}
+    return {"user": user.name, "uid": user.id}

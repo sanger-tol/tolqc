@@ -7,7 +7,7 @@ from .base import Base, db
 
 class TolqcProject(Base):
     __tablename__ = "project"
-    project_id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
     description = db.Column(db.String())

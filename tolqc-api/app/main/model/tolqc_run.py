@@ -13,7 +13,7 @@ class TolqcRun(Base):
     run_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    platform_id = db.Column(db.Integer(), db.ForeignKey("platform.platform_id"),
+    platform_id = db.Column(db.Integer(), db.ForeignKey("platform.id"),
                             nullable=False)
     centre_id = db.Column(db.Integer(), db.ForeignKey(TolqcCentre.id),
                           nullable=False)
@@ -24,7 +24,3 @@ class TolqcRun(Base):
     seq = db.relationship("TolqcSeq", back_populates="run")
     platform = db.relationship("TolqcPlatform", back_populates="run")
     centre = db.relationship(TolqcCentre, back_populates="run", foreign_keys=[centre_id])
-
-    @classmethod
-    def find_by_id(cls, _id):
-        return cls.query.filter_by(id=_id).one_or_none()

@@ -7,7 +7,7 @@ from .base import Base, db
 
 class TolqcPlatform(Base):
     __tablename__ = "platform"
-    platform_id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     model = db.Column(db.String(), nullable=False)
     run = db.relationship("TolqcRun", back_populates="platform")

@@ -7,12 +7,12 @@ from .base import Base, db
 
 class TolqcSample(Base):
     __tablename__ = "sample"
-    row_id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     sample_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
     lims_id = db.Column(db.Integer())
-    specimen_row_id = db.Column(db.Integer(), db.ForeignKey("specimen.row_id"),
+    specimen_row_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"),
                                 nullable=False)
     accession_id = db.Column(db.Integer())
     changed = db.Column(db.DateTime())

@@ -7,9 +7,9 @@ from .base import Base, db
 
 class TolqcRole(Base):
     __tablename__ = "role"
-    role_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship("TolqcUser", back_populates="roles",
                            uselist=False, foreign_keys=[user_id])
 
