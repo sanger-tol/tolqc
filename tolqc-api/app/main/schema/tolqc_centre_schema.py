@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base_schema import BaseSchema
+from .base import BaseSchema
 from main.model import TolqcCentre
 
 

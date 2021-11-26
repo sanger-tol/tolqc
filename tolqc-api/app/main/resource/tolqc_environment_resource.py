@@ -12,8 +12,8 @@ environment_namespace = Namespace(
 )
 
 
-environment = environment_namespace.model('Environment', {
-    'environment': fields.String("The environment string of the server"),
+environment_model = environment_namespace.model('Environment', {
+    'environment': fields.String("dev"),
 })
 
 
@@ -23,6 +23,11 @@ class EnvironmentResource(Resource):
         self._environment = app.config["DEPLOYMENT_ENVIRONMENT"]
 
     @environment_namespace.doc('Gets the deployment environment string')
+    @environment_namespace.response(
+        200,
+        description='Success',
+        model=environment_model,
+    )
     def get(self):
         return {'environment': self._environment}, 200
 

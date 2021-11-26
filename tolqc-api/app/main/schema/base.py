@@ -60,3 +60,9 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
             f: cls._get_field_model_type(f)
             for f in fields
         }
+    
+    @classmethod
+    def to_api_model_dict_exclude_id(cls):
+        return cls.to_api_model_dict(
+            exclude_fields=['id']
+        )

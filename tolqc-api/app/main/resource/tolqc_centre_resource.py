@@ -15,9 +15,7 @@ get_centre_model = centre_namespace.model(
 
 post_centre_model = centre_namespace.model(
     'POST Centre Model',
-    TolqcCentreSchema.to_api_model_dict(
-        exclude_fields=['id']
-    )
+    TolqcCentreSchema.to_api_model_dict_exclude_id()
 )
 
 
@@ -29,6 +27,15 @@ class TolqcCentreListResource(Resource):
     name = 'centres'
 
     @centre_namespace.expect(post_centre_model)
+    @centre_namespace.response(
+        200,
+        description='Success',
+        model=get_centre_model,
+    )
+    @centre_namespace.response(
+        400,
+        description='Error'
+    )
     def post(self, data):
         pass
 
