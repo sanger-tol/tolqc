@@ -109,11 +109,11 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
         dict_schema = cls.to_dict(
             exclude_fields=exclude_fields
         )
+        
         id_field = dict_schema.pop('id', None)
         if id_field == None:
-            raise IdExcludedOnJsonapiDictException(
-                cls
-            )
+            raise IdExcludedOnJsonapiDictException(cls)
+        
         model_dict = {
             'required': ['data'],
             'properties': {

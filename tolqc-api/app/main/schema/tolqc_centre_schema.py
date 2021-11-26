@@ -8,7 +8,7 @@ from main.model import TolqcCentre
 
 class TolqcCentreSchema(BaseSchema):
     class Meta:
-        type_ = 'centres'
+        type_ = 'centre'
         strict = True
         model = TolqcCentre
         include_fk = True

@@ -8,7 +8,7 @@ from main.model import TolqcRun
 
 class TolqcRunSchema(BaseSchema):
     class Meta:
-        type_ = 'runs'
+        type_ = 'run'
         strict = True
         model = TolqcRun
         include_fk = True
