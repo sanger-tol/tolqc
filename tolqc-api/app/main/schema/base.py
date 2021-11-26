@@ -3,22 +3,16 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
+from typing import Dict
 from flask_restx import fields
 from marshmallow_jsonapi import Schema, SchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema , \
                                    SQLAlchemyAutoSchemaOpts
 
 
-class DictFieldNotSpecifiedException(Exception):
-    def __init__(self):
-        print("dict_field was not specified in kwargs")
-
-
 class DictField(fields.Raw):
     """Provides a field class that marshals to a dict"""
-    def __init__(self, *args, dict_field=None, **kwargs):
-        if dict_field is None:
-            raise DictFieldNotSpecifiedException()
+    def __init__(self, dict_field, *args, **kwargs):
         self._dict_field = dict_field
         super().__init__(*args, **kwargs)
     def output(self, key, obj, *args, **kwargs):
@@ -51,6 +45,36 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
             in all_fields
             if f not in exclude_fields
         ]
+    
+    @classmethod
+    def _python_to_model_type(cls, python_type):
+        if python_type == int:
+            return {
+                'type': 'integer'
+            }
+        if python_type == str:
+            return {
+                'type': 'string'
+            }
+        if python_type == bool:
+            return {
+                'type': 'boolean'
+            }
+        if python_type == datetime:
+            return {
+                'type': 'string',
+                'format': 'date-time'
+            }
+        if python_type == float:
+            return {
+                'type': 'number',
+                'format': 'float'
+            }
+        
+        raise NotImplementedError(
+            "Type '%s' has not been implemented yet."
+                % python_type
+        )
 
     @classmethod
     def _get_field_model_type(cls, field):
@@ -59,20 +83,8 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
             field
         )
 
-        if python_type == int:
-            return fields.Integer
-        if python_type == str:
-            return fields.String(field)
-        if python_type == bool:
-            return fields.Boolean
-        if python_type == datetime:
-            return fields.DateTime
-        if python_type == float:
-            return fields.Float
-        
-        raise NotImplementedError(
-            "Type '%s' has not been implemented yet."
-                % python_type
+        return cls._python_to_model_type(
+            python_type
         )
 
 
@@ -93,7 +105,7 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
         )
     
     @classmethod
-    def to_jsonapi_model_dict(cls, exclude_fields=None):
+    def to_jsonapi_schema_model_dict(cls, exclude_fields=None):
         dict_schema = cls.to_dict(
             exclude_fields=exclude_fields
         )
@@ -102,15 +114,28 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
             raise IdExcludedOnJsonapiDictException(
                 cls
             )
-        return {
-            "data": DictField(
-                dict_field={
-                    "type": cls.Meta.type_,
-                    "attributes": dict_schema,
-                    "id": id_field
-                }
-            )
+        model_dict = {
+            'required': ['data'],
+            'properties': {
+                "data": {
+                    'required': ['type', 'attributes', 'id'],
+                    'properties': {
+                        "type": cls._python_to_model_type(
+                            str
+                        ),
+                        "attributes": {
+                            'required': list(dict_schema.keys()),
+                            'properties': dict_schema,
+                            'type': 'object',
+                        },
+                        "id": id_field,
+                    },
+                    'type': 'object',
+                },
+            },
+            'type': 'object',
         }
+        return model_dict
     
     @classmethod
     def get_by_id(cls, id):
