@@ -13,10 +13,10 @@ get_centre_model = centre_namespace.schema_model(
     TolqcCentreSchema.to_jsonapi_schema_model_dict()
 )
 
-# post_centre_model = centre_namespace.schema_model(
-#     'POST Centre Model',
-#     TolqcCentreSchema.to_dict_exclude_id()
-# )
+post_centre_model = centre_namespace.model(
+    'POST Centre Model',
+    TolqcCentreSchema.to_model_dict_exclude_id()
+)
 
 
 class TolqcCentreDetailResource(Resource):
@@ -45,7 +45,7 @@ class TolqcCentreDetailResource(Resource):
 class TolqcCentreListResource(Resource):
     name = 'centres'
 
-    #@centre_namespace.expect(post_centre_model)
+    @centre_namespace.expect(post_centre_model)
     @centre_namespace.response(
         200,
         description='Success',

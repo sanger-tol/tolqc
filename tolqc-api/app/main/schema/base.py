@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-from typing import Dict
 from flask_restx import fields
 from marshmallow_jsonapi import Schema, SchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema , \
@@ -45,9 +44,37 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
             in all_fields
             if f not in exclude_fields
         ]
-    
+
     @classmethod
-    def _python_to_model_type(cls, python_type):
+    def _get_field_model_type(cls, field):
+        model = cls.Meta.model
+        python_type = model.get_column_python_type(
+            field
+        )
+
+        if python_type == int:
+            return fields.Integer
+        if python_type == str:
+            return fields.String
+        if python_type == bool:
+            return fields.Boolean
+        if python_type == datetime:
+            return fields.DateTime
+        if python_type == float:
+            return fields.Float
+        
+        raise NotImplementedError(
+            "Type '%s' has not been implemented yet."
+                % python_type
+        )
+
+    @classmethod
+    def _get_field_schema_model_type(cls, field):
+        model = cls.Meta.model
+        python_type = model.get_column_python_type(
+            field
+        )
+
         if python_type == int:
             return {
                 'type': 'integer'
@@ -77,19 +104,9 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
         )
 
     @classmethod
-    def _get_field_model_type(cls, field):
-        model = cls.Meta.model
-        python_type = model.get_column_python_type(
-            field
-        )
-
-        return cls._python_to_model_type(
-            python_type
-        )
-
-
-    @classmethod
-    def to_dict(cls, exclude_fields=None):
+    def to_model_dict(cls, exclude_fields=None):
+        """Returns a dict for a Model, excluding
+           the specified fields"""
         fields = cls._get_fields(
             exclude_fields=exclude_fields
         )
@@ -99,17 +116,22 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
         }
     
     @classmethod
-    def to_dict_exclude_id(cls):
-        return cls.to_dict(
+    def to_model_dict_exclude_id(cls):
+        """Returns a dict for a Model excluding the ID"""
+        return cls.to_model_dict(
             exclude_fields=['id']
         )
     
     @classmethod
     def to_jsonapi_schema_model_dict(cls, exclude_fields=None):
-        dict_schema = cls.to_dict(
-            exclude_fields=exclude_fields
-        )
-        
+        """Returns a dict for a SchemaModel in JSON:API format"""
+        dict_schema = {
+            f: cls._get_field_schema_model_type(f)
+            for f in cls._get_fields(
+                exclude_fields=exclude_fields
+            )
+        }
+
         id_field = dict_schema.pop('id', None)
         if id_field == None:
             raise IdExcludedOnJsonapiDictException(cls)
