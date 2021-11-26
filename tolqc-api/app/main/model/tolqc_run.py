@@ -13,17 +13,17 @@ class TolqcRun(Base):
     run_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    #platform_id = db.Column(db.Integer(), db.ForeignKey("platform.platform_id"),
-    #                        nullable=False)
+    platform_id = db.Column(db.Integer(), db.ForeignKey("platform.platform_id"),
+                            nullable=False)
     centre_id = db.Column(db.Integer(), db.ForeignKey(TolqcCentre.id),
                           nullable=False)
     lims_id = db.Column(db.Integer())
     element = db.Column(db.String())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    #seq = db.relationship("TolqcSeq", back_populates="run")
-    #platform = db.relationship("TolqcPlatform", back_populates="run")#, foreign_keys="[TolqcPlatform.platform_id]")
-    centre = db.relationship(TolqcCentre, back_populates="run", foreign_keys=[centre_id])#, foreign_keys="[TolqcCentre.id]")
+    seq = db.relationship("TolqcSeq", back_populates="run")
+    platform = db.relationship("TolqcPlatform", back_populates="run")
+    centre = db.relationship(TolqcCentre, back_populates="run", foreign_keys=[centre_id])
 
     @classmethod
     def find_by_id(cls, _id):

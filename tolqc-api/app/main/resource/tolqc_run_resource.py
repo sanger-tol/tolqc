@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from flask_restx import Namespace, Resource
-from main.schema import TolqcRunSchema
 
 
 run_namespace = Namespace(

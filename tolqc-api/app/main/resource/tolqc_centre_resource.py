@@ -33,7 +33,7 @@ class TolqcCentreDetailResource(Resource):
     )
     def get(self, id):
         centre = TolqcCentreSchema.get_by_id(id)
-        if centre == None:
+        if centre is None:
             # TODO make a custom error response in class
             return {
                 "error": f"Centre with id {id} not found"

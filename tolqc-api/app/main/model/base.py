@@ -39,7 +39,7 @@ class Base(db.Model):
     def bulk_update(data):
         db.session.add_all(data)
         db.session.commit()
-    
+
     @classmethod
     def find_by_id(cls, _id):
         return cls.query.filter_by(id=_id).one_or_none()
@@ -47,7 +47,7 @@ class Base(db.Model):
     @classmethod
     def get_columns(cls):
         return list(cls.__table__.c)
-    
+
     @classmethod
     def get_column_python_type(cls, column_name):
         column = getattr(cls, column_name)
