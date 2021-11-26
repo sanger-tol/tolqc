@@ -16,7 +16,7 @@ class TolqcSeq(Base):
     library_row_id = db.Column(db.Integer(), db.ForeignKey("library.row_id"),
                                nullable=False)
     accession_id = db.Column(db.Integer())
-    run_row_id = db.Column(db.Integer(), db.ForeignKey("run.row_id"),
+    run_row_id = db.Column(db.Integer(), db.ForeignKey("run.id"),
                            nullable=False)
     processed = db.Column(db.Integer())
     tag1_id = db.Column(db.String())
