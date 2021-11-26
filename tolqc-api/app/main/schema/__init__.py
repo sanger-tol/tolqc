@@ -2,5 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .tolqc_centre_schema import TolqcCentreSchema # noqa
-from .tolqc_run_schema import TolqcRunSchema # noqa
+from .tolqc_centre_schema import TolqcCentreRequestSchema, \
+                                 TolqcCentreResponseSchema # noqa
+from .tolqc_run_schema import TolqcRunRequestSchema, \
+                              TolqcRunResponseSchema # noqa

@@ -2,21 +2,29 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema import TolqcCentreSchema
 from flask_restx import Namespace, Resource
 
+from main.schema import TolqcCentreRequestSchema, \
+                        TolqcCentreResponseSchema
 
-centre_namespace = Namespace('centre', description='Centre related methods')
-
-get_centre_model = centre_namespace.schema_model(
-    'GET Centre Model',
-    TolqcCentreSchema.to_jsonapi_schema_model_dict()
+centre_namespace = Namespace(
+    'centre',
+    description='Centre related methods',
+    validate=True,
 )
 
-post_centre_model = centre_namespace.model(
-    'POST Centre Model',
-    TolqcCentreSchema.to_model_dict_exclude_id()
+centre_response_model = centre_namespace.schema_model(
+    'Centre Response-Model',
+    TolqcCentreResponseSchema.to_model_dict()
 )
+
+centre_request_model = centre_namespace.model(
+    'Centre Request-Model',
+    TolqcCentreRequestSchema.to_model_dict_exclude_id()
+)
+
+centre_request_schema = TolqcCentreRequestSchema()
+centre_response_schema = TolqcCentreResponseSchema()
 
 
 class TolqcCentreDetailResource(Resource):
@@ -25,38 +33,44 @@ class TolqcCentreDetailResource(Resource):
     @centre_namespace.response(
         200,
         description='Success',
-        model=get_centre_model,
+        model=centre_response_model,
     )
     @centre_namespace.response(
         404,
         description='Not Found'
     )
     def get(self, id):
-        centre = TolqcCentreSchema.get_by_id(id)
+        centre = centre_response_schema.get_by_id(id)
         if centre is None:
             # TODO make a custom error response in class
             return {
                 "error": f"Centre with id {id} not found"
             }, 404
         # schema has to be instantiated
-        return TolqcCentreSchema().dump(centre), 200
+        return centre, 200
 
 
 class TolqcCentreListResource(Resource):
     name = 'centres'
 
-    @centre_namespace.expect(post_centre_model)
+    @centre_namespace.expect(centre_request_model)
     @centre_namespace.response(
         200,
         description='Success',
-        model=get_centre_model,
+        model=centre_response_model,
     )
     @centre_namespace.response(
         400,
         description='Error'
     )
-    def post(self, data):
-        pass
+    def post(self):
+        data = centre_namespace.payload
+        return centre_response_schema.dump(
+            centre_request_schema.save_and_get_model(
+                data
+            )
+        ), 200
+
 
 
 centre_namespace.add_resource(TolqcCentreDetailResource, '/<int:id>')

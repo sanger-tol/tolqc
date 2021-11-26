@@ -2,11 +2,19 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import BaseSchema
+from .base import BaseRequestSchema, BaseResponseSchema
 from main.model import TolqcRun
 
 
-class TolqcRunSchema(BaseSchema):
+class TolqcRunRequestSchema(BaseRequestSchema):
+    class Meta:
+        type_ = 'run'
+        strict = True
+        model = TolqcRun
+        # should include foreign key maybe?
+
+
+class TolqcRunResponseSchema(BaseResponseSchema):
     class Meta:
         type_ = 'run'
         strict = True

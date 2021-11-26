@@ -8,6 +8,7 @@ from flask_restx import Namespace, Resource
 run_namespace = Namespace(
     'run',
     description='ToLQC-Run related methods',
+    validate=True,
 )
 
 
