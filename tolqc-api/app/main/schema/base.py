@@ -120,9 +120,10 @@ class BaseSchema(SQLAlchemyAutoSchema, Schema):
                 "data": {
                     'required': ['type', 'attributes', 'id'],
                     'properties': {
-                        "type": cls._python_to_model_type(
-                            str
-                        ),
+                        "type": {
+                            'type': 'string',
+                            'default': cls.Meta.type_,
+                        },
                         "attributes": {
                             'required': list(dict_schema.keys()),
                             'properties': dict_schema,
