@@ -15,12 +15,12 @@ centre_namespace = Namespace(
 
 centre_response_model = centre_namespace.schema_model(
     'Centre Response-Model',
-    TolqcCentreResponseSchema.to_model_dict()
+    TolqcCentreResponseSchema.to_schema_model_dict()
 )
 
 centre_request_model = centre_namespace.model(
     'Centre Request-Model',
-    TolqcCentreRequestSchema.to_model_dict_exclude_id()
+    TolqcCentreRequestSchema.to_model_dict()
 )
 
 centre_request_schema = TolqcCentreRequestSchema()
@@ -46,7 +46,6 @@ class TolqcCentreDetailResource(Resource):
             return {
                 "error": f"Centre with id {id} not found"
             }, 404
-        # schema has to be instantiated
         return centre, 200
 
 

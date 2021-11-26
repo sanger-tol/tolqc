@@ -81,19 +81,12 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, Schema):
         """Returns a dict for a Model, excluding
            the specified fields"""
         fields = cls._get_fields(
-            exclude_fields=exclude_fields
+            exclude_fields=exclude_fields+['id']
         )
         return {
             f: cls._get_field_model_type(f)
             for f in fields
         }
-
-    @classmethod
-    def to_model_dict_exclude_id(cls):
-        """Returns a dict for a Model excluding the ID"""
-        return cls.to_model_dict(
-            exclude_fields=['id']
-        )
 
 
 class ResponseCombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
@@ -139,7 +132,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             "Type f'{python_type}' has not been implemented yet."
         )
 
-    # this is a lot of duplication, make a common class
+    # TODO - this is a lot of duplication, make a common class
     @classmethod
     def _get_fields(cls, exclude_fields=None):
         columns = cls.Meta.model.get_columns()
@@ -155,7 +148,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         ]
 
     @classmethod
-    def to_model_dict(cls, exclude_fields=None):
+    def to_schema_model_dict(cls, exclude_fields=None):
         """Returns a dict for a SchemaModel in JSON:API format"""
         dict_schema = {
             f: cls._get_field_schema_model_type(f)
