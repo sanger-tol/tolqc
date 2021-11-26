@@ -9,15 +9,6 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema , \
                                    SQLAlchemyAutoSchemaOpts
 
 
-class DictField(fields.Raw):
-    """Provides a field class that marshals to a dict"""
-    def __init__(self, dict_field, *args, **kwargs):
-        self._dict_field = dict_field
-        super().__init__(*args, **kwargs)
-    def output(self, key, obj, *args, **kwargs):
-        return self._dict_field
-
-
 class IdExcludedOnJsonapiDictException(Exception):
     def __init__(self, schema):
         print("The field 'id' cannot be excluded" \
