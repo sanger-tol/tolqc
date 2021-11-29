@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import RowDoesNotExistException
+from .base import RowDoesNotExistException # noqa
 from .tolqc_centre_schema import TolqcCentreRequestSchema, \
                                  TolqcCentreResponseSchema # noqa
 from .tolqc_run_schema import TolqcRunRequestSchema, \

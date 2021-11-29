@@ -45,7 +45,7 @@ class TolqcCentreDetailResource(BaseDetailResource):
     )
     def get(self, id):
         return self._get_by_id(id)
-    
+
     @centre_namespace.response(
         204,
         description='Success'

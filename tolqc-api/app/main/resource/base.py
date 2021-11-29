@@ -18,7 +18,7 @@ class BaseDetailResource(Resource):
     """Wrapper for flask-restx's Resource - provides default
     implementations of GET, DELETE, PUT methods for a detail
     resource
-    
+
     Requires class/static variables request_schema and
     response_schema to be declared in inherited classes, and a
     name to be declared for errors
@@ -36,7 +36,7 @@ class BaseDetailResource(Resource):
             return model, 200
         except RowDoesNotExistException:
             return self._404_error(id)
-    
+
     # TODO add auth
     # TODO add deletion conflict exception
     def _delete_by_id(self, id):

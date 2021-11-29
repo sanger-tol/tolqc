@@ -69,7 +69,7 @@ class BaseSchema():
             f for f in all_fields
             if f not in non_required_fields
         ]
-    
+
     def _find_model_by_id(self, id):
         model = self.Meta.model.find_by_id(id)
         if model is None:
