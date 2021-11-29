@@ -8,7 +8,7 @@ from .base import BaseNamespace
 
 
 run_namespace = BaseNamespace(
-    'run',
+    'runs',
     description='ToLQC-Run related methods',
 )
 

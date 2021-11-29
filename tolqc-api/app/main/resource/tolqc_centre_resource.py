@@ -11,7 +11,7 @@ from main.schema import TolqcCentreRequestSchema, \
 # TODO implement list resources (not just detail)
 
 centre_namespace = BaseNamespace(
-    'centre',
+    'centres',
     description='Centre related methods',
 )
 

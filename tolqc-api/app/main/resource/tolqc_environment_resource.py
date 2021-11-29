@@ -9,7 +9,7 @@ from .base import BaseNamespace
 
 
 environment_namespace = BaseNamespace(
-    'environment',
+    'environments',
     description='Deployment environment related methods',
 )
 
