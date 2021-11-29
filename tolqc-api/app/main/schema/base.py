@@ -89,7 +89,7 @@ class BaseSchema():
         model = self._find_model_by_id(id)
         model.delete()
         model.commit()
-    
+
     def save_and_get_model(self, data):
         """Currently removes extra data"""
         request_fields = data.keys()
@@ -104,8 +104,6 @@ class BaseSchema():
         model = self.Meta.model(**base_data)
         model.save()
         return model
-
-
 
 # requests are in regular dict format, responses in JSON:API
 
