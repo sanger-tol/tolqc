@@ -75,7 +75,7 @@ class BaseDetailResource(Resource):
 
     def _get_by_id(self, id):
         try:
-            model = self.response_schema.get_by_id(id)
+            model = self.response_schema.read_by_id(id)
             return model, 200
         except InstanceDoesNotExistException:
             return self._404_error(id)
@@ -91,7 +91,7 @@ class BaseDetailResource(Resource):
 
     def _put_by_id(self, id):
         try:
-            model = self.response_schema.put_by_id(
+            model = self.response_schema.update_by_id(
                 id,
                 self.namespace.payload
             )

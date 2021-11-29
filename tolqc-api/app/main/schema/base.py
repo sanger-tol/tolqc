@@ -86,15 +86,6 @@ class BaseSchema():
             raise InstanceDoesNotExistException(id, self)
         return model
 
-    def get_by_id(self, id):
-        model = self._find_model_by_id(id)
-        return self.dump(model)
-
-    def delete_by_id(self, id):
-        model = self._find_model_by_id(id)
-        model.delete()
-        model.commit()
-    
     def _separate_extra_data(self, data):
         request_fields = data.keys()
         if 'id' in request_fields:
@@ -112,19 +103,28 @@ class BaseSchema():
         }
         return base_data, extra_data
     
-    def put_by_id(self, id, data):
-        base_data, _ = self._separate_extra_data(data)
-        model = self._find_model_by_id(id)
-        model.update(base_data)
-        model.commit()
-        return model
-
     def create(self, data):
         """Currently removes extra data"""
         base_data, _ = self._separate_extra_data(data)
         model = self.Meta.model(**base_data)
         model.save()
         return model
+
+    def read_by_id(self, id):
+        model = self._find_model_by_id(id)
+        return self.dump(model)
+    
+    def update_by_id(self, id, data):
+        base_data, _ = self._separate_extra_data(data)
+        model = self._find_model_by_id(id)
+        model.update(base_data)
+        model.commit()
+        return self.dump(model)
+
+    def delete_by_id(self, id):
+        model = self._find_model_by_id(id)
+        model.delete()
+        model.commit()
 
 # requests are in regular dict format, responses in JSON:API
 
