@@ -12,6 +12,17 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
 
 
+class RequiredFieldExcludedException(Exception):
+    def __init__(self, field, schema):
+        print(f"The requied field {field} cannot be excluded"
+              f" on schema '{schema.Meta.type_}'.")
+
+
+class RowDoesNotExistException(Exception):
+    def __init__(self, id, schema):
+        print(f"No {schema.Meta.type_} exists with id {id}.")
+
+
 class BaseSchema():
     @classmethod
     def _get_fields(cls, exclude_fields):
@@ -58,21 +69,22 @@ class BaseSchema():
             f for f in all_fields
             if f not in non_required_fields
         ]
+    
+    def _find_model_by_id(self, id):
+        model = self.Meta.model.find_by_id(id)
+        if model is None:
+            raise RowDoesNotExistException(id, self)
+        return model
 
     def get_by_id(self, id):
-        row = self.Meta.model.find_by_id(id)
-        if row is None:
-            return None
-        return self.dump(row)
+        model = self._find_model_by_id(id)
+        return self.dump(model)
 
     def delete_by_id(self, id):
-        pass
+        model = self._find_model_by_id(id)
+        model.delete()
+        model.commit()
 
-
-class RequiredFieldExcludedException(Exception):
-    def __init__(self, field, schema):
-        print(f"The requied field {field} cannot be excluded"
-              f", on schema {schema.Meta.type_}")
 
 # requests are in regular dict format, responses in JSON:API
 

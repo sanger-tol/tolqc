@@ -6,7 +6,8 @@ from flask_restx import Resource
 
 from .base import BaseNamespace
 from main.schema import TolqcCentreRequestSchema, \
-                        TolqcCentreResponseSchema
+                        TolqcCentreResponseSchema, \
+                        RowDoesNotExistException
 
 centre_namespace = BaseNamespace(
     'centre',
@@ -40,13 +41,32 @@ class TolqcCentreDetailResource(Resource):
         description='Not Found'
     )
     def get(self, id):
-        centre = centre_response_schema.get_by_id(id)
-        if centre is None:
-            # TODO make a custom error response in class
+        try:
+            centre = centre_response_schema.get_by_id(id)
+            return centre, 200
+        except RowDoesNotExistException:
             return {
-                "error": f"Centre with id {id} not found"
+                "error": f"Centre with {id} not found."
             }, 404
-        return centre, 200
+    
+    @centre_namespace.response(
+        204,
+        description='Success'
+    )
+    @centre_namespace.response(
+        404,
+        description='Not Found'
+    )
+    # TODO add auth
+    # TODO add deletion conflict exception
+    def delete(self, id):
+        try:
+            centre_response_schema.delete_by_id(id)
+            return 204
+        except RowDoesNotExistException:
+            return {
+                "error": f"Centre with {id} not found."
+            }, 404
 
 
 class TolqcCentreListResource(Resource):
