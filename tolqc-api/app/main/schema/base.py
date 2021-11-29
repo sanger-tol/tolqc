@@ -4,11 +4,29 @@
 
 from datetime import datetime
 from flask_restx import fields
-from marshmallow import Schema, SchemaOpts
+from marshmallow import Schema as MarshmallowSchema, \
+                        SchemaOpts as MarshmallowSchemaOpts
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
+
+
+class BaseSchema():
+    @classmethod
+    def _get_fields(cls, exclude_fields=[]):
+        columns = cls.Meta.model.get_columns()
+        return [
+            c.name for c
+            in columns
+            if c.name not in exclude_fields
+        ]
+    
+    def get_by_id(self, id):
+        model = self.Meta.model.find_by_id(id)
+        if model is None:
+            return None
+        return self.dump(model)
 
 
 class IdExcludedOnResponseException(Exception):
@@ -20,11 +38,11 @@ class IdExcludedOnResponseException(Exception):
 # requests are in regular dict format, responses in JSON:API
 
 
-class RequestCombinedOpts(SQLAlchemyAutoSchemaOpts, SchemaOpts):
+class RequestCombinedOpts(SQLAlchemyAutoSchemaOpts, MarshmallowSchemaOpts):
     pass
 
 
-class BaseRequestSchema(SQLAlchemyAutoSchema, Schema):
+class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
     """Used for request/input"""
 
     OPTIONS_CLASS = RequestCombinedOpts
@@ -33,12 +51,6 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, Schema):
         model = self.Meta.model(**data)
         model.save()
         return model
-
-    def get_by_id(self, id):
-        model = self.Meta.model.find_by_id(id)
-        if model is None:
-            return None
-        return self.dump(model)
 
     @classmethod
     def _get_field_model_type(cls, field):
@@ -63,21 +75,7 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, Schema):
         )
 
     @classmethod
-    def _get_fields(cls, exclude_fields=None):
-        columns = cls.Meta.model.get_columns()
-        all_fields = [
-            c.name for c in columns
-        ]
-        if exclude_fields is None:
-            return all_fields
-        return [
-            f for f
-            in all_fields
-            if f not in exclude_fields
-        ]
-
-    @classmethod
-    def to_model_dict(cls, exclude_fields=None):
+    def to_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a Model, excluding
            the specified fields"""
         fields = cls._get_fields(
@@ -93,7 +91,7 @@ class ResponseCombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
     pass
 
 
-class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
+class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     """Used for response/output"""
 
     OPTIONS_CLASS = ResponseCombinedOpts
@@ -132,23 +130,8 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             "Type f'{python_type}' has not been implemented yet."
         )
 
-    # TODO - this is a lot of duplication, make a common class
     @classmethod
-    def _get_fields(cls, exclude_fields=None):
-        columns = cls.Meta.model.get_columns()
-        all_fields = [
-            c.name for c in columns
-        ]
-        if exclude_fields is None:
-            return all_fields
-        return [
-            f for f
-            in all_fields
-            if f not in exclude_fields
-        ]
-
-    @classmethod
-    def to_schema_model_dict(cls, exclude_fields=None):
+    def to_schema_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a SchemaModel in JSON:API format"""
         dict_schema = {
             f: cls._get_field_schema_model_type(f)
@@ -184,9 +167,3 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             'type': 'object',
         }
         return model_dict
-
-    def get_by_id(self, id):
-        model = self.Meta.model.find_by_id(id)
-        if model is None:
-            return None
-        return self.dump(model)
