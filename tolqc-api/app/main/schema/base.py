@@ -117,7 +117,7 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
     @classmethod
     def to_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a Model, excluding
-           the specified fields"""
+           the specified list of fields"""
         fields = cls._get_fields(
             exclude_fields=exclude_fields+['id']
         )

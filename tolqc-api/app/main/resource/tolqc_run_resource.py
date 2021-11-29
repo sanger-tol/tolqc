@@ -2,10 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Namespace, Resource
+from flask_restx import Resource
+
+from .base import BaseNamespace
 
 
-run_namespace = Namespace(
+run_namespace = BaseNamespace(
     'run',
     description='ToLQC-Run related methods',
     validate=True,

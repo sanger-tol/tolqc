@@ -2,12 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Namespace, Resource
+from flask_restx import Resource
 
+from .base import BaseNamespace
 from main.schema import TolqcCentreRequestSchema, \
                         TolqcCentreResponseSchema
 
-centre_namespace = Namespace(
+centre_namespace = BaseNamespace(
     'centre',
     description='Centre related methods',
     validate=True,
