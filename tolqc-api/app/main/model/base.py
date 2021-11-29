@@ -52,7 +52,7 @@ class Base(db.Model):
     def get_column_python_type(cls, column_name):
         column = getattr(cls, column_name)
         return column.type.python_type
-    
+
     @classmethod
     def column_is_nullable(cls, column_name):
         return cls.__table__.columns[column_name].nullable

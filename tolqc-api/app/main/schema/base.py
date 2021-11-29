@@ -20,7 +20,7 @@ class BaseSchema():
             c.name for c in columns
             if c.name not in exclude_fields
         ]
-    
+
     @classmethod
     def _check_excluded_fields_are_nullable(
         cls,
@@ -33,7 +33,7 @@ class BaseSchema():
                 raise RequiredFieldExcludedException(
                     field, cls
                 )
-    
+
     @classmethod
     def _get_non_required_fields(cls, exclude_fields):
         columns = cls.Meta.model.get_columns()
@@ -47,7 +47,7 @@ class BaseSchema():
             exclude_fields
         )
         return nullable_fields
-    
+
     @classmethod
     def _get_required_fields(cls, exclude_fields):
         all_fields = cls._get_fields(exclude_fields)
@@ -64,9 +64,9 @@ class BaseSchema():
         if row is None:
             return None
         return self.dump(row)
-    
+
     def delete_by_id(self, id):
-        row = self.Meta.model.find_by_id(id)
+        pass
 
 
 class RequiredFieldExcludedException(Exception):
@@ -183,7 +183,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         id_field = dict_schema.pop('id', None)
         if id_field is None:
             raise RequiredFieldExcludedException('id', cls)
-        
+
         required_fields = cls._get_required_fields(
             exclude_fields=exclude_fields
         )
