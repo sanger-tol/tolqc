@@ -11,7 +11,6 @@ from main.schema import TolqcCentreRequestSchema, \
 centre_namespace = BaseNamespace(
     'centre',
     description='Centre related methods',
-    validate=True,
 )
 
 centre_response_model = centre_namespace.schema_model(
