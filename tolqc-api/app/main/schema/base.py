@@ -60,13 +60,13 @@ class BaseSchema():
         ]
 
     def get_by_id(self, id):
-        model = self.Meta.model.find_by_id(id)
-        if model is None:
+        row = self.Meta.model.find_by_id(id)
+        if row is None:
             return None
-        return self.dump(model)
+        return self.dump(row)
     
     def delete_by_id(self, id):
-        model = self.Meta.model.find_by_id(id)
+        row = self.Meta.model.find_by_id(id)
 
 
 class RequiredFieldExcludedException(Exception):
