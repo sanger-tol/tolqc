@@ -24,6 +24,10 @@ class InstanceDoesNotExistException(Exception):
                        f"exists with id {id}."
 
 
+class IdSpecifiedOnPostException(Exception):
+    pass
+
+
 class BaseSchema():
     @classmethod
     def _get_fields(cls, exclude_fields):
@@ -85,6 +89,22 @@ class BaseSchema():
         model = self._find_model_by_id(id)
         model.delete()
         model.commit()
+    
+    def save_and_get_model(self, data):
+        """Currently removes extra data"""
+        request_fields = data.keys()
+        if 'id' in request_fields:
+            raise IdSpecifiedOnPostException()
+        base_fields = self._get_fields([])
+        base_data = {
+            f: data[f]
+            for f in request_fields
+            if f in base_fields
+        }
+        model = self.Meta.model(**base_data)
+        model.save()
+        return model
+
 
 
 # requests are in regular dict format, responses in JSON:API
@@ -98,11 +118,6 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
     """Used for request/input"""
 
     OPTIONS_CLASS = RequestCombinedOpts
-
-    def save_and_get_model(self, data):
-        model = self.Meta.model(**data)
-        model.save()
-        return model
 
     @classmethod
     def _get_field_model_type(cls, field):
