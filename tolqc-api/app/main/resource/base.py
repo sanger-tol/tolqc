@@ -18,11 +18,11 @@ class MissingResourceClassVariableException(Exception):
 
 def validate_resource(resource):
     if getattr(
-            resource,
-            'check_class_variables',
-            None
-        ) is not None:
-            resource.check_class_variables()
+        resource,
+        'check_class_variables',
+        None
+    ) is not None:
+        resource.check_class_variables()
 
 
 class BaseNamespace(Namespace):
@@ -31,7 +31,7 @@ class BaseNamespace(Namespace):
     resource's class variables"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, validate=True, **kwargs)
-    
+
     def add_resource(self, resource, *args, **kwargs):
         validate_resource(resource)
         super().add_resource(resource, *args, **kwargs)

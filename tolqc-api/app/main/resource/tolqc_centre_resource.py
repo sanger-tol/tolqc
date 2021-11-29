@@ -62,7 +62,7 @@ class TolqcCentreDetailResource(BaseDetailResource):
     )
     def delete(self, id):
         return self._delete_by_id(id)
-    
+
     @centre_namespace.expect(centre_put_model)
     @centre_namespace.response(
         200,

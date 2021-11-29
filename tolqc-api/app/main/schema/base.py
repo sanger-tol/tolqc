@@ -2,11 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-import logging
 from datetime import datetime
 from flask_restx import fields
 from marshmallow import Schema as MarshmallowSchema, \
-                        SchemaOpts as MarshmallowSchemaOpts, base
+                        SchemaOpts as MarshmallowSchemaOpts
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
@@ -102,7 +101,7 @@ class BaseSchema():
             if f not in base_fields
         }
         return base_data, extra_data
-    
+
     def create(self, data):
         """Currently removes extra data"""
         base_data, _ = self._separate_extra_data(data)
@@ -113,7 +112,7 @@ class BaseSchema():
     def read_by_id(self, id):
         model = self._find_model_by_id(id)
         return self.dump(model)
-    
+
     def update_by_id(self, id, data):
         base_data, _ = self._separate_extra_data(data)
         model = self._find_model_by_id(id)
@@ -163,7 +162,7 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
         raise NotImplementedError(
             f"Type '{python_type}' has not been implemented yet."
         )
-    
+
     @classmethod
     def _to_model_dict(cls, exclude_fields=[], ignore_required=None):
         fields = cls._get_fields(
@@ -183,7 +182,7 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
             exclude_fields=exclude_fields,
             ignore_required=False
         )
-    
+
     @classmethod
     def to_put_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a Model, excluding
