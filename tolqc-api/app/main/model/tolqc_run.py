@@ -22,5 +22,5 @@ class TolqcRun(Base):
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
     seq = db.relationship("TolqcSeq", back_populates="run")
-    platform = db.relationship("TolqcPlatform", back_populates="run")
+    platform = db.relationship("TolqcPlatform", back_populates="run", foreign_keys=[platform_id])
     centre = db.relationship(TolqcCentre, back_populates="run", foreign_keys=[centre_id])
