@@ -4,7 +4,7 @@
 
 from flask_restx import Namespace, Resource
 
-from main.schema import RowDoesNotExistException
+from main.schema import InstanceDoesNotExistException
 
 
 class BaseNamespace(Namespace):
@@ -34,7 +34,7 @@ class BaseDetailResource(Resource):
         try:
             model = self.response_schema.get_by_id(id)
             return model, 200
-        except RowDoesNotExistException:
+        except InstanceDoesNotExistException:
             return self._404_error(id)
 
     # TODO add auth
@@ -43,5 +43,5 @@ class BaseDetailResource(Resource):
         try:
             self.response_schema.delete_by_id(id)
             return {}, 204
-        except RowDoesNotExistException:
+        except InstanceDoesNotExistException:
             return self._404_error(id)

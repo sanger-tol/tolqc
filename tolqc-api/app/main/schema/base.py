@@ -18,9 +18,10 @@ class RequiredFieldExcludedException(Exception):
               f" on schema '{schema.Meta.type_}'.")
 
 
-class RowDoesNotExistException(Exception):
+class InstanceDoesNotExistException(Exception):
     def __init__(self, id, schema):
-        print(f"No {schema.Meta.type_} exists with id {id}.")
+        self._string = f"No {schema.Meta.type_} instance" \
+                       f"exists with id {id}."
 
 
 class BaseSchema():
@@ -73,7 +74,7 @@ class BaseSchema():
     def _find_model_by_id(self, id):
         model = self.Meta.model.find_by_id(id)
         if model is None:
-            raise RowDoesNotExistException(id, self)
+            raise InstanceDoesNotExistException(id, self)
         return model
 
     def get_by_id(self, id):
