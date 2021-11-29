@@ -1,0 +1,14 @@
+<!--
+SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+
+SPDX-License-Identifier: MIT
+-->
+
+# Testing
+
+## Generic Requirements List
+
+- Nullable fields in SQLAlchemy models are not set as required when processed into Swagger OpenAPI models
+- Methods requiring auth are not authorized to unauthenticated users, and those without sufficient permissions
+- Excluding fields corresponding to non-nullable model-columns in a schema throws an exception
+    - Other than id, as this is not required in request schemas

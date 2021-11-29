@@ -14,26 +14,65 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
 
 class BaseSchema():
     @classmethod
-    def _get_fields(cls, exclude_fields=[]):
+    def _get_fields(cls, exclude_fields):
         columns = cls.Meta.model.get_columns()
         return [
-            c.name for c
-            in columns
+            c.name for c in columns
             if c.name not in exclude_fields
         ]
     
+    @classmethod
+    def _check_excluded_fields_are_nullable(
+        cls,
+        nullable_fields,
+        exclude_fields
+    ):
+        for field in nullable_fields:
+            # id is not required on request schemas
+            if field in exclude_fields and field != "id":
+                raise RequiredFieldExcludedException(
+                    field, cls
+                )
+    
+    @classmethod
+    def _get_non_required_fields(cls, exclude_fields):
+        columns = cls.Meta.model.get_columns()
+        nullable_fields = [
+            c.name for c in columns
+            if c.nullable
+            and c.name not in exclude_fields
+        ]
+        cls._check_excluded_fields_are_nullable(
+            nullable_fields,
+            exclude_fields
+        )
+        return nullable_fields
+    
+    @classmethod
+    def _get_required_fields(cls, exclude_fields):
+        all_fields = cls._get_fields(exclude_fields)
+        non_required_fields = cls._get_non_required_fields(
+            exclude_fields=exclude_fields
+        )
+        return [
+            f for f in all_fields
+            if f not in non_required_fields
+        ]
+
     def get_by_id(self, id):
         model = self.Meta.model.find_by_id(id)
         if model is None:
             return None
         return self.dump(model)
+    
+    def delete_by_id(self, id):
+        model = self.Meta.model.find_by_id(id)
 
 
-class IdExcludedOnResponseException(Exception):
-    def __init__(self, schema):
-        print("The field 'id' cannot be excluded"
-              f", on schema {schema.Meta.type_}, "
-              "for a JSON:API resource model dict.")
+class RequiredFieldExcludedException(Exception):
+    def __init__(self, field, schema):
+        print(f"The requied field {field} cannot be excluded"
+              f", on schema {schema.Meta.type_}")
 
 # requests are in regular dict format, responses in JSON:API
 
@@ -58,17 +97,18 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
         python_type = model.get_column_python_type(
             field
         )
+        required = not model.column_is_nullable(field)
 
         if python_type == int:
-            return fields.Integer
+            return fields.Integer(required=required)
         if python_type == str:
-            return fields.String
+            return fields.String(required=required)
         if python_type == bool:
-            return fields.Boolean
+            return fields.Boolean(required=required)
         if python_type == datetime:
-            return fields.DateTime
+            return fields.DateTime(required=required)
         if python_type == float:
-            return fields.Float
+            return fields.Float(required=required)
 
         raise NotImplementedError(
             f"Type '{python_type}' has not been implemented yet."
@@ -142,9 +182,13 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
         id_field = dict_schema.pop('id', None)
         if id_field is None:
-            raise IdExcludedOnResponseException(cls)
+            raise RequiredFieldExcludedException('id', cls)
+        
+        required_fields = cls._get_required_fields(
+            exclude_fields=exclude_fields
+        )
 
-        model_dict = {
+        return {
             'required': ['data'],
             'properties': {
                 "data": {
@@ -155,7 +199,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
                             'default': cls.Meta.type_,
                         },
                         "attributes": {
-                            'required': list(dict_schema.keys()),
+                            'required': required_fields,
                             'properties': dict_schema,
                             'type': 'object',
                         },
@@ -166,4 +210,3 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             },
             'type': 'object',
         }
-        return model_dict
