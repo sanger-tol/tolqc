@@ -16,13 +16,18 @@ centre_namespace = BaseNamespace(
 )
 
 centre_response_model = centre_namespace.schema_model(
-    'Centre Response-Model',
+    'Centre Response',
     TolqcCentreResponseSchema.to_schema_model_dict()
 )
 
-centre_request_model = centre_namespace.model(
-    'Centre Request-Model',
-    TolqcCentreRequestSchema.to_model_dict()
+centre_post_model = centre_namespace.model(
+    'Centre POST Request',
+    TolqcCentreRequestSchema.to_post_model_dict()
+)
+
+centre_put_model = centre_namespace.model(
+    'Centre PUT Request',
+    TolqcCentreRequestSchema.to_put_model_dict()
 )
 
 centre_request_schema = TolqcCentreRequestSchema()
@@ -31,6 +36,7 @@ centre_response_schema = TolqcCentreResponseSchema()
 
 class TolqcCentreDetailResource(BaseDetailResource):
     name = 'centre'
+    namespace = centre_namespace
     request_schema = TolqcCentreRequestSchema()
     response_schema = TolqcCentreResponseSchema()
 
@@ -61,7 +67,7 @@ class TolqcCentreDetailResource(BaseDetailResource):
 class TolqcCentreListResource(Resource):
     name = 'centres'
 
-    @centre_namespace.expect(centre_request_model)
+    @centre_namespace.expect(centre_post_model)
     @centre_namespace.response(
         200,
         description='Success',
@@ -74,7 +80,7 @@ class TolqcCentreListResource(Resource):
     def post(self):
         data = centre_namespace.payload
         return centre_response_schema.dump(
-            centre_request_schema.save_and_get_model(
+            centre_request_schema.create(
                 data
             )
         ), 200

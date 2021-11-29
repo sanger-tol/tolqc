@@ -2,10 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
+import logging
 from datetime import datetime
 from flask_restx import fields
 from marshmallow import Schema as MarshmallowSchema, \
-                        SchemaOpts as MarshmallowSchemaOpts
+                        SchemaOpts as MarshmallowSchemaOpts, base
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
@@ -14,14 +15,18 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
 
 class RequiredFieldExcludedException(Exception):
     def __init__(self, field, schema):
-        print(f"The requied field {field} cannot be excluded"
-              f" on schema '{schema.Meta.type_}'.")
+        super().__init__(
+            f"The requied field {field} cannot be excluded"
+            f" on schema '{schema.Meta.type_}'."
+        )
 
 
 class InstanceDoesNotExistException(Exception):
     def __init__(self, id, schema):
-        self._string = f"No {schema.Meta.type_} instance" \
-                       f"exists with id {id}."
+        super().__init__(
+            f"No {schema.Meta.type_} instance"
+            f"exists with id {id}."
+        )
 
 
 class IdSpecifiedOnPostException(Exception):
@@ -89,9 +94,8 @@ class BaseSchema():
         model = self._find_model_by_id(id)
         model.delete()
         model.commit()
-
-    def save_and_get_model(self, data):
-        """Currently removes extra data"""
+    
+    def _separate_extra_data(self, data):
         request_fields = data.keys()
         if 'id' in request_fields:
             raise IdSpecifiedOnPostException()
@@ -101,6 +105,23 @@ class BaseSchema():
             for f in request_fields
             if f in base_fields
         }
+        extra_data = {
+            f: data[f]
+            for f in request_fields
+            if f not in base_fields
+        }
+        return base_data, extra_data
+    
+    def put_by_id(self, id, data):
+        base_data, _ = self._separate_extra_data(data)
+        model = self._find_model_by_id(id)
+        model.update(base_data)
+        model.commit()
+        return model
+
+    def create(self, data):
+        """Currently removes extra data"""
+        base_data, _ = self._separate_extra_data(data)
         model = self.Meta.model(**base_data)
         model.save()
         return model
@@ -118,12 +139,15 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
     OPTIONS_CLASS = RequestCombinedOpts
 
     @classmethod
-    def _get_field_model_type(cls, field):
+    def _get_field_model_type(cls, field, ignore_required=None):
         model = cls.Meta.model
         python_type = model.get_column_python_type(
             field
         )
-        required = not model.column_is_nullable(field)
+        if not ignore_required:
+            required = not model.column_is_nullable(field)
+        else:
+            required = False
 
         if python_type == int:
             return fields.Integer(required=required)
@@ -139,18 +163,36 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
         raise NotImplementedError(
             f"Type '{python_type}' has not been implemented yet."
         )
-
+    
     @classmethod
-    def to_model_dict(cls, exclude_fields=[]):
-        """Returns a dict for a Model, excluding
-           the specified list of fields"""
+    def _to_model_dict(cls, exclude_fields=[], ignore_required=None):
         fields = cls._get_fields(
             exclude_fields=exclude_fields+['id']
         )
         return {
-            f: cls._get_field_model_type(f)
+            f: cls._get_field_model_type(f, ignore_required)
             for f in fields
         }
+
+    @classmethod
+    def to_post_model_dict(cls, exclude_fields=[]):
+        """Returns a dict for a Model, excluding
+           the specified list of fields, for a POST
+           request"""
+        return cls._to_model_dict(
+            exclude_fields=exclude_fields,
+            ignore_required=False
+        )
+    
+    @classmethod
+    def to_put_model_dict(cls, exclude_fields=[]):
+        """Returns a dict for a Model, excluding
+           the specified list of fields, for a PUT
+           request"""
+        return cls._to_model_dict(
+            exclude_fields=exclude_fields,
+            ignore_required=True
+        )
 
 
 class ResponseCombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):

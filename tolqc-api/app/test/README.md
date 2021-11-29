@@ -12,3 +12,4 @@ SPDX-License-Identifier: MIT
 - Methods requiring auth are not authorized to unauthenticated users, and those without sufficient permissions
 - Excluding fields corresponding to non-nullable model-columns in a schema throws an exception
     - Other than id, as this is not required in request schemas
+- Specifying an id on post is handled correctly (no 500 INTERNAL SERVER ERROR)
