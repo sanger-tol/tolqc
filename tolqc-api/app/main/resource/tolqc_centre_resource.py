@@ -2,13 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Resource
-
-from .base import BaseNamespace, BaseDetailResource
+from .base import BaseNamespace, BaseDetailResource, \
+                  BaseListResource
 from main.schema import TolqcCentreRequestSchema, \
                         TolqcCentreResponseSchema
-
-# TODO implement list resources (not just detail)
 
 centre_namespace = BaseNamespace(
     'centres',
@@ -81,8 +78,11 @@ class TolqcCentreDetailResource(BaseDetailResource):
         return self._put_by_id(id)
 
 
-class TolqcCentreListResource(Resource):
+class TolqcCentreListResource(BaseListResource):
     name = 'centres'
+    namespace = centre_namespace
+    request_schema = TolqcCentreRequestSchema()
+    response_schema = TolqcCentreResponseSchema()
 
     @centre_namespace.expect(centre_post_model)
     @centre_namespace.response(
@@ -95,12 +95,7 @@ class TolqcCentreListResource(Resource):
         description='Error'
     )
     def post(self):
-        data = centre_namespace.payload
-        return centre_response_schema.dump(
-            centre_request_schema.create(
-                data
-            )
-        ), 200
+        return self._post()
 
 
 centre_namespace.add_resource(TolqcCentreDetailResource, '/<int:id>')

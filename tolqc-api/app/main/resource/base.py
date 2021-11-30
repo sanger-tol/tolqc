@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from flask_restx import Namespace, Resource
+from sqlalchemy.exc import IntegrityError
 
 from main.schema import InstanceDoesNotExistException
 
@@ -47,13 +48,25 @@ def handle_404(function):
     return wrapper
 
 
+def handle_400_db_error(function):
+    def wrapper(obj, *args, **kwargs):
+        try:
+            return function(obj, *args, **kwargs)
+        except IntegrityError:
+            return {
+                "error": "Integrity error, most likely due to"
+                         " bad foreign keys specified."
+            }, 400
+    return wrapper
+
+
 class BaseDetailResource(Resource):
     """Wrapper for flask-restx's Resource - provides default
     implementations of GET, DELETE, PUT methods for a detail
     resource
 
     Need to declare (as class variables):
-    * name - for custom error messages
+    * name
     * namespace - for PUT requests
     * request_schema
     * response_schema
@@ -96,11 +109,13 @@ class BaseDetailResource(Resource):
 
     # TODO add auth
     # TODO add deletion conflict exception
+    @handle_400_db_error
     @handle_404
     def _delete_by_id(self, id):
         self.response_schema.delete_by_id(id)
         return {}, 204
 
+    @handle_400_db_error
     @handle_404
     def _put_by_id(self, id):
         data = self.namespace.payload
@@ -111,3 +126,23 @@ class BaseDetailResource(Resource):
             data
         )
         return model, 200
+
+
+class BaseListResource(Resource):
+    """Wrapper for flask-restx's Resource - provides default
+    implementations of a POST method for a list resource
+
+    Need to declare (as class variables):
+    * name
+    * namespace
+    * request_schema
+    * response_schema
+    """
+
+    # TODO modify to accept multiple instances in one go
+    @handle_400_db_error
+    def _post(self):
+        data = self.namespace.payload
+        return self.response_schema.dump(
+            self.request_schema.create(data)
+        ), 200

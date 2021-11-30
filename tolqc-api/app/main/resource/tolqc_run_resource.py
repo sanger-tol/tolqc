@@ -2,9 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Resource
-
-from .base import BaseNamespace, BaseDetailResource
+from .base import BaseNamespace, BaseDetailResource, \
+                  BaseListResource
 from main.schema import TolqcRunRequestSchema, \
                         TolqcRunResponseSchema
 
@@ -70,6 +69,10 @@ class TolqcRunDetailResource(BaseDetailResource):
         'Success'
     )
     @run_namespace.response(
+        400,
+        'Bad Request'
+    )
+    @run_namespace.response(
         404,
         'Not Found'
     )
@@ -77,8 +80,11 @@ class TolqcRunDetailResource(BaseDetailResource):
         return self._delete_by_id(id)
 
 
-class TolqcRunListResource(Resource):
+class TolqcRunListResource(BaseListResource):
     name = "runs"
+    namespace = run_namespace
+    request_schema = TolqcRunRequestSchema()
+    response_schema = TolqcRunResponseSchema()
 
     @run_namespace.expect(run_post_model)
     @run_namespace.response(
@@ -88,15 +94,10 @@ class TolqcRunListResource(Resource):
     )
     @run_namespace.response(
         400,
-        description='Error'
+        description='Bad Request'
     )
     def post(self):
-        data = run_namespace.payload
-        return TolqcRunResponseSchema().dump(
-            TolqcRunRequestSchema().create(
-                data
-            )
-        ), 200
+        return self._post()
 
 
 run_namespace.add_resource(TolqcRunDetailResource, '/<int:id>')
