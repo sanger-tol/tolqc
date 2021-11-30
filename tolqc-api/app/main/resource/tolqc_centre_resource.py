@@ -70,6 +70,10 @@ class TolqcCentreDetailResource(BaseDetailResource):
         model=centre_response_model
     )
     @centre_namespace.response(
+        400,
+        description='Bad Request'
+    )
+    @centre_namespace.response(
         404,
         description='Not Found'
     )

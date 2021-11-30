@@ -72,6 +72,12 @@ class BaseDetailResource(Resource):
         return {
             "error": f"No {self.name} with id {id} found."
         }, 404
+    
+    def _400_error_empty_put_request(self):
+        return {
+            "error": "Data must be specified in the body "
+                     "of a PUT request"
+        }, 400
 
     def _get_by_id(self, id):
         try:
@@ -90,10 +96,13 @@ class BaseDetailResource(Resource):
             return self._404_error(id)
 
     def _put_by_id(self, id):
+        data = self.namespace.payload
+        if not data:
+            return self._400_error_empty_put_request()
         try:
             model = self.response_schema.update_by_id(
                 id,
-                self.namespace.payload
+                data
             )
             return model, 200
         except InstanceDoesNotExistException:
