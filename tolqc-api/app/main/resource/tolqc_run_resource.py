@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Resource, namespace
+from flask_restx import Resource
 
 from .base import BaseNamespace, BaseDetailResource
 from main.schema import TolqcRunRequestSchema, \
@@ -47,7 +47,7 @@ class TolqcRunDetailResource(BaseDetailResource):
     )
     def get(self, id):
         return self._get_by_id(id)
-    
+
     @run_namespace.expect(run_put_model)
     @run_namespace.response(
         200,
@@ -64,7 +64,7 @@ class TolqcRunDetailResource(BaseDetailResource):
     )
     def put(self, id):
         return self._put_by_id(id)
-    
+
     @run_namespace.response(
         204,
         'Success'
@@ -79,7 +79,7 @@ class TolqcRunDetailResource(BaseDetailResource):
 
 class TolqcRunListResource(Resource):
     name = "runs"
-    
+
     @run_namespace.expect(run_post_model)
     @run_namespace.response(
         200,

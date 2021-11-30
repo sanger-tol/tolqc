@@ -82,7 +82,7 @@ class BaseDetailResource(Resource):
         return {
             "error": f"No {self.name} with id {id} found."
         }, 404
-    
+
     def _error_400_empty_put_request(self):
         return {
             "error": "Data must be specified in the body "
