@@ -28,13 +28,23 @@ def validate_resource(resource):
 class BaseNamespace(Namespace):
     """Wrapper for flask-restx's Namespace - always validates
     input using Marshmallow, and will try to validate each
-    resource's class variables"""
+    resource's class variables - do not use for namespaces
+    containing custom resources without these"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, validate=True, **kwargs)
 
     def add_resource(self, resource, *args, **kwargs):
         validate_resource(resource)
         super().add_resource(resource, *args, **kwargs)
+
+
+def handle_404(function):
+    def wrapper(obj, id, *args, **kwargs):
+        try:
+            return function(obj, id, *args, **kwargs)
+        except InstanceDoesNotExistException:
+            return obj.error_404(id)
+    return wrapper
 
 
 class BaseDetailResource(Resource):
@@ -68,42 +78,36 @@ class BaseDetailResource(Resource):
         for class_variable in required_class_variables:
             cls._check_class_variable(class_variable)
 
-    def _404_error(self, id):
+    def error_404(self, id):
         return {
             "error": f"No {self.name} with id {id} found."
         }, 404
     
-    def _400_error_empty_put_request(self):
+    def _error_400_empty_put_request(self):
         return {
             "error": "Data must be specified in the body "
                      "of a PUT request"
         }, 400
 
+    @handle_404
     def _get_by_id(self, id):
-        try:
-            model = self.response_schema.read_by_id(id)
-            return model, 200
-        except InstanceDoesNotExistException:
-            return self._404_error(id)
+        model = self.response_schema.read_by_id(id)
+        return model, 200
 
     # TODO add auth
     # TODO add deletion conflict exception
+    @handle_404
     def _delete_by_id(self, id):
-        try:
-            self.response_schema.delete_by_id(id)
-            return {}, 204
-        except InstanceDoesNotExistException:
-            return self._404_error(id)
+        self.response_schema.delete_by_id(id)
+        return {}, 204
 
+    @handle_404
     def _put_by_id(self, id):
         data = self.namespace.payload
         if not data:
-            return self._400_error_empty_put_request()
-        try:
-            model = self.response_schema.update_by_id(
-                id,
-                data
-            )
-            return model, 200
-        except InstanceDoesNotExistException:
-            return self._404_error(id)
+            return self._error_400_empty_put_request()
+        model = self.response_schema.update_by_id(
+            id,
+            data
+        )
+        return model, 200
