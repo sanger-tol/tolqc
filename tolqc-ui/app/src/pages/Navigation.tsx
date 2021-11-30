@@ -30,7 +30,7 @@ const assumeProduction = (): string => {
 }
 
 const fetchEnvironment = (): Promise<string> => {
-  return fetch('/api/v1/environment')
+  return fetch('/api/v1/environments')
       .then(res => {
           if (res.ok) {
               return res.json() as Promise<Environment>;
