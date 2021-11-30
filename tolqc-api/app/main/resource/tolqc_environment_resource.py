@@ -3,12 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 from flask import current_app as app
-from flask_restx import fields, Resource
-
-from .base import BaseNamespace
+from flask_restx import fields, Resource, Namespace
 
 
-environment_namespace = BaseNamespace(
+environment_namespace = Namespace(
     'environments',
     description='Deployment environment related methods',
 )
