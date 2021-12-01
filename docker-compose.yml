@@ -53,8 +53,8 @@ services:
   tolqc-api-test:
     image: tolqc-api
     command: dockerize
-        -wait tcp://tolqc-db:5432 -wait tcp://tolqc-api:80 -timeout 10s
-        bash -c "pytest -v"
+        -wait tcp://tolqc-db:5432 -timeout 10s
+        bash -c "pytest -v --ignore=/app/test/main/ && pytest -v --ignore=/app/test/core/"
     environment:
       - DB_URI
       - TOLQC_URL

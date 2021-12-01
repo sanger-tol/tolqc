@@ -28,7 +28,7 @@ def validate_resource(resource):
 
 class BaseNamespace(Namespace):
     """Wrapper for flask-restx's Namespace - always validates
-    input using Marshmallow, and will try to validate each
+    input, and will try to validate each
     resource's class variables - do not use for namespaces
     containing custom resources without these"""
     def __init__(self, *args, **kwargs):

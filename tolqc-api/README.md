@@ -19,11 +19,11 @@ Schemas are from Marshmallow. These are the intermediate forms between json requ
 There are (currently) two kinds:
 
 - Request schemas
-    - validate user-supplied input
+    - deserialises user-supplied input
     - provide this to DB models
 - Response schemas
     - receives data back from the models, after the queries have taken place
-    - returns this data in [**JSON:API**](https://jsonapi.org) format
+    - serialises this data in [**JSON:API**](https://jsonapi.org) format
 
 ### Namespaces
 
