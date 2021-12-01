@@ -15,7 +15,7 @@ class TestDetailResource404(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_get_C_404(self):
         response = self.client.open(
             '/api/v1/C/9999',
@@ -25,7 +25,7 @@ class TestDetailResource404(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_get_D_404(self):
         response = self.client.open(
             '/api/v1/D/9999',
@@ -45,7 +45,7 @@ class TestDetailResource404(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_delete_C_404(self):
         response = self.client.open(
             '/api/v1/C/9999',
@@ -55,7 +55,7 @@ class TestDetailResource404(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_delete_D_404(self):
         response = self.client.open(
             '/api/v1/D/9999',
@@ -65,7 +65,7 @@ class TestDetailResource404(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_put_B_404(self):
         response = self.client.open(
             '/api/v1/B/9999',
@@ -91,7 +91,7 @@ class TestDetailResource404(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_put_D_404(self):
         response = self.client.open(
             '/api/v1/D/9999',
