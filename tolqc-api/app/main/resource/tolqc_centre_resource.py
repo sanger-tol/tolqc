@@ -27,9 +27,6 @@ centre_put_model = centre_namespace.model(
     TolqcCentreRequestSchema.to_put_model_dict()
 )
 
-centre_request_schema = TolqcCentreRequestSchema()
-centre_response_schema = TolqcCentreResponseSchema()
-
 
 class TolqcCentreDetailResource(BaseDetailResource):
     name = 'centre'
