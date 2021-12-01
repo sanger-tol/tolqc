@@ -4,6 +4,7 @@
 
 from test.core import BaseTestCase
 
+
 class FakeTest(BaseTestCase):
     def test(self):
         self.assertEqual(True, True) # noqa

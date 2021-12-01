@@ -13,7 +13,7 @@ from main.model import db
 
 
 def _setup_api(blueprint):
-    api = Api(
+    Api(
         blueprint,
         doc='/ui',
         title="Tree of Life Quality Control"
@@ -25,7 +25,7 @@ class BaseTestCase(TestCase):
         self.maxDiff = None
         db.create_all()
         db.session.commit()
-    
+
     def tearDown(self):
         pass
 
