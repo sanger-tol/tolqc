@@ -11,13 +11,24 @@ from flask_restx import Api
 from main import encoder
 from main.model import db
 
+from test.core.models import ModelRelationshipA, \
+                             ModelRelationshipB, \
+                             ModelWithNullableColumn, \
+                             ModelWithNonNullableColumn
+from test.core.resources import b_namespace, \
+                                c_namespace, \
+                                d_namespace
+
 
 def _setup_api(blueprint):
-    Api(
+    api = Api(
         blueprint,
         doc='/ui',
         title="Tree of Life Quality Control"
     )
+    api.add_namespace(b_namespace)
+    api.add_namespace(c_namespace)
+    api.add_namespace(d_namespace)
 
 
 class BaseTestCase(TestCase):
@@ -27,7 +38,11 @@ class BaseTestCase(TestCase):
         db.session.commit()
 
     def tearDown(self):
-        pass
+        db.session.query(ModelRelationshipA).delete()
+        db.session.query(ModelRelationshipB).delete()
+        db.session.query(ModelWithNullableColumn).delete()
+        db.session.query(ModelWithNonNullableColumn).delete()
+        db.session.commit()
 
     def create_app(self):
         app = Flask(__name__)

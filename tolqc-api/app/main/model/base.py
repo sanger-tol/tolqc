@@ -8,6 +8,8 @@ db = SQLAlchemy()
 
 
 class Base(db.Model):
+    """The base model class. Its primary key must be called
+    id"""
     __abstract__ = True
 
     def to_dict(cls):
