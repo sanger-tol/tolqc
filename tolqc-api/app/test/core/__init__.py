@@ -2,43 +2,42 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 from flask_testing import TestCase
+from flask import Flask, Blueprint
+from flask_restx import Api
 
-from main.model import Base, db
-
-
-class ModelRelationshipA(Base):
-    __tablename__ = 'test_A'
-    # the variable below is necessary on every test model!
-    __table_args__ = {'extend_existing': True}
-    id = db.Column(db.Integer, primary_key=True)
-    test_B = db.relationship('ModelRelationshipB', back_populates='test_A')
+from main import encoder
+from main.model import db
 
 
-class ModelRelationshipB(Base):
-    __tablename__ = 'test_B'
-    __table_args__ = {'extend_existing': True}
-    id = db.Column(db.Integer, primary_key=True)
-    a_id = db.Column(db.Integer, db.ForeignKey("test_A.id"), nullable=False)
-    test_A = db.relationship(ModelRelationshipA, back_populates='test_B', foreign_keys=[a_id])
-
-
-class ModelWithNullableColumn(Base):
-    __tablename__ = 'test_C'
-    __table_args__ = {'extend_existing': True}
-    id = db.Column(db.Integer, primary_key=True)
-    nullable_column = db.Column(db.String, nullable=True)
-
-
-class ModelWithNonNullableColumn(Base):
-    __tablename__ = 'test_D'
-    __table_args__ = {'extend_existing': True}
-    id = db.Column(db.Integer, primary_key=True)
-    non_nullable_column = db.Column(db.String, nullable=False)
+def _setup_api(blueprint):
+    api = Api(
+        blueprint,
+        doc='/ui',
+        title="Tree of Life Quality Control"
+    )
 
 
 class BaseTestCase(TestCase):
+    def setUp(self):
+        self.maxDiff = None
+        db.create_all()
+        db.session.commit()
+    
+    def tearDown(self):
+        pass
+
     def create_app(self):
-        # temp solution
-        from flask import Flask
-        return Flask(__name__)
+        app = Flask(__name__)
+        blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
+        _setup_api(blueprint)
+        app.register_blueprint(blueprint)
+        app.json_encoder = encoder.JSONEncoder
+        db_uri = f"postgresql://{os.environ['POSTGRES_USER']}:" \
+                 f"{os.environ['POSTGRES_PASSWORD']}@tolqc-db-core-test/core-test"
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        db.init_app(app)
+        return app
