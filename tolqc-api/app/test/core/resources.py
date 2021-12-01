@@ -66,11 +66,11 @@ class B_DetailResource(BaseDetailResource):
 
     def get(self, id):
         return self._get_by_id(id)
-    
+
     @b_namespace.expect(b_put_model)
     def put(self, id):
         return self._put_by_id(id)
-    
+
     def delete(self, id):
         return self._delete_by_id(id)
 
@@ -94,11 +94,11 @@ class C_DetailResource(BaseDetailResource):
 
     def get(self, id):
         return self._get_by_id(id)
-    
+
     @c_namespace.expect(c_put_model)
     def put(self, id):
         return self._put_by_id(id)
-    
+
     def delete(self, id):
         return self._delete_by_id(id)
 
@@ -122,11 +122,11 @@ class D_DetailResource(BaseDetailResource):
 
     def get(self, id):
         return self._get_by_id(id)
-    
+
     @d_namespace.expect(d_put_model)
     def put(self, id):
         return self._put_by_id(id)
-    
+
     def delete(self, id):
         return self._delete_by_id(id)
 
