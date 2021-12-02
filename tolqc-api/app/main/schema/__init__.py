@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from .base import InstanceDoesNotExistException, \
-                  IdSpecifiedOnListResourceException # noqa
+                  IdSpecifiedInRequestBodyException # noqa
 from .tolqc_centre_schema import TolqcCentreRequestSchema, \
                                  TolqcCentreResponseSchema # noqa
 from .tolqc_run_schema import TolqcRunRequestSchema, \

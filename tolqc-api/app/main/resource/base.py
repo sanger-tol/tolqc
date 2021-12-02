@@ -6,7 +6,7 @@ from flask_restx import Namespace, Resource
 from sqlalchemy.exc import IntegrityError
 
 from main.schema import InstanceDoesNotExistException, \
-                        IdSpecifiedOnListResourceException
+                        IdSpecifiedInRequestBodyException
 
 
 class MissingResourceClassVariableException(Exception):
@@ -61,11 +61,11 @@ def handle_400_db_integrity_error(function):
     return wrapper
 
 
-def handle_400_id_specified_error(function):
+def handle_400_id_in_body_error(function):
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
-        except IdSpecifiedOnListResourceException:
+        except IdSpecifiedInRequestBodyException:
             return {
                 "error": "An id must not be specified in the "
                          "body of a request to this endpoint."
@@ -129,6 +129,7 @@ class BaseDetailResource(Resource):
         return {}, 204
 
     @handle_400_db_integrity_error
+    @handle_400_id_in_body_error
     @handle_404
     def _put_by_id(self, id):
         data = self.namespace.payload
@@ -159,7 +160,7 @@ class BaseListResource(Resource):
         }, 400
 
     # TODO modify to accept multiple instances in one go
-    @handle_400_id_specified_error
+    @handle_400_id_in_body_error
     @handle_400_db_integrity_error
     def _post(self):
         data = self.namespace.payload
