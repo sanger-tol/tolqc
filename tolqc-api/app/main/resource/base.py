@@ -82,7 +82,7 @@ def handle_400_id_in_body_error(function):
     return wrapper
 
 
-def handle_400_empty_request_body(function):
+def handle_400_empty_body_error(function):
     def wrapper(obj, data, *args, **kwargs):
         if not data:
             return {
@@ -145,7 +145,7 @@ class BaseDetailResource(Resource):
     @provide_body_data
     @handle_400_db_integrity_error
     @handle_400_id_in_body_error
-    @handle_400_empty_request_body
+    @handle_400_empty_body_error
     @handle_404
     def _put_by_id(self, data, id):
         # N.B., the process_body_data decorator provides the data,
@@ -173,7 +173,7 @@ class BaseListResource(Resource):
     @provide_body_data
     @handle_400_id_in_body_error
     @handle_400_db_integrity_error
-    @handle_400_empty_request_body
+    @handle_400_empty_body_error
     def _post(self, data):
         # N.B., the process_body_decorator provides the data,
         # _do not_ provide it in the call signature, i.e.
