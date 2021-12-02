@@ -133,7 +133,7 @@ class BaseDetailResource(Resource):
     @handle_404
     def _put_by_id(self, id):
         data = self.namespace.payload
-        if data is None:
+        if not data:
             return self._error_400_empty_put_request()
         model = self.response_schema.update_by_id(
             id,
