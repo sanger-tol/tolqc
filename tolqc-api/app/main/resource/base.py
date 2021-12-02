@@ -18,13 +18,6 @@ class MissingResourceClassVariableException(Exception):
         super().__init__(message)
 
 
-def provide_body_data(function):
-    def wrapper(obj, *args, **kwargs):
-        data = obj.namespace.payload
-        return function(obj, data, *args, **kwargs)
-    return wrapper
-
-
 def validate_resource(resource):
     if getattr(
         resource,
@@ -47,6 +40,13 @@ class BaseNamespace(Namespace):
         super().add_resource(resource, *args, **kwargs)
 
 
+def provide_body_data(function):
+    def wrapper(obj, *args, **kwargs):
+        data = obj.namespace.payload
+        return function(obj, data, *args, **kwargs)
+    return wrapper
+
+
 def handle_404(function):
     def wrapper(obj, id, *args, **kwargs):
         try:
@@ -63,9 +63,9 @@ def handle_400_db_integrity_error(function):
         except IntegrityError:
             return {
                 "error": "Integrity error, most likely due to"
-                         " bad foreign keys specified, or for "
-                         "DELETE, a dependency on the specified"
-                         "instance."
+                         " bad foreign keys specified, or, for "
+                         "DELETE - other instances depend on the"
+                         " specified instance."
             }, 400
     return wrapper
 
