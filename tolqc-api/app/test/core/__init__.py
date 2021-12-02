@@ -38,8 +38,8 @@ class BaseTestCase(TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.query(ModelRelationshipA).delete()
         db.session.query(ModelRelationshipB).delete()
+        db.session.query(ModelRelationshipA).delete()
         db.session.query(ModelWithNullableColumn).delete()
         db.session.query(ModelWithNonNullableColumn).delete()
         db.session.commit()
@@ -56,3 +56,19 @@ class BaseTestCase(TestCase):
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
         return app
+    
+    def add_A(self, **kwargs):
+        a_model = ModelRelationshipA(**kwargs)
+        a_model.save()
+
+    def add_B(self, **kwargs):
+        b_model = ModelRelationshipB(**kwargs)
+        b_model.save()
+    
+    def add_C(self, **kwargs):
+        c_model = ModelWithNullableColumn(**kwargs)
+        c_model.save()
+    
+    def add_D(self, **kwargs):
+        d_model = ModelWithNonNullableColumn(**kwargs)
+        d_model.save()
