@@ -31,6 +31,7 @@ class InstanceDoesNotExistException(Exception):
 class IdSpecifiedInRequestBodyException(Exception):
     pass
 
+
 class BaseSchema():
     @classmethod
     def _get_fields(cls, exclude_fields):

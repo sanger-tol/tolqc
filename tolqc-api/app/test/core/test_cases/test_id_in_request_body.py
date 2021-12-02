@@ -47,7 +47,7 @@ class TestIdInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_B_id_in_request_body_put_400(self):
         response = self.client.open(
             '/api/v1/B/70',
@@ -60,7 +60,7 @@ class TestIdInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_C_id_in_request_body_put_400(self):
         response = self.client.open(
             '/api/v1/B/70',
@@ -73,7 +73,7 @@ class TestIdInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_D_id_in_request_body_put_400(self):
         response = self.client.open(
             '/api/v1/D/70',

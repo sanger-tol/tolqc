@@ -15,7 +15,7 @@ class TestListResourceIdGiven(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_id_given_C_post_405(self):
         response = self.client.open(
             '/api/v1/C/9999',
@@ -25,7 +25,7 @@ class TestListResourceIdGiven(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_id_given_D_post_405(self):
         response = self.client.open(
             '/api/v1/D/9999',
