@@ -27,7 +27,7 @@ class TestGetInsertedData(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         self.assertEqual(expected, response.json)
-    
+
     def test_get_inserted_C_200(self):
         self.add_C(id=9, other_column='test the world')
 
@@ -49,7 +49,7 @@ class TestGetInsertedData(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         self.assertEqual(expected, response.json)
-    
+
     def test_get_inserted_D_200(self):
         self.add_D(
             id=1122,
