@@ -28,7 +28,7 @@ class InstanceDoesNotExistException(Exception):
         )
 
 
-class IdSpecifiedOnPostException(Exception):
+class IdSpecifiedOnListResourceException(Exception):
     pass
 
 
@@ -88,7 +88,7 @@ class BaseSchema():
     def _separate_extra_data(self, data):
         request_fields = data.keys()
         if 'id' in request_fields:
-            raise IdSpecifiedOnPostException()
+            raise IdSpecifiedOnListResourceException()
         base_fields = self._get_fields([])
         base_data = {
             f: data[f]

@@ -5,7 +5,8 @@
 from flask_restx import Namespace, Resource
 from sqlalchemy.exc import IntegrityError
 
-from main.schema import InstanceDoesNotExistException
+from main.schema import InstanceDoesNotExistException, \
+                        IdSpecifiedOnListResourceException
 
 
 class MissingResourceClassVariableException(Exception):
@@ -48,14 +49,26 @@ def handle_404(function):
     return wrapper
 
 
-def handle_400_db_error(function):
-    def wrapper(obj, *args, **kwargs):
+def handle_400_db_integrity_error(function):
+    def wrapper(*args, **kwargs):
         try:
-            return function(obj, *args, **kwargs)
+            return function(*args, **kwargs)
         except IntegrityError:
             return {
                 "error": "Integrity error, most likely due to"
                          " bad foreign keys specified."
+            }, 400
+    return wrapper
+
+
+def handle_400_id_specified_error(function):
+    def wrapper(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except IdSpecifiedOnListResourceException:
+            return {
+                "error": "An id must not be specified in the "
+                         "body of a request to this endpoint."
             }, 400
     return wrapper
 
@@ -101,7 +114,7 @@ class BaseDetailResource(Resource):
             "error": "Data must be specified in the body "
                      "of a PUT request"
         }, 400
-
+    
     @handle_404
     def _get_by_id(self, id):
         model = self.response_schema.read_by_id(id)
@@ -109,17 +122,17 @@ class BaseDetailResource(Resource):
 
     # TODO add auth
     # TODO add deletion conflict exception
-    @handle_400_db_error
+    @handle_400_db_integrity_error
     @handle_404
     def _delete_by_id(self, id):
         self.response_schema.delete_by_id(id)
         return {}, 204
 
-    @handle_400_db_error
+    @handle_400_db_integrity_error
     @handle_404
     def _put_by_id(self, id):
         data = self.namespace.payload
-        if not data:
+        if data is None:
             return self._error_400_empty_put_request()
         model = self.response_schema.update_by_id(
             id,
@@ -139,10 +152,19 @@ class BaseListResource(Resource):
     * response_schema
     """
 
+    def _error_400_empty_post_request(self):
+        return {
+                "error": "Data must be specified in the request"
+                        " body for a POST request."
+        }, 400
+
     # TODO modify to accept multiple instances in one go
-    @handle_400_db_error
+    @handle_400_id_specified_error
+    @handle_400_db_integrity_error
     def _post(self):
         data = self.namespace.payload
+        if not data:
+            return self._error_400_empty_post_request()
         return self.response_schema.dump(
             self.request_schema.create(data)
         ), 200
