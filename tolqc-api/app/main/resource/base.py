@@ -48,11 +48,11 @@ def provide_body_data(function):
 
 
 def handle_404(function):
-    def wrapper(obj, id, *args, **kwargs):
+    def wrapper(obj, *args, **kwargs):
         try:
-            return function(obj, id, *args, **kwargs)
+            return function(obj, *args, **kwargs)
         except InstanceDoesNotExistException:
-            return obj.error_404(id, *args)
+            return obj.error_404(*args)
     return wrapper
 
 
