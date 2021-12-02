@@ -81,6 +81,7 @@ def handle_400_id_in_body_error(function):
             }, 400
     return wrapper
 
+
 def handle_400_empty_request_body(function):
     def wrapper(obj, data, *args, **kwargs):
         if not data:
