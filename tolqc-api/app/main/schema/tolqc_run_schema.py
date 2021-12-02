@@ -11,7 +11,7 @@ class TolqcRunRequestSchema(BaseRequestSchema):
         type_ = 'run'
         strict = True
         model = TolqcRun
-        # should include foreign key maybe?
+        include_fk = True
 
 
 class TolqcRunResponseSchema(BaseResponseSchema):
