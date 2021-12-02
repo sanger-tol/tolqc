@@ -52,7 +52,7 @@ def handle_404(function):
         try:
             return function(obj, id, *args, **kwargs)
         except InstanceDoesNotExistException:
-            return obj.error_404(id)
+            return obj.error_404(id, *args)
     return wrapper
 
 
@@ -124,7 +124,8 @@ class BaseDetailResource(Resource):
         for class_variable in required_class_variables:
             cls._check_class_variable(class_variable)
 
-    def error_404(self, id):
+    def error_404(self, *args):
+        id = args[0] if len(args) == 1 else args[1]
         return {
             "error": f"No {self.name} with id {id} found."
         }, 404
