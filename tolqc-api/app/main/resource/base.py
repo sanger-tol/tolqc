@@ -81,6 +81,16 @@ def handle_400_id_in_body_error(function):
             }, 400
     return wrapper
 
+def handle_400_empty_request_body(function):
+    def wrapper(obj, data, *args, **kwargs):
+        if not data:
+            return {
+                "error": "Data must be specified in the request"
+                         " body, this cannot be empty."
+            }, 404
+        return function(obj, data, *args, **kwargs)
+    return wrapper
+
 
 class BaseDetailResource(Resource):
     """Wrapper for flask-restx's Resource - provides default
@@ -118,12 +128,6 @@ class BaseDetailResource(Resource):
             "error": f"No {self.name} with id {id} found."
         }, 404
 
-    def _error_400_empty_put_request(self):
-        return {
-            "error": "Data must be specified in the body "
-                     "of a PUT request"
-        }, 400
-
     @handle_404
     def _get_by_id(self, id):
         model = self.response_schema.read_by_id(id)
@@ -140,12 +144,11 @@ class BaseDetailResource(Resource):
     @provide_body_data
     @handle_400_db_integrity_error
     @handle_400_id_in_body_error
+    @handle_400_empty_request_body
     @handle_404
     def _put_by_id(self, data, id):
-        # N.B., the process_body_decorator provides the data,
+        # N.B., the process_body_data decorator provides the data,
         # _do not_ provide it in the call signature, only id
-        if not data:
-            return self._error_400_empty_put_request()
         model = self.response_schema.update_by_id(
             id,
             data
@@ -164,21 +167,14 @@ class BaseListResource(Resource):
     * response_schema
     """
 
-    def _error_400_empty_post_request(self):
-        return {
-                "error": "Data must be specified in the request"
-                         " body for a POST request."
-        }, 400
-
     # TODO modify to accept multiple instances in one go
     @provide_body_data
     @handle_400_id_in_body_error
     @handle_400_db_integrity_error
+    @handle_400_empty_request_body
     def _post(self, data):
         # N.B., the process_body_decorator provides the data,
         # _do not_ provide it in the call signature
-        if not data:
-            return self._error_400_empty_post_request()
         return self.response_schema.dump(
             self.request_schema.create(data)
         ), 200
