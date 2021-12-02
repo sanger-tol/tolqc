@@ -32,6 +32,21 @@ class IdSpecifiedInRequestBodyException(Exception):
     pass
 
 
+def check_excluded_fields_nullable(function):
+    def wrapper(schema, *args, exclude_fields=[], **kwargs):
+        nullable_fields = schema._get_non_required_fields()
+        for field in exclude_fields:
+            if field != 'id' and field not in nullable_fields:
+                raise RequiredFieldExcludedException(field, schema)
+        return function(
+            schema,
+            *args,
+            exclude_fields=exclude_fields,
+            **kwargs,
+        )
+    return wrapper
+
+
 class BaseSchema():
     @classmethod
     def _get_fields(cls, exclude_fields):
@@ -55,28 +70,30 @@ class BaseSchema():
                 )
 
     @classmethod
-    def _get_non_required_fields(cls, exclude_fields):
+    def _get_nullable_fields(cls):
+        columns = cls.Meta.model.get_columns()
+        return [
+            c.name for c in columns
+            if c.nullable
+        ]
+
+    @classmethod
+    def _get_non_required_fields(cls):
         columns = cls.Meta.model.get_columns()
         nullable_fields = [
             c.name for c in columns
             if c.nullable
-            and c.name not in exclude_fields
         ]
-        cls._check_excluded_fields_are_nullable(
-            nullable_fields,
-            exclude_fields
-        )
         return nullable_fields
 
     @classmethod
     def _get_required_fields(cls, exclude_fields):
         all_fields = cls._get_fields(exclude_fields)
-        non_required_fields = cls._get_non_required_fields(
-            exclude_fields=exclude_fields
-        )
+        non_required_fields = cls._get_non_required_fields()
         return [
             f for f in all_fields
             if f not in non_required_fields
+            and f not in exclude_fields
         ]
 
     def _find_model_by_id(self, id):
@@ -174,10 +191,16 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
         }
 
     @classmethod
+    @check_excluded_fields_nullable
     def to_post_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a Model, excluding
            the specified list of fields, for a POST
            request"""
+        non_required_fields = cls._get_non_required_fields()
+        for field in exclude_fields:
+            if field != 'id' and field not in non_required_fields:
+                raise RequiredFieldExcludedException(field, cls)
+        
         return cls._to_model_dict(
             exclude_fields=exclude_fields,
             ignore_required=False
@@ -238,6 +261,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         )
 
     @classmethod
+    @check_excluded_fields_nullable
     def to_schema_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a SchemaModel in JSON:API format"""
         dict_schema = {
