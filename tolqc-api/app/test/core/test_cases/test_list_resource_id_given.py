@@ -19,7 +19,7 @@ class TestListResourceIdGiven400(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_C_id_given_400_post(self):
         response = self.client.open(
             '/api/v1/C',

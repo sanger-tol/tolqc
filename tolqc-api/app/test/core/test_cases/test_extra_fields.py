@@ -22,7 +22,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_extra_fields_put_C_200(self):
         self.add_C(id=50)
 
@@ -38,7 +38,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_extra_fields_put_D_200(self):
         self.add_D(id=50, non_nullable_column='test')
 

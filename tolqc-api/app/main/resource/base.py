@@ -114,7 +114,7 @@ class BaseDetailResource(Resource):
             "error": "Data must be specified in the body "
                      "of a PUT request"
         }, 400
-    
+
     @handle_404
     def _get_by_id(self, id):
         model = self.response_schema.read_by_id(id)
@@ -155,7 +155,7 @@ class BaseListResource(Resource):
     def _error_400_empty_post_request(self):
         return {
                 "error": "Data must be specified in the request"
-                        " body for a POST request."
+                         " body for a POST request."
         }, 400
 
     # TODO modify to accept multiple instances in one go
