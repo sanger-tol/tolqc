@@ -6,7 +6,7 @@ from test.core import BaseTestCase
 
 
 class TestGetInsertedData(BaseTestCase):
-    def test_get_inserted_B(self):
+    def test_get_inserted_B_200(self):
         self.add_A(id=90)
         self.add_B(id=10, a_id=90)
 
@@ -28,7 +28,7 @@ class TestGetInsertedData(BaseTestCase):
         )
         self.assertEqual(expected, response.json)
     
-    def test_get_inserted_C(self):
+    def test_get_inserted_C_200(self):
         self.add_C(id=9, other_column='test the world')
 
         expected = self.to_json_api(
@@ -50,7 +50,7 @@ class TestGetInsertedData(BaseTestCase):
         )
         self.assertEqual(expected, response.json)
     
-    def test_get_inserted_D(self):
+    def test_get_inserted_D_200(self):
         self.add_D(
             id=1122,
             non_nullable_column='This shouldnt be null',
