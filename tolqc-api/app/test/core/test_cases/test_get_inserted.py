@@ -27,3 +27,51 @@ class TestGetInsertedData(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         self.assertEqual(expected, response.json)
+    
+    def test_get_inserted_C(self):
+        self.add_C(id=9, other_column='test the world')
+
+        expected = self.to_json_api(
+            9, 
+            'C',
+            {
+                'nullable_column': None,
+                'other_column': 'test the world',
+            }
+        )
+        
+        response = self.client.open(
+            '/api/v1/C/9',
+            method='GET',
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(expected, response.json)
+    
+    def test_get_inserted_D(self):
+        self.add_D(
+            id=1122,
+            non_nullable_column='This shouldnt be null',
+            other_column='This, however, can be null!',
+        )
+
+        expected = self.to_json_api(
+            1122,
+            'D',
+            {
+                "non_nullable_column": 'This shouldnt be null',
+                "other_column": 'This, however, can be null!',
+            }
+        )
+
+        response = self.client.open(
+            '/api/v1/D/1122',
+            method='GET',
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(expected, response.json)
