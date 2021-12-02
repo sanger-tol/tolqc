@@ -18,6 +18,13 @@ class MissingResourceClassVariableException(Exception):
         super().__init__(message)
 
 
+def provide_body_data(function):
+    def wrapper(obj, *args, **kwargs):
+        data = obj.namespace.payload
+        return function(obj, data, *args, **kwargs)
+    return wrapper
+
+
 def validate_resource(resource):
     if getattr(
         resource,
@@ -128,11 +135,13 @@ class BaseDetailResource(Resource):
         self.response_schema.delete_by_id(id)
         return {}, 204
 
+    @provide_body_data
     @handle_400_db_integrity_error
     @handle_400_id_in_body_error
     @handle_404
-    def _put_by_id(self, id):
-        data = self.namespace.payload
+    def _put_by_id(self, data, id):
+        # N.B., the process_body_decorator provides the data,
+        # _do not_ provide it in the call signature, only id
         if not data:
             return self._error_400_empty_put_request()
         model = self.response_schema.update_by_id(
@@ -160,10 +169,12 @@ class BaseListResource(Resource):
         }, 400
 
     # TODO modify to accept multiple instances in one go
+    @provide_body_data
     @handle_400_id_in_body_error
     @handle_400_db_integrity_error
-    def _post(self):
-        data = self.namespace.payload
+    def _post(self, data):
+        # N.B., the process_body_decorator provides the data,
+        # _do not_ provide it in the call signature
         if not data:
             return self._error_400_empty_post_request()
         return self.response_schema.dump(

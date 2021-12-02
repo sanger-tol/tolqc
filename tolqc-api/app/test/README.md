@@ -19,3 +19,4 @@ Main - tests the main logic of ToLQC
 - Specifying an id on post is handled correctly (no 500 INTERNAL SERVER ERROR)
 - Requests that lead to sqlalchemy errors do not return 500 INTERNAL SERVER ERROR
 - That every custom exception has a test case!
+- That post/put requests lead to the correct corresponding changes to the DB
