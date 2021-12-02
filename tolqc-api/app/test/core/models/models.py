@@ -26,6 +26,7 @@ class ModelWithNullableColumn(Base):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     nullable_column = db.Column(db.String, nullable=True)
+    other_column = db.Column(db.String, nullable=True)
 
 
 class ModelWithNonNullableColumn(Base):
@@ -33,3 +34,4 @@ class ModelWithNonNullableColumn(Base):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     non_nullable_column = db.Column(db.String, nullable=False)
+    other_column = db.Column(db.String, nullable=True)
