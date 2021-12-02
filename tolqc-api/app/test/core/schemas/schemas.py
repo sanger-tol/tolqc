@@ -15,6 +15,7 @@ class B_RequestSchema(BaseRequestSchema):
         type_ = 'B'
         strict = True
         model = ModelRelationshipB
+        include_fk = True
 
 
 class B_ResponseSchema(BaseResponseSchema):
@@ -22,6 +23,7 @@ class B_ResponseSchema(BaseResponseSchema):
         type_ = 'B'
         strict = True
         model = ModelRelationshipB
+        include_fk = True
 
 
 class C_RequestSchema(BaseRequestSchema):
@@ -29,6 +31,7 @@ class C_RequestSchema(BaseRequestSchema):
         type_ = 'C'
         strict = True
         model = ModelWithNullableColumn
+        include_fk = True
 
 
 class C_ResponseSchema(BaseResponseSchema):
@@ -36,6 +39,7 @@ class C_ResponseSchema(BaseResponseSchema):
         type_ = 'C'
         strict = True
         model = ModelWithNullableColumn
+        include_fk = True
 
 
 class D_RequestSchema(BaseRequestSchema):
@@ -43,6 +47,7 @@ class D_RequestSchema(BaseRequestSchema):
         type_ = 'D'
         strict = True
         model = ModelWithNonNullableColumn
+        include_fk = True
 
 
 class D_ResponseSchema(BaseResponseSchema):
@@ -50,3 +55,4 @@ class D_ResponseSchema(BaseResponseSchema):
         type_ = 'D'
         strict = True
         model = ModelWithNonNullableColumn
+        include_fk = True

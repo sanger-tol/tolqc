@@ -72,3 +72,12 @@ class BaseTestCase(TestCase):
     def add_D(self, **kwargs):
         d_model = ModelWithNonNullableColumn(**kwargs)
         d_model.save()
+    
+    def to_json_api(self, id, type, json):
+        return {
+            'data': {
+                'type': type,
+                'id': id,
+                'attributes': json
+            }
+        }

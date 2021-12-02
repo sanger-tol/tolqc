@@ -11,6 +11,7 @@ class TolqcCentreRequestSchema(BaseRequestSchema):
         type_ = 'centre'
         strict = True
         model = TolqcCentre
+        include_fk = True
 
 
 class TolqcCentreResponseSchema(BaseResponseSchema):
