@@ -148,7 +148,8 @@ class BaseDetailResource(Resource):
     @handle_404
     def _put_by_id(self, data, id):
         # N.B., the process_body_data decorator provides the data,
-        # _do not_ provide it in the call signature, only id
+        # _do not_ provide it in the call signature, only id, i.e.:
+        # use _put_by_id(id) not _put_by_id(data, id)
         model = self.response_schema.update_by_id(
             id,
             data
@@ -174,7 +175,8 @@ class BaseListResource(Resource):
     @handle_400_empty_request_body
     def _post(self, data):
         # N.B., the process_body_decorator provides the data,
-        # _do not_ provide it in the call signature
+        # _do not_ provide it in the call signature, i.e.
+        # use _post() not _post(data)
         return self.response_schema.dump(
             self.request_schema.create(data)
         ), 200
