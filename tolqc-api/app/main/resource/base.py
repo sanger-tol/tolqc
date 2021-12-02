@@ -63,7 +63,9 @@ def handle_400_db_integrity_error(function):
         except IntegrityError:
             return {
                 "error": "Integrity error, most likely due to"
-                         " bad foreign keys specified."
+                         " bad foreign keys specified, or for "
+                         "DELETE, a dependency on the specified"
+                         "instance."
             }, 400
     return wrapper
 
