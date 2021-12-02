@@ -200,7 +200,7 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
         for field in exclude_fields:
             if field != 'id' and field not in non_required_fields:
                 raise RequiredFieldExcludedException(field, cls)
-        
+
         return cls._to_model_dict(
             exclude_fields=exclude_fields,
             ignore_required=False
