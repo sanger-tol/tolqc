@@ -75,11 +75,11 @@ class BaseTestCase(TestCase):
     def add_D(self, **kwargs):
         d_model = ModelWithNonNullableColumn(**kwargs)
         d_model.save()
-    
+
     def add_E(self, **kwargs):
         e_model = ModelRelationshipE(**kwargs)
         e_model.save()
-    
+
     def to_json_api(self, id, type, json):
         return {
             'data': {

@@ -32,14 +32,14 @@ class TestGetInsertedData(BaseTestCase):
         self.add_C(id=9, other_column='test the world')
 
         expected = self.to_json_api(
-            9, 
+            9,
             'C',
             {
                 'nullable_column': None,
                 'other_column': 'test the world',
             }
         )
-        
+
         response = self.client.open(
             '/api/v1/C/9',
             method='GET',
