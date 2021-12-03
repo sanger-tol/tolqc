@@ -144,8 +144,6 @@ class BaseDetailResource(Resource):
         model = self.response_schema.read_by_id(id)
         return model, 200
 
-    # TODO add auth
-    # TODO add deletion conflict exception
     @handle_400_db_integrity_error
     @handle_404
     def _delete_by_id(self, id):
