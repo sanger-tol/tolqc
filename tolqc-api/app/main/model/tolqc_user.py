@@ -20,3 +20,9 @@ class TolqcUser(Base):
                 'email': cls.email,
                 'organisation': ("" if cls.organisation is None else cls.organisation),
                 'roles': cls.roles}
+
+    @classmethod
+    def get_user_infos_by_token(cls, token):
+        user_id = cls.query.with_entities(cls.id) \
+            .filter(cls.token == token).first()
+        return user_id
