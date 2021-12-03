@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_sqlalchemy.model import Model
 from test.core import BaseTestCase
 from test.core.models import ModelRelationshipB, \
                              ModelWithNullableColumn, \

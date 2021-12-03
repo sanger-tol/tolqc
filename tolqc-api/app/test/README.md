@@ -22,3 +22,4 @@ Main - tests the main logic of ToLQC
     - e.g. deleting an instance with dependencies causes a 400
 - That every custom exception has a test case!
 - That post/put requests lead to the correct corresponding changes to the DB
+- That a model, with one of every field, serialiases correctly
