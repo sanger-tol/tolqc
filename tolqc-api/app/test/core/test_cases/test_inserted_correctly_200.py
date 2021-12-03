@@ -10,7 +10,7 @@ from test.core.models import ModelRelationshipB, \
 
 class TestInsertedCorrectly200(BaseTestCase):
     def test_inserted_correctly_B_200(self):
-        a_id=90
+        a_id = 90
         self.add_A(id=a_id)
 
         response = self.client.open(
@@ -28,7 +28,7 @@ class TestInsertedCorrectly200(BaseTestCase):
 
         inserted = ModelRelationshipB.find_by_id(id)
         self.assertEqual(inserted.a_id, a_id)
-    
+
     def test_inserted_correctly_C_200(self):
         other_column_string = 'this is a test, nice'
 
@@ -48,7 +48,7 @@ class TestInsertedCorrectly200(BaseTestCase):
         inserted = ModelWithNullableColumn.find_by_id(id)
         self.assertEqual(inserted.nullable_column, None)
         self.assertEqual(inserted.other_column, other_column_string)
-    
+
     def test_inserted_correctly_D_200(self):
         other_column_string = 'this is also a test'
         non_nullable_string = 'another test, sick'
