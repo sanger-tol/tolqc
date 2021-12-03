@@ -43,7 +43,13 @@ class BaseNamespace(Namespace):
 def provide_body_data(function):
     def wrapper(obj, *args, **kwargs):
         data = obj.namespace.payload
-        return function(obj, data, *args, **kwargs)
+        if obj.is_list_resource():
+            # no id, return data straight after obj
+            return function(obj, data, *args, **kwargs)
+        else:
+            # id is defined, and needs to go before data
+            id = args[0]
+            return function(obj, id, data, *args[1:], **kwargs)
     return wrapper
 
 
@@ -106,6 +112,10 @@ class BaseDetailResource(Resource):
     """
 
     @classmethod
+    def is_list_resource(cls):
+        return False
+
+    @classmethod
     def _check_class_variable(cls, class_variable):
         if not hasattr(cls, class_variable):
             raise MissingResourceClassVariableException(
@@ -124,8 +134,7 @@ class BaseDetailResource(Resource):
         for class_variable in required_class_variables:
             cls._check_class_variable(class_variable)
 
-    def error_404(self, *args):
-        id = args[0] if len(args) == 1 else args[1]
+    def error_404(self, id, *args):
         return {
             "error": f"No {self.name} with id {id} found."
         }, 404
@@ -148,10 +157,10 @@ class BaseDetailResource(Resource):
     @handle_400_id_in_body_error
     @handle_400_empty_body_error
     @handle_404
-    def _put_by_id(self, data, id):
+    def _put_by_id(self, id, data):
         # N.B., the process_body_data decorator provides the data,
         # _do not_ provide it in the call signature, only id, i.e.:
-        # use _put_by_id(id) not _put_by_id(data, id)
+        # use _put_by_id(id) not _put_by_id(id, data)
         model = self.response_schema.update_by_id(
             id,
             data
@@ -169,6 +178,10 @@ class BaseListResource(Resource):
     * request_schema
     * response_schema
     """
+
+    @classmethod
+    def is_list_resource(cls):
+        return True
 
     # TODO modify to accept multiple instances in one go
     @provide_body_data
