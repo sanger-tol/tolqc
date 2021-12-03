@@ -54,11 +54,11 @@ def provide_body_data(function):
 
 
 def handle_404(function):
-    def wrapper(obj, *args, **kwargs):
+    def wrapper(obj, id, *args, **kwargs):
         try:
-            return function(obj, *args, **kwargs)
+            return function(obj, id, *args, **kwargs)
         except InstanceDoesNotExistException:
-            return obj.error_404(*args)
+            return obj.error_404(id)
     return wrapper
 
 
@@ -134,7 +134,7 @@ class BaseDetailResource(Resource):
         for class_variable in required_class_variables:
             cls._check_class_variable(class_variable)
 
-    def error_404(self, id, *args):
+    def error_404(self, id):
         return {
             "error": f"No {self.name} with id {id} found."
         }, 404
