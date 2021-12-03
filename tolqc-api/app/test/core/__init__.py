@@ -14,7 +14,8 @@ from main.model import db
 from test.core.models import ModelRelationshipA, \
                              ModelRelationshipB, \
                              ModelWithNullableColumn, \
-                             ModelWithNonNullableColumn
+                             ModelWithNonNullableColumn, \
+                             ModelRelationshipE
 from test.core.resources import b_namespace, \
                                 c_namespace, \
                                 d_namespace
@@ -38,6 +39,8 @@ class BaseTestCase(TestCase):
         db.session.commit()
 
     def tearDown(self):
+        db.session.rollback()
+        db.session.query(ModelRelationshipE).delete()
         db.session.query(ModelRelationshipB).delete()
         db.session.query(ModelRelationshipA).delete()
         db.session.query(ModelWithNullableColumn).delete()
@@ -72,6 +75,10 @@ class BaseTestCase(TestCase):
     def add_D(self, **kwargs):
         d_model = ModelWithNonNullableColumn(**kwargs)
         d_model.save()
+    
+    def add_E(self, **kwargs):
+        e_model = ModelRelationshipE(**kwargs)
+        e_model.save()
     
     def to_json_api(self, id, type, json):
         return {

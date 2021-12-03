@@ -5,4 +5,5 @@
 from .models import ModelRelationshipA, \
                     ModelRelationshipB, \
                     ModelWithNullableColumn, \
-                    ModelWithNonNullableColumn # noqa
+                    ModelWithNonNullableColumn , \
+                    ModelRelationshipE # noqa
