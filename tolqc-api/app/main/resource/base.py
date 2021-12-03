@@ -89,13 +89,14 @@ def handle_400_id_in_body_error(function):
 
 
 def handle_400_empty_body_error(function):
-    def wrapper(obj, data, *args, **kwargs):
+    def wrapper(obj, *args, **kwargs):
+        data = args[0] if obj.is_list_resource() else args[1]
         if not data:
             return {
                 "error": "Data must be specified in the request"
                          " body, this cannot be empty."
-            }, 404
-        return function(obj, data, *args, **kwargs)
+            }, 400
+        return function(obj, *args, **kwargs)
     return wrapper
 
 
