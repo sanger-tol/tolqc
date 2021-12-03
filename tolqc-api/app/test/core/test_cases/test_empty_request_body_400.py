@@ -16,7 +16,7 @@ class TestEmptyRequestBody400(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_post_C_with_empty_request_body_400(self):
         response = self.client.open(
             '/api/v1/C',
@@ -27,7 +27,7 @@ class TestEmptyRequestBody400(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_post_D_with_empty_request_body_400(self):
         response = self.client.open(
             '/api/v1/D',
