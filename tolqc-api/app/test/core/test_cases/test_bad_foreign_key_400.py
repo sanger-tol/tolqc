@@ -20,3 +20,19 @@ class TestBadForeignKey400(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+
+    def test_put_B_with_bad_foreign_key_400(self):
+        self.add_A(id=50)
+        self.add_B(id=26, a_id=50)
+
+        response = self.client.open(
+            '/api/v1/B/26',
+            method='PUT',
+            json={
+                'a_id': 99999
+            }
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
