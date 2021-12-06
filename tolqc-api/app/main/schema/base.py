@@ -113,26 +113,30 @@ class BaseSchema():
 
     def create(self, data):
         """Currently removes extra data"""
-        base_data, _ = self._separate_extra_data(data)
-        model = self.Meta.model(**base_data)
-        model.save()
-        return model
+        base_data, ext_data = self._separate_extra_data(data)
+        model = self.Meta.model
+        if model.has_ext_column():
+            model_instance = model(ext=ext_data, **base_data)
+        else:
+            model_instance = model(**base_data)
+        model_instance.save()
+        return model_instance
 
     def read_by_id(self, id):
-        model = self._find_model_by_id(id)
-        return self.dump(model)
+        model_instance = self._find_model_by_id(id)
+        return self.dump(model_instance)
 
     def update_by_id(self, id, data):
         base_data, _ = self._separate_extra_data(data)
-        model = self._find_model_by_id(id)
-        model.update(base_data)
-        model.commit()
-        return self.dump(model)
+        model_instance = self._find_model_by_id(id)
+        model_instance.update(base_data)
+        model_instance.commit()
+        return self.dump(model_instance)
 
     def delete_by_id(self, id):
-        model = self._find_model_by_id(id)
-        model.delete()
-        model.commit()
+        model_instance = self._find_model_by_id(id)
+        model_instance.delete()
+        model_instance.commit()
 
 # requests are in regular dict format, responses in JSON:API
 
