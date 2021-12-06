@@ -59,26 +59,24 @@ class BaseTestCase(TestCase):
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
         return app
+    
+    def _add_model_instance(self, model, **kwargs):
+        model(**kwargs).save()
 
     def add_A(self, **kwargs):
-        a_model = ModelRelationshipA(**kwargs)
-        a_model.save()
+        self._add_model_instance(ModelRelationshipA, **kwargs)
 
     def add_B(self, **kwargs):
-        b_model = ModelRelationshipB(**kwargs)
-        b_model.save()
+        self._add_model_instance(ModelRelationshipB, **kwargs)
 
     def add_C(self, **kwargs):
-        c_model = ModelWithNullableColumn(**kwargs)
-        c_model.save()
+        self._add_model_instance(ModelWithNullableColumn, **kwargs)
 
     def add_D(self, **kwargs):
-        d_model = ModelWithNonNullableColumn(**kwargs)
-        d_model.save()
+        self._add_model_instance(ModelWithNonNullableColumn, **kwargs)
 
     def add_E(self, **kwargs):
-        e_model = ModelRelationshipE(**kwargs)
-        e_model.save()
+        self._add_model_instance(ModelRelationshipE, **kwargs)
 
     def to_json_api(self, id, type, json):
         return {
