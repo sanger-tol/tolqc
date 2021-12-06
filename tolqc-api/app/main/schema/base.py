@@ -120,7 +120,7 @@ class BaseSchema():
         base_data, ext_data = self._separate_extra_data(data)
         model = self.Meta.model
 
-        if model.has_ext_column() and ext_data:
+        if ext_data:
             model_instance = model(ext=ext_data, **base_data)
         else:
             model_instance = model(**base_data)
@@ -133,7 +133,8 @@ class BaseSchema():
 
     def update_by_id(self, id, data):
         base_data, ext_data = self._separate_extra_data(data)
-        base_data['ext'] = ext_data
+        if ext_data:
+            base_data['ext'] = ext_data
         model_instance = self._find_model_by_id(id)
         model_instance.update(base_data)
         model_instance.commit()
