@@ -111,7 +111,7 @@ class BaseSchema():
         }
         return base_data, extra_data
 
-    def create(self, data):
+    def create_individual(self, data):
         """Currently removes extra data"""
         base_data, ext_data = self._separate_extra_data(data)
         model = self.Meta.model
