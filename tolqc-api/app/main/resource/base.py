@@ -69,8 +69,8 @@ def handle_400_extra_fields_not_permitted_error(function):
             return function(*args, **kwargs)
         except ExtraFieldsNotPermittedException as e:
             return {
-                "error": "Extra fields (" + \
-                         e.get_extra_fields_str() + \
+                "error": "Extra fields (" +
+                         e.get_extra_fields_str() +
                          ") not permitted."
             }, 400
     return wrapper
