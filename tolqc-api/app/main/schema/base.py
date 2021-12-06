@@ -70,14 +70,6 @@ class BaseSchema():
                 )
 
     @classmethod
-    def _get_nullable_fields(cls):
-        columns = cls.Meta.model.get_columns()
-        return [
-            c.name for c in columns
-            if c.nullable
-        ]
-
-    @classmethod
     def _get_non_required_fields(cls):
         columns = cls.Meta.model.get_columns()
         nullable_fields = [
