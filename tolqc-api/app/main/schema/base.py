@@ -133,6 +133,7 @@ class BaseSchema():
 
     def update_by_id(self, id, data):
         base_data, ext_data = self._separate_extra_data(data)
+        base_data['ext'] = ext_data
         model_instance = self._find_model_by_id(id)
         model_instance.update(base_data)
         model_instance.commit()

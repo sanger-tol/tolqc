@@ -109,3 +109,17 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+    
+    def test_extra_fields_post_D_400(self):
+        response = self.client.open(
+            '/api/v1/D',
+            method='POST',
+            json={
+                "non_nullable_column": "new test",
+                "extra_field": "superfluity"
+            }
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
