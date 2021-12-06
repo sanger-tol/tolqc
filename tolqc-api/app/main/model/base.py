@@ -17,10 +17,20 @@ class Base(db.Model):
 
     def add(self):
         db.session.add(self)
+    
+    def update_ext(self, new_ext_data):
+        for key, item in new_ext_data.items():
+            if item is None and self.ext[key]:
+                del self.ext[key]
+                continue
+            self.ext[key] = item
 
     def update(self, data):
         for key, item in data.items():
-            setattr(self, key, item)
+            if key == 'ext':
+                self.update_ext(item)
+            else:
+                setattr(self, key, item)
 
     def delete(self):
         db.session.delete(self)
