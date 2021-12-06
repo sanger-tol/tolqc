@@ -7,7 +7,7 @@ from .base import Base, db
 
 class TolqcUser(Base):
     __tablename__ = "user"
-    user_id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), nullable=False, unique=True)
     organisation = db.Column(db.String())

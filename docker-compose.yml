@@ -14,6 +14,13 @@ services:
       - POSTGRES_DB
     ports:
       - 5435:5432
+  
+  tolqc-db-core-test:
+    image: postgres:11
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB=core-test
 
   tolqc-api:
     build: tolqc-api/.
@@ -53,8 +60,8 @@ services:
   tolqc-api-test:
     image: tolqc-api
     command: dockerize
-        -wait tcp://tolqc-db:5432 -wait tcp://tolqc-api:80 -timeout 10s
-        bash -c "pytest -v"
+        -wait tcp://tolqc-db:5432 -timeout 10s -wait tcp://tolqc-db-core-test:5432 -timeout 10s
+        bash -c "pytest -v --ignore=/app/test/main/ && pytest -v --ignore=/app/test/core/"
     environment:
       - DB_URI
       - TOLQC_URL
@@ -68,6 +75,8 @@ services:
       - MAIL_PASSWORD_SMTP
       - MAIL_HOST
       - MAIL_PORT
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
     depends_on:
       - tolqc-db
       - tolqc-api

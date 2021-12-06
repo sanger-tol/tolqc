@@ -12,7 +12,11 @@ from jwt import (
 from jwt.exceptions import (
     JWTDecodeError,
 )
-from connexion.exceptions import OAuthProblem
+
+
+class OAuthProblem(Exception):
+    # implement this
+    pass
 
 
 def apikey_auth(token, required_scopes):
@@ -38,4 +42,4 @@ def apikey_auth(token, required_scopes):
         except JWTDecodeError as e:
             raise OAuthProblem('Invalid Elixir token: '+e.args[0])
         print(payload)
-    return {"user": user.name, "uid": user.user_id}
+    return {"user": user.name, "uid": user.id}

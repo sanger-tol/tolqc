@@ -7,11 +7,11 @@ from .base import Base, db
 
 class TolqcSpecimen(Base):
     __tablename__ = "specimen"
-    row_id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     specimen_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    species_row_id = db.Column(db.Integer(), db.ForeignKey("species.row_id"),
+    species_row_id = db.Column(db.Integer(), db.ForeignKey("species.id"),
                                nullable=False)
     lims_id = db.Column(db.Integer())
     supplier_name = db.Column(db.String())

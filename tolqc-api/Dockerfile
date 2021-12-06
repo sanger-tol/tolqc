@@ -23,6 +23,5 @@ RUN pip3 install --upgrade setuptools
 RUN python3 setup.py install
 
 RUN pip3 --no-cache-dir install -r requirements.txt
-RUN pip3 --no-cache-dir install 'connexion[swagger-ui]'
 
 COPY ./app /app

@@ -130,7 +130,8 @@ test-api:
     STACK_NAME: tolqc
   script:
     - sleep 60
-    - docker exec $(docker ps -q -f name="tolqc_tolqc-api") bash -c "pytest -v"
+    - docker exec $(docker ps -q -f name="tolqc_tolqc-api") 
+      bash -c "pytest -v --ignore=/app/test/main/ && pytest -v --ignore=/app/test/core/"
   except:
     - staging
     - production

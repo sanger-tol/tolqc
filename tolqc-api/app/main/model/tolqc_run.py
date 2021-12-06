@@ -3,17 +3,19 @@
 # SPDX-License-Identifier: MIT
 
 from .base import Base, db
+from .tolqc_centre import TolqcCentre
 
 
 class TolqcRun(Base):
     __tablename__ = "run"
-    row_id = db.Column(db.Integer(), primary_key=True)
+    # the row id
+    id = db.Column(db.Integer(), primary_key=True)
     run_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    platform_id = db.Column(db.Integer(), db.ForeignKey("platform.platform_id"),
+    platform_id = db.Column(db.Integer(), db.ForeignKey("platform.id"),
                             nullable=False)
-    centre_id = db.Column(db.Integer(), db.ForeignKey("centre.centre_id"),
+    centre_id = db.Column(db.Integer(), db.ForeignKey(TolqcCentre.id),
                           nullable=False)
     lims_id = db.Column(db.Integer())
     element = db.Column(db.String())
@@ -21,4 +23,4 @@ class TolqcRun(Base):
     current = db.Column(db.Boolean())
     seq = db.relationship("TolqcSeq", back_populates="run")
     platform = db.relationship("TolqcPlatform", back_populates="run", foreign_keys=[platform_id])
-    centre = db.relationship("TolqcCentre", back_populates="run", foreign_keys=[centre_id])
+    centre = db.relationship(TolqcCentre, back_populates="run", foreign_keys=[centre_id])

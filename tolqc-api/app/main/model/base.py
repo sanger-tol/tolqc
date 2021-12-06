@@ -8,6 +8,8 @@ db = SQLAlchemy()
 
 
 class Base(db.Model):
+    """The base model class. Its primary key must be called
+    id"""
     __abstract__ = True
 
     def to_dict(cls):
@@ -39,3 +41,20 @@ class Base(db.Model):
     def bulk_update(data):
         db.session.add_all(data)
         db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, _id):
+        return cls.query.filter_by(id=_id).one_or_none()
+
+    @classmethod
+    def get_columns(cls):
+        return list(cls.__table__.c)
+
+    @classmethod
+    def get_column_python_type(cls, column_name):
+        column = getattr(cls, column_name)
+        return column.type.python_type
+
+    @classmethod
+    def column_is_nullable(cls, column_name):
+        return cls.__table__.columns[column_name].nullable

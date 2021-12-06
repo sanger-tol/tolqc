@@ -15,3 +15,13 @@ services:
       - tolqc
     deploy:
       replicas: 1
+  tolqc-db-core-test:
+    image: postgres:11
+    env_file:
+      - ${ENV_FILE}
+    environment:
+      - POSTGRES_DB=core-test
+    networks:
+      - tolqc
+    deploy:
+      replicas: 1

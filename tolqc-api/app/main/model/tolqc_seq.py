@@ -7,16 +7,16 @@ from .base import Base, db
 
 class TolqcSeq(Base):
     __tablename__ = "seq"
-    row_id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     seq_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    sample_row_id = db.Column(db.Integer(), db.ForeignKey("sample.row_id"),
+    sample_row_id = db.Column(db.Integer(), db.ForeignKey("sample.id"),
                               nullable=False)
-    library_row_id = db.Column(db.Integer(), db.ForeignKey("library.row_id"),
+    library_row_id = db.Column(db.Integer(), db.ForeignKey("library.id"),
                                nullable=False)
     accession_id = db.Column(db.Integer())
-    run_row_id = db.Column(db.Integer(), db.ForeignKey("run.row_id"),
+    run_row_id = db.Column(db.Integer(), db.ForeignKey("run.id"),
                            nullable=False)
     processed = db.Column(db.Integer())
     tag1_id = db.Column(db.String())
