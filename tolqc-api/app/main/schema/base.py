@@ -10,6 +10,9 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
+from marshmallow_jsonapi.fields import DocumentMeta, \
+                                       BaseRelationship, \
+                                       ResourceMeta
 
 
 class RequiredFieldExcludedException(Exception):
@@ -262,6 +265,68 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         raise NotImplementedError(
             "Type f'{python_type}' has not been implemented yet."
         )
+    
+    # overrides
+    def format_item(self, item):
+        """Sourced from Marshmallow-jsonapi (MIT License)
+        Format a single datum as a Resource object.
+        See: http://jsonapi.org/format/#document-resource-objects
+        """
+        # TODO add license somewhere
+
+        # http://jsonapi.org/format/#document-top-level
+        # Primary data MUST be either... a single resource object, a single resource
+        # identifier object, or null, for requests that target single resources
+        TYPE = "type"
+        ID = "id"
+
+        if not item:
+            return None
+
+        ret = self.dict_class()
+        ret[TYPE] = self.opts.type_
+
+        # Get the schema attributes so we can confirm `dump-to` values exist
+        attributes = {
+            (self.fields[field].data_key or field): field for field in self.fields
+        }
+
+        for field_name, value in item.items():
+            #if value is None:# or field_name == 'ext':
+                #continue
+            # intercept external field
+            if field_name == 'ext':
+                if value is not None:
+                    for ext_field_name, ext_field_value in value.items():
+                        if "attributes" not in ret:
+                            ret["attributes"] = self.dict_class()
+                        ret["attributes"][ext_field_name] = ext_field_value
+                continue
+            attribute = attributes[field_name]
+            if attribute == ID:
+                ret[ID] = value
+            elif isinstance(self.fields[attribute], DocumentMeta):
+                if not self.document_meta:
+                    self.document_meta = self.dict_class()
+                self.document_meta.update(value)
+            elif isinstance(self.fields[attribute], ResourceMeta):
+                if "meta" not in ret:
+                    ret["meta"] = self.dict_class()
+                ret["meta"].update(value)
+            elif isinstance(self.fields[attribute], BaseRelationship):
+                if value:
+                    if "relationships" not in ret:
+                        ret["relationships"] = self.dict_class()
+                    ret["relationships"][self.inflect(field_name)] = value
+            else:
+                if "attributes" not in ret:
+                    ret["attributes"] = self.dict_class()
+                ret["attributes"][self.inflect(field_name)] = value
+
+        links = self.get_resource_links(item)
+        if links:
+            ret["links"] = links
+        return ret
 
     @classmethod
     @check_excluded_fields_nullable

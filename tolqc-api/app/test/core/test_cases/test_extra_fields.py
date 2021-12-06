@@ -123,3 +123,40 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+    
+    def test_extra_fields_put_F_200(self):
+        self.add_F(
+            id=90900,
+            ext={
+                "first": "nice",
+                "second": "nicer",
+                "third": "nicest",
+                "fourth": "irrelevant"
+            }
+        )
+        response = self.client.open(
+            '/api/v1/F/90900',
+            method='PUT',
+            json={
+                "first": "not very nice",
+                "second": "much less nice",
+                "third": None,
+                "fifth": "the worst of the bunch"
+            }
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        expected = self.to_json_api(
+            90900,
+            'F',
+            {
+                "first": "not very nice",
+                "second": "much less nice",
+                "fourth": "irrelevant",
+                "fifth": "the worst of the bunch",
+                "other_column": None
+            }
+        )
+        self.assertEqual(response.json, expected)

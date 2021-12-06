@@ -18,12 +18,14 @@ class Base(db.Model):
     def add(self):
         db.session.add(self)
     
-    def update_ext(self, new_ext_data):
-        for key, item in new_ext_data.items():
-            if item is None and self.ext[key]:
-                del self.ext[key]
+    def update_ext(self, ext_data_changes):
+        new_ext_data = {**self.ext}
+        for key, item in ext_data_changes.items():
+            if item is None and new_ext_data[key]:
+                del new_ext_data[key]
                 continue
-            self.ext[key] = item
+            new_ext_data[key] = item
+        self.ext = new_ext_data
 
     def update(self, data):
         for key, item in data.items():
