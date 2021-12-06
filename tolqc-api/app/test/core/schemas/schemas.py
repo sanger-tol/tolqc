@@ -58,6 +58,7 @@ class D_ResponseSchema(BaseResponseSchema):
         model = ModelWithNonNullableColumn
         include_fk = True
 
+
 class F_RequestSchema(BaseRequestSchema):
     class Meta:
         type_ = 'F'

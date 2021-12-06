@@ -19,7 +19,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             ModelWithExtField.has_ext_column(),
             True
         )
-    
+
     def test_extra_fields_post_F_200(self):
         extra_fields = {
             "extra_field": "superfluity",
@@ -42,7 +42,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         F_instance = ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.ext, extra_fields)
         self.assertEqual(F_instance.other_column, "another test :(")
-    
+
     def test_no_extra_fields_post_F_200(self):
         response = self.client.open(
             '/api/v1/F',

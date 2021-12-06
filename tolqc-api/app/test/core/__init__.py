@@ -63,7 +63,7 @@ class BaseTestCase(TestCase):
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
         return app
-    
+
     def _add_model_instance(self, model, **kwargs):
         model(**kwargs).save()
 
@@ -81,7 +81,7 @@ class BaseTestCase(TestCase):
 
     def add_E(self, **kwargs):
         self._add_model_instance(ModelRelationshipE, **kwargs)
-    
+
     def add_F(self, **kwargs):
         self._add_model_instance(ModelWithExtField, **kwargs)
 
