@@ -107,18 +107,18 @@ class BaseSchema():
             for f in request_fields
             if f in base_fields
         }
-        extra_data = {
+        ext_data = {
             f: data[f]
             for f in request_fields
             if f not in base_fields
         }
-        return base_data, extra_data
+        if ext_data and not self.Meta.model.has_ext_column():
+            raise ExtraFieldsNotPermittedException(ext_data)
+        return base_data, ext_data
 
     def create_individual(self, data):
         base_data, ext_data = self._separate_extra_data(data)
         model = self.Meta.model
-        if ext_data and not model.has_ext_column():
-            raise ExtraFieldsNotPermittedException(ext_data)
 
         if model.has_ext_column() and ext_data:
             model_instance = model(ext=ext_data, **base_data)
@@ -133,11 +133,6 @@ class BaseSchema():
 
     def update_by_id(self, id, data):
         base_data, ext_data = self._separate_extra_data(data)
-        if ext_data and not self.Meta.model.has_ext_column():
-            # TODO move this (and in post) into a decorator
-            # e.g. separate_data
-            raise ExtraFieldsNotPermittedException(ext_data)
-
         model_instance = self._find_model_by_id(id)
         model_instance.update(base_data)
         model_instance.commit()
