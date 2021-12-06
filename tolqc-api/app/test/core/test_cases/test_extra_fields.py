@@ -3,9 +3,23 @@
 # SPDX-License-Identifier: MIT
 
 from test.core import BaseTestCase
+from test.core.models import ModelRelationshipA, \
+                             ModelWithExtField
 
 
 class TestExtraFieldsInRequestBody(BaseTestCase):
+    def test_extra_fields_does_not_exist_A(self):
+        self.assertEqual(
+            ModelRelationshipA.has_ext_column(),
+            False
+        )
+
+    def test_extra_fields_exists_F(self):
+        self.assertEqual(
+            ModelWithExtField.has_ext_column(),
+            True
+        )
+
     def test_extra_fields_put_B_200(self):
         self.add_A(id=50)
         self.add_B(id=20, a_id=50)

@@ -45,10 +45,21 @@ class Base(db.Model):
     @classmethod
     def find_by_id(cls, _id):
         return cls.query.filter_by(id=_id).one_or_none()
+    
+    @classmethod
+    def _get_columns(cls):
+        return list(cls.__table__.c)
 
     @classmethod
-    def get_columns(cls):
-        return list(cls.__table__.c)
+    def get_nullable_column_names(cls):
+        return [
+            c.name for c in cls._get_columns()
+            if c.nullable
+        ]
+
+    @classmethod
+    def get_column_names(cls):
+        return [c.name for c in cls._get_columns()]
 
     @classmethod
     def get_column_python_type(cls, column_name):
@@ -61,4 +72,4 @@ class Base(db.Model):
     
     @classmethod
     def has_ext_column(cls):
-        return 'ext' in cls.get_columns()
+        return 'ext' in cls.get_column_names()

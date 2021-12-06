@@ -50,10 +50,10 @@ def check_excluded_fields_nullable(function):
 class BaseSchema():
     @classmethod
     def _get_fields(cls, exclude_fields):
-        columns = cls.Meta.model.get_columns()
+        column_names = cls.Meta.model.get_column_names()
         return [
-            c.name for c in columns
-            if c.name not in exclude_fields
+            c for c in column_names
+            if c not in exclude_fields
         ]
 
     @classmethod
@@ -71,12 +71,7 @@ class BaseSchema():
 
     @classmethod
     def _get_non_required_fields(cls):
-        columns = cls.Meta.model.get_columns()
-        nullable_fields = [
-            c.name for c in columns
-            if c.nullable
-        ]
-        return nullable_fields
+        return cls.Meta.model.get_nullable_column_names()
 
     @classmethod
     def _get_required_fields(cls, exclude_fields):
