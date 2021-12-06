@@ -265,7 +265,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         raise NotImplementedError(
             "Type f'{python_type}' has not been implemented yet."
         )
-    
+
     # overrides
     def format_item(self, item):
         """Sourced from Marshmallow-jsonapi (MIT License)
@@ -292,8 +292,6 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         }
 
         for field_name, value in item.items():
-            #if value is None:# or field_name == 'ext':
-                #continue
             # intercept external field
             if field_name == 'ext':
                 if value is not None:

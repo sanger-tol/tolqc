@@ -109,7 +109,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_extra_fields_post_D_400(self):
         response = self.client.open(
             '/api/v1/D',
@@ -123,7 +123,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_extra_fields_put_F_200(self):
         self.add_F(
             id=90900,

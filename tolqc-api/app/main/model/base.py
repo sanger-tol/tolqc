@@ -17,7 +17,7 @@ class Base(db.Model):
 
     def add(self):
         db.session.add(self)
-    
+
     def update_ext(self, ext_data_changes):
         new_ext_data = {**self.ext}
         for key, item in ext_data_changes.items():
