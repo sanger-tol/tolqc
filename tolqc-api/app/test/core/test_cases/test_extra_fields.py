@@ -61,7 +61,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         self.assertEqual(F_instance.other_column, "nonsense!!!")
         self.assertEqual(F_instance.ext, None)
 
-    def test_extra_fields_put_B_200(self):
+    def test_extra_fields_put_B_400(self):
         self.add_A(id=50)
         self.add_B(id=20, a_id=50)
 
@@ -73,12 +73,12 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
                 "extra_field": "superfluity"
             }
         )
-        self.assert200(
+        self.assert400(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
 
-    def test_extra_fields_put_C_200(self):
+    def test_extra_fields_put_C_400(self):
         self.add_C(id=50)
 
         response = self.client.open(
@@ -89,12 +89,12 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
                 "extra_field": "superfluity"
             }
         )
-        self.assert200(
+        self.assert400(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
 
-    def test_extra_fields_put_D_200(self):
+    def test_extra_fields_put_D_400(self):
         self.add_D(id=50, non_nullable_column='test')
 
         response = self.client.open(
@@ -105,7 +105,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
                 "extra_field": "superfluity"
             }
         )
-        self.assert200(
+        self.assert400(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )

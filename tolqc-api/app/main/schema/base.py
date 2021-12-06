@@ -32,6 +32,14 @@ class IdSpecifiedInRequestBodyException(Exception):
     pass
 
 
+class ExtraFieldsNotPermittedException(Exception):
+    def __init__(self, ext_fields):
+        self._ext_fields = ext_fields
+
+    def get_extra_fields_str(self):
+        return ', '.join(self._ext_fields.keys())
+
+
 def check_excluded_fields_nullable(function):
     def wrapper(schema, *args, exclude_fields=[], **kwargs):
         nullable_fields = schema._get_non_required_fields()
@@ -109,6 +117,9 @@ class BaseSchema():
     def create_individual(self, data):
         base_data, ext_data = self._separate_extra_data(data)
         model = self.Meta.model
+        if ext_data and not model.has_ext_column():
+            raise ExtraFieldsNotPermittedException(ext_data)
+
         if model.has_ext_column() and ext_data:
             model_instance = model(ext=ext_data, **base_data)
         else:
@@ -121,7 +132,12 @@ class BaseSchema():
         return self.dump(model_instance)
 
     def update_by_id(self, id, data):
-        base_data, _ = self._separate_extra_data(data)
+        base_data, ext_data = self._separate_extra_data(data)
+        if ext_data and not self.Meta.model.has_ext_column():
+            # TODO move this (and in post) into a decorator
+            # e.g. separate_data
+            raise ExtraFieldsNotPermittedException(ext_data)
+
         model_instance = self._find_model_by_id(id)
         model_instance.update(base_data)
         model_instance.commit()
