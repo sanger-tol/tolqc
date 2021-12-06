@@ -58,3 +58,7 @@ class Base(db.Model):
     @classmethod
     def column_is_nullable(cls, column_name):
         return cls.__table__.columns[column_name].nullable
+    
+    @classmethod
+    def has_ext_column(cls):
+        return 'ext' in cls.get_columns()
