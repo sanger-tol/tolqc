@@ -51,3 +51,4 @@ class ModelWithExtField(Base):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     ext = db.Column(db.JSON, nullable=True)
+    other_column = db.Column(db.String, nullable=True)

@@ -109,7 +109,7 @@ class BaseSchema():
     def create_individual(self, data):
         base_data, ext_data = self._separate_extra_data(data)
         model = self.Meta.model
-        if model.has_ext_column():
+        if model.has_ext_column() and ext_data:
             model_instance = model(ext=ext_data, **base_data)
         else:
             model_instance = model(**base_data)
@@ -173,7 +173,7 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
     @classmethod
     def _to_model_dict(cls, exclude_fields=[], ignore_required=None):
         fields = cls._get_fields(
-            exclude_fields=exclude_fields+['id']
+            exclude_fields=exclude_fields+['id', 'ext']
         )
         return {
             f: cls._get_field_model_type(f, ignore_required)
@@ -257,7 +257,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         dict_schema = {
             f: cls._get_field_schema_model_type(f)
             for f in cls._get_fields(
-                exclude_fields=exclude_fields
+                exclude_fields=exclude_fields + ['ext']
             )
         }
 

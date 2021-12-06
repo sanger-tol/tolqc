@@ -11,12 +11,15 @@ from test.core.schemas import B_RequestSchema, \
                               C_RequestSchema, \
                               C_ResponseSchema, \
                               D_RequestSchema, \
-                              D_ResponseSchema
+                              D_ResponseSchema, \
+                              F_RequestSchema, \
+                              F_ResponseSchema
 
 
 b_namespace = BaseNamespace('B')
 c_namespace = BaseNamespace('C')
 d_namespace = BaseNamespace('D')
+f_namespace = BaseNamespace('F')
 
 b_post_model = b_namespace.model(
     'B Post',
@@ -55,6 +58,19 @@ d_put_model = d_namespace.model(
 d_response_model = d_namespace.schema_model(
     'D response',
     D_ResponseSchema.to_schema_model_dict()
+)
+
+f_post_model = f_namespace.model(
+    'F Post',
+    F_RequestSchema.to_post_model_dict()
+)
+f_put_model = f_namespace.model(
+    'F put',
+    F_RequestSchema.to_put_model_dict()
+)
+f_response_model = f_namespace.schema_model(
+    'F response',
+    F_ResponseSchema.to_schema_model_dict()
 )
 
 
@@ -142,6 +158,34 @@ class D_ListResource(BaseListResource):
         return self._post()
 
 
+class F_DetailResource(BaseDetailResource):
+    name = 'F'
+    namespace = f_namespace
+    request_schema = F_RequestSchema()
+    response_schema = F_ResponseSchema()
+
+    def get(self, id):
+        return self._get_by_id(id)
+
+    @f_namespace.expect(f_put_model)
+    def put(self, id):
+        return self._put_by_id(id)
+
+    def delete(self, id):
+        return self._delete_by_id(id)
+
+
+class F_ListResource(BaseListResource):
+    name = 'F'
+    namespace = f_namespace
+    request_schema = F_RequestSchema()
+    response_schema = F_ResponseSchema()
+
+    @f_namespace.expect(f_post_model)
+    def post(self):
+        return self._post()
+
+
 b_namespace.add_resource(B_DetailResource, '/<int:id>')
 b_namespace.add_resource(B_ListResource, '')
 
@@ -150,3 +194,6 @@ c_namespace.add_resource(C_ListResource, '')
 
 d_namespace.add_resource(D_DetailResource, '/<int:id>')
 d_namespace.add_resource(D_ListResource, '')
+
+f_namespace.add_resource(F_DetailResource, '/<int:id>')
+f_namespace.add_resource(F_ListResource, '')

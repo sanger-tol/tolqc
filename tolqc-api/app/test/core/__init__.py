@@ -15,10 +15,12 @@ from test.core.models import ModelRelationshipA, \
                              ModelRelationshipB, \
                              ModelWithNullableColumn, \
                              ModelWithNonNullableColumn, \
-                             ModelRelationshipE
+                             ModelRelationshipE, \
+                             ModelWithExtField
 from test.core.resources import b_namespace, \
                                 c_namespace, \
-                                d_namespace
+                                d_namespace, \
+                                f_namespace
 
 
 def _setup_api(blueprint):
@@ -30,6 +32,7 @@ def _setup_api(blueprint):
     api.add_namespace(b_namespace)
     api.add_namespace(c_namespace)
     api.add_namespace(d_namespace)
+    api.add_namespace(f_namespace)
 
 
 class BaseTestCase(TestCase):
@@ -45,6 +48,7 @@ class BaseTestCase(TestCase):
         db.session.query(ModelRelationshipA).delete()
         db.session.query(ModelWithNullableColumn).delete()
         db.session.query(ModelWithNonNullableColumn).delete()
+        db.session.query(ModelWithExtField).delete()
         db.session.commit()
 
     def create_app(self):
@@ -77,6 +81,9 @@ class BaseTestCase(TestCase):
 
     def add_E(self, **kwargs):
         self._add_model_instance(ModelRelationshipE, **kwargs)
+    
+    def add_F(self, **kwargs):
+        self._add_model_instance(ModelWithExtField, **kwargs)
 
     def to_json_api(self, id, type, json):
         return {
