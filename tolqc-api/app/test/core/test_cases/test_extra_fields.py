@@ -161,7 +161,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             }
         )
         self.assertEqual(response.json, expected)
-    
+
     def test_no_extra_fields_get_F_200(self):
         self.add_F(id=290)
 
