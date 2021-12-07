@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: marshmallow-jsonapi
+Upstream-Contact: Steven Loria
+Source: https://github.com/marshmallow-code/marshmallow-jsonapi
+
+Files: tolqc-api/app/main/schema/base.py # just BaseRequestSchema.format_item()
+Copyright: 2015-2020 Steven Loria and contributors
+License: MIT
