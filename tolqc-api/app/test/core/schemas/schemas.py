@@ -7,7 +7,8 @@ from main.schema.base import BaseRequestSchema, \
 
 from test.core.models import ModelRelationshipB, \
                              ModelWithNullableColumn, \
-                             ModelWithNonNullableColumn
+                             ModelWithNonNullableColumn, \
+                             ModelWithExtField
 
 
 class B_RequestSchema(BaseRequestSchema):
@@ -55,4 +56,20 @@ class D_ResponseSchema(BaseResponseSchema):
         type_ = 'D'
         strict = True
         model = ModelWithNonNullableColumn
+        include_fk = True
+
+
+class F_RequestSchema(BaseRequestSchema):
+    class Meta:
+        type_ = 'F'
+        strict = True
+        model = ModelWithExtField
+        include_fk = True
+
+
+class F_ResponseSchema(BaseResponseSchema):
+    class Meta:
+        type_ = 'F'
+        strict = True
+        model = ModelWithExtField
         include_fk = True

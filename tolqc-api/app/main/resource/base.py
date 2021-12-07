@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from main.schema import InstanceDoesNotExistException, \
                         IdSpecifiedInRequestBodyException
+from main.model import ExtraFieldsNotPermittedException
 
 
 class MissingResourceClassVariableException(Exception):
@@ -59,6 +60,19 @@ def handle_404(function):
             return function(obj, id, *args, **kwargs)
         except InstanceDoesNotExistException:
             return obj.error_404(id)
+    return wrapper
+
+
+def handle_400_extra_fields_not_permitted_error(function):
+    def wrapper(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except ExtraFieldsNotPermittedException as e:
+            return {
+                "error": "Extra fields (" +
+                         e.get_extra_fields_str() +
+                         ") not permitted."
+            }, 400
     return wrapper
 
 
@@ -155,6 +169,7 @@ class BaseDetailResource(Resource):
     @handle_400_db_integrity_error
     @handle_400_id_in_body_error
     @handle_400_empty_body_error
+    @handle_400_extra_fields_not_permitted_error
     @handle_404
     def _put_by_id(self, id, data):
         # N.B., the process_body_data decorator provides the data,
@@ -187,10 +202,11 @@ class BaseListResource(Resource):
     @handle_400_id_in_body_error
     @handle_400_db_integrity_error
     @handle_400_empty_body_error
+    @handle_400_extra_fields_not_permitted_error
     def _post(self, data):
         # N.B., the process_body_decorator provides the data,
         # _do not_ provide it in the call signature, i.e.
         # use _post() not _post(data)
         return self.response_schema.dump(
-            self.request_schema.create(data)
+            self.request_schema.create_individual(data)
         ), 200

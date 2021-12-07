@@ -10,6 +10,11 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
+from marshmallow_jsonapi.fields import DocumentMeta, \
+                                       BaseRelationship, \
+                                       ResourceMeta
+
+from main.model import ExtraFieldsNotPermittedException
 
 
 class RequiredFieldExcludedException(Exception):
@@ -50,10 +55,10 @@ def check_excluded_fields_nullable(function):
 class BaseSchema():
     @classmethod
     def _get_fields(cls, exclude_fields):
-        columns = cls.Meta.model.get_columns()
+        column_names = cls.Meta.model.get_column_names()
         return [
-            c.name for c in columns
-            if c.name not in exclude_fields
+            c for c in column_names
+            if c not in exclude_fields
         ]
 
     @classmethod
@@ -71,12 +76,7 @@ class BaseSchema():
 
     @classmethod
     def _get_non_required_fields(cls):
-        columns = cls.Meta.model.get_columns()
-        nullable_fields = [
-            c.name for c in columns
-            if c.nullable
-        ]
-        return nullable_fields
+        return cls.Meta.model.get_nullable_column_names()
 
     @classmethod
     def _get_required_fields(cls, exclude_fields):
@@ -104,35 +104,43 @@ class BaseSchema():
             for f in request_fields
             if f in base_fields
         }
-        extra_data = {
+        ext_data = {
             f: data[f]
             for f in request_fields
             if f not in base_fields
         }
-        return base_data, extra_data
+        if ext_data and not self.Meta.model.has_ext_column():
+            raise ExtraFieldsNotPermittedException(ext_data)
+        return base_data, ext_data
 
-    def create(self, data):
-        """Currently removes extra data"""
-        base_data, _ = self._separate_extra_data(data)
-        model = self.Meta.model(**base_data)
-        model.save()
-        return model
+    def create_individual(self, data):
+        base_data, ext_data = self._separate_extra_data(data)
+        model = self.Meta.model
+
+        if ext_data:
+            model_instance = model(ext=ext_data, **base_data)
+        else:
+            model_instance = model(**base_data)
+        model_instance.save()
+        return model_instance
 
     def read_by_id(self, id):
-        model = self._find_model_by_id(id)
-        return self.dump(model)
+        model_instance = self._find_model_by_id(id)
+        return self.dump(model_instance)
 
     def update_by_id(self, id, data):
-        base_data, _ = self._separate_extra_data(data)
-        model = self._find_model_by_id(id)
-        model.update(base_data)
-        model.commit()
-        return self.dump(model)
+        base_data, ext_data = self._separate_extra_data(data)
+        if ext_data:
+            base_data['ext'] = ext_data
+        model_instance = self._find_model_by_id(id)
+        model_instance.update(base_data)
+        model_instance.commit()
+        return self.dump(model_instance)
 
     def delete_by_id(self, id):
-        model = self._find_model_by_id(id)
-        model.delete()
-        model.commit()
+        model_instance = self._find_model_by_id(id)
+        model_instance.delete()
+        model_instance.commit()
 
 # requests are in regular dict format, responses in JSON:API
 
@@ -175,7 +183,7 @@ class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
     @classmethod
     def _to_model_dict(cls, exclude_fields=[], ignore_required=None):
         fields = cls._get_fields(
-            exclude_fields=exclude_fields+['id']
+            exclude_fields=exclude_fields+['id', 'ext']
         )
         return {
             f: cls._get_field_model_type(f, ignore_required)
@@ -252,6 +260,65 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             "Type f'{python_type}' has not been implemented yet."
         )
 
+    # overrides
+    def format_item(self, item):
+        """Sourced from Marshmallow-jsonapi (MIT License)
+        Format a single datum as a Resource object.
+        See: http://jsonapi.org/format/#document-resource-objects
+        """
+        # TODO add license somewhere
+
+        # http://jsonapi.org/format/#document-top-level
+        # Primary data MUST be either... a single resource object, a single resource
+        # identifier object, or null, for requests that target single resources
+        TYPE = "type"
+        ID = "id"
+
+        if not item:
+            return None
+
+        ret = self.dict_class()
+        ret[TYPE] = self.opts.type_
+
+        # Get the schema attributes so we can confirm `dump-to` values exist
+        attributes = {
+            (self.fields[field].data_key or field): field for field in self.fields
+        }
+
+        for field_name, value in item.items():
+            # intercept external field
+            if field_name == 'ext':
+                for ext_field_name, ext_field_value in value.items():
+                    if "attributes" not in ret:
+                        ret["attributes"] = self.dict_class()
+                    ret["attributes"][ext_field_name] = ext_field_value
+                continue
+            attribute = attributes[field_name]
+            if attribute == ID:
+                ret[ID] = value
+            elif isinstance(self.fields[attribute], DocumentMeta):
+                if not self.document_meta:
+                    self.document_meta = self.dict_class()
+                self.document_meta.update(value)
+            elif isinstance(self.fields[attribute], ResourceMeta):
+                if "meta" not in ret:
+                    ret["meta"] = self.dict_class()
+                ret["meta"].update(value)
+            elif isinstance(self.fields[attribute], BaseRelationship):
+                if value:
+                    if "relationships" not in ret:
+                        ret["relationships"] = self.dict_class()
+                    ret["relationships"][self.inflect(field_name)] = value
+            else:
+                if "attributes" not in ret:
+                    ret["attributes"] = self.dict_class()
+                ret["attributes"][self.inflect(field_name)] = value
+
+        links = self.get_resource_links(item)
+        if links:
+            ret["links"] = links
+        return ret
+
     @classmethod
     @check_excluded_fields_nullable
     def to_schema_model_dict(cls, exclude_fields=[]):
@@ -259,7 +326,7 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         dict_schema = {
             f: cls._get_field_schema_model_type(f)
             for f in cls._get_fields(
-                exclude_fields=exclude_fields
+                exclude_fields=exclude_fields + ['ext']
             )
         }
 

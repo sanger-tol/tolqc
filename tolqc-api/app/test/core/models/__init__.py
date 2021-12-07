@@ -6,4 +6,5 @@ from .models import ModelRelationshipA, \
                     ModelRelationshipB, \
                     ModelWithNullableColumn, \
                     ModelWithNonNullableColumn , \
-                    ModelRelationshipE # noqa
+                    ModelRelationshipE, \
+                    ModelWithExtField # noqa

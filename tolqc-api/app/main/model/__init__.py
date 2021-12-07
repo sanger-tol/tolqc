@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import db, Base  # noqa
+from .base import db, Base, ExtColumn, \
+                  ExtraFieldsNotPermittedException  # noqa
 
 from .tolqc_user import TolqcUser  # noqa
 from .tolqc_role import TolqcRole  # noqa
