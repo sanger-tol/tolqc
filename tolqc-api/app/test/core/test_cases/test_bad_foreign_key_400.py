@@ -12,9 +12,9 @@ class TestBadForeignKey400(BaseTestCase):
         response = self.client.open(
             '/api/v1/B',
             method='POST',
-            json={
+            json=[{
                 "a_id": 9999
-            }
+            }]
         )
         self.assert400(
             response,

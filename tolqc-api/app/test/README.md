@@ -26,4 +26,6 @@ Main - tests the main logic of ToLQC
 
 - That new list resources work correctly
 - That new post response model works correctly
+    - check the various edge cases such as:
+        - The same object given multiple times
 - Test bulk get works correctly

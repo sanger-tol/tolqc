@@ -359,8 +359,9 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
         model = self.Meta.model
         return model.find_bulk()
     
-    def create_bulk(self, data):
-        base_data, ext_data = self._separate_extra_data(data)
+    def _create_individual(self, datum):
+        # TODO error handling
+        base_data, ext_data = self._separate_extra_data(datum)
         model = self.Meta.model
 
         if ext_data:
@@ -368,7 +369,10 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
         else:
             model_instance = model(**base_data)
         model_instance.save()
-        return [model_instance]
+        return model_instance
+    
+    def create_bulk(self, data):
+        return [self._create_individual(d) for d in data]
 
     @classmethod
     @check_excluded_fields_nullable
