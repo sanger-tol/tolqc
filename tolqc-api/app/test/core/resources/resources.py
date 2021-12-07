@@ -99,15 +99,15 @@ class B_DetailResource(BaseDetailResource):
         return self._delete_by_id(id)
 
 
-# class B_ListResource(BaseListResource):
-#     name = 'B'
-#     namespace = b_namespace
-#     request_schema = B_DetailRequestSchema()
-#     response_schema = B_DetailResponseSchema()
+class B_ListResource(BaseListResource):
+    name = 'B'
+    namespace = b_namespace
+    request_schema = B_ListRequestSchema()
+    response_schema = B_ListResponseSchema()
 
-#     @b_namespace.expect(b_post_model)
-#     def post(self):
-#         return self._post()
+    @b_namespace.expect(b_post_model)
+    def post(self):
+        return self._post()
 
 
 class C_DetailResource(BaseDetailResource):
@@ -127,15 +127,15 @@ class C_DetailResource(BaseDetailResource):
         return self._delete_by_id(id)
 
 
-# class C_ListResource(BaseListResource):
-#     name = 'C'
-#     namespace = c_namespace
-#     request_schema = C_DetailRequestSchema()
-#     response_schema = C_DetailResponseSchema()
+class C_ListResource(BaseListResource):
+    name = 'C'
+    namespace = c_namespace
+    request_schema = C_ListRequestSchema()
+    response_schema = C_ListResponseSchema()
 
-#     @c_namespace.expect(c_post_model)
-#     def post(self):
-#         return self._post()
+    @c_namespace.expect(c_post_model)
+    def post(self):
+        return self._post()
 
 
 class D_DetailResource(BaseDetailResource):
@@ -155,15 +155,15 @@ class D_DetailResource(BaseDetailResource):
         return self._delete_by_id(id)
 
 
-# class D_ListResource(BaseListResource):
-#     name = 'D'
-#     namespace = d_namespace
-#     request_schema = D_DetailRequestSchema()
-#     response_schema = D_DetailResponseSchema()
+class D_ListResource(BaseListResource):
+    name = 'D'
+    namespace = d_namespace
+    request_schema = D_ListRequestSchema()
+    response_schema = D_ListResponseSchema()
 
-#     @d_namespace.expect(d_post_model)
-#     def post(self):
-#         return self._post()
+    @d_namespace.expect(d_post_model)
+    def post(self):
+        return self._post()
 
 
 class F_DetailResource(BaseDetailResource):
@@ -183,25 +183,25 @@ class F_DetailResource(BaseDetailResource):
         return self._delete_by_id(id)
 
 
-# class F_ListResource(BaseListResource):
-#     name = 'F'
-#     namespace = f_namespace
-#     request_schema = F_DetailRequestSchema()
-#     response_schema = F_DetailResponseSchema()
+class F_ListResource(BaseListResource):
+    name = 'F'
+    namespace = f_namespace
+    request_schema = F_ListRequestSchema()
+    response_schema = F_ListResponseSchema()
 
-#     @f_namespace.expect(f_post_model)
-#     def post(self):
-#         return self._post()
+    @f_namespace.expect(f_post_model)
+    def post(self):
+        return self._post()
 
 
 b_namespace.add_resource(B_DetailResource, '/<int:id>')
-#b_namespace.add_resource(B_ListResource, '')
+b_namespace.add_resource(B_ListResource, '')
 
 c_namespace.add_resource(C_DetailResource, '/<int:id>')
-#c_namespace.add_resource(C_ListResource, '')
+c_namespace.add_resource(C_ListResource, '')
 
 d_namespace.add_resource(D_DetailResource, '/<int:id>')
-#d_namespace.add_resource(D_ListResource, '')
+d_namespace.add_resource(D_ListResource, '')
 
 f_namespace.add_resource(F_DetailResource, '/<int:id>')
-#f_namespace.add_resource(F_ListResource, '')
+f_namespace.add_resource(F_ListResource, '')

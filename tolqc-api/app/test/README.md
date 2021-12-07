@@ -23,3 +23,7 @@ Main - tests the main logic of ToLQC
 - That every custom exception has a test case!
 - That post/put requests lead to the correct corresponding changes to the DB
 - That a model, with one of every field, serialiases correctly
+
+- That new list resources work correctly
+- That new post response model works correctly
+- Test bulk get works correctly

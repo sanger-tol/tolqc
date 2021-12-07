@@ -211,7 +211,7 @@ class BaseListResource(BaseResource):
         # _do not_ provide it in the call signature, i.e.
         # use _post() not _post(data)
         return self.response_schema.dump(
-            self.request_schema.create_individual(data)
+            self.request_schema.create_bulk(data)
         ), 200
 
 

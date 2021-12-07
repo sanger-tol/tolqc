@@ -357,7 +357,7 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
     
     def read_bulk(self):
         model = self.Meta.model
-        return self.dump(model.find_bulk())
+        return model.find_bulk()
     
     def create_bulk(self, data):
         base_data, ext_data = self._separate_extra_data(data)
