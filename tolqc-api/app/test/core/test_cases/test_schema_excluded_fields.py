@@ -8,7 +8,9 @@ from main.schema.base import RequiredFieldExcludedException
 
 from test.core import BaseTestCase
 from test.core.schemas import C_DetailRequestSchema, C_DetailResponseSchema, \
-                              D_DetailRequestSchema, D_DetailResponseSchema
+                              C_ListRequestSchema, \
+                              D_DetailRequestSchema, D_DetailResponseSchema, \
+                              D_ListRequestSchema
 
 
 class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
@@ -17,7 +19,7 @@ class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
         an exception in the right situations"""
         exclude_fields = ['nullable_column']
         # shouldn't raise exception on any dict conversion for C
-        C_DetailRequestSchema.to_post_model_dict(
+        C_ListRequestSchema.to_post_model_dict(
             exclude_fields=exclude_fields
         )
         C_DetailResponseSchema.to_schema_model_dict(
@@ -32,7 +34,7 @@ class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
         an exception in the right situations"""
         exclude_fields = ['non_nullable_column']
         with pytest.raises(RequiredFieldExcludedException):
-            D_DetailRequestSchema.to_post_model_dict(
+            D_ListRequestSchema.to_post_model_dict(
                 exclude_fields=exclude_fields
             )
         with pytest.raises(RequiredFieldExcludedException):
