@@ -186,10 +186,10 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
     def test_variety_type_extra_fields_get_F_200(self):
         ext_data = {
             "arrayData": [27, {
-                "testelement": "123"
+                "testElement": "123"
             }],
             "float": 9090.248,
-            "null": None
+            "null": [None]
         }
         self.add_F(id=297, ext=ext_data)
 
