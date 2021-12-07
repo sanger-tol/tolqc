@@ -43,8 +43,9 @@ class Base(db.Model):
             )
         ext_data = {**self.ext}
         for key, item in ext_data_changes.items():
-            if item is None and ext_data[key]:
-                del ext_data[key]
+            if item is None:
+                if ext_data[key]:
+                    del ext_data[key]
             else:
                 ext_data[key] = item
         self.ext = ext_data
