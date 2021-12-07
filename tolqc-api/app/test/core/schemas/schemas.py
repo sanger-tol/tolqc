@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema.base import BaseRequestSchema, \
-                             BaseResponseSchema, \
+from main.schema.base import BaseDetailRequestSchema, \
+                             BaseDetailResponseSchema, \
                              BaseMeta
 
 from test.core.models import ModelRelationshipB, \
@@ -16,11 +16,11 @@ class BMeta(BaseMeta):
     model = ModelRelationshipB
 
 
-class B_RequestSchema(BaseRequestSchema):
+class B_RequestSchema(BaseDetailRequestSchema):
     Meta = BMeta
         
 
-class B_ResponseSchema(BaseResponseSchema):
+class B_ResponseSchema(BaseDetailResponseSchema):
     Meta = BMeta
 
 
@@ -29,11 +29,11 @@ class CMeta(BaseMeta):
     model = ModelWithNullableColumn
 
 
-class C_RequestSchema(BaseRequestSchema):
+class C_RequestSchema(BaseDetailRequestSchema):
     Meta = CMeta
 
 
-class C_ResponseSchema(BaseResponseSchema):
+class C_ResponseSchema(BaseDetailResponseSchema):
     Meta = CMeta
 
 
@@ -42,11 +42,11 @@ class DMeta(BaseMeta):
     model = ModelWithNonNullableColumn
 
 
-class D_RequestSchema(BaseRequestSchema):
+class D_RequestSchema(BaseDetailRequestSchema):
     Meta = DMeta
 
 
-class D_ResponseSchema(BaseResponseSchema):
+class D_ResponseSchema(BaseDetailResponseSchema):
     Meta = DMeta
 
 
@@ -55,9 +55,9 @@ class FMeta(BaseMeta):
     model = ModelWithExtField
 
 
-class F_RequestSchema(BaseRequestSchema):
+class F_RequestSchema(BaseDetailRequestSchema):
     Meta = FMeta
 
 
-class F_ResponseSchema(BaseResponseSchema):
+class F_ResponseSchema(BaseDetailResponseSchema):
     Meta = FMeta

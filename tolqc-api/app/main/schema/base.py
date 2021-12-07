@@ -154,7 +154,7 @@ class RequestCombinedOpts(SQLAlchemyAutoSchemaOpts, MarshmallowSchemaOpts):
     pass
 
 
-class BaseRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
+class BaseDetailRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
     """Used for request/input"""
 
     OPTIONS_CLASS = RequestCombinedOpts
@@ -226,7 +226,7 @@ class ResponseCombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
     pass
 
 
-class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
+class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     """Used for response/output"""
 
     OPTIONS_CLASS = ResponseCombinedOpts
