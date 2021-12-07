@@ -4,6 +4,8 @@
 
 from main.schema.base import BaseDetailRequestSchema, \
                              BaseDetailResponseSchema, \
+                             BaseListRequestSchema, \
+                             BaseListResponseSchema, \
                              BaseMeta
 
 from test.core.models import ModelRelationshipB, \
@@ -16,11 +18,19 @@ class BMeta(BaseMeta):
     model = ModelRelationshipB
 
 
-class B_RequestSchema(BaseDetailRequestSchema):
+class B_DetailRequestSchema(BaseDetailRequestSchema):
+    Meta = BMeta
+  
+
+class B_DetailResponseSchema(BaseDetailResponseSchema):
+    Meta = BMeta
+
+
+class B_ListRequestSchema(BaseListRequestSchema):
     Meta = BMeta
         
 
-class B_ResponseSchema(BaseDetailResponseSchema):
+class B_ListResponseSchema(BaseListResponseSchema):
     Meta = BMeta
 
 
@@ -29,11 +39,19 @@ class CMeta(BaseMeta):
     model = ModelWithNullableColumn
 
 
-class C_RequestSchema(BaseDetailRequestSchema):
+class C_DetailRequestSchema(BaseDetailRequestSchema):
     Meta = CMeta
 
 
-class C_ResponseSchema(BaseDetailResponseSchema):
+class C_DetailResponseSchema(BaseDetailResponseSchema):
+    Meta = CMeta
+
+
+class C_ListRequestSchema(BaseListRequestSchema):
+    Meta = CMeta
+
+
+class C_ListResponseSchema(BaseListResponseSchema):
     Meta = CMeta
 
 
@@ -42,11 +60,19 @@ class DMeta(BaseMeta):
     model = ModelWithNonNullableColumn
 
 
-class D_RequestSchema(BaseDetailRequestSchema):
+class D_DetailRequestSchema(BaseDetailRequestSchema):
     Meta = DMeta
 
 
-class D_ResponseSchema(BaseDetailResponseSchema):
+class D_DetailResponseSchema(BaseDetailResponseSchema):
+    Meta = DMeta
+
+
+class D_ListRequestSchema(BaseListRequestSchema):
+    Meta = DMeta
+
+
+class D_ListResponseSchema(BaseListResponseSchema):
     Meta = DMeta
 
 
@@ -55,9 +81,17 @@ class FMeta(BaseMeta):
     model = ModelWithExtField
 
 
-class F_RequestSchema(BaseDetailRequestSchema):
+class F_DetailRequestSchema(BaseDetailRequestSchema):
     Meta = FMeta
 
 
-class F_ResponseSchema(BaseDetailResponseSchema):
+class F_DetailResponseSchema(BaseDetailResponseSchema):
+    Meta = FMeta
+
+
+class F_ListRequestSchema(BaseListRequestSchema):
+    Meta = FMeta
+
+
+class F_ListResponseSchema(BaseListResponseSchema):
     Meta = FMeta

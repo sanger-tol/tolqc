@@ -67,6 +67,11 @@ class Base(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+    
+    @classmethod
+    def find_bulk(cls, **kwargs):
+        # TODO narrow the scope here
+        return db.session.query(cls).all()
 
     @staticmethod
     def rollback():

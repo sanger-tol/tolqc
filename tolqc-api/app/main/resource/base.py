@@ -114,22 +114,8 @@ def handle_400_empty_body_error(function):
     return wrapper
 
 
-class BaseDetailResource(Resource):
-    """Wrapper for flask-restx's Resource - provides default
-    implementations of GET, DELETE, PUT methods for a detail
-    resource
 
-    Need to declare (as class variables):
-    * name
-    * namespace - for PUT requests
-    * request_schema
-    * response_schema
-    """
-
-    @classmethod
-    def is_list_resource(cls):
-        return False
-
+class BaseResource(Resource):
     @classmethod
     def _check_class_variable(cls, class_variable):
         if not hasattr(cls, class_variable):
@@ -148,6 +134,23 @@ class BaseDetailResource(Resource):
         ]
         for class_variable in required_class_variables:
             cls._check_class_variable(class_variable)
+
+
+class BaseDetailResource(BaseResource):
+    """Wrapper for flask-restx's Resource - provides default
+    implementations of GET, DELETE, PUT methods for a detail
+    resource
+
+    Need to declare (as class variables):
+    * name
+    * namespace - for PUT requests
+    * request_schema
+    * response_schema
+    """
+
+    @classmethod
+    def is_list_resource(cls):
+        return False
 
     def error_404(self, id):
         return {
@@ -182,7 +185,7 @@ class BaseDetailResource(Resource):
         return model, 200
 
 
-class BaseListResource(Resource):
+class BaseListResource(BaseResource):
     """Wrapper for flask-restx's Resource - provides default
     implementations of a POST method for a list resource
 
@@ -210,3 +213,5 @@ class BaseListResource(Resource):
         return self.response_schema.dump(
             self.request_schema.create_individual(data)
         ), 200
+
+

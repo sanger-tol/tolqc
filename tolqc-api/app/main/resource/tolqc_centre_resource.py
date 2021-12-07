@@ -4,8 +4,10 @@
 
 from .base import BaseNamespace, BaseDetailResource, \
                   BaseListResource
-from main.schema import TolqcCentreRequestSchema, \
-                        TolqcCentreResponseSchema
+from main.schema import CentreDetailRequestSchema, \
+                        CentreDetailResponseSchema, \
+                        CentreListRequestSchema, \
+                        CentreListResponseSchema
 
 centre_namespace = BaseNamespace(
     'centres',
@@ -14,25 +16,25 @@ centre_namespace = BaseNamespace(
 
 centre_response_model = centre_namespace.schema_model(
     'Centre Response',
-    TolqcCentreResponseSchema.to_schema_model_dict()
+    CentreDetailResponseSchema.to_schema_model_dict()
 )
 
 centre_post_model = centre_namespace.model(
     'Centre POST Request',
-    TolqcCentreRequestSchema.to_post_model_dict()
+    CentreListRequestSchema.to_post_model_dict()
 )
 
 centre_put_model = centre_namespace.model(
     'Centre PUT Request',
-    TolqcCentreRequestSchema.to_put_model_dict()
+    CentreDetailRequestSchema.to_put_model_dict()
 )
 
 
 class TolqcCentreDetailResource(BaseDetailResource):
     name = 'centre'
     namespace = centre_namespace
-    request_schema = TolqcCentreRequestSchema()
-    response_schema = TolqcCentreResponseSchema()
+    request_schema = CentreDetailRequestSchema()
+    response_schema = CentreDetailResponseSchema()
 
     @centre_namespace.response(
         200,
@@ -78,8 +80,8 @@ class TolqcCentreDetailResource(BaseDetailResource):
 class TolqcCentreListResource(BaseListResource):
     name = 'centres'
     namespace = centre_namespace
-    request_schema = TolqcCentreRequestSchema()
-    response_schema = TolqcCentreResponseSchema()
+    request_schema = CentreListRequestSchema()
+    response_schema = CentreListResponseSchema()
 
     @centre_namespace.expect(centre_post_model)
     @centre_namespace.response(

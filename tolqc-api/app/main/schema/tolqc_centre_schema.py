@@ -2,21 +2,28 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import BaseDetailRequestSchema, BaseDetailResponseSchema
 from main.model import TolqcCentre
 
-
-class TolqcCentreRequestSchema(BaseDetailRequestSchema):
-    class Meta:
-        type_ = 'centre'
-        strict = True
-        model = TolqcCentre
-        include_fk = True
+from .base import BaseDetailRequestSchema, BaseDetailResponseSchema, \
+                  BaseListRequestSchema, BaseListResponseSchema, BaseMeta
 
 
-class TolqcCentreResponseSchema(BaseDetailResponseSchema):
-    class Meta:
-        type_ = 'centre'
-        strict = True
-        model = TolqcCentre
-        include_fk = True
+class CentreMeta(BaseMeta):
+    type_ = 'centre'
+    model = TolqcCentre
+
+
+class CentreDetailRequestSchema(BaseDetailRequestSchema):
+    Meta = CentreMeta
+
+
+class CentreDetailResponseSchema(BaseDetailResponseSchema):
+    Meta = CentreMeta
+
+
+class CentreListRequestSchema(BaseListRequestSchema):
+    Meta = CentreMeta
+
+
+class CentreListResponseSchema(BaseListResponseSchema):
+    Meta = CentreMeta
