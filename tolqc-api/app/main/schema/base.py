@@ -6,6 +6,8 @@ from datetime import datetime
 from flask_restx import fields
 from marshmallow import Schema as MarshmallowSchema, \
                         SchemaOpts as MarshmallowSchemaOpts
+import marshmallow
+from marshmallow.schema import Schema
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
@@ -365,3 +367,14 @@ class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             },
             'type': 'object',
         }
+
+
+class BaseListRequestSchema(BaseDetailRequestSchema):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, many=True, **kwargs)
+
+
+class BaseListResponseSchema(BaseDetailResponseSchema):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, many=True, **kwargs)
+
