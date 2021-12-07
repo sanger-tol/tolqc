@@ -59,6 +59,66 @@ def check_excluded_fields_nullable(function):
     return wrapper
 
 
+# overrides
+def format_item(obj, item):
+    """Sourced from Marshmallow-jsonapi (MIT License)
+    Format a single datum as a Resource object.
+    See: http://jsonapi.org/format/#document-resource-objects
+    """
+    # TODO add license somewhere
+
+    # http://jsonapi.org/format/#document-top-level
+    # Primary data MUST be either... a single resource object, a single resource
+    # identifier object, or null, for requests that target single resources
+    TYPE = "type"
+    ID = "id"
+
+    if not item:
+        return None
+
+    ret = obj.dict_class()
+    ret[TYPE] = obj.opts.type_
+
+    # Get the schema attributes so we can confirm `dump-to` values exist
+    attributes = {
+        (obj.fields[field].data_key or field): field for field in obj.fields
+    }
+
+    for field_name, value in item.items():
+        # intercept external field
+        if field_name == 'ext':
+            for ext_field_name, ext_field_value in value.items():
+                if "attributes" not in ret:
+                    ret["attributes"] = obj.dict_class()
+                ret["attributes"][ext_field_name] = ext_field_value
+            continue
+        attribute = attributes[field_name]
+        if attribute == ID:
+            ret[ID] = value
+        elif isinstance(obj.fields[attribute], DocumentMeta):
+            if not obj.document_meta:
+                obj.document_meta = obj.dict_class()
+            obj.document_meta.update(value)
+        elif isinstance(obj.fields[attribute], ResourceMeta):
+            if "meta" not in ret:
+                ret["meta"] = obj.dict_class()
+            ret["meta"].update(value)
+        elif isinstance(obj.fields[attribute], BaseRelationship):
+            if value:
+                if "relationships" not in ret:
+                    ret["relationships"] = obj.dict_class()
+                ret["relationships"][obj.inflect(field_name)] = value
+        else:
+            if "attributes" not in ret:
+                ret["attributes"] = obj.dict_class()
+            ret["attributes"][obj.inflect(field_name)] = value
+
+    links = obj.get_resource_links(item)
+    if links:
+        ret["links"] = links
+    return ret
+
+
 class BaseSchema():
     @classmethod
     def _get_fields(cls, exclude_fields):
@@ -269,62 +329,7 @@ class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     # overrides
     def format_item(self, item):
-        """Sourced from Marshmallow-jsonapi (MIT License)
-        Format a single datum as a Resource object.
-        See: http://jsonapi.org/format/#document-resource-objects
-        """
-        # TODO add license somewhere
-
-        # http://jsonapi.org/format/#document-top-level
-        # Primary data MUST be either... a single resource object, a single resource
-        # identifier object, or null, for requests that target single resources
-        TYPE = "type"
-        ID = "id"
-
-        if not item:
-            return None
-
-        ret = self.dict_class()
-        ret[TYPE] = self.opts.type_
-
-        # Get the schema attributes so we can confirm `dump-to` values exist
-        attributes = {
-            (self.fields[field].data_key or field): field for field in self.fields
-        }
-
-        for field_name, value in item.items():
-            # intercept external field
-            if field_name == 'ext':
-                for ext_field_name, ext_field_value in value.items():
-                    if "attributes" not in ret:
-                        ret["attributes"] = self.dict_class()
-                    ret["attributes"][ext_field_name] = ext_field_value
-                continue
-            attribute = attributes[field_name]
-            if attribute == ID:
-                ret[ID] = value
-            elif isinstance(self.fields[attribute], DocumentMeta):
-                if not self.document_meta:
-                    self.document_meta = self.dict_class()
-                self.document_meta.update(value)
-            elif isinstance(self.fields[attribute], ResourceMeta):
-                if "meta" not in ret:
-                    ret["meta"] = self.dict_class()
-                ret["meta"].update(value)
-            elif isinstance(self.fields[attribute], BaseRelationship):
-                if value:
-                    if "relationships" not in ret:
-                        ret["relationships"] = self.dict_class()
-                    ret["relationships"][self.inflect(field_name)] = value
-            else:
-                if "attributes" not in ret:
-                    ret["attributes"] = self.dict_class()
-                ret["attributes"][self.inflect(field_name)] = value
-
-        links = self.get_resource_links(item)
-        if links:
-            ret["links"] = links
-        return ret
+        return format_item(self, item)
 
     @classmethod
     @check_excluded_fields_nullable
@@ -369,9 +374,15 @@ class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         }
 
 
-class BaseListRequestSchema(BaseDetailRequestSchema):
+class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
+    """Used for request/input to list resources"""
+
+    OPTIONS_CLASS = RequestCombinedOpts
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
+    
+
 
 
 class BaseListResponseSchema(BaseDetailResponseSchema):
