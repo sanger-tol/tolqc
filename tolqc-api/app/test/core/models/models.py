@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import Base, db
+from main.model import Base, db, ExtColumn
 
 
 class ModelRelationshipA(Base):
@@ -50,5 +50,5 @@ class ModelWithExtField(Base):
     __tablename__ = 'test_F'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    ext = db.Column(db.JSON, nullable=False)
+    ext = ExtColumn()
     other_column = db.Column(db.String, nullable=True)

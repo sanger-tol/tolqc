@@ -59,7 +59,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         id = response.json['data']['id']
         F_instance = ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.other_column, "nonsense!!!")
-        self.assertEqual(F_instance.ext, None)
+        self.assertEqual(F_instance.ext, {})
 
     def test_extra_fields_put_B_400(self):
         self.add_A(id=50)

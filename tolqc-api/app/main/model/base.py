@@ -15,6 +15,16 @@ class ExtraFieldsNotPermittedException(Exception):
         return ', '.join(self._ext_fields.keys())
 
 
+class ExtColumn(db.Column):
+    def __init__(self, **kwargs):
+        super().__init__(
+            db.JSON,
+            nullable=False,
+            default={},
+            **kwargs
+        )
+
+
 class Base(db.Model):
     """The base model class. Its primary key must be called
     id"""
@@ -25,35 +35,19 @@ class Base(db.Model):
 
     def add(self):
         db.session.add(self)
-    
-    def _get_ext_data(self):
-        if self.ext is None:
-            return {}
-        return {**self.ext}
-    
-    def _set_ext_data_empty(self):
-        if self.column_is_nullable('ext'):
-            self.ext = None
-        else:
-            self.ext = {}
-    
-    def _set_ext_data(self, ext_data):
-        if ext_data == {}:
-            self._set_ext_data_empty()
-        self.ext = ext_data
 
     def _update_ext(self, ext_data_changes):
         if not self.has_ext_column():
             raise ExtraFieldsNotPermittedException(
                 ext_data_changes
             )
-        ext_data = self._get_ext_data()
+        ext_data = {**self.ext}
         for key, item in ext_data_changes.items():
             if item is None and ext_data[key]:
                 del ext_data[key]
             else:
                 ext_data[key] = item
-        self._set_ext_data(ext_data)
+        self.ext = ext_data
 
     def update(self, data):
         for key, item in data.items():

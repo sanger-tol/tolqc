@@ -288,11 +288,10 @@ class BaseResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         for field_name, value in item.items():
             # intercept external field
             if field_name == 'ext':
-                if value is not None:
-                    for ext_field_name, ext_field_value in value.items():
-                        if "attributes" not in ret:
-                            ret["attributes"] = self.dict_class()
-                        ret["attributes"][ext_field_name] = ext_field_value
+                for ext_field_name, ext_field_value in value.items():
+                    if "attributes" not in ret:
+                        ret["attributes"] = self.dict_class()
+                    ret["attributes"][ext_field_name] = ext_field_value
                 continue
             attribute = attributes[field_name]
             if attribute == ID:
