@@ -368,7 +368,7 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
         else:
             model_instance = model(**base_data)
         model_instance.save()
-        return model_instance
+        return [model_instance]
 
     @classmethod
     @check_excluded_fields_nullable
