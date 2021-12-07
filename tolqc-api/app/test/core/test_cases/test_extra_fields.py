@@ -161,3 +161,53 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             }
         )
         self.assertEqual(response.json, expected)
+    
+    def test_no_extra_fields_get_F_200(self):
+        self.add_F(id=290)
+
+        response = self.client.open(
+            '/api/v1/F/290',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+
+        expected = self.to_json_api(
+            290,
+            'F',
+            {
+                "other_column": None
+            }
+        )
+        self.assertEqual(response.json, expected)
+
+    def test_variety_type_extra_fields_get_F_200(self):
+        ext_data = {
+            "arrayData": [27, {
+                "testelement": "123"
+            }],
+            "float": 9090.248,
+            "null": None
+        }
+        self.add_F(id=297, ext=ext_data)
+
+        response = self.client.open(
+            '/api/v1/F/297',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+
+        expected = self.to_json_api(
+            297,
+            'F',
+            {
+                "other_column": None,
+                **ext_data
+            }
+        )
+        self.assertEqual(response.json, expected)
