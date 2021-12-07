@@ -14,6 +14,8 @@ from marshmallow_jsonapi.fields import DocumentMeta, \
                                        BaseRelationship, \
                                        ResourceMeta
 
+from main.model import ExtraFieldsNotPermittedException
+
 
 class RequiredFieldExcludedException(Exception):
     def __init__(self, field, schema):
@@ -33,14 +35,6 @@ class InstanceDoesNotExistException(Exception):
 
 class IdSpecifiedInRequestBodyException(Exception):
     pass
-
-
-class ExtraFieldsNotPermittedException(Exception):
-    def __init__(self, ext_fields):
-        self._ext_fields = ext_fields
-
-    def get_extra_fields_str(self):
-        return ', '.join(self._ext_fields.keys())
 
 
 def check_excluded_fields_nullable(function):

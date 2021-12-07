@@ -7,6 +7,14 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+class ExtraFieldsNotPermittedException(Exception):
+    def __init__(self, ext_fields):
+        self._ext_fields = ext_fields
+
+    def get_extra_fields_str(self):
+        return ', '.join(self._ext_fields.keys())
+
+
 class Base(db.Model):
     """The base model class. Its primary key must be called
     id"""
@@ -17,20 +25,40 @@ class Base(db.Model):
 
     def add(self):
         db.session.add(self)
+    
+    def _get_ext_data(self):
+        if self.ext is None:
+            return {}
+        return {**self.ext}
+    
+    def _set_ext_data_empty(self):
+        if self.column_is_nullable('ext'):
+            self.ext = None
+        else:
+            self.ext = {}
+    
+    def _set_ext_data(self, ext_data):
+        if ext_data == {}:
+            self._set_ext_data_empty()
+        self.ext = ext_data
 
-    def update_ext(self, ext_data_changes):
-        new_ext_data = {**self.ext}
+    def _update_ext(self, ext_data_changes):
+        if not self.has_ext_column():
+            raise ExtraFieldsNotPermittedException(
+                ext_data_changes
+            )
+        ext_data = self._get_ext_data()
         for key, item in ext_data_changes.items():
-            if item is None and new_ext_data[key]:
-                del new_ext_data[key]
-                continue
-            new_ext_data[key] = item
-        self.ext = new_ext_data
+            if item is None and ext_data[key]:
+                del ext_data[key]
+            else:
+                ext_data[key] = item
+        self._set_ext_data(ext_data)
 
     def update(self, data):
         for key, item in data.items():
             if key == 'ext':
-                self.update_ext(item)
+                self._update_ext(item)
             else:
                 setattr(self, key, item)
 

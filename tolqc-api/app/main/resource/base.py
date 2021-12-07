@@ -6,8 +6,8 @@ from flask_restx import Namespace, Resource
 from sqlalchemy.exc import IntegrityError
 
 from main.schema import InstanceDoesNotExistException, \
-                        IdSpecifiedInRequestBodyException, \
-                        ExtraFieldsNotPermittedException
+                        IdSpecifiedInRequestBodyException
+from main.model import ExtraFieldsNotPermittedException
 
 
 class MissingResourceClassVariableException(Exception):
