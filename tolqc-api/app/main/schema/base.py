@@ -17,6 +17,11 @@ from marshmallow_jsonapi.fields import DocumentMeta, \
 from main.model import ExtraFieldsNotPermittedException
 
 
+class BaseMeta:
+    strict = True
+    include_fk = True
+
+
 class RequiredFieldExcludedException(Exception):
     def __init__(self, field, schema):
         super().__init__(

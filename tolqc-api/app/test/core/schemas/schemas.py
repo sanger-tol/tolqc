@@ -3,73 +3,61 @@
 # SPDX-License-Identifier: MIT
 
 from main.schema.base import BaseRequestSchema, \
-                             BaseResponseSchema
+                             BaseResponseSchema, \
+                             BaseMeta
 
 from test.core.models import ModelRelationshipB, \
                              ModelWithNullableColumn, \
                              ModelWithNonNullableColumn, \
                              ModelWithExtField
 
+class BMeta(BaseMeta):
+    type_ = 'B'
+    model = ModelRelationshipB
+
 
 class B_RequestSchema(BaseRequestSchema):
-    class Meta:
-        type_ = 'B'
-        strict = True
-        model = ModelRelationshipB
-        include_fk = True
-
+    Meta = BMeta
+        
 
 class B_ResponseSchema(BaseResponseSchema):
-    class Meta:
-        type_ = 'B'
-        strict = True
-        model = ModelRelationshipB
-        include_fk = True
+    Meta = BMeta
+
+
+class CMeta(BaseMeta):
+    type_ = 'C'
+    model = ModelWithNullableColumn
 
 
 class C_RequestSchema(BaseRequestSchema):
-    class Meta:
-        type_ = 'C'
-        strict = True
-        model = ModelWithNullableColumn
-        include_fk = True
+    Meta = CMeta
 
 
 class C_ResponseSchema(BaseResponseSchema):
-    class Meta:
-        type_ = 'C'
-        strict = True
-        model = ModelWithNullableColumn
-        include_fk = True
+    Meta = CMeta
+
+
+class DMeta(BaseMeta):
+    type_ = 'D'
+    model = ModelWithNonNullableColumn
 
 
 class D_RequestSchema(BaseRequestSchema):
-    class Meta:
-        type_ = 'D'
-        strict = True
-        model = ModelWithNonNullableColumn
-        include_fk = True
+    Meta = DMeta
 
 
 class D_ResponseSchema(BaseResponseSchema):
-    class Meta:
-        type_ = 'D'
-        strict = True
-        model = ModelWithNonNullableColumn
-        include_fk = True
+    Meta = DMeta
+
+
+class FMeta(BaseMeta):
+    type_ = 'F'
+    model = ModelWithExtField
 
 
 class F_RequestSchema(BaseRequestSchema):
-    class Meta:
-        type_ = 'F'
-        strict = True
-        model = ModelWithExtField
-        include_fk = True
+    Meta = FMeta
 
 
 class F_ResponseSchema(BaseResponseSchema):
-    class Meta:
-        type_ = 'F'
-        strict = True
-        model = ModelWithExtField
-        include_fk = True
+    Meta = FMeta
