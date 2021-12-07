@@ -134,6 +134,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
                 "fourth": "irrelevant"
             }
         )
+        # overwrite 1,2 ; remove 3, leave 4 unchanged, add 5
         response = self.client.open(
             '/api/v1/F/90900',
             method='PUT',
