@@ -119,7 +119,7 @@ def format_item(obj, item):
 
 class BaseSchema():
     @classmethod
-    def _format_individual_schema_model_dict(cls, exclude_fields):
+    def _individual_schema_model_dict(cls, exclude_fields):
         dict_schema = {
             f: cls._get_field_schema_model_type(f)
             for f in cls._get_fields(
@@ -343,7 +343,7 @@ class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         return {
             'required': ['data'],
             'properties': {
-                "data": cls._format_individual_schema_model_dict(
+                "data": cls._individual_schema_model_dict(
                     exclude_fields
                 )
             },
@@ -404,17 +404,30 @@ class BaseListResponseSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema
     
     @classmethod
     @check_excluded_fields_nullable
-    def to_get_schema_model_dict(cls, exclude_fields=[]):
+    def to_schema_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a SchemaModel in JSON:API format"""
         return {
             'required': ['data'],
             'properties': {
                 "data": {
                     'type': 'array',
-                    'items': cls._format_individual_schema_model_dict(
+                    'items': cls._individual_schema_model_dict(
                         exclude_fields
                     )
                 },
             },
             'type': 'object',
+        }
+    
+    @classmethod
+    def _error_schema_model_dict(cls):
+        return {
+            'required': ['error'],
+            'type': 'object',
+            'properties': {
+                'error': {
+                    'type': 'string',
+                    'default': 'The error message for this failed create.'
+                }
+            },
         }

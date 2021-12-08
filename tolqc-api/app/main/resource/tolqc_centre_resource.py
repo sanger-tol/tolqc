@@ -19,7 +19,7 @@ centre_detail_response_model = centre_namespace.schema_model(
     CentreDetailResponseSchema.to_schema_model_dict()
 )
 
-centre_post_model = centre_namespace.model(
+centre_post_request_model = centre_namespace.model(
     'Centre POST Request',
     CentreListRequestSchema.to_post_model_dict()
 )
@@ -29,9 +29,9 @@ centre_put_model = centre_namespace.model(
     CentreDetailRequestSchema.to_put_model_dict()
 )
 
-centre_get_list_response_model = centre_namespace.schema_model(
-    'Centre Bulk GET Response',
-    CentreListResponseSchema.to_get_schema_model_dict()
+centre_list_response_model = centre_namespace.schema_model(
+    'Centre Bulk Response',
+    CentreListResponseSchema.to_schema_model_dict()
 )
 
 class TolqcCentreDetailResource(BaseDetailResource):
@@ -87,11 +87,11 @@ class TolqcCentreListResource(BaseListResource):
     request_schema = CentreListRequestSchema()
     response_schema = CentreListResponseSchema()
 
-    @centre_namespace.expect(centre_post_model)
+    @centre_namespace.expect(centre_post_request_model)
     @centre_namespace.response(
         200,
         description='Success',
-        model=centre_detail_response_model,
+        model=centre_list_response_model,
     )
     @centre_namespace.response(
         400,
@@ -103,7 +103,7 @@ class TolqcCentreListResource(BaseListResource):
     @centre_namespace.response(
         200,
         description='Success',
-        model=centre_get_list_response_model
+        model=centre_list_response_model
     )
     def get(self):
         pass
