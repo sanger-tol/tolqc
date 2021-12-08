@@ -16,7 +16,7 @@ from main.route import init_blueprint
 def application():
     app = Flask(__name__)
     set_config(app)
-    blueprint = init_blueprint()
+    blueprint = init_blueprint(app)
     app.register_blueprint(blueprint)
     app.json_encoder = encoder.JSONEncoder
     db.init_app(app)
