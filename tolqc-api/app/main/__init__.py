@@ -5,19 +5,19 @@
 # SPDX-License-Identifier: MIT
 
 import os
-import logging
 from flask import Flask
 
 from main import encoder
+from main.config import set_config
 from main.model import db
-from main.route import blueprint
+from main.route import init_blueprint
 
 
 def application():
     app = Flask(__name__)
+    set_config(app)
+    blueprint = init_blueprint()
     app.register_blueprint(blueprint)
     app.json_encoder = encoder.JSONEncoder
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
     return app

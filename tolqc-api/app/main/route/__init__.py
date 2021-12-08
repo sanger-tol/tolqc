@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .api import blueprint # noqa
+from .api import init_blueprint # noqa

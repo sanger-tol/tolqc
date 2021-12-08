@@ -5,7 +5,7 @@
 import os
 import logging
 
-def _get_environment():
+def _get_environment_env():
     deployment_environment = os.getenv("ENVIRONMENT", "")
     if deployment_environment != "":
         return deployment_environment
@@ -14,4 +14,7 @@ def _get_environment():
     logging.warning("$ENVIRONMENT is unset - assuming a 'dev' environment")
     return "dev"
 
-deployment_environment = _get_environment()
+def set_config(app):
+    app.config['DEPLOYMENT_ENVIRONMENT'] = _get_environment_env()
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

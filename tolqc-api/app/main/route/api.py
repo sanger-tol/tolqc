@@ -2,16 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask import Blueprint
+from flask import Blueprint, current_app as app
 from flask_restx import Api
 
-from main.config import deployment_environment
 from main.resource import centre_namespace, environment_namespace
 
 def _get_environment_string():
-    if deployment_environment == 'production':
+    environment = app.config['DEPLOYMENT_ENVIRONMENT']
+    if environment == 'production':
         return ""
-    return f" ({deployment_environment})"
+    return f" ({environment})"
 
 def _setup_api(blueprint):
     api = Api(
@@ -22,5 +22,6 @@ def _setup_api(blueprint):
     api.add_namespace(centre_namespace)
     api.add_namespace(environment_namespace)
 
-blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
-_setup_api(blueprint)
+def init_blueprint():
+    blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
+    _setup_api(blueprint)
