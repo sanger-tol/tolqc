@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask import current_app as app
+from main.config import deployment_environment
 from flask_restx import fields, Resource, Namespace
 
 
@@ -20,7 +20,6 @@ environment_model = environment_namespace.model('Environment', {
 class EnvironmentResource(Resource):
     def __init__(self, api=None):
         super().__init__(api)
-        self._environment = app.config["DEPLOYMENT_ENVIRONMENT"]
 
     @environment_namespace.doc('Gets the deployment environment string')
     @environment_namespace.response(
@@ -29,7 +28,7 @@ class EnvironmentResource(Resource):
         model=environment_model,
     )
     def get(self):
-        return {'environment': self._environment}, 200
+        return {'environment': deployment_environment}, 200
 
 
 environment_namespace.add_resource(EnvironmentResource, '')
