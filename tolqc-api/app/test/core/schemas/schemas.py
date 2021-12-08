@@ -2,10 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema.base import BaseDetailRequestSchema, \
-                             BaseDetailResponseSchema, \
-                             BaseListRequestSchema, \
-                             BaseListResponseSchema, \
+from main.schema.base import BaseListSchema, \
+                             BaseDetailSchema, \
                              BaseMeta
 
 from test.core.models import ModelRelationshipB, \
@@ -19,19 +17,11 @@ class BMeta(BaseMeta):
     model = ModelRelationshipB
 
 
-class B_DetailRequestSchema(BaseDetailRequestSchema):
+class B_DetailSchema(BaseDetailSchema):
     Meta = BMeta
 
 
-class B_DetailResponseSchema(BaseDetailResponseSchema):
-    Meta = BMeta
-
-
-class B_ListRequestSchema(BaseListRequestSchema):
-    Meta = BMeta
-
-
-class B_ListResponseSchema(BaseListResponseSchema):
+class B_ListSchema(BaseListSchema):
     Meta = BMeta
 
 
@@ -40,19 +30,11 @@ class CMeta(BaseMeta):
     model = ModelWithNullableColumn
 
 
-class C_DetailRequestSchema(BaseDetailRequestSchema):
+class C_DetailSchema(BaseDetailSchema):
     Meta = CMeta
 
 
-class C_DetailResponseSchema(BaseDetailResponseSchema):
-    Meta = CMeta
-
-
-class C_ListRequestSchema(BaseListRequestSchema):
-    Meta = CMeta
-
-
-class C_ListResponseSchema(BaseListResponseSchema):
+class C_ListSchema(BaseListSchema):
     Meta = CMeta
 
 
@@ -61,19 +43,11 @@ class DMeta(BaseMeta):
     model = ModelWithNonNullableColumn
 
 
-class D_DetailRequestSchema(BaseDetailRequestSchema):
+class D_DetailSchema(BaseDetailSchema):
     Meta = DMeta
 
 
-class D_DetailResponseSchema(BaseDetailResponseSchema):
-    Meta = DMeta
-
-
-class D_ListRequestSchema(BaseListRequestSchema):
-    Meta = DMeta
-
-
-class D_ListResponseSchema(BaseListResponseSchema):
+class D_ListSchema(BaseListSchema):
     Meta = DMeta
 
 
@@ -82,17 +56,9 @@ class FMeta(BaseMeta):
     model = ModelWithExtField
 
 
-class F_DetailRequestSchema(BaseDetailRequestSchema):
+class F_DetailSchema(BaseDetailSchema):
     Meta = FMeta
 
 
-class F_DetailResponseSchema(BaseDetailResponseSchema):
-    Meta = FMeta
-
-
-class F_ListRequestSchema(BaseListRequestSchema):
-    Meta = FMeta
-
-
-class F_ListResponseSchema(BaseListResponseSchema):
+class F_ListSchema(BaseListSchema):
     Meta = FMeta

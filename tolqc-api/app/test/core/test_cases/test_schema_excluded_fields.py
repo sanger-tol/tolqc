@@ -7,10 +7,8 @@ import pytest
 from main.schema.base import RequiredFieldExcludedException
 
 from test.core import BaseTestCase
-from test.core.schemas import C_DetailRequestSchema, C_DetailResponseSchema, \
-                              C_ListRequestSchema, \
-                              D_DetailRequestSchema, D_DetailResponseSchema, \
-                              D_ListRequestSchema
+from test.core.schemas import C_DetailSchema, C_ListSchema, \
+                              D_DetailSchema, D_ListSchema
 
 
 class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
@@ -19,13 +17,13 @@ class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
         an exception in the right situations"""
         exclude_fields = ['nullable_column']
         # shouldn't raise exception on any dict conversion for C
-        C_ListRequestSchema.to_post_model_dict(
+        C_ListSchema.to_post_model_dict(
             exclude_fields=exclude_fields
         )
-        C_DetailResponseSchema.to_schema_model_dict(
+        C_DetailSchema.to_schema_model_dict(
             exclude_fields=exclude_fields
         )
-        C_DetailRequestSchema.to_put_model_dict(
+        C_DetailSchema.to_put_model_dict(
             exclude_fields=exclude_fields
         )
 
@@ -34,14 +32,14 @@ class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
         an exception in the right situations"""
         exclude_fields = ['non_nullable_column']
         with pytest.raises(RequiredFieldExcludedException):
-            D_ListRequestSchema.to_post_model_dict(
+            D_ListSchema.to_post_model_dict(
                 exclude_fields=exclude_fields
             )
         with pytest.raises(RequiredFieldExcludedException):
-            D_DetailResponseSchema.to_schema_model_dict(
+            D_DetailSchema.to_schema_model_dict(
                 exclude_fields=exclude_fields
             )
         # should not raise exception on PUT dict
-        D_DetailRequestSchema.to_put_model_dict(
+        D_DetailSchema.to_put_model_dict(
             exclude_fields=exclude_fields
         )
