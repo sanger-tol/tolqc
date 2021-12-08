@@ -7,11 +7,13 @@ from functools import wraps
 from flask import request
 from main.custom_exception import CustomException
 
+
 def check_key_valid(api_key):
     user_id = model.TolqcUser.get_user_infos_by_api_key(api_key)
     if not user_id:
         raise CustomException(401, "User does not exist")
     return user_id
+
 
 def require_auth():
     def warp_decorator(function):
