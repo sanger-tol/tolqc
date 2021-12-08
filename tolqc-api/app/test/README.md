@@ -29,3 +29,4 @@ Main - tests the main logic of ToLQC
     - check the various edge cases such as:
         - The same object given multiple times
 - Test bulk get works correctly
+- Responses match their defined Swagger models

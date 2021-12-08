@@ -392,3 +392,48 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
 class BaseListResponseSchema(BaseDetailResponseSchema):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
+    
+    @classmethod
+    @check_excluded_fields_nullable
+    def to_get_schema_model_dict(cls, exclude_fields=[]):
+        """Returns a dict for a SchemaModel in JSON:API format"""
+        dict_schema = {
+            f: cls._get_field_schema_model_type(f)
+            for f in cls._get_fields(
+                exclude_fields=exclude_fields + ['ext']
+            )
+        }
+
+        id_field = dict_schema.pop('id', None)
+        if id_field is None:
+            raise RequiredFieldExcludedException('id', cls)
+
+        required_fields = cls._get_required_fields(
+            exclude_fields=exclude_fields
+        )
+
+        return {
+            'required': ['data'],
+            'properties': {
+                "data": {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'required': ['type', 'attributes', 'id'],
+                        'properties': {
+                            "type": {
+                                'type': 'string',
+                                'default': cls.Meta.type_,
+                            },
+                            "attributes": {
+                                'required': required_fields,
+                                'properties': dict_schema,
+                                'type': 'object',
+                            },
+                            "id": id_field,
+                        },
+                    },
+                },
+            },
+            'type': 'object',
+        }

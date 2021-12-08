@@ -14,8 +14,8 @@ centre_namespace = BaseNamespace(
     description='Centre related methods',
 )
 
-centre_response_model = centre_namespace.schema_model(
-    'Centre Response',
+centre_detail_response_model = centre_namespace.schema_model(
+    'Centre GET/PUT Response',
     CentreDetailResponseSchema.to_schema_model_dict()
 )
 
@@ -29,6 +29,10 @@ centre_put_model = centre_namespace.model(
     CentreDetailRequestSchema.to_put_model_dict()
 )
 
+centre_get_list_response_model = centre_namespace.schema_model(
+    'Centre Bulk GET Response',
+    CentreListResponseSchema.to_get_schema_model_dict()
+)
 
 class TolqcCentreDetailResource(BaseDetailResource):
     name = 'centre'
@@ -39,7 +43,7 @@ class TolqcCentreDetailResource(BaseDetailResource):
     @centre_namespace.response(
         200,
         description='Success',
-        model=centre_response_model,
+        model=centre_detail_response_model,
     )
     @centre_namespace.response(
         404,
@@ -63,7 +67,7 @@ class TolqcCentreDetailResource(BaseDetailResource):
     @centre_namespace.response(
         200,
         description='Success',
-        model=centre_response_model
+        model=centre_detail_response_model
     )
     @centre_namespace.response(
         400,
@@ -87,7 +91,7 @@ class TolqcCentreListResource(BaseListResource):
     @centre_namespace.response(
         200,
         description='Success',
-        model=centre_response_model,
+        model=centre_detail_response_model,
     )
     @centre_namespace.response(
         400,
@@ -95,6 +99,14 @@ class TolqcCentreListResource(BaseListResource):
     )
     def post(self):
         return self._post()
+    
+    @centre_namespace.response(
+        200,
+        description='Success',
+        model=centre_get_list_response_model
+    )
+    def get(self):
+        pass
 
 
 centre_namespace.add_resource(TolqcCentreDetailResource, '/<int:id>')
