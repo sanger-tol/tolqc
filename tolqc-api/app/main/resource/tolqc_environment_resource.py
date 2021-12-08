@@ -13,7 +13,7 @@ environment_namespace = Namespace(
 
 
 environment_model = environment_namespace.model('Environment', {
-    'environment': fields.String("dev"),
+    'environment': fields.String("dev", required=True),
 })
 
 
