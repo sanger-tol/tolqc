@@ -30,3 +30,4 @@ Main - tests the main logic of ToLQC
         - The same object given multiple times
 - Test bulk get works correctly
 - Responses match their defined Swagger models
+- That a list must be specified in a request to a ListResource

@@ -4,6 +4,7 @@
 
 from datetime import datetime
 from flask_restx import fields
+from sqlalchemy.exc import IntegrityError
 from marshmallow import Schema as MarshmallowSchema, \
                         SchemaOpts as MarshmallowSchemaOpts
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
@@ -370,11 +371,18 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
         model = self.Meta.model
 
         if ext_data:
-            model_instance = model(ext=ext_data, **base_data)
+            kwargs = {'ext': ext_data, **base_data}
         else:
-            model_instance = model(**base_data)
-        model_instance.save()
-        return model_instance
+            kwargs = base_data
+
+        try:
+            model_instance = model(**kwargs)
+            model_instance.save()
+            return model_instance
+        except IntegrityError:
+            # TODO make this consistent with in base resource
+            # TODO add error handling for bad kwargs
+            return {"error_message": "Integrity error"}
 
     def create_bulk(self, data):
         return [self._create_individual(d) for d in data]

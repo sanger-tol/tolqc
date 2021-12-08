@@ -15,7 +15,7 @@ centre_namespace = BaseNamespace(
 )
 
 centre_detail_response_model = centre_namespace.schema_model(
-    'Centre GET/PUT Response',
+    'Centre Individual Response',
     CentreDetailResponseSchema.to_schema_model_dict()
 )
 
