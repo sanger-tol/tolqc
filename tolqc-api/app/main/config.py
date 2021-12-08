@@ -5,6 +5,7 @@
 import os
 import logging
 
+
 def _get_environment_env():
     deployment_environment = os.getenv("ENVIRONMENT", "")
     if deployment_environment != "":
@@ -13,6 +14,7 @@ def _get_environment_env():
     # if unset, assume dev
     logging.warning("$ENVIRONMENT is unset - assuming a 'dev' environment")
     return "dev"
+
 
 def set_config(app):
     app.config['DEPLOYMENT_ENVIRONMENT'] = _get_environment_env()

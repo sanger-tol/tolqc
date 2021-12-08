@@ -114,7 +114,6 @@ def handle_400_empty_body_error(function):
     return wrapper
 
 
-
 class BaseResource(Resource):
     @classmethod
     def _check_class_variable(cls, class_variable):
@@ -213,5 +212,3 @@ class BaseListResource(BaseResource):
         return self.response_schema.dump(
             self.request_schema.create_bulk(data)
         ), 200
-
-

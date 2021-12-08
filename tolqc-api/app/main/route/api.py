@@ -7,11 +7,13 @@ from flask_restx import Api
 
 from main.resource import centre_namespace, environment_namespace
 
+
 def _get_environment_string(app):
     environment = app.config['DEPLOYMENT_ENVIRONMENT']
     if environment == 'production':
         return ""
     return f" ({environment})"
+
 
 def _setup_api(blueprint, app):
     api = Api(
@@ -21,6 +23,7 @@ def _setup_api(blueprint, app):
     )
     api.add_namespace(centre_namespace)
     api.add_namespace(environment_namespace)
+
 
 def init_blueprint(app):
     blueprint = Blueprint('api', __name__, url_prefix='/api/v1')

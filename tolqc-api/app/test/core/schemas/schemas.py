@@ -13,6 +13,7 @@ from test.core.models import ModelRelationshipB, \
                              ModelWithNonNullableColumn, \
                              ModelWithExtField
 
+
 class BMeta(BaseMeta):
     type_ = 'B'
     model = ModelRelationshipB
@@ -20,7 +21,7 @@ class BMeta(BaseMeta):
 
 class B_DetailRequestSchema(BaseDetailRequestSchema):
     Meta = BMeta
-  
+
 
 class B_DetailResponseSchema(BaseDetailResponseSchema):
     Meta = BMeta
@@ -28,7 +29,7 @@ class B_DetailResponseSchema(BaseDetailResponseSchema):
 
 class B_ListRequestSchema(BaseListRequestSchema):
     Meta = BMeta
-        
+
 
 class B_ListResponseSchema(BaseListResponseSchema):
     Meta = BMeta

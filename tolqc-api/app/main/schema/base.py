@@ -6,8 +6,6 @@ from datetime import datetime
 from flask_restx import fields
 from marshmallow import Schema as MarshmallowSchema, \
                         SchemaOpts as MarshmallowSchemaOpts
-import marshmallow
-from marshmallow.schema import Schema
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
@@ -354,11 +352,11 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
-    
+
     def read_bulk(self):
         model = self.Meta.model
         return model.find_bulk()
-    
+
     def _create_individual(self, datum):
         # TODO error handling
         base_data, ext_data = self._separate_extra_data(datum)
@@ -370,7 +368,7 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
             model_instance = model(**base_data)
         model_instance.save()
         return model_instance
-    
+
     def create_bulk(self, data):
         return [self._create_individual(d) for d in data]
 
@@ -394,4 +392,3 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
 class BaseListResponseSchema(BaseDetailResponseSchema):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
-
