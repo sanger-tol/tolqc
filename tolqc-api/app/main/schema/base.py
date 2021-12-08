@@ -274,7 +274,7 @@ class RequestCombinedOpts(SQLAlchemyAutoSchemaOpts, MarshmallowSchemaOpts):
 
 
 class BaseDetailRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
-    """Used for request/input"""
+    """Used for request/input on individual resources specified by an ID"""
 
     OPTIONS_CLASS = RequestCombinedOpts
 
@@ -294,7 +294,7 @@ class ResponseCombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
 
 
 class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
-    """Used for response/output"""
+    """Used for response/output for a single model instance resource"""
 
     OPTIONS_CLASS = ResponseCombinedOpts
 
@@ -346,7 +346,8 @@ class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
 
 class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
-    """Used for request/input to list resources"""
+    """Used for request/input to list resources, i.e. operating on multiple
+    model instances at a time"""
 
     OPTIONS_CLASS = RequestCombinedOpts
 
@@ -389,7 +390,9 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
         )
 
 
-class BaseListResponseSchema(BaseDetailResponseSchema):
+class BaseListResponseSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
+    """Serializes responses for a list resource """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
     
