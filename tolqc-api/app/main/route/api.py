@@ -25,3 +25,4 @@ def _setup_api(blueprint):
 def init_blueprint():
     blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
     _setup_api(blueprint)
+    return blueprint
