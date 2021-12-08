@@ -4,28 +4,8 @@
 
 from flask_restx import Namespace, Resource
 from sqlalchemy.exc import IntegrityError
-from functools import wraps
-from flask import request
-from main.resource.auth import Auth
-from main.util import CustomException
 from main.schema import InstanceDoesNotExistException, \
                         IdSpecifiedInRequestBodyException
-
-
-def require_auth():
-    def warp_decorator(function):
-        @wraps(function)
-        def decorated(*args, **kwargs):
-            auth_token = request.headers.get('Authorization')
-            if not auth_token:
-                raise CustomException(401, "Token is missing")
-            user = Auth.check_token_valid(auth_token)
-            request_data = dict(user_id=user.id, user_name=user.name, user_email=user.email,
-                                **kwargs)
-            return function(*args, request_data)
-
-        return decorated
-    return warp_decorator
 
 
 class MissingResourceClassVariableException(Exception):

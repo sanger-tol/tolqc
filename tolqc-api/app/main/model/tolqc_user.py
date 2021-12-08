@@ -22,7 +22,7 @@ class TolqcUser(Base):
                 'roles': cls.roles}
 
     @classmethod
-    def get_user_infos_by_token(cls, token):
+    def get_user_infos_by_api_key(cls, api_key):
         user_id = cls.query.with_entities(cls.id) \
-            .filter(cls.token == token).first()
+            .filter(cls.api_key == api_key).first()
         return user_id
