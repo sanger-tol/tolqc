@@ -4,8 +4,7 @@
 
 from main.model import TolqcCentre
 
-from .base import BaseDetailRequestSchema, BaseDetailResponseSchema, \
-                  BaseListRequestSchema, BaseListResponseSchema, BaseMeta
+from .base import BaseDetailSchema, BaseListSchema, BaseMeta
 
 
 class CentreMeta(BaseMeta):
@@ -13,17 +12,9 @@ class CentreMeta(BaseMeta):
     model = TolqcCentre
 
 
-class CentreDetailRequestSchema(BaseDetailRequestSchema):
+class CentreDetailSchema(BaseDetailSchema):
     Meta = CentreMeta
 
 
-class CentreDetailResponseSchema(BaseDetailResponseSchema):
-    Meta = CentreMeta
-
-
-class CentreListRequestSchema(BaseListRequestSchema):
-    Meta = CentreMeta
-
-
-class CentreListResponseSchema(BaseListResponseSchema):
+class CentreListSchema(BaseListSchema):
     Meta = CentreMeta

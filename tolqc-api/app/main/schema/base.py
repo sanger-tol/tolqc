@@ -304,14 +304,14 @@ class BaseSchema():
 # requests are in regular dict format, responses in JSON:API
 
 
-class RequestCombinedOpts(SQLAlchemyAutoSchemaOpts, MarshmallowSchemaOpts):
+class CombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
     pass
 
 
-class BaseDetailRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
-    """Used for request/input on individual resources specified by an ID"""
+class BaseDetailSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
+    """Used for individual resources specified by an ID"""
 
-    OPTIONS_CLASS = RequestCombinedOpts
+    OPTIONS_CLASS = CombinedOpts
 
     @classmethod
     def to_put_model_dict(cls, exclude_fields=[]):
@@ -322,16 +322,6 @@ class BaseDetailRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchem
             exclude_fields=exclude_fields,
             ignore_required=True
         )
-
-
-class ResponseCombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
-    pass
-
-
-class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
-    """Used for response/output for a single model instance resource"""
-
-    OPTIONS_CLASS = ResponseCombinedOpts
 
     # overrides
     def format_item(self, item):
@@ -352,11 +342,11 @@ class BaseDetailResponseSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         }
 
 
-class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
-    """Used for request/input to list resources, i.e. operating on multiple
+class BaseListSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
+    """Used for list resources, i.e. operating on multiple
     model instances at a time"""
 
-    OPTIONS_CLASS = RequestCombinedOpts
+    OPTIONS_CLASS = CombinedOpts
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
@@ -402,13 +392,6 @@ class BaseListRequestSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema)
             exclude_fields=exclude_fields,
             ignore_required=False
         )
-
-
-class BaseListResponseSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
-    """Serializes responses for a list resource """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, many=True, **kwargs)
     
     @classmethod
     @check_excluded_fields_nullable

@@ -5,7 +5,5 @@
 from .base import InstanceDoesNotExistException, \
                   IdSpecifiedInRequestBodyException, \
                   ExtraFieldsNotPermittedException # noqa
-from .tolqc_centre_schema import CentreDetailRequestSchema, \
-                                 CentreDetailResponseSchema, \
-                                 CentreListRequestSchema, \
-                                 CentreListResponseSchema # noqa
+from .tolqc_centre_schema import CentreDetailSchema, \
+                                 CentreListSchema # noqa
