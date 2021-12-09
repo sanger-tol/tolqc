@@ -102,8 +102,5 @@ class TestInsertedCorrectly(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         errors = response.json['meta']['errors']
-        import logging
-        logging.warning(errors)
-        logging.warning(response.json['data'])
         self.assertNotEqual(errors[0], None)
         self.assertEqual(errors[1], None)
