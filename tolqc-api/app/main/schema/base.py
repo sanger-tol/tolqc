@@ -4,7 +4,6 @@
 
 from datetime import datetime
 from flask_restx import fields
-from sqlalchemy import exc
 from sqlalchemy.exc import IntegrityError
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
@@ -359,6 +358,8 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     OPTIONS_CLASS = CombinedOpts
 
+    document_meta = DocumentMeta()
+
     # TODO move functions out of here, into the correct detail/list inheritor
     #id = auto_field(dump_only=True)
 
@@ -375,13 +376,9 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         try:
             base_data, ext_data = self._separate_extra_data(datum)
         except ExtraFieldsNotPermittedException:
-            return {
-                "error_message": "Extra fields not permitted"
-            }
+            return None, "Extra fields are not permitted"
         except IdSpecifiedInRequestBodyException:
-            return {
-                "error_message": "Id not permitted in request body"
-            }
+            return None, "Id not permitted in request body"
         
         model = self.Meta.model
 
@@ -393,15 +390,23 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         try:
             model_instance = model(**kwargs)
             model_instance.save()
-            return model_instance
+            return model_instance, None
         except IntegrityError:
             # TODO make this consistent with in base resource
             # TODO add error handling for bad kwargs
             # TODO make all errors correctly formatted
-            return {"error_message": "Integrity error"}
+            return None, "Integrity error"
 
     def create_bulk(self, data):
-        return self.dump([self._create_individual(d) for d in data])
+        created = [self._create_individual(d) for d in data]
+        instances = [c[0] for c in created]
+        errors = [c[1] for c in created]
+
+        if not self.document_meta:
+            self.document_meta = self.dict_class()
+        self.document_meta.update({"errors": errors})
+        return self.dump(instances)
+
     
     @classmethod
     @check_excluded_fields_nullable
