@@ -21,7 +21,7 @@ class TestIdInRequestBody(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
 
-    def test_C_id_in_request_body_post_400(self):
+    def test_C_id_in_request_body_post_error(self):
         response = self.client.open(
             '/api/v1/C',
             method='POST',
@@ -30,10 +30,13 @@ class TestIdInRequestBody(BaseTestCase):
                 "nullable_column": "doesn't matter"
             }]
         )
-        self.assert400(
+        self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        errors = response.json['meta']['errors']
+        self.assertEqual(len(errors), 1)
+        self.assertNotEqual(errors[0], None)
 
     def test_D_id_in_request_body_post_error(self):
         response = self.client.open(
