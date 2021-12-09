@@ -20,7 +20,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             True
         )
 
-    def test_extra_fields_post_F_200(self):
+    def test_extra_fields_post_F_no_error(self):
         extra_fields = {
             "extra_field": "superfluity",
             "another_ext": "Yet another extra field"
@@ -28,17 +28,20 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         response = self.client.open(
             '/api/v1/F',
             method='POST',
-            json={
+            json=[{
                 **extra_fields,
                 "other_column": "another test :("
-            }
+            }]
         )
         self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-
-        id = response.json['data']['id']
+        errors = response.json['meta']['errors']
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], None)
+        
+        id = response.json['data'][0]['id']
         F_instance = ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.ext, extra_fields)
         self.assertEqual(F_instance.other_column, "another test :(")
