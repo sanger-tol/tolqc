@@ -50,16 +50,19 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         response = self.client.open(
             '/api/v1/F',
             method='POST',
-            json={
+            json=[{
                 "other_column": "nonsense!!!"
-            }
+            }]
         )
         self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        errors = response.json['meta']['errors']
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], None)
 
-        id = response.json['data']['id']
+        id = response.json['data'][0]['id']
         F_instance = ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.other_column, "nonsense!!!")
         self.assertEqual(F_instance.ext, {})
