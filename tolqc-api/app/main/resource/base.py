@@ -196,15 +196,10 @@ class BaseListResource(BaseResource):
     def is_list_resource(cls):
         return True
 
-    # TODO modify to accept multiple instances in one go
     @provide_body_data
     @handle_400_empty_body_error
     def _post(self, data):
         # N.B., the provide_body_decorator adds the data,
         # _do not_ provide it in the call signature, i.e.
         # use _post() not _post(data)
-
-        # TODO move schema.dump calls into relevant CRUD methods
-        return self.schema.dump(
-            self.schema.create_bulk(data)
-        ), 200
+        return self.schema.create_bulk(data), 200

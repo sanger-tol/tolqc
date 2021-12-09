@@ -380,7 +380,7 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             return {"error_message": "Integrity error"}
 
     def create_bulk(self, data):
-        return [self._create_individual(d) for d in data]
+        return self.dump([self._create_individual(d) for d in data])
 
     @classmethod
     @check_excluded_fields_nullable
