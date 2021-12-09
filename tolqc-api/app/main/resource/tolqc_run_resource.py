@@ -6,6 +6,7 @@ from .base import BaseNamespace, BaseDetailResource, \
                   BaseListResource
 from main.schema import TolqcRunRequestSchema, \
                         TolqcRunResponseSchema
+from main.resource.auth import auth
 
 
 run_namespace = BaseNamespace(
@@ -61,7 +62,8 @@ class TolqcRunDetailResource(BaseDetailResource):
         404,
         'Not Found'
     )
-    def put(self, id):
+    @auth(run_namespace)
+    def put(self, id, request_data):
         return self._put_by_id(id)
 
     @run_namespace.response(
@@ -76,7 +78,8 @@ class TolqcRunDetailResource(BaseDetailResource):
         404,
         'Not Found'
     )
-    def delete(self, id):
+    @auth(run_namespace)
+    def delete(self, id, request_data):
         return self._delete_by_id(id)
 
 
@@ -96,7 +99,8 @@ class TolqcRunListResource(BaseListResource):
         400,
         description='Bad Request'
     )
-    def post(self):
+    @auth(run_namespace)
+    def post(self, request_data):
         return self._post()
 
 

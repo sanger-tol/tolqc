@@ -4,7 +4,6 @@
 
 from main import application
 from flask_testing import TestCase
-
 from main.model import db, TolqcUser, TolqcRole, TolqcAllocation, \
                        TolqcCentre, TolqcLibrary, TolqcLibraryType, \
                        TolqcPlatform, TolqcProject, TolqcRun, \

@@ -6,6 +6,8 @@ from .base import BaseNamespace, BaseDetailResource, \
                   BaseListResource
 from main.schema import TolqcCentreRequestSchema, \
                         TolqcCentreResponseSchema
+from main.resource.auth import auth
+
 
 centre_namespace = BaseNamespace(
     'centres',
@@ -54,7 +56,8 @@ class TolqcCentreDetailResource(BaseDetailResource):
         404,
         description='Not Found'
     )
-    def delete(self, id):
+    @auth(centre_namespace)
+    def delete(self, id, request_data):
         return self._delete_by_id(id)
 
     @centre_namespace.expect(centre_put_model)
@@ -71,7 +74,8 @@ class TolqcCentreDetailResource(BaseDetailResource):
         404,
         description='Not Found'
     )
-    def put(self, id):
+    @auth(centre_namespace)
+    def put(self, id, request_data):
         return self._put_by_id(id)
 
 
@@ -91,7 +95,8 @@ class TolqcCentreListResource(BaseListResource):
         400,
         description='Error'
     )
-    def post(self):
+    @auth(centre_namespace)
+    def post(self, request_data):
         return self._post()
 
 
