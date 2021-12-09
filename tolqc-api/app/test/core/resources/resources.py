@@ -21,9 +21,9 @@ c_namespace = BaseNamespace('C')
 d_namespace = BaseNamespace('D')
 f_namespace = BaseNamespace('F')
 
-b_post_model = b_namespace.model(
+b_post_model = b_namespace.schema_model(
     'B Post',
-    B_ListSchema.to_post_model_dict()
+    B_ListSchema.to_post_schema_model_dict()
 )
 b_put_model = b_namespace.model(
     'B put',
@@ -34,9 +34,9 @@ b_response_model = b_namespace.schema_model(
     B_DetailSchema.to_schema_model_dict()
 )
 
-c_post_model = c_namespace.model(
+c_post_model = c_namespace.schema_model(
     'C Post',
-    C_ListSchema.to_post_model_dict()
+    C_ListSchema.to_post_schema_model_dict()
 )
 c_put_model = c_namespace.model(
     'C put',
@@ -47,9 +47,9 @@ c_response_model = c_namespace.schema_model(
     C_DetailSchema.to_schema_model_dict()
 )
 
-d_post_model = d_namespace.model(
+d_post_model = d_namespace.schema_model(
     'D Post',
-    D_ListSchema.to_post_model_dict()
+    D_ListSchema.to_post_schema_model_dict()
 )
 d_put_model = d_namespace.model(
     'D put',
@@ -60,9 +60,9 @@ d_response_model = d_namespace.schema_model(
     D_DetailSchema.to_schema_model_dict()
 )
 
-f_post_model = f_namespace.model(
+f_post_model = f_namespace.schema_model(
     'F Post',
-    F_ListSchema.to_post_model_dict()
+    F_ListSchema.to_post_schema_model_dict()
 )
 f_put_model = f_namespace.model(
     'F put',

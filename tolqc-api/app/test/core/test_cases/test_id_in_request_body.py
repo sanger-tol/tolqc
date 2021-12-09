@@ -6,14 +6,15 @@ from test.core import BaseTestCase
 
 
 class TestIdInRequestBody(BaseTestCase):
+    # TODO these tests are passing for the wrong reason, fix!
     def test_B_id_in_request_body_post_400(self):
         response = self.client.open(
             '/api/v1/B',
             method='POST',
-            json={
+            json=[{
                 "id": 9999,
                 "a_id": 0
-            }
+            }]
         )
         self.assert400(
             response,
@@ -24,10 +25,10 @@ class TestIdInRequestBody(BaseTestCase):
         response = self.client.open(
             '/api/v1/C',
             method='POST',
-            json={
+            json=[{
                 "id": 9999,
                 "nullable_column": "doesn't matter"
-            }
+            }]
         )
         self.assert400(
             response,
@@ -38,10 +39,10 @@ class TestIdInRequestBody(BaseTestCase):
         response = self.client.open(
             '/api/v1/D',
             method='POST',
-            json={
+            json=[{
                 "id": 9999,
                 "non_nullable_column": "Not at all"
-            }
+            }]
         )
         self.assert400(
             response,

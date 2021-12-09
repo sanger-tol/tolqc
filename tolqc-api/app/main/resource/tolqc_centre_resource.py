@@ -17,9 +17,9 @@ centre_detail_response_model = centre_namespace.schema_model(
     CentreDetailSchema.to_schema_model_dict()
 )
 
-centre_post_request_model = centre_namespace.model(
+centre_post_request_model = centre_namespace.schema_model(
     'Centre POST Request',
-    CentreListSchema.to_post_model_dict()
+    CentreListSchema.to_post_schema_model_dict()
 )
 
 centre_put_model = centre_namespace.model(

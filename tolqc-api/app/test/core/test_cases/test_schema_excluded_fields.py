@@ -17,7 +17,7 @@ class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
         an exception in the right situations"""
         exclude_fields = ['nullable_column']
         # shouldn't raise exception on any dict conversion for C
-        C_ListSchema.to_post_model_dict(
+        C_ListSchema.to_post_schema_model_dict(
             exclude_fields=exclude_fields
         )
         C_DetailSchema.to_schema_model_dict(
@@ -32,7 +32,7 @@ class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
         an exception in the right situations"""
         exclude_fields = ['non_nullable_column']
         with pytest.raises(RequiredFieldExcludedException):
-            D_ListSchema.to_post_model_dict(
+            D_ListSchema.to_post_schema_model_dict(
                 exclude_fields=exclude_fields
             )
         with pytest.raises(RequiredFieldExcludedException):

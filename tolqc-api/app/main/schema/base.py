@@ -4,6 +4,7 @@
 
 from datetime import datetime
 from flask_restx import fields
+from sqlalchemy import exc
 from sqlalchemy.exc import IntegrityError
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
@@ -119,21 +120,33 @@ def format_item(obj, item):
 
 class BaseSchema():
     @classmethod
-    def _individual_schema_model_dict(cls, exclude_fields):
-        dict_schema = {
+    def _get_dict_schema(cls, exclude_fields):
+        return {
             f: cls._get_field_schema_model_type(f)
             for f in cls._get_fields(
                 exclude_fields=exclude_fields + ['ext']
             )
         }
 
-        id_field = dict_schema.pop('id', None)
-        if id_field is None:
-            raise RequiredFieldExcludedException('id', cls)
+    @classmethod
+    def _individual_attributes_schem_model_dict(cls, exclude_fields):
+        dict_schema = cls._get_dict_schema(exclude_fields)
 
         required_fields = cls._get_required_fields(
             exclude_fields=exclude_fields
         )
+
+        return {
+            'required': required_fields,
+            'properties': dict_schema,
+            'type': 'object',
+        }
+
+    @classmethod
+    def _individual_schema_model_dict(cls, exclude_fields):
+        id_field = cls._get_dict_schema(exclude_fields).pop('id', None)
+        if id_field is None:
+            raise RequiredFieldExcludedException('id', cls)
 
         return {
             'type': 'object',
@@ -143,12 +156,8 @@ class BaseSchema():
                     'type': 'string',
                     'default': cls.Meta.type_,
                 },
-                "attributes": {
-                    'required': required_fields,
-                    'properties': dict_schema,
-                    'type': 'object',
-                },
                 "id": id_field,
+                "attributes": cls._get_dict_schema(exclude_fields)
             }
         }
 
@@ -381,22 +390,6 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     def create_bulk(self, data):
         return self.dump([self._create_individual(d) for d in data])
-
-    @classmethod
-    @check_excluded_fields_nullable
-    def to_post_model_dict(cls, exclude_fields=[]):
-        """Returns a dict for a Model, excluding
-           the specified list of fields, for a POST
-           request"""
-        non_required_fields = cls._get_non_required_fields()
-        for field in exclude_fields:
-            if field != 'id' and field not in non_required_fields:
-                raise RequiredFieldExcludedException(field, cls)
-
-        return cls._to_model_dict(
-            exclude_fields=exclude_fields,
-            ignore_required=False
-        )
     
     @classmethod
     @check_excluded_fields_nullable
@@ -426,4 +419,22 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
                     'default': 'The error message for this failed create.'
                 }
             },
+        }
+    
+    @classmethod
+    @check_excluded_fields_nullable
+    def to_post_schema_model_dict(cls, exclude_fields=[]):
+        """Returns a dict for a Model, excluding
+           the specified list of fields, for a POST
+           request"""
+        non_required_fields = cls._get_non_required_fields()
+        for field in exclude_fields:
+            if field != 'id' and field not in non_required_fields:
+                raise RequiredFieldExcludedException(field, cls)
+
+        return {
+            'type': 'array',
+            'items': cls._individual_attributes_schem_model_dict(
+                exclude_fields=exclude_fields+['id']
+            )
         }

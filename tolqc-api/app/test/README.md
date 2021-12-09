@@ -32,3 +32,4 @@ Main - tests the main logic of ToLQC
 - Responses match their defined Swagger models
 - That a list must be specified in a request to a ListResource
 - Confirm that empty lists in ListResource requests return a 400 error
+- Confirm that put only accepts a dict, and post only accepts a list (otherwise 400)

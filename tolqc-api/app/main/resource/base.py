@@ -102,7 +102,7 @@ def handle_400_id_in_body_error(function):
     return wrapper
 
 
-def handle_400_empty_body_error(function):
+def handle_400_bad_data_error(function):
     def wrapper(obj, *args, **kwargs):
         data = args[0] if obj.is_list_resource() else args[1]
         if not data:
@@ -110,6 +110,18 @@ def handle_400_empty_body_error(function):
                 "error": "Data must be specified in the request"
                          " body, this cannot be empty."
             }, 400
+
+        if obj.is_list_resource() and type(data) is not list:
+            return {
+                "error": "A list must be provided to this endpoint."
+            }, 400
+        
+        if not obj.is_list_resource() and type(data) is not dict:
+            return {
+                "error": "A non-list object must be provided to this"
+                         " endpoint."
+            }, 400
+
         return function(obj, *args, **kwargs)
     return wrapper
 
@@ -168,7 +180,7 @@ class BaseDetailResource(BaseResource):
     @provide_body_data
     @handle_400_db_integrity_error
     @handle_400_id_in_body_error
-    @handle_400_empty_body_error
+    @handle_400_bad_data_error
     @handle_400_extra_fields_not_permitted_error
     @handle_404
     def _put_by_id(self, id, data):
@@ -197,7 +209,7 @@ class BaseListResource(BaseResource):
         return True
 
     @provide_body_data
-    @handle_400_empty_body_error
+    @handle_400_bad_data_error
     def _post(self, data):
         # N.B., the provide_body_decorator adds the data,
         # _do not_ provide it in the call signature, i.e.
