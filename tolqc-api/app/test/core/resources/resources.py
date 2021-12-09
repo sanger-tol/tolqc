@@ -77,8 +77,7 @@ f_response_model = f_namespace.schema_model(
 class B_DetailResource(BaseDetailResource):
     name = 'B'
     namespace = b_namespace
-    request_schema = B_DetailSchema()
-    response_schema = B_DetailSchema()
+    schema = B_DetailSchema()
 
     def get(self, id):
         return self._get_by_id(id)
@@ -94,8 +93,7 @@ class B_DetailResource(BaseDetailResource):
 class B_ListResource(BaseListResource):
     name = 'B'
     namespace = b_namespace
-    request_schema = B_ListSchema()
-    response_schema = B_ListSchema()
+    schema = B_ListSchema()
 
     @b_namespace.expect(b_post_model)
     def post(self):
@@ -105,8 +103,7 @@ class B_ListResource(BaseListResource):
 class C_DetailResource(BaseDetailResource):
     name = 'C'
     namespace = c_namespace
-    request_schema = C_DetailSchema()
-    response_schema = C_DetailSchema()
+    schema = C_DetailSchema()
 
     def get(self, id):
         return self._get_by_id(id)
@@ -122,8 +119,7 @@ class C_DetailResource(BaseDetailResource):
 class C_ListResource(BaseListResource):
     name = 'C'
     namespace = c_namespace
-    request_schema = C_ListSchema()
-    response_schema = C_ListSchema()
+    schema = C_ListSchema()
 
     @c_namespace.expect(c_post_model)
     def post(self):
@@ -133,8 +129,7 @@ class C_ListResource(BaseListResource):
 class D_DetailResource(BaseDetailResource):
     name = 'D'
     namespace = d_namespace
-    request_schema = D_DetailSchema()
-    response_schema = D_DetailSchema()
+    schema = D_DetailSchema()
 
     def get(self, id):
         return self._get_by_id(id)
@@ -150,8 +145,7 @@ class D_DetailResource(BaseDetailResource):
 class D_ListResource(BaseListResource):
     name = 'D'
     namespace = d_namespace
-    request_schema = D_ListSchema()
-    response_schema = D_ListSchema()
+    schema = D_ListSchema()
 
     @d_namespace.expect(d_post_model)
     def post(self):
@@ -161,8 +155,7 @@ class D_ListResource(BaseListResource):
 class F_DetailResource(BaseDetailResource):
     name = 'F'
     namespace = f_namespace
-    request_schema = F_DetailSchema()
-    response_schema = F_DetailSchema()
+    schema = F_DetailSchema()
 
     def get(self, id):
         return self._get_by_id(id)
@@ -178,8 +171,7 @@ class F_DetailResource(BaseDetailResource):
 class F_ListResource(BaseListResource):
     name = 'F'
     namespace = f_namespace
-    request_schema = F_ListSchema()
-    response_schema = F_ListSchema()
+    schema = F_ListSchema()
 
     @f_namespace.expect(f_post_model)
     def post(self):

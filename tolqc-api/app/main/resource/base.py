@@ -14,8 +14,8 @@ class MissingResourceClassVariableException(Exception):
     """Thrown when a required class variable has not been
     declared on a resource"""
     def __init__(self, cls, class_variable):
-        message = f"Resource '{cls.__name__}'' is missing " \
-                  f"class variable '{class_variable}'"
+        message = f"Resource '{cls.__name__}' is missing " \
+                  f"required class variable '{class_variable}'"
         super().__init__(message)
 
 
@@ -127,8 +127,7 @@ class BaseResource(Resource):
     def check_class_variables(cls):
         required_class_variables = [
             'name',
-            'request_schema',
-            'response_schema',
+            'schema',
             'namespace'
         ]
         for class_variable in required_class_variables:
@@ -143,8 +142,7 @@ class BaseDetailResource(BaseResource):
     Need to declare (as class variables):
     * name
     * namespace - for PUT requests
-    * request_schema
-    * response_schema
+    * schema
     """
 
     @classmethod
@@ -158,13 +156,13 @@ class BaseDetailResource(BaseResource):
 
     @handle_404
     def _get_by_id(self, id):
-        model = self.response_schema.read_by_id(id)
+        model = self.schema.read_by_id(id)
         return model, 200
 
     @handle_400_db_integrity_error
     @handle_404
     def _delete_by_id(self, id):
-        self.response_schema.delete_by_id(id)
+        self.schema.delete_by_id(id)
         return {}, 204
 
     @provide_body_data
@@ -177,7 +175,7 @@ class BaseDetailResource(BaseResource):
         # N.B., the process_body_data decorator provides the data,
         # _do not_ provide it in the call signature, only id, i.e.:
         # use _put_by_id(id) not _put_by_id(id, data)
-        model = self.response_schema.update_by_id(
+        model = self.schema.update_by_id(
             id,
             data
         )
@@ -191,8 +189,7 @@ class BaseListResource(BaseResource):
     Need to declare (as class variables):
     * name
     * namespace
-    * request_schema
-    * response_schema
+    * schema
     """
 
     @classmethod
@@ -201,14 +198,13 @@ class BaseListResource(BaseResource):
 
     # TODO modify to accept multiple instances in one go
     @provide_body_data
-    @handle_400_id_in_body_error
-    @handle_400_db_integrity_error
     @handle_400_empty_body_error
-    @handle_400_extra_fields_not_permitted_error
     def _post(self, data):
-        # N.B., the process_body_decorator provides the data,
+        # N.B., the provide_body_decorator adds the data,
         # _do not_ provide it in the call signature, i.e.
         # use _post() not _post(data)
-        return self.response_schema.dump(
-            self.request_schema.create_bulk(data)
+
+        # TODO move schema.dump calls into relevant CRUD methods
+        return self.schema.dump(
+            self.schema.create_bulk(data)
         ), 200

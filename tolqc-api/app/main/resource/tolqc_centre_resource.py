@@ -35,10 +35,7 @@ centre_list_response_model = centre_namespace.schema_model(
 class TolqcCentreDetailResource(BaseDetailResource):
     name = 'centre'
     namespace = centre_namespace
-    # TODO coalesce these!
-    # TODO move these into a Meta class
-    request_schema = CentreDetailSchema()
-    response_schema = CentreDetailSchema()
+    schema = CentreDetailSchema()
 
     @centre_namespace.response(
         200,
@@ -84,8 +81,7 @@ class TolqcCentreDetailResource(BaseDetailResource):
 class TolqcCentreListResource(BaseListResource):
     name = 'centres'
     namespace = centre_namespace
-    request_schema = CentreListSchema()
-    response_schema = CentreListSchema()
+    schema = CentreListSchema()
 
     @centre_namespace.expect(centre_post_request_model)
     @centre_namespace.response(

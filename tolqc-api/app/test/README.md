@@ -31,3 +31,4 @@ Main - tests the main logic of ToLQC
 - Test bulk get works correctly
 - Responses match their defined Swagger models
 - That a list must be specified in a request to a ListResource
+- Confirm that empty lists in ListResource requests return a 400 error

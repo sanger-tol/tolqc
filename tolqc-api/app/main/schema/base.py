@@ -5,12 +5,11 @@
 from datetime import datetime
 from flask_restx import fields
 from sqlalchemy.exc import IntegrityError
-from marshmallow import Schema as MarshmallowSchema, \
-                        SchemaOpts as MarshmallowSchemaOpts
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
-                                   SQLAlchemyAutoSchemaOpts
+                                   SQLAlchemyAutoSchemaOpts, \
+                                   auto_field
 from marshmallow_jsonapi.fields import DocumentMeta, \
                                        BaseRelationship, \
                                        ResourceMeta
@@ -59,12 +58,12 @@ def check_excluded_fields_nullable(function):
 
 
 # overrides
+# TODO move this into one of the base schema classes
 def format_item(obj, item):
     """Sourced from Marshmallow-jsonapi (MIT License)
     Format a single datum as a Resource object.
     See: http://jsonapi.org/format/#document-resource-objects
     """
-    # TODO add license somewhere
 
     # http://jsonapi.org/format/#document-top-level
     # Primary data MUST be either... a single resource object, a single resource
@@ -308,10 +307,13 @@ class CombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
     pass
 
 
-class BaseDetailSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
+class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     """Used for individual resources specified by an ID"""
 
     OPTIONS_CLASS = CombinedOpts
+
+    # TODO move functions out of here, into the correct detail/list inheritor
+    #id = auto_field(dump_only=True)
 
     @classmethod
     def to_put_model_dict(cls, exclude_fields=[]):
@@ -342,11 +344,14 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
         }
 
 
-class BaseListSchema(SQLAlchemyAutoSchema, MarshmallowSchema, BaseSchema):
+class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     """Used for list resources, i.e. operating on multiple
     model instances at a time"""
 
     OPTIONS_CLASS = CombinedOpts
+
+    # TODO move functions out of here, into the correct detail/list inheritor
+    #id = auto_field(dump_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
