@@ -350,6 +350,14 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
                         exclude_fields
                     )
                 },
+                'meta': {
+                    'type': 'object',
+                    'properties': {
+                        "errors": {
+                            'type': 'array'
+                        }
+                    }
+                }
             },
             'type': 'object',
         }
