@@ -92,7 +92,9 @@ class BaseSchema():
                     'default': cls.Meta.type_,
                 },
                 "id": id_field,
-                "attributes": cls._get_dict_schema(exclude_fields)
+                "attributes": cls._individual_attributes_schem_model_dict(
+                    exclude_fields=exclude_fields+['id']
+                )
             }
         }
 
