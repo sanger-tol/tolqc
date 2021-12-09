@@ -371,7 +371,18 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     def _create_individual(self, datum):
         # TODO error handling
-        base_data, ext_data = self._separate_extra_data(datum)
+        # TODO use decorators
+        try:
+            base_data, ext_data = self._separate_extra_data(datum)
+        except ExtraFieldsNotPermittedException:
+            return {
+                "error_message": "Extra fields not permitted"
+            }
+        except IdSpecifiedInRequestBodyException:
+            return {
+                "error_message": "Id not permitted in request body"
+            }
+        
         model = self.Meta.model
 
         if ext_data:
@@ -386,6 +397,7 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         except IntegrityError:
             # TODO make this consistent with in base resource
             # TODO add error handling for bad kwargs
+            # TODO make all errors correctly formatted
             return {"error_message": "Integrity error"}
 
     def create_bulk(self, data):
