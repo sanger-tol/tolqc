@@ -84,3 +84,13 @@ class BaseTestCase(TestCase):
 
     def add_F(self, **kwargs):
         self._add_model_instance(ModelWithExtField, **kwargs)
+
+    def to_json_api(self, id, type, attributes):
+        return {
+            'data': {
+                'type': type,
+                'id': id,
+                'attributes': attributes
+            }
+        }
+
