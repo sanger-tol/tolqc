@@ -97,6 +97,11 @@ class BaseSchema():
                 )
             }
         }
+    
+    def ext_field_should_not_be_specified(self, data):
+        if 'ext' in data.keys() and self.Meta.model.has_ext_column():
+            return True
+        return False
 
     @classmethod
     def _to_model_dict(cls, exclude_fields=[], ignore_required=None):
@@ -306,6 +311,11 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     def _create_individual(self, datum):
         # TODO error handling
         # TODO use decorators
+        if self.ext_field_should_not_be_specified(datum):
+            return None, "Do not write directly to the ext field." \
+                         " Simply specify the key-value pairs that" \
+                         " are not in the schema, and they will be " \
+                         "added to the ext field automatically."
         try:
             base_data, ext_data = self._separate_extra_data(datum)
         except ExtraFieldsNotPermittedException:
