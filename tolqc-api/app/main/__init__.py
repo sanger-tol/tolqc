@@ -12,7 +12,7 @@ from flask_restx import Api
 from main import encoder
 from main.model import db
 from main.resource import centre_namespace, environment_namespace, \
-                          run_namespace
+                          run_namespace, authorizations
 
 
 def _get_environment():
@@ -36,7 +36,8 @@ def _setup_api(blueprint, app):
     api = Api(
         blueprint,
         doc='/ui',
-        title=f"Tree of Life Quality Control{_get_environment_string(app)}"
+        title=f"Tree of Life Quality Control{_get_environment_string(app)}",
+        authorizations=authorizations
     )
     api.add_namespace(centre_namespace)
     api.add_namespace(run_namespace)
