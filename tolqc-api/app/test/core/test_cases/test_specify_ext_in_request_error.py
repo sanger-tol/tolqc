@@ -21,3 +21,5 @@ class TestSpecifyExtInRequestError(BaseTestCase):
         errors = response.json['meta']['errors']
         self.assertEqual(len(errors), 1)
         self.assertNotEqual(errors[0], None)
+
+    # TODO implement for PUT

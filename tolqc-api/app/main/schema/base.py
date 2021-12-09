@@ -97,7 +97,7 @@ class BaseSchema():
                 )
             }
         }
-    
+
     def ext_field_should_not_be_specified(self, data):
         if 'ext' in data.keys() and self.Meta.model.has_ext_column():
             return True
