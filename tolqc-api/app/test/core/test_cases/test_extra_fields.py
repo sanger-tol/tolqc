@@ -175,14 +175,11 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
 
-        expected = self.to_json_api(
-            290,
-            'F',
-            {
-                "other_column": None
-            }
-        )
-        self.assertEqual(response.json, expected)
+        expected = {
+            "other_column": None,
+            "ext": {}
+        }
+        self.assertEqual(response.json['data']['attributes'], expected)
 
     def test_variety_type_extra_fields_get_F_200(self):
         ext_data = {
