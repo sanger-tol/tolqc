@@ -10,7 +10,7 @@ class TestEmptyRequestBody400(BaseTestCase):
         response = self.client.open(
             '/api/v1/B',
             method='POST',
-            json={}
+            json=[]
         )
         self.assert400(
             response,
@@ -21,7 +21,7 @@ class TestEmptyRequestBody400(BaseTestCase):
         response = self.client.open(
             '/api/v1/C',
             method='POST',
-            json={}
+            json=[]
         )
         self.assert400(
             response,
@@ -32,7 +32,7 @@ class TestEmptyRequestBody400(BaseTestCase):
         response = self.client.open(
             '/api/v1/D',
             method='POST',
-            json={}
+            json=[]
         )
         self.assert400(
             response,
