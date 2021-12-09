@@ -16,10 +16,13 @@ class TestIdInRequestBody(BaseTestCase):
                 "a_id": 0
             }]
         )
-        self.assert400(
+        self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        errors = response.json['meta']['errors']
+        self.assertEqual(len(errors), 1)
+        self.assertNotEqual(errors[0], None)
 
     def test_C_id_in_request_body_post_error(self):
         response = self.client.open(
