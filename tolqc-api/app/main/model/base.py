@@ -67,8 +67,8 @@ class Base(db.Model):
 
     def save(self):
         try:
-            db.session.add(self)
-            db.session.commit()
+            self.add()
+            self.commit()
             return None
         except IntegrityError:
             self.rollback()
