@@ -33,8 +33,6 @@ class BaseNamespace(Namespace):
     input, and will try to validate each
     resource's class variables - do not use for namespaces
     containing custom resources without these"""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, validate=True, **kwargs)
 
     def add_resource(self, resource, *args, **kwargs):
         validate_resource(resource)
