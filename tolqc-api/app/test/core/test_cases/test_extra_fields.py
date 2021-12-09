@@ -153,10 +153,12 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         expected = {
-            "first": "not very nice",
-            "second": "much less nice",
-            "fourth": "irrelevant",
-            "fifth": "the worst of the bunch",
+            "ext": {
+                "first": "not very nice",
+                "second": "much less nice",
+                "fourth": "irrelevant",
+                "fifth": "the worst of the bunch",
+            },
             "other_column": None
         }
         self.assertEqual(response.json['data']['attributes'], expected)
