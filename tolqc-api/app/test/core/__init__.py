@@ -93,4 +93,3 @@ class BaseTestCase(TestCase):
                 'attributes': attributes
             }
         }
-

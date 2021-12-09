@@ -32,6 +32,7 @@ centre_list_response_model = centre_namespace.schema_model(
     CentreListSchema.to_schema_model_dict()
 )
 
+
 class TolqcCentreDetailResource(BaseDetailResource):
     name = 'centre'
     namespace = centre_namespace
@@ -95,7 +96,7 @@ class TolqcCentreListResource(BaseListResource):
     )
     def post(self):
         return self._post()
-    
+
     @centre_namespace.response(
         200,
         description='Success',

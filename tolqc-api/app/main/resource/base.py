@@ -113,7 +113,7 @@ def handle_400_bad_data_error(function):
             return {
                 "error": "A list must be provided to this endpoint."
             }, 400
-        
+
         if not obj.is_list_resource() and type(data) is not dict:
             return {
                 "error": "A non-list object must be provided to this"

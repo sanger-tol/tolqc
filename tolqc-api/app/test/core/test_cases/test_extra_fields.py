@@ -40,7 +40,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         errors = response.json['meta']['errors']
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], None)
-        
+
         id = response.json['data'][0]['id']
         F_instance = ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.ext, extra_fields)

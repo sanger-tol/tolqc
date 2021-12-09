@@ -86,7 +86,7 @@ class Base(db.Model):
     @staticmethod
     def bulk_update(data):
         db.session.add_all(data)
-        db.session.commit()   
+        db.session.commit()
 
     @classmethod
     def find_by_id(cls, _id):

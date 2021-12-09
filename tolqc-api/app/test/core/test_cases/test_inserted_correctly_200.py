@@ -7,7 +7,7 @@ from test.core.models import ModelRelationshipB, \
                              ModelWithNullableColumn, \
                              ModelWithNonNullableColumn
 
-# TODO check multiple inserts
+
 class TestInsertedCorrectly(BaseTestCase):
     def test_inserted_correctly_B(self):
         a_id = 90
@@ -84,7 +84,7 @@ class TestInsertedCorrectly(BaseTestCase):
             non_nullable_string
         )
         self.assertEqual(inserted.other_column, other_column_string)
-    
+
     def test_partial_insertion_success_B(self):
         self.add_A(id=9090)
 

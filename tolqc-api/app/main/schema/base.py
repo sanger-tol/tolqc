@@ -258,7 +258,6 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     OPTIONS_CLASS = CombinedOpts
 
     # TODO move functions out of here, into the correct detail/list inheritor
-    #id = auto_field(dump_only=True)
 
     @classmethod
     def to_put_model_dict(cls, exclude_fields=[]):
@@ -294,7 +293,6 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     document_meta = DocumentMeta()
 
     # TODO move functions out of here, into the correct detail/list inheritor
-    #id = auto_field(dump_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
@@ -312,7 +310,7 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             return None, "Extra fields are not permitted"
         except IdSpecifiedInRequestBodyException:
             return None, "Id not permitted in request body"
-        
+
         model = self.Meta.model
 
         if ext_data:
@@ -337,7 +335,6 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         self.document_meta.update({"errors": errors})
         return self.dump(instances)
 
-    
     @classmethod
     @check_excluded_fields_nullable
     def to_schema_model_dict(cls, exclude_fields=[]):
@@ -354,7 +351,7 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             },
             'type': 'object',
         }
-    
+
     @classmethod
     def _error_schema_model_dict(cls):
         return {
@@ -367,7 +364,7 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
                 }
             },
         }
-    
+
     @classmethod
     @check_excluded_fields_nullable
     def to_post_schema_model_dict(cls, exclude_fields=[]):
