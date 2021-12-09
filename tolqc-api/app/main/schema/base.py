@@ -380,15 +380,12 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         else:
             kwargs = base_data
 
-        try:
-            model_instance = model(**kwargs)
-            model_instance.save()
-            return model_instance, None
-        except IntegrityError:
-            # TODO make this consistent with in base resource
-            # TODO add error handling for bad kwargs
-            # TODO make all errors correctly formatted
-            return None, "Integrity error"
+        model_instance = model(**kwargs)
+        error = model_instance.save()
+        if error is not None:
+            return None, error
+
+        return model_instance, None
 
     def create_bulk(self, data):
         created = [self._create_individual(d) for d in data]

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 
 db = SQLAlchemy()
 
@@ -65,8 +66,13 @@ class Base(db.Model):
         db.session.commit()
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return None
+        except IntegrityError:
+            self.rollback()
+            return "DB integrity error"
 
     @classmethod
     def find_bulk(cls, **kwargs):
@@ -80,7 +86,7 @@ class Base(db.Model):
     @staticmethod
     def bulk_update(data):
         db.session.add_all(data)
-        db.session.commit()
+        db.session.commit()   
 
     @classmethod
     def find_by_id(cls, _id):

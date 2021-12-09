@@ -85,5 +85,25 @@ class TestInsertedCorrectly(BaseTestCase):
         )
         self.assertEqual(inserted.other_column, other_column_string)
     
-    def partial_insertion_success_F(self):
-        pass
+    def test_partial_insertion_success_B(self):
+        self.add_A(id=9090)
+
+        response = self.client.open(
+            '/api/v1/B',
+            method='POST',
+            json=[{
+                'a_id': 70707,
+            }, {
+                'a_id': 9090,
+            }]
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        errors = response.json['meta']['errors']
+        import logging
+        logging.warning(errors)
+        logging.warning(response.json['data'])
+        self.assertNotEqual(errors[0], None)
+        self.assertEqual(errors[1], None)
