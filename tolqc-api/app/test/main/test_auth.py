@@ -9,6 +9,7 @@ from main.model import db
 api_key = {"Authorization": "AnyThingBecAuseThIsIsATEST567890"}
 false_api_key = {"Authorization": "IamAhacker"}
 
+
 class TestAuthentication(BaseTestCase):
     def test_api_key_auth(self):
         db.engine.execute("ALTER SEQUENCE centre_id_seq RESTART WITH 1;")
