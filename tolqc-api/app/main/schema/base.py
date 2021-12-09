@@ -8,8 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
-                                   SQLAlchemyAutoSchemaOpts, \
-                                   auto_field
+                                   SQLAlchemyAutoSchemaOpts
 from marshmallow_jsonapi.fields import DocumentMeta, \
                                        BaseRelationship, \
                                        ResourceMeta
@@ -55,66 +54,6 @@ def check_excluded_fields_nullable(function):
             **kwargs,
         )
     return wrapper
-
-
-# overrides
-# TODO move this into one of the base schema classes
-def format_item(obj, item):
-    """Sourced from Marshmallow-jsonapi (MIT License)
-    Format a single datum as a Resource object.
-    See: http://jsonapi.org/format/#document-resource-objects
-    """
-
-    # http://jsonapi.org/format/#document-top-level
-    # Primary data MUST be either... a single resource object, a single resource
-    # identifier object, or null, for requests that target single resources
-    TYPE = "type"
-    ID = "id"
-
-    if not item:
-        return None
-
-    ret = obj.dict_class()
-    ret[TYPE] = obj.opts.type_
-
-    # Get the schema attributes so we can confirm `dump-to` values exist
-    attributes = {
-        (obj.fields[field].data_key or field): field for field in obj.fields
-    }
-
-    for field_name, value in item.items():
-        # intercept external field
-        if field_name == 'ext':
-            for ext_field_name, ext_field_value in value.items():
-                if "attributes" not in ret:
-                    ret["attributes"] = obj.dict_class()
-                ret["attributes"][ext_field_name] = ext_field_value
-            continue
-        attribute = attributes[field_name]
-        if attribute == ID:
-            ret[ID] = value
-        elif isinstance(obj.fields[attribute], DocumentMeta):
-            if not obj.document_meta:
-                obj.document_meta = obj.dict_class()
-            obj.document_meta.update(value)
-        elif isinstance(obj.fields[attribute], ResourceMeta):
-            if "meta" not in ret:
-                ret["meta"] = obj.dict_class()
-            ret["meta"].update(value)
-        elif isinstance(obj.fields[attribute], BaseRelationship):
-            if value:
-                if "relationships" not in ret:
-                    ret["relationships"] = obj.dict_class()
-                ret["relationships"][obj.inflect(field_name)] = value
-        else:
-            if "attributes" not in ret:
-                ret["attributes"] = obj.dict_class()
-            ret["attributes"][obj.inflect(field_name)] = value
-
-    links = obj.get_resource_links(item)
-    if links:
-        ret["links"] = links
-    return ret
 
 
 class BaseSchema():
@@ -264,6 +203,63 @@ class BaseSchema():
             if f not in non_required_fields
             and f not in exclude_fields
         ]
+    
+    def format_item(obj, item):
+        """Sourced from Marshmallow-jsonapi (MIT License)
+        Format a single datum as a Resource object.
+        See: http://jsonapi.org/format/#document-resource-objects
+        """
+
+        # http://jsonapi.org/format/#document-top-level
+        # Primary data MUST be either... a single resource object, a single resource
+        # identifier object, or null, for requests that target single resources
+        TYPE = "type"
+        ID = "id"
+
+        if not item:
+            return None
+
+        ret = obj.dict_class()
+        ret[TYPE] = obj.opts.type_
+
+        # Get the schema attributes so we can confirm `dump-to` values exist
+        attributes = {
+            (obj.fields[field].data_key or field): field for field in obj.fields
+        }
+
+        for field_name, value in item.items():
+            # intercept external field
+            if field_name == 'ext':
+                for ext_field_name, ext_field_value in value.items():
+                    if "attributes" not in ret:
+                        ret["attributes"] = obj.dict_class()
+                    ret["attributes"][ext_field_name] = ext_field_value
+                continue
+            attribute = attributes[field_name]
+            if attribute == ID:
+                ret[ID] = value
+            elif isinstance(obj.fields[attribute], DocumentMeta):
+                if not obj.document_meta:
+                    obj.document_meta = obj.dict_class()
+                obj.document_meta.update(value)
+            elif isinstance(obj.fields[attribute], ResourceMeta):
+                if "meta" not in ret:
+                    ret["meta"] = obj.dict_class()
+                ret["meta"].update(value)
+            elif isinstance(obj.fields[attribute], BaseRelationship):
+                if value:
+                    if "relationships" not in ret:
+                        ret["relationships"] = obj.dict_class()
+                    ret["relationships"][obj.inflect(field_name)] = value
+            else:
+                if "attributes" not in ret:
+                    ret["attributes"] = obj.dict_class()
+                ret["attributes"][obj.inflect(field_name)] = value
+
+        links = obj.get_resource_links(item)
+        if links:
+            ret["links"] = links
+        return ret
 
     def _find_model_by_id(self, id):
         model = self.Meta.model.find_by_id(id)
@@ -295,6 +291,7 @@ class BaseSchema():
         return self.dump(model_instance)
 
     def update_by_id(self, id, data):
+        # TODO schema validation
         base_data, ext_data = self._separate_extra_data(data)
         if ext_data:
             base_data['ext'] = ext_data
@@ -332,10 +329,6 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             exclude_fields=exclude_fields,
             ignore_required=True
         )
-
-    # overrides
-    def format_item(self, item):
-        return format_item(self, item)
 
     @classmethod
     @check_excluded_fields_nullable
