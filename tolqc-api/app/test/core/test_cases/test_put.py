@@ -22,13 +22,9 @@ class TestPut200(BaseTestCase):
             a_id=1
         )
 
-        expected = self.to_json_api(
-            290,
-            'B',
-            {
-                'a_id': 101
-            }
-        )
+        expected = {
+            'a_id': 101
+        }
         response = self.client.open(
             '/api/v1/B/290',
             method='PUT',
@@ -37,15 +33,11 @@ class TestPut200(BaseTestCase):
             }
         )
         self.assert200(response)
-        self.assertEqual(expected, response.json)
+        self.assertEqual(response.json['data']['attributes'], expected)
 
-        expected = self.to_json_api(
-            290,
-            'B',
-            {
-                'a_id': 10101
-            }
-        )
+        expected = {
+            'a_id': 10101
+        }
         response = self.client.open(
             '/api/v1/B/290',
             method='PUT',
@@ -54,4 +46,4 @@ class TestPut200(BaseTestCase):
             }
         )
         self.assert200(response)
-        self.assertEqual(expected, response.json)
+        self.assertEqual(response.json['data']['attributes'], expected)
