@@ -7,7 +7,7 @@ from test.core.models import ModelRelationshipB, \
                              ModelWithNullableColumn, \
                              ModelWithNonNullableColumn
 
-
+# TODO check multiple inserts
 class TestInsertedCorrectly200(BaseTestCase):
     def test_inserted_correctly_B_200(self):
         a_id = 90
@@ -16,15 +16,16 @@ class TestInsertedCorrectly200(BaseTestCase):
         response = self.client.open(
             '/api/v1/B',
             method='POST',
-            json={
+            json=[{
                 'a_id': a_id,
-            }
+            }]
         )
         self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        id = response.json['data']['id']
+        self.assertEqual(response.json['meta']['errors'], [None])
+        id = response.json['data'][0]['id']
 
         inserted = ModelRelationshipB.find_by_id(id)
         self.assertEqual(inserted.a_id, a_id)
