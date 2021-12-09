@@ -28,8 +28,10 @@ def auth_dec():
         return decorated
     return warp_decorator
 
-def auth(namespace:Namespace):
+
+def auth(namespace: Namespace):
     decs = (namespace.doc(security=['ApiKeyAuth']), auth_dec())
+    
     def deco(func):
         for dec in reversed(decs):
             func = dec(func)
