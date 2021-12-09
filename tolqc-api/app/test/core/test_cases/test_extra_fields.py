@@ -203,12 +203,8 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
 
-        expected = self.to_json_api(
-            297,
-            'F',
-            {
-                "other_column": None,
-                **ext_data
-            }
-        )
-        self.assertEqual(response.json, expected)
+        expected = {
+            "other_column": None,
+            "ext": ext_data
+        }
+        self.assertEqual(response.json['data']['attributes'], expected)
