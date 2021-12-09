@@ -34,3 +34,4 @@ Main - tests the main logic of ToLQC
 - empty lists in ListResource requests return a 400 error
 - PUT only accepts a dict, and POST only accepts a list (otherwise 400)
 - incorrect data types cause validation errors
+- the ext field can't be overwritten by specifying an ext key in a request

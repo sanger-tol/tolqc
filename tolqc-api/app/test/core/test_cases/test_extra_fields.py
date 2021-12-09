@@ -152,18 +152,14 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        expected = self.to_json_api(
-            90900,
-            'F',
-            {
-                "first": "not very nice",
-                "second": "much less nice",
-                "fourth": "irrelevant",
-                "fifth": "the worst of the bunch",
-                "other_column": None
-            }
-        )
-        self.assertEqual(response.json, expected)
+        expected = {
+            "first": "not very nice",
+            "second": "much less nice",
+            "fourth": "irrelevant",
+            "fifth": "the worst of the bunch",
+            "other_column": None
+        }
+        self.assertEqual(response.json['data']['attributes'], expected)
 
     def test_no_extra_fields_get_F_200(self):
         self.add_F(id=290)
