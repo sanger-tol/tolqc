@@ -6,7 +6,7 @@ from flask_restx import Namespace, Resource
 from sqlalchemy.exc import IntegrityError
 
 from main.schema import InstanceDoesNotExistException, \
-                        IdSpecifiedInRequestBodyException
+                        ValidationError
 from main.model import ExtraFieldsNotPermittedException
 
 
@@ -88,14 +88,13 @@ def handle_400_db_integrity_error(function):
     return wrapper
 
 
-def handle_400_id_in_body_error(function):
+def handle_400_validation_error(function):
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
-        except IdSpecifiedInRequestBodyException:
+        except ValidationError as e:
             return {
-                "error": "An id must not be specified in the "
-                         "body of a request to this endpoint."
+                "error": e.message
             }, 400
     return wrapper
 
@@ -177,7 +176,7 @@ class BaseDetailResource(BaseResource):
 
     @provide_body_data
     @handle_400_db_integrity_error
-    @handle_400_id_in_body_error
+    @handle_400_validation_error
     @handle_400_bad_data_error
     @handle_400_extra_fields_not_permitted_error
     @handle_404

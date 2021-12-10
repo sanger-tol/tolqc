@@ -34,8 +34,10 @@ class InstanceDoesNotExistException(Exception):
         )
 
 
-class IdSpecifiedInRequestBodyException(Exception):
-    pass
+class ValidationError(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
 
 
 def check_excluded_fields_nullable(function):
@@ -174,7 +176,7 @@ class BaseSchema():
         )
 
     @classmethod
-    def _get_fields(cls, exclude_fields):
+    def _get_fields(cls, exclude_fields=[]):
         column_names = cls.Meta.model.get_column_names()
         return [
             c for c in column_names
@@ -210,8 +212,6 @@ class BaseSchema():
 
     def _separate_extra_data(self, data):
         request_fields = data.keys()
-        if 'id' in request_fields:
-            raise IdSpecifiedInRequestBodyException()
         base_fields = self._get_fields([])
         base_data = {
             f: data[f]
@@ -235,7 +235,10 @@ class BaseSchema():
             if field not in data.keys():
                 return f"The field '{field}' is required on this endpoint."
         model = self.Meta.model
-        for field, value in data:
+        model_fields = self._get_fields()
+        for field, value in data.items():
+            if field not in model_fields:
+                continue
             expected_python_type = model.get_column_python_type(field)
             observed_python_type = type(value)
             if observed_python_type != expected_python_type:
@@ -292,8 +295,9 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         return self.dump(model_instance)
 
     def update_by_id(self, id, data):
-        # TODO schema validation
-        # TODO add data_is_valid
+        validation_error = self._get_validation_error(data)
+        if validation_error is not None:
+            raise ValidationError(validation_error)
         base_data, ext_data = self._separate_extra_data(data)
         if ext_data:
             base_data['ext'] = ext_data
