@@ -318,7 +318,7 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     def read_bulk(self):
         model = self.Meta.model
-        return model.find_bulk()
+        return self.dump(model.find_bulk())
 
     def _create_individual(self, datum):
         # TODO error handling

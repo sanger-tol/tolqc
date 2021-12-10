@@ -103,7 +103,7 @@ class TolqcCentreListResource(BaseListResource):
         model=centre_list_response_model
     )
     def get(self):
-        pass
+        return self._get()
 
 
 centre_namespace.add_resource(TolqcCentreDetailResource, '/<int:id>')

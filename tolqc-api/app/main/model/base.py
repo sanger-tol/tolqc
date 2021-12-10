@@ -72,12 +72,12 @@ class Base(db.Model):
             return None
         except IntegrityError:
             self.rollback()
+            # TODO make better error message, in separate module
             return "DB integrity error"
 
     @classmethod
     def find_bulk(cls, **kwargs):
-        # TODO narrow the scope here
-        return db.session.query(cls).all()
+        return db.session.query(cls).limit(50).all()
 
     @staticmethod
     def rollback():
