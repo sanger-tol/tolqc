@@ -226,7 +226,7 @@ class BaseSchema():
         if ext_data and not self.Meta.model.has_ext_column():
             raise ExtraFieldsNotPermittedException(ext_data)
         return base_data, ext_data
-    
+
     def _get_validation_error(self, data):
         if 'id' in data.keys():
             return 'An id must not be specified in the body of a request to this endpoint.'
@@ -283,7 +283,7 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             },
             'type': 'object',
         }
-    
+
     def _find_model_by_id(self, id):
         model = self.Meta.model.find_by_id(id)
         if model is None:
