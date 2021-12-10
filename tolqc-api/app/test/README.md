@@ -35,3 +35,6 @@ Main - tests the main logic of ToLQC
 - PUT only accepts a dict, and POST only accepts a list (otherwise 400)
 - incorrect data types cause validation errors
 - the ext field can't be overwritten by specifying an ext key in a request
+
+- **IMPORTANT** - missing required fields don't raise an DB-integrity 400 error
+    - something more specific is raised
