@@ -208,3 +208,20 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             "ext": ext_data
         }
         self.assertEqual(response.json['data']['attributes'], expected)
+    
+    def test_specify_explicit_extra_fields_entry_error_post_F(self):
+        response = self.client.open(
+            '/api/v1/F',
+            method='POST',
+            json=[{
+                'other_column': 'doesnt matter',
+                'ext': {}
+            }]
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        errors = response.json['meta']['errors']
+        self.assertEqual(len(errors), 1)
+        self.assertNotEqual(errors[0], None)
