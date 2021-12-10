@@ -5,7 +5,8 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from main.resource import centre_namespace, environment_namespace
+from main.resource import centre_namespace, environment_namespace, \
+                          run_namespace, authorizations
 
 
 def _get_environment_string(app):
@@ -19,10 +20,12 @@ def _setup_api(blueprint, app):
     api = Api(
         blueprint,
         doc='/ui',
-        title=f"Tree of Life Quality Control{_get_environment_string(app)}"
+        title=f"Tree of Life Quality Control{_get_environment_string(app)}",
+        authorizations=authorizations
     )
     api.add_namespace(centre_namespace)
     api.add_namespace(environment_namespace)
+    api.add_namespace(run_namespace)
 
 
 def init_blueprint(app):
