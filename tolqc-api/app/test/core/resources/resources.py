@@ -124,7 +124,7 @@ class C_ListResource(BaseListResource):
     @c_namespace.expect(c_post_model)
     def post(self):
         return self._post()
-    
+
     def get(self):
         return self._get()
 

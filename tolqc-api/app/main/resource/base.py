@@ -212,6 +212,6 @@ class BaseListResource(BaseResource):
         # _do not_ provide it in the call signature, i.e.
         # use _post() not _post(data)
         return self.schema.create_bulk(data), 200
-    
+
     def _get(self):
         return self.schema.read_bulk(), 200

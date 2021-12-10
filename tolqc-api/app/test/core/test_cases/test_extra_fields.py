@@ -208,7 +208,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             "ext": ext_data
         }
         self.assertEqual(response.json['data']['attributes'], expected)
-    
+
     def test_specify_explicit_extra_fields_entry_error_post_F(self):
         response = self.client.open(
             '/api/v1/F',
