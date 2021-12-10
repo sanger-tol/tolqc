@@ -208,12 +208,6 @@ class BaseSchema():
             and f not in exclude_fields
         ]
 
-    def _find_model_by_id(self, id):
-        model = self.Meta.model.find_by_id(id)
-        if model is None:
-            raise InstanceDoesNotExistException(id, self)
-        return model
-
     def _separate_extra_data(self, data):
         request_fields = data.keys()
         if 'id' in request_fields:
@@ -232,25 +226,6 @@ class BaseSchema():
         if ext_data and not self.Meta.model.has_ext_column():
             raise ExtraFieldsNotPermittedException(ext_data)
         return base_data, ext_data
-
-    def read_by_id(self, id):
-        model_instance = self._find_model_by_id(id)
-        return self.dump(model_instance)
-
-    def update_by_id(self, id, data):
-        # TODO schema validation
-        base_data, ext_data = self._separate_extra_data(data)
-        if ext_data:
-            base_data['ext'] = ext_data
-        model_instance = self._find_model_by_id(id)
-        model_instance.update(base_data)
-        model_instance.commit()
-        return self.dump(model_instance)
-
-    def delete_by_id(self, id):
-        model_instance = self._find_model_by_id(id)
-        model_instance.delete()
-        model_instance.commit()
 
 # requests are in regular dict format, responses in JSON:API
 
@@ -289,6 +264,31 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             },
             'type': 'object',
         }
+    
+    def _find_model_by_id(self, id):
+        model = self.Meta.model.find_by_id(id)
+        if model is None:
+            raise InstanceDoesNotExistException(id, self)
+        return model
+
+    def read_by_id(self, id):
+        model_instance = self._find_model_by_id(id)
+        return self.dump(model_instance)
+
+    def update_by_id(self, id, data):
+        # TODO schema validation
+        base_data, ext_data = self._separate_extra_data(data)
+        if ext_data:
+            base_data['ext'] = ext_data
+        model_instance = self._find_model_by_id(id)
+        model_instance.update(base_data)
+        model_instance.commit()
+        return self.dump(model_instance)
+
+    def delete_by_id(self, id):
+        model_instance = self._find_model_by_id(id)
+        model_instance.delete()
+        model_instance.commit()
 
 
 class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
