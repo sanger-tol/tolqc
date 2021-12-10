@@ -4,8 +4,8 @@
 
 from .base import BaseNamespace, BaseDetailResource, \
                   BaseListResource
-from main.schema import TolqcRunRequestSchema, \
-                        TolqcRunResponseSchema
+from main.schema import RunListSchema, \
+                        RunDetailSchema
 from main.resource.auth import auth
 
 
@@ -14,32 +14,36 @@ run_namespace = BaseNamespace(
     description='ToLQC-Run related methods',
 )
 
-run_response_model = run_namespace.schema_model(
-    'Run Response',
-    TolqcRunResponseSchema.to_schema_model_dict()
+run_detail_response_model = run_namespace.schema_model(
+    'Run Individual Response',
+    RunDetailSchema.to_response_schema_model_dict()
 )
 
-run_post_model = run_namespace.model(
+run_post_request_model = run_namespace.schema_model(
     'Run POST Request',
-    TolqcRunRequestSchema.to_post_model_dict()
+    RunListSchema.to_post_request_schema_model_dict()
 )
 
-run_put_model = run_namespace.model(
+run_put_request_model = run_namespace.model(
     'Run PUT Request',
-    TolqcRunRequestSchema.to_put_model_dict()
+    RunDetailSchema.to_put_request_model_dict()
+)
+
+run_list_response_model = run_namespace.schema_model(
+    'Run Bulk Response',
+    RunListSchema.to_response_schema_model_dict()
 )
 
 
 class TolqcRunDetailResource(BaseDetailResource):
     name = "run"
     namespace = run_namespace
-    request_schema = TolqcRunRequestSchema()
-    response_schema = TolqcRunResponseSchema()
+    schema = RunDetailSchema()
 
     @run_namespace.response(
         200,
         'Success',
-        run_response_model
+        run_detail_response_model
     )
     @run_namespace.response(
         404,
@@ -48,11 +52,11 @@ class TolqcRunDetailResource(BaseDetailResource):
     def get(self, id):
         return self._get_by_id(id)
 
-    @run_namespace.expect(run_put_model)
+    @run_namespace.expect(run_put_request_model)
     @run_namespace.response(
         200,
         'Success',
-        run_response_model
+        run_detail_response_model
     )
     @run_namespace.response(
         400,
@@ -63,7 +67,7 @@ class TolqcRunDetailResource(BaseDetailResource):
         'Not Found'
     )
     @auth(run_namespace)
-    def put(self, id, request_data):
+    def put(self, id):
         return self._put_by_id(id)
 
     @run_namespace.response(
@@ -79,29 +83,36 @@ class TolqcRunDetailResource(BaseDetailResource):
         'Not Found'
     )
     @auth(run_namespace)
-    def delete(self, id, request_data):
+    def delete(self, id):
         return self._delete_by_id(id)
 
 
 class TolqcRunListResource(BaseListResource):
     name = "runs"
     namespace = run_namespace
-    request_schema = TolqcRunRequestSchema()
-    response_schema = TolqcRunResponseSchema()
+    schema = RunListSchema()
 
-    @run_namespace.expect(run_post_model)
+    @run_namespace.expect(run_post_request_model)
     @run_namespace.response(
         200,
         description='Success',
-        model=run_response_model,
+        model=run_list_response_model,
     )
     @run_namespace.response(
         400,
         description='Bad Request'
     )
     @auth(run_namespace)
-    def post(self, request_data):
+    def post(self):
         return self._post()
+
+    @run_namespace.response(
+        200,
+        description='Success',
+        model=run_list_response_model,
+    )
+    def get(self):
+        return self._get()
 
 
 run_namespace.add_resource(TolqcRunDetailResource, '/<int:id>')

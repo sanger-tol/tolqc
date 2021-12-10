@@ -8,46 +8,55 @@ from test.core.models import ModelRelationshipB, \
                              ModelWithNonNullableColumn
 
 
-class TestInsertedCorrectly200(BaseTestCase):
-    def test_inserted_correctly_B_200(self):
+class TestInsertedCorrectly(BaseTestCase):
+    def test_inserted_correctly_B(self):
         a_id = 90
         self.add_A(id=a_id)
 
         response = self.client.open(
             '/api/v1/B',
             method='POST',
-            json={
+            json=[{
                 'a_id': a_id,
-            }
+            }]
         )
         self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        id = response.json['data']['id']
+        self.assertEqual(response.json['meta']['errors'], [None])
+        id = response.json['data'][0]['id']
 
         inserted = ModelRelationshipB.find_by_id(id)
         self.assertEqual(inserted.a_id, a_id)
 
-    def test_inserted_correctly_C_200(self):
-        other_column_string = 'this is a test, nice'
-
+    def test_multiple_inserted_correctly_C_200(self):
         response = self.client.open(
             '/api/v1/C',
             method='POST',
-            json={
-                'other_column': other_column_string
-            }
+            json=[{
+                'other_column': 'this is a test, nice'
+            }, {
+                'other_column': 'another test',
+                'nullable_column': 'nothing to see here'
+            }]
         )
         self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        id = response.json['data']['id']
 
-        inserted = ModelWithNullableColumn.find_by_id(id)
-        self.assertEqual(inserted.nullable_column, None)
-        self.assertEqual(inserted.other_column, other_column_string)
+        self.assertEqual(response.json['meta']['errors'], [None, None])
+
+        id_0 = response.json['data'][0]['id']
+        inserted_0 = ModelWithNullableColumn.find_by_id(id_0)
+        self.assertEqual(inserted_0.nullable_column, None)
+        self.assertEqual(inserted_0.other_column, 'this is a test, nice')
+
+        id_1 = response.json['data'][1]['id']
+        inserted_1 = ModelWithNullableColumn.find_by_id(id_1)
+        self.assertEqual(inserted_1.nullable_column, 'nothing to see here')
+        self.assertEqual(inserted_1.other_column, 'another test')
 
     def test_inserted_correctly_D_200(self):
         other_column_string = 'this is also a test'
@@ -56,20 +65,42 @@ class TestInsertedCorrectly200(BaseTestCase):
         response = self.client.open(
             '/api/v1/D',
             method='POST',
-            json={
+            json=[{
                 'other_column': other_column_string,
                 'non_nullable_column': non_nullable_string
-            }
+            }]
         )
         self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        id = response.json['data']['id']
 
+        self.assertEqual(response.json['meta']['errors'], [None])
+
+        id = response.json['data'][0]['id']
         inserted = ModelWithNonNullableColumn.find_by_id(id)
         self.assertEqual(
             inserted.non_nullable_column,
             non_nullable_string
         )
         self.assertEqual(inserted.other_column, other_column_string)
+
+    def test_partial_insertion_success_B(self):
+        self.add_A(id=9090)
+
+        response = self.client.open(
+            '/api/v1/B',
+            method='POST',
+            json=[{
+                'a_id': 70707,
+            }, {
+                'a_id': 9090,
+            }]
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        errors = response.json['meta']['errors']
+        self.assertNotEqual(errors[0], None)
+        self.assertEqual(errors[1], None)

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 
 db = SQLAlchemy()
 
@@ -65,8 +66,18 @@ class Base(db.Model):
         db.session.commit()
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            self.add()
+            self.commit()
+            return None
+        except IntegrityError:
+            self.rollback()
+            # TODO make better error message, in separate module
+            return "DB integrity error"
+
+    @classmethod
+    def find_bulk(cls, **kwargs):
+        return db.session.query(cls).limit(50).all()
 
     @staticmethod
     def rollback():

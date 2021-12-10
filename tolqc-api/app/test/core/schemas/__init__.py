@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .schemas import B_RequestSchema, B_ResponseSchema, \
-                     C_RequestSchema, C_ResponseSchema, \
-                     D_RequestSchema, D_ResponseSchema, \
-                     F_RequestSchema, F_ResponseSchema # noqa
+from .schemas import B_DetailSchema, B_ListSchema, \
+                     C_DetailSchema, C_ListSchema, \
+                     D_DetailSchema, D_ListSchema, \
+                     F_DetailSchema, F_ListSchema # noqa

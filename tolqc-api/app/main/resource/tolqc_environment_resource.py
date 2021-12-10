@@ -13,14 +13,14 @@ environment_namespace = Namespace(
 
 
 environment_model = environment_namespace.model('Environment', {
-    'environment': fields.String("dev"),
+    'environment': fields.String("dev", required=True),
 })
 
 
 class EnvironmentResource(Resource):
     def __init__(self, api=None):
         super().__init__(api)
-        self._environment = app.config["DEPLOYMENT_ENVIRONMENT"]
+        self._environment = app.config['DEPLOYMENT_ENVIRONMENT']
 
     @environment_namespace.doc('Gets the deployment environment string')
     @environment_namespace.response(

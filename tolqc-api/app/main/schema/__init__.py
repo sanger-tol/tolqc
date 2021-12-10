@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 from .base import InstanceDoesNotExistException, \
-                  IdSpecifiedInRequestBodyException, \
+                  ValidationError, \
                   ExtraFieldsNotPermittedException # noqa
-from .tolqc_centre_schema import TolqcCentreRequestSchema, \
-                                 TolqcCentreResponseSchema # noqa
-from .tolqc_run_schema import TolqcRunRequestSchema, \
-                              TolqcRunResponseSchema # noqa
+from .tolqc_centre_schema import CentreDetailSchema, \
+                                 CentreListSchema # noqa
+from .tolqc_run_schema import RunDetailSchema, \
+                              RunListSchema # noqa

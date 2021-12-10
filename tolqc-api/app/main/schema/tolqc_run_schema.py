@@ -2,21 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import BaseRequestSchema, BaseResponseSchema
 from main.model import TolqcRun
+from .base import BaseMeta, BaseDetailSchema, BaseListSchema
 
 
-class TolqcRunRequestSchema(BaseRequestSchema):
-    class Meta:
-        type_ = 'run'
-        strict = True
-        model = TolqcRun
-        include_fk = True
+class RunMeta(BaseMeta):
+    type_ = 'run'
+    model = TolqcRun
 
 
-class TolqcRunResponseSchema(BaseResponseSchema):
-    class Meta:
-        type_ = 'run'
-        strict = True
-        model = TolqcRun
-        include_fk = True
+class RunDetailSchema(BaseDetailSchema):
+    Meta = RunMeta
+
+
+class RunListSchema(BaseListSchema):
+    Meta = RunMeta

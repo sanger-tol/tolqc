@@ -7,8 +7,8 @@ import pytest
 from main.schema.base import RequiredFieldExcludedException
 
 from test.core import BaseTestCase
-from test.core.schemas import C_RequestSchema, C_ResponseSchema, \
-                              D_RequestSchema, D_ResponseSchema
+from test.core.schemas import C_DetailSchema, C_ListSchema, \
+                              D_DetailSchema, D_ListSchema
 
 
 class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
@@ -17,13 +17,13 @@ class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
         an exception in the right situations"""
         exclude_fields = ['nullable_column']
         # shouldn't raise exception on any dict conversion for C
-        C_RequestSchema.to_post_model_dict(
+        C_ListSchema.to_post_request_schema_model_dict(
             exclude_fields=exclude_fields
         )
-        C_ResponseSchema.to_schema_model_dict(
+        C_DetailSchema.to_response_schema_model_dict(
             exclude_fields=exclude_fields
         )
-        C_RequestSchema.to_put_model_dict(
+        C_DetailSchema.to_put_request_model_dict(
             exclude_fields=exclude_fields
         )
 
@@ -32,14 +32,14 @@ class TestSchemaExlucdedFieldsToModelDict(BaseTestCase):
         an exception in the right situations"""
         exclude_fields = ['non_nullable_column']
         with pytest.raises(RequiredFieldExcludedException):
-            D_RequestSchema.to_post_model_dict(
+            D_ListSchema.to_post_request_schema_model_dict(
                 exclude_fields=exclude_fields
             )
         with pytest.raises(RequiredFieldExcludedException):
-            D_ResponseSchema.to_schema_model_dict(
+            D_DetailSchema.to_response_schema_model_dict(
                 exclude_fields=exclude_fields
             )
         # should not raise exception on PUT dict
-        D_RequestSchema.to_put_model_dict(
+        D_DetailSchema.to_put_request_model_dict(
             exclude_fields=exclude_fields
         )

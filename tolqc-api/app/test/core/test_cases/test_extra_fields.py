@@ -20,7 +20,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             True
         )
 
-    def test_extra_fields_post_F_200(self):
+    def test_extra_fields_post_F_no_error(self):
         extra_fields = {
             "extra_field": "superfluity",
             "another_ext": "Yet another extra field"
@@ -28,17 +28,20 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         response = self.client.open(
             '/api/v1/F',
             method='POST',
-            json={
+            json=[{
                 **extra_fields,
                 "other_column": "another test :("
-            }
+            }]
         )
         self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        errors = response.json['meta']['errors']
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], None)
 
-        id = response.json['data']['id']
+        id = response.json['data'][0]['id']
         F_instance = ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.ext, extra_fields)
         self.assertEqual(F_instance.other_column, "another test :(")
@@ -47,16 +50,19 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         response = self.client.open(
             '/api/v1/F',
             method='POST',
-            json={
+            json=[{
                 "other_column": "nonsense!!!"
-            }
+            }]
         )
         self.assert200(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        errors = response.json['meta']['errors']
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], None)
 
-        id = response.json['data']['id']
+        id = response.json['data'][0]['id']
         F_instance = ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.other_column, "nonsense!!!")
         self.assertEqual(F_instance.ext, {})
@@ -149,18 +155,16 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        expected = self.to_json_api(
-            90900,
-            'F',
-            {
+        expected = {
+            "ext": {
                 "first": "not very nice",
                 "second": "much less nice",
                 "fourth": "irrelevant",
                 "fifth": "the worst of the bunch",
-                "other_column": None
-            }
-        )
-        self.assertEqual(response.json, expected)
+            },
+            "other_column": None
+        }
+        self.assertEqual(response.json['data']['attributes'], expected)
 
     def test_no_extra_fields_get_F_200(self):
         self.add_F(id=290)
@@ -174,14 +178,11 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
 
-        expected = self.to_json_api(
-            290,
-            'F',
-            {
-                "other_column": None
-            }
-        )
-        self.assertEqual(response.json, expected)
+        expected = {
+            "other_column": None,
+            "ext": {}
+        }
+        self.assertEqual(response.json['data']['attributes'], expected)
 
     def test_variety_type_extra_fields_get_F_200(self):
         ext_data = {
@@ -202,12 +203,25 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
 
-        expected = self.to_json_api(
-            297,
-            'F',
-            {
-                "other_column": None,
-                **ext_data
-            }
+        expected = {
+            "other_column": None,
+            "ext": ext_data
+        }
+        self.assertEqual(response.json['data']['attributes'], expected)
+
+    def test_specify_explicit_extra_fields_entry_error_post_F(self):
+        response = self.client.open(
+            '/api/v1/F',
+            method='POST',
+            json=[{
+                'other_column': 'doesnt matter',
+                'ext': {}
+            }]
         )
-        self.assertEqual(response.json, expected)
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        errors = response.json['meta']['errors']
+        self.assertEqual(len(errors), 1)
+        self.assertNotEqual(errors[0], None)

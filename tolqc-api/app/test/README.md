@@ -23,3 +23,18 @@ Main - tests the main logic of ToLQC
 - That every custom exception has a test case!
 - That post/put requests lead to the correct corresponding changes to the DB
 - That a model, with one of every field, serialiases correctly
+
+- That new list resources work correctly
+- That new post response model works correctly
+    - check the various edge cases such as:
+        - The same object given multiple times
+- Test bulk get works correctly
+- Responses match their defined Swagger models
+- That a list must be specified in a request to a ListResource
+- empty lists in ListResource requests return a 400 error
+- PUT only accepts a dict, and POST only accepts a list (otherwise 400)
+- incorrect data types cause validation errors
+- the ext field can't be overwritten by specifying an ext key in a request
+
+- **IMPORTANT** - missing required fields don't raise an DB-integrity 400 error
+    - something more specific is raised

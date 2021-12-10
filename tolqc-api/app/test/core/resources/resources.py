@@ -6,14 +6,14 @@ from main.resource.base import BaseNamespace, \
                                BaseDetailResource, \
                                BaseListResource
 
-from test.core.schemas import B_RequestSchema, \
-                              B_ResponseSchema, \
-                              C_RequestSchema, \
-                              C_ResponseSchema, \
-                              D_RequestSchema, \
-                              D_ResponseSchema, \
-                              F_RequestSchema, \
-                              F_ResponseSchema
+from test.core.schemas import B_DetailSchema, \
+                              B_ListSchema, \
+                              C_DetailSchema, \
+                              C_ListSchema, \
+                              D_DetailSchema, \
+                              D_ListSchema, \
+                              F_DetailSchema, \
+                              F_ListSchema
 
 
 b_namespace = BaseNamespace('B')
@@ -21,64 +21,63 @@ c_namespace = BaseNamespace('C')
 d_namespace = BaseNamespace('D')
 f_namespace = BaseNamespace('F')
 
-b_post_model = b_namespace.model(
+b_post_model = b_namespace.schema_model(
     'B Post',
-    B_RequestSchema.to_post_model_dict()
+    B_ListSchema.to_post_request_schema_model_dict()
 )
 b_put_model = b_namespace.model(
     'B put',
-    B_RequestSchema.to_put_model_dict()
+    B_DetailSchema.to_put_request_model_dict()
 )
 b_response_model = b_namespace.schema_model(
     'B response',
-    B_ResponseSchema.to_schema_model_dict()
+    B_DetailSchema.to_response_schema_model_dict()
 )
 
-c_post_model = c_namespace.model(
+c_post_model = c_namespace.schema_model(
     'C Post',
-    C_RequestSchema.to_post_model_dict()
+    C_ListSchema.to_post_request_schema_model_dict()
 )
 c_put_model = c_namespace.model(
     'C put',
-    C_RequestSchema.to_put_model_dict()
+    C_DetailSchema.to_put_request_model_dict()
 )
 c_response_model = c_namespace.schema_model(
     'C response',
-    C_ResponseSchema.to_schema_model_dict()
+    C_DetailSchema.to_response_schema_model_dict()
 )
 
-d_post_model = d_namespace.model(
+d_post_model = d_namespace.schema_model(
     'D Post',
-    D_RequestSchema.to_post_model_dict()
+    D_ListSchema.to_post_request_schema_model_dict()
 )
 d_put_model = d_namespace.model(
     'D put',
-    D_RequestSchema.to_put_model_dict()
+    D_DetailSchema.to_put_request_model_dict()
 )
 d_response_model = d_namespace.schema_model(
     'D response',
-    D_ResponseSchema.to_schema_model_dict()
+    D_DetailSchema.to_response_schema_model_dict()
 )
 
-f_post_model = f_namespace.model(
+f_post_model = f_namespace.schema_model(
     'F Post',
-    F_RequestSchema.to_post_model_dict()
+    F_ListSchema.to_post_request_schema_model_dict()
 )
 f_put_model = f_namespace.model(
     'F put',
-    F_RequestSchema.to_put_model_dict()
+    F_DetailSchema.to_put_request_model_dict()
 )
 f_response_model = f_namespace.schema_model(
     'F response',
-    F_ResponseSchema.to_schema_model_dict()
+    F_DetailSchema.to_response_schema_model_dict()
 )
 
 
 class B_DetailResource(BaseDetailResource):
     name = 'B'
     namespace = b_namespace
-    request_schema = B_RequestSchema()
-    response_schema = B_ResponseSchema()
+    schema = B_DetailSchema()
 
     def get(self, id):
         return self._get_by_id(id)
@@ -94,8 +93,7 @@ class B_DetailResource(BaseDetailResource):
 class B_ListResource(BaseListResource):
     name = 'B'
     namespace = b_namespace
-    request_schema = B_RequestSchema()
-    response_schema = B_ResponseSchema()
+    schema = B_ListSchema()
 
     @b_namespace.expect(b_post_model)
     def post(self):
@@ -105,8 +103,7 @@ class B_ListResource(BaseListResource):
 class C_DetailResource(BaseDetailResource):
     name = 'C'
     namespace = c_namespace
-    request_schema = C_RequestSchema()
-    response_schema = C_ResponseSchema()
+    schema = C_DetailSchema()
 
     def get(self, id):
         return self._get_by_id(id)
@@ -122,19 +119,20 @@ class C_DetailResource(BaseDetailResource):
 class C_ListResource(BaseListResource):
     name = 'C'
     namespace = c_namespace
-    request_schema = C_RequestSchema()
-    response_schema = C_ResponseSchema()
+    schema = C_ListSchema()
 
     @c_namespace.expect(c_post_model)
     def post(self):
         return self._post()
 
+    def get(self):
+        return self._get()
+
 
 class D_DetailResource(BaseDetailResource):
     name = 'D'
     namespace = d_namespace
-    request_schema = D_RequestSchema()
-    response_schema = D_ResponseSchema()
+    schema = D_DetailSchema()
 
     def get(self, id):
         return self._get_by_id(id)
@@ -150,8 +148,7 @@ class D_DetailResource(BaseDetailResource):
 class D_ListResource(BaseListResource):
     name = 'D'
     namespace = d_namespace
-    request_schema = D_RequestSchema()
-    response_schema = D_ResponseSchema()
+    schema = D_ListSchema()
 
     @d_namespace.expect(d_post_model)
     def post(self):
@@ -161,8 +158,7 @@ class D_ListResource(BaseListResource):
 class F_DetailResource(BaseDetailResource):
     name = 'F'
     namespace = f_namespace
-    request_schema = F_RequestSchema()
-    response_schema = F_ResponseSchema()
+    schema = F_DetailSchema()
 
     def get(self, id):
         return self._get_by_id(id)
@@ -178,8 +174,7 @@ class F_DetailResource(BaseDetailResource):
 class F_ListResource(BaseListResource):
     name = 'F'
     namespace = f_namespace
-    request_schema = F_RequestSchema()
-    response_schema = F_ResponseSchema()
+    schema = F_ListSchema()
 
     @f_namespace.expect(f_post_model)
     def post(self):

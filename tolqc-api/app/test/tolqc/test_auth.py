@@ -18,10 +18,10 @@ class TestAuthentication(BaseTestCase):
         response = self.client.open(
             '/api/v1/centres',
             method='POST',
-            json={
+            json=[{
                 "name": "David",
                 "hierarchy_name": "Hierarchy Tester"
-            },
+            }],
         )
         self.assert401(response)
 
@@ -29,10 +29,10 @@ class TestAuthentication(BaseTestCase):
         response = self.client.open(
             '/api/v1/centres',
             method='POST',
-            json={
+            json=[{
                 "name": "David",
                 "hierarchy_name": "Hierarchy Tester"
-            },
+            }],
             headers=false_api_key
         )
         self.assert401(response)
@@ -41,31 +41,29 @@ class TestAuthentication(BaseTestCase):
         response = self.client.open(
             '/api/v1/centres',
             method='POST',
-            json={
+            json=[{
                 "name": "David",
                 "hierarchy_name": "Hierarchy Tester"
-            },
+            }],
             headers=api_key
         )
-        expect = {
-            "data": {
-              "type": "centre",
-              "attributes": {
-                "hierarchy_name": "Hierarchy Tester",
-                "name": "David"
-              },
-              "id": 1
-            }
+        expect_data = {
+            "hierarchy_name": "Hierarchy Tester",
+            "name": "David"
         }
+        expect_errors = [None]
         self.assert200(response)
-        self.assertEqual(expect, response.json)
+        self.assertEqual(expect_data, response.json['data'][0]['attributes'])
+        self.assertEqual(expect_errors, response.json['meta']['errors'])
+
+        id = response.json['data'][0]['id']
 
         # GET data without api key
         response = self.client.open(
-            '/api/v1/centres/1',
+            f'/api/v1/centres/{id}',
             method='GET',
         )
-        expect = {
+        expect_data = {
             "data": {
               "type": "centre",
               "attributes": {
@@ -76,7 +74,7 @@ class TestAuthentication(BaseTestCase):
             }
         }
         self.assert200(response)
-        self.assertEqual(expect, response.json)
+        self.assertEqual(expect_data, response.json)
 
         # GET data with api key
         response = self.client.open(
@@ -84,7 +82,7 @@ class TestAuthentication(BaseTestCase):
             method='GET',
             headers=api_key
         )
-        expect = {
+        expect_data = {
             "data": {
               "type": "centre",
               "attributes": {
@@ -95,4 +93,4 @@ class TestAuthentication(BaseTestCase):
             }
         }
         self.assert200(response)
-        self.assertEqual(expect, response.json)
+        self.assertEqual(expect_data, response.json)
