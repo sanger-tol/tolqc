@@ -234,16 +234,7 @@ class BaseSchema():
         for field in required_fields:
             if field not in data.keys():
                 return f"The field '{field}' is required on this endpoint."
-        model = self.Meta.model
-        model_fields = self._get_fields()
-        for field, value in data.items():
-            if field not in model_fields:
-                continue
-            expected_python_type = model.get_column_python_type(field)
-            observed_python_type = type(value)
-            if observed_python_type != expected_python_type:
-                return f"Incorrect type for field '{field}'. This should be " \
-                       f"{expected_python_type} not {observed_python_type}."
+        # TODO add type checking
         return None
 
 # requests are in regular dict format, responses in JSON:API
