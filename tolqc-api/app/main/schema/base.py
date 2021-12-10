@@ -226,6 +226,22 @@ class BaseSchema():
         if ext_data and not self.Meta.model.has_ext_column():
             raise ExtraFieldsNotPermittedException(ext_data)
         return base_data, ext_data
+    
+    def _get_validation_error(self, data):
+        if 'id' in data.keys():
+            return 'An id must not be specified in the body of a request to this endpoint.'
+        required_fields = self._get_required_fields(exclude_fields=['id', 'ext'])
+        for field in required_fields:
+            if field not in data.keys():
+                return f"The field '{field}' is required on this endpoint."
+        model = self.Meta.model
+        for field, value in data:
+            expected_python_type = model.get_column_python_type(field)
+            observed_python_type = type(value)
+            if observed_python_type != expected_python_type:
+                return f"Incorrect type for field '{field}'. This should be " \
+                       f"{expected_python_type} not {observed_python_type}."
+        return None
 
 # requests are in regular dict format, responses in JSON:API
 
@@ -277,6 +293,7 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     def update_by_id(self, id, data):
         # TODO schema validation
+        # TODO add data_is_valid
         base_data, ext_data = self._separate_extra_data(data)
         if ext_data:
             base_data['ext'] = ext_data
@@ -311,6 +328,9 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     def _create_individual(self, datum):
         # TODO error handling
         # TODO use decorators
+        validation_error = self._get_validation_error(datum)
+        if validation_error is not None:
+            return None, validation_error
         if self.ext_field_should_not_be_specified(datum):
             return None, "Do not write directly to the ext field." \
                          " Simply specify the key-value pairs that" \
@@ -320,8 +340,6 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             base_data, ext_data = self._separate_extra_data(datum)
         except ExtraFieldsNotPermittedException:
             return None, "Extra fields are not permitted"
-        except IdSpecifiedInRequestBodyException:
-            return None, "Id not permitted in request body"
 
         model = self.Meta.model
 
