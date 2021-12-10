@@ -106,6 +106,14 @@ class TolqcRunListResource(BaseListResource):
     def post(self):
         return self._post()
 
+    @run_namespace.response(
+        200,
+        description='Success',
+        model=run_list_response_model,
+    )
+    def get(self):
+        return self._get()
+
 
 run_namespace.add_resource(TolqcRunDetailResource, '/<int:id>')
 run_namespace.add_resource(TolqcRunListResource, '')
