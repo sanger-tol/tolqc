@@ -23,54 +23,54 @@ f_namespace = BaseNamespace('F')
 
 b_post_model = b_namespace.schema_model(
     'B Post',
-    B_ListSchema.to_post_schema_model_dict()
+    B_ListSchema.to_post_request_schema_model_dict()
 )
 b_put_model = b_namespace.model(
     'B put',
-    B_DetailSchema.to_put_model_dict()
+    B_DetailSchema.to_put_request_model_dict()
 )
 b_response_model = b_namespace.schema_model(
     'B response',
-    B_DetailSchema.to_schema_model_dict()
+    B_DetailSchema.to_response_schema_model_dict()
 )
 
 c_post_model = c_namespace.schema_model(
     'C Post',
-    C_ListSchema.to_post_schema_model_dict()
+    C_ListSchema.to_post_request_schema_model_dict()
 )
 c_put_model = c_namespace.model(
     'C put',
-    C_DetailSchema.to_put_model_dict()
+    C_DetailSchema.to_put_request_model_dict()
 )
 c_response_model = c_namespace.schema_model(
     'C response',
-    C_DetailSchema.to_schema_model_dict()
+    C_DetailSchema.to_response_schema_model_dict()
 )
 
 d_post_model = d_namespace.schema_model(
     'D Post',
-    D_ListSchema.to_post_schema_model_dict()
+    D_ListSchema.to_post_request_schema_model_dict()
 )
 d_put_model = d_namespace.model(
     'D put',
-    D_DetailSchema.to_put_model_dict()
+    D_DetailSchema.to_put_request_model_dict()
 )
 d_response_model = d_namespace.schema_model(
     'D response',
-    D_DetailSchema.to_schema_model_dict()
+    D_DetailSchema.to_response_schema_model_dict()
 )
 
 f_post_model = f_namespace.schema_model(
     'F Post',
-    F_ListSchema.to_post_schema_model_dict()
+    F_ListSchema.to_post_request_schema_model_dict()
 )
 f_put_model = f_namespace.model(
     'F put',
-    F_DetailSchema.to_put_model_dict()
+    F_DetailSchema.to_put_request_model_dict()
 )
 f_response_model = f_namespace.schema_model(
     'F response',
-    F_DetailSchema.to_schema_model_dict()
+    F_DetailSchema.to_response_schema_model_dict()
 )
 
 

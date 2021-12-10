@@ -242,7 +242,7 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
     # TODO move functions out of here, into the correct detail/list inheritor
 
     @classmethod
-    def to_put_model_dict(cls, exclude_fields=[]):
+    def to_put_request_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a Model, excluding
            the specified list of fields, for a PUT
            request"""
@@ -253,7 +253,7 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     @classmethod
     @check_excluded_fields_nullable
-    def to_schema_model_dict(cls, exclude_fields=[]):
+    def to_response_schema_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a SchemaModel in JSON:API format"""
         return {
             'required': ['data'],
@@ -349,7 +349,7 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     @classmethod
     @check_excluded_fields_nullable
-    def to_schema_model_dict(cls, exclude_fields=[]):
+    def to_response_schema_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a SchemaModel in JSON:API format"""
         return {
             'required': ['data'],
@@ -387,7 +387,7 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     @classmethod
     @check_excluded_fields_nullable
-    def to_post_schema_model_dict(cls, exclude_fields=[]):
+    def to_post_request_schema_model_dict(cls, exclude_fields=[]):
         """Returns a dict for a Model, excluding
            the specified list of fields, for a POST
            request"""

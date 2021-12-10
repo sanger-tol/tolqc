@@ -14,22 +14,22 @@ centre_namespace = BaseNamespace(
 
 centre_detail_response_model = centre_namespace.schema_model(
     'Centre Individual Response',
-    CentreDetailSchema.to_schema_model_dict()
+    CentreDetailSchema.to_response_schema_model_dict()
 )
 
 centre_post_request_model = centre_namespace.schema_model(
     'Centre POST Request',
-    CentreListSchema.to_post_schema_model_dict()
+    CentreListSchema.to_post_request_schema_model_dict()
 )
 
 centre_put_model = centre_namespace.model(
     'Centre PUT Request',
-    CentreDetailSchema.to_put_model_dict()
+    CentreDetailSchema.to_put_request_model_dict()
 )
 
 centre_list_response_model = centre_namespace.schema_model(
     'Centre Bulk Response',
-    CentreListSchema.to_schema_model_dict()
+    CentreListSchema.to_response_schema_model_dict()
 )
 
 
