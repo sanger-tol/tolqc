@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .sub_base import SubBase, db
 
 
-class TolqcLibraryType(Base):
+class TolqcLibraryType(SubBase):
     __tablename__ = "library_type"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)

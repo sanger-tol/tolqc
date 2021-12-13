@@ -30,6 +30,7 @@ class Base(db.Model):
     """The base model class. Its primary key must be called
     id"""
     __abstract__ = True
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
 
     def to_dict(cls):
         return {"override": "this"}
