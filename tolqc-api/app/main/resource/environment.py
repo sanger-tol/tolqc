@@ -20,4 +20,4 @@ class EnvironmentResource(Resource):
         model=EnvironmentSwagger.response_model,
     )
     def get(self):
-        return EnvironmentService.get_environment(), 200
+        return EnvironmentService.get_environment()
