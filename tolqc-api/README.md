@@ -6,40 +6,38 @@ SPDX-License-Identifier: MIT
 
 # ToLQC API
 
-## Overview
+## Overview of Directories
 
-### (Database) Models
+### model
 
 Models are sqlalchemy (ORM) classes. These represent SQL concepts in python objects, and produce SQL queries.
 
-### Schemas
+### schema
 
-Schemas are from Marshmallow. These are the intermediate forms between json requests and DB models.
+Schemas are from Marshmallow. These serialise models, deserialise requests, and validate deserialised requests.
 
-There are (currently) two kinds:
+### swagger
 
-- Request schemas
-    - deserialises user-supplied input
-    - provide this to DB models
-- Response schemas
-    - receives data back from the models, after the queries have taken place
-    - serialises this data in [**JSON:API**](https://jsonapi.org) format
+These organise the main namespace of an ORM-model, such as TolqcRun, into a format that is easily documentable by swagger.
+They also contain Swagger-models for documentation, and methods to generate them from a schema.
 
-### Namespaces
+#### A note on _Namespaces_
 
 Namespaces are the delimiters for differing concepts (such as centre/run) within the API, and present themselves
 after the prefix (/api/v1) in an endpoint's URL, _e.g._ GET /api/v1/**_centres_**/85.
 
 They originate from flask-restx.
 
-### Resources
+They are listed as the **api** class variable under a swagger class.
 
-Resources provide HTTP methods on namespaces, such as GET, PUT, and POST.
+### resource
+
+Resources document HTTP methods on namespaces, such as GET, PUT, and POST.
 
 There are two kinds:
 
 - **Detail Resources**
-    - Operate only on a single **DB model** instance (_via_ schemas)
+    - Operate only on a single **DB model** instance (_via_ services)
     - An ID must be supplied in the endpoint URL
     - Provide GET, PUT, and DELETE methods
 - **List Resources**
@@ -49,12 +47,15 @@ There are two kinds:
 
 They originate from flask-restx (like namespaces).
 
-## Dataflow
+### service
 
-1. User-input to endpoint
-2. Received by a **resource** on the relevant **namespace**
-3. Validated by a **request schema**
-4. Passed to a **DB model**
-5. The database is queried appropriately
-6. Returned data (if any) is passed to a **response schema**, and formatted
-7. The resource then serves the formatted data to the end-user in a response
+Services contain the main backend logic for fulfilling an HTTP request:
+
+- Their methods are called by resources
+- They dump and load data using schemas
+- They interact with the database using models 
+
+## TODO
+
+- Research how to unify Detail and List schemas into one class
+- Get schema validation working, especially concerning required fields

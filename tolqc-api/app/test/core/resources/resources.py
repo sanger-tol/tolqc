@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.namespace.base import BaseNamespace, \
+from main.swagger.base import BaseNamespace, \
                                 BaseDetailResource, \
                                 BaseListResource
 
