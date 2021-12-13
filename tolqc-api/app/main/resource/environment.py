@@ -4,8 +4,8 @@
 
 from flask_restx import Resource
 
-from main.service.environment import EnvironmentService
-from main.swagger.environment import EnvironmentSwagger
+from main.service import EnvironmentService
+from main.swagger import EnvironmentSwagger
 
 
 api_environment = EnvironmentSwagger.api

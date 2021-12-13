@@ -2,114 +2,34 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.resource.base import BaseNamespace, BaseDetailResource, \
-                  BaseListResource
+from flask_restx import Namespace
+
 from main.schema import CentreDetailSchema, \
                         CentreListSchema
-from main.auth import auth
 
 
-centre_namespace = BaseNamespace(
-    'centres',
-    description='Centre related methods',
-)
-
-centre_detail_response_model = centre_namespace.schema_model(
-    'Centre Individual Response',
-    CentreDetailSchema.to_response_schema_model_dict()
-)
-
-centre_post_request_model = centre_namespace.schema_model(
-    'Centre POST Request',
-    CentreListSchema.to_post_request_schema_model_dict()
-)
-
-centre_put_model = centre_namespace.model(
-    'Centre PUT Request',
-    CentreDetailSchema.to_put_request_model_dict()
-)
-
-centre_list_response_model = centre_namespace.schema_model(
-    'Centre Bulk Response',
-    CentreListSchema.to_response_schema_model_dict()
-)
-
-
-class TolqcCentreDetailResource(BaseDetailResource):
-    name = 'centre'
-    namespace = centre_namespace
-    schema = CentreDetailSchema()
-
-    @centre_namespace.response(
-        200,
-        description='Success',
-        model=centre_detail_response_model,
+class CentreSwagger:
+    api = Namespace(
+        'centres',
+        description='Centre related methods',
     )
-    @centre_namespace.response(
-        404,
-        description='Not Found'
-    )
-    def get(self, id):
-        return self._get_by_id(id)
 
-    @centre_namespace.response(
-        204,
-        description='Success'
+    detail_response_model = api.schema_model(
+        'Centre Individual Response',
+        CentreDetailSchema.to_response_schema_model_dict()
     )
-    @centre_namespace.response(
-        404,
-        description='Not Found'
-    )
-    @auth(centre_namespace)
-    def delete(self, id):
-        return self._delete_by_id(id)
 
-    @centre_namespace.expect(centre_put_model)
-    @centre_namespace.response(
-        200,
-        description='Success',
-        model=centre_detail_response_model
+    post_request_model = api.schema_model(
+        'Centre POST Request',
+        CentreListSchema.to_post_request_schema_model_dict()
     )
-    @centre_namespace.response(
-        400,
-        description='Bad Request'
+
+    put_request_model = api.model(
+        'Centre PUT Request',
+        CentreDetailSchema.to_put_request_model_dict()
     )
-    @centre_namespace.response(
-        404,
-        description='Not Found'
+
+    list_response_model = api.schema_model(
+        'Centre Bulk Response',
+        CentreListSchema.to_response_schema_model_dict()
     )
-    @auth(centre_namespace)
-    def put(self, id):
-        return self._put_by_id(id)
-
-
-class TolqcCentreListResource(BaseListResource):
-    name = 'centres'
-    namespace = centre_namespace
-    schema = CentreListSchema()
-
-    @centre_namespace.expect(centre_post_request_model)
-    @centre_namespace.response(
-        200,
-        description='Success',
-        model=centre_list_response_model,
-    )
-    @centre_namespace.response(
-        400,
-        description='Error'
-    )
-    @auth(centre_namespace)
-    def post(self):
-        return self._post()
-
-    @centre_namespace.response(
-        200,
-        description='Success',
-        model=centre_list_response_model
-    )
-    def get(self):
-        return self._get()
-
-
-centre_namespace.add_resource(TolqcCentreDetailResource, '/<int:id>')
-centre_namespace.add_resource(TolqcCentreListResource, '')

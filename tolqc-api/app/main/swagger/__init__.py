@@ -2,6 +2,5 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .centre import centre_namespace # noqa
+from .centre import CentreSwagger # noqa
 from .environment import EnvironmentSwagger # noqa
-from .run import run_namespace # noqa

@@ -2,4 +2,5 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .environment import EnvironmentResource # noqa
+from .centre import api_centre # noqa
+from .environment import api_environment # noqa
