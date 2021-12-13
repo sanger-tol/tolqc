@@ -5,7 +5,7 @@
 from .base import InstanceDoesNotExistException, \
                   ValidationError, \
                   ExtraFieldsNotPermittedException # noqa
-from .tolqc_centre_schema import CentreDetailSchema, \
+from .centre import CentreDetailSchema, \
                                  CentreListSchema # noqa
-from .tolqc_run_schema import RunDetailSchema, \
+from .run import RunDetailSchema, \
                               RunListSchema # noqa
