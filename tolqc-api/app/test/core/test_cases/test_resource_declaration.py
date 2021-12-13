@@ -6,7 +6,7 @@ import pytest
 
 from test.core import BaseTestCase
 
-from main.swagger.base import BaseNamespace, \
+from main.resource.base import BaseNamespace, \
                                 BaseDetailResource, \
                                 MissingResourceClassVariableException
 

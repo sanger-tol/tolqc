@@ -43,7 +43,7 @@ There are two kinds:
 - **List Resources**
     - Operate on multiple instances at a time
     - Do not require an ID in the endpoint URL
-    - Provide POST methods
+    - Provide GET and POST methods
 
 They originate from flask-restx (like namespaces).
 

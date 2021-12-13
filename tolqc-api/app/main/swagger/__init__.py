@@ -3,13 +3,5 @@
 # SPDX-License-Identifier: MIT
 
 from .centre import centre_namespace # noqa
-from .environment import environment_namespace # noqa
+from .environment import EnvironmentSwagger # noqa
 from .run import run_namespace # noqa
-
-authorizations = {
-        'ApiKeyAuth': {
-            'type': 'apiKey',
-            'in': 'header',
-            'name': 'Authorization'
-        }
-    }

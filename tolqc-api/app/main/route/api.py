@@ -5,8 +5,9 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from main.swagger import centre_namespace, environment_namespace, \
-                          run_namespace, authorizations
+from main.auth import authorizations
+from main.swagger import centre_namespace, EnvironmentSwagger, \
+                          run_namespace
 
 
 def _get_environment_string(app):
@@ -24,7 +25,7 @@ def _setup_api(blueprint, app):
         authorizations=authorizations
     )
     api.add_namespace(centre_namespace)
-    api.add_namespace(environment_namespace)
+    api.add_namespace(EnvironmentSwagger.api)
     api.add_namespace(run_namespace)
 
 

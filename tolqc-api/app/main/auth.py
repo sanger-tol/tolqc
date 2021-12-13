@@ -2,14 +2,23 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main import model
+from main.model import TolqcUser
 from functools import wraps
 from flask import request, abort
 from flask_restx import Namespace
 
 
+authorizations = {
+    'ApiKeyAuth': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    }
+}
+
+
 def check_key_valid(api_key):
-    user_id = model.TolqcUser.get_user_infos_by_api_key(api_key)
+    user_id = TolqcUser.get_user_infos_by_api_key(api_key)
     if not user_id:
         abort(401, "User does not exist")
     return user_id

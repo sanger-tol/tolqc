@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import BaseNamespace, BaseDetailResource, \
+from main.resource.base import BaseNamespace, BaseDetailResource, \
                   BaseListResource
 from main.schema import CentreDetailSchema, \
                         CentreListSchema
-from main.swagger.auth import auth
+from main.auth import auth
 
 
 centre_namespace = BaseNamespace(
