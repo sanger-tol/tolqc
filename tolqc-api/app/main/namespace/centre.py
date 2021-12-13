@@ -6,7 +6,7 @@ from .base import BaseNamespace, BaseDetailResource, \
                   BaseListResource
 from main.schema import CentreDetailSchema, \
                         CentreListSchema
-from main.resource.auth import auth
+from main.namespace.auth import auth
 
 
 centre_namespace = BaseNamespace(

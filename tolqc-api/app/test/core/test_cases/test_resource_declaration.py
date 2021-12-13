@@ -6,9 +6,9 @@ import pytest
 
 from test.core import BaseTestCase
 
-from main.resource.base import BaseNamespace, \
-                               BaseDetailResource, \
-                               MissingResourceClassVariableException
+from main.namespace.base import BaseNamespace, \
+                                BaseDetailResource, \
+                                MissingResourceClassVariableException
 
 
 class ResourceDeclarationTest(BaseTestCase):

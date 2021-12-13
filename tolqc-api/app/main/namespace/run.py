@@ -6,7 +6,7 @@ from .base import BaseNamespace, BaseDetailResource, \
                   BaseListResource
 from main.schema import RunListSchema, \
                         RunDetailSchema
-from main.resource.auth import auth
+from main.namespace.auth import auth
 
 
 run_namespace = BaseNamespace(

@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.resource.base import BaseNamespace, \
-                               BaseDetailResource, \
-                               BaseListResource
+from main.namespace.base import BaseNamespace, \
+                                BaseDetailResource, \
+                                BaseListResource
 
 from test.core.schemas import B_DetailSchema, \
                               B_ListSchema, \

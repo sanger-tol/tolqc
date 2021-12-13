@@ -5,7 +5,7 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from main.resource import centre_namespace, environment_namespace, \
+from main.namespace import centre_namespace, environment_namespace, \
                           run_namespace, authorizations
 
 

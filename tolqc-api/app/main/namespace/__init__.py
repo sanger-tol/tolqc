@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .tolqc_centre_resource import centre_namespace # noqa
-from .tolqc_environment_resource import environment_namespace # noqa
-from .tolqc_run_resource import run_namespace # noqa
+from .centre import centre_namespace # noqa
+from .environment import environment_namespace # noqa
+from .run import run_namespace # noqa
 
 authorizations = {
         'ApiKeyAuth': {
