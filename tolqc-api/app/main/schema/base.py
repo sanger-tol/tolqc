@@ -17,19 +17,24 @@ class BaseMeta:
     strict = True
     include_fk = True
 
+    @classmethod
+    def add_model(cls, model):
+        cls.model = model
+        cls.type_ = model.__tablename__
+
 
 class RequiredFieldExcludedException(Exception):
     def __init__(self, field, schema):
         super().__init__(
             f"The requied field {field} cannot be excluded"
-            f" on schema '{schema.Meta.type_}'."
+            f" on schema '{schema.get_type()}'."
         )
 
 
 class InstanceDoesNotExistException(Exception):
     def __init__(self, id, schema):
         super().__init__(
-            f"No {schema.Meta.type_} instance"
+            f"No {schema.get_type()} instance"
             f"exists with id {id}."
         )
 
@@ -56,6 +61,10 @@ def check_excluded_fields_nullable(function):
 
 
 class BaseSchema():
+    @classmethod
+    def get_type(cls):
+        return cls.Meta.model.__tablename__
+
     @classmethod
     def _get_dict_schema(cls, exclude_fields):
         return {
@@ -91,7 +100,7 @@ class BaseSchema():
             'properties': {
                 "type": {
                     'type': 'string',
-                    'default': cls.Meta.type_,
+                    'default': cls.get_type(),
                 },
                 "id": id_field,
                 "attributes": cls._individual_attributes_schem_model_dict(

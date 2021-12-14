@@ -12,7 +12,7 @@ class TestGetInsertedData(BaseTestCase):
 
         expected = self.to_json_api(
             10,
-            'B',
+            'test_B',
             {
                 "a_id": 90,
             },
@@ -33,7 +33,7 @@ class TestGetInsertedData(BaseTestCase):
 
         expected = self.to_json_api(
             9,
-            'C',
+            'test_C',
             {
                 'nullable_column': None,
                 'other_column': 'test the world',
@@ -59,7 +59,7 @@ class TestGetInsertedData(BaseTestCase):
 
         expected = self.to_json_api(
             1122,
-            'D',
+            'test_D',
             {
                 "non_nullable_column": 'This shouldnt be null',
                 "other_column": 'This, however, can be null!',

@@ -13,8 +13,10 @@ from test.core.models import ModelRelationshipB, \
 
 
 class BMeta(BaseMeta):
-    type_ = 'B'
-    model = ModelRelationshipB
+    pass
+
+
+BMeta.add_model(ModelRelationshipB)
 
 
 class B_DetailSchema(BaseDetailSchema):
@@ -26,8 +28,10 @@ class B_ListSchema(BaseListSchema):
 
 
 class CMeta(BaseMeta):
-    type_ = 'C'
-    model = ModelWithNullableColumn
+    pass
+
+
+CMeta.add_model(ModelWithNullableColumn)
 
 
 class C_DetailSchema(BaseDetailSchema):
@@ -39,8 +43,10 @@ class C_ListSchema(BaseListSchema):
 
 
 class DMeta(BaseMeta):
-    type_ = 'D'
-    model = ModelWithNonNullableColumn
+    pass
+
+
+DMeta.add_model(ModelWithNonNullableColumn)
 
 
 class D_DetailSchema(BaseDetailSchema):
@@ -52,8 +58,10 @@ class D_ListSchema(BaseListSchema):
 
 
 class FMeta(BaseMeta):
-    type_ = 'F'
-    model = ModelWithExtField
+    pass
+
+
+FMeta.add_model(ModelWithExtField)
 
 
 class F_DetailSchema(BaseDetailSchema):

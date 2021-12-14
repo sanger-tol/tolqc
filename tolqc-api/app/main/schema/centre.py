@@ -8,8 +8,10 @@ from .base import BaseDetailSchema, BaseListSchema, BaseMeta
 
 
 class CentreMeta(BaseMeta):
-    type_ = 'centre'
-    model = TolqcCentre
+    pass
+
+
+CentreMeta.add_model(TolqcCentre)
 
 
 class CentreDetailSchema(BaseDetailSchema):
