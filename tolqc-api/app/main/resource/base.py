@@ -49,15 +49,6 @@ def provide_body_data(function):
     return wrapper
 
 
-def handle_404(function):
-    def wrapper(obj, id, *args, **kwargs):
-        try:
-            return function(obj, id, *args, **kwargs)
-        except Exception: #InstanceDoesNotExistException:
-            return obj.error_404(id)
-    return wrapper
-
-
 def handle_400_extra_fields_not_permitted_error(function):
     def wrapper(*args, **kwargs):
         try:
@@ -160,14 +151,12 @@ class BaseDetailResource(BaseResource):
             "error": f"No {self.name} with id {id} found."
         }, 404
 
-    @handle_404
     def _get_by_id(self, id):
         return
         model = self.schema.read_by_id(id)
         return model, 200
 
     @handle_400_db_integrity_error
-    @handle_404
     def _delete_by_id(self, id):
         self.schema.delete_by_id(id)
         return {}, 204
@@ -177,7 +166,6 @@ class BaseDetailResource(BaseResource):
     @handle_400_validation_error
     @handle_400_bad_data_error
     @handle_400_extra_fields_not_permitted_error
-    @handle_404
     def _put_by_id(self, id, data):
         # N.B., the process_body_data decorator provides the data,
         # _do not_ provide it in the call signature, only id, i.e.:

@@ -5,21 +5,31 @@
 import json
 
 from flask import Response
-from flask_sqlalchemy import model
+
+from main.model import InstanceDoesNotExistException
 
 
-class InstanceDoesNotExistException(Exception):
-    def __init__(self, id, model_instance):
-        super().__init__(
-            f"No {model_instance.__tablename__}"
-            f" instance exists with id {id}."
-        )
+def handle_404(function):
+    def wrapper(cls, id, *args, **kwargs):
+        try:
+            return function(cls, id, *args, **kwargs)
+        except InstanceDoesNotExistException:
+            return cls.error_404(id)
+    return wrapper
 
 
 class BaseService:
     @classmethod
     def _get_type(cls):
         return cls.Meta.model.__tablename__
+    
+    @classmethod
+    def error_404(cls, id):
+        return cls.custom_individual_error(
+            "Not Found",
+            404,
+            f"No {cls._get_type()} found with id {id}."
+        )
 
     @classmethod
     def _split_error_components(cls, errors):
@@ -81,12 +91,7 @@ class BaseService:
         }])
 
     @classmethod
+    @handle_404
     def get_by_id(cls, id):
         model_instance = cls.Meta.model.find_by_id(id)
-        if model_instance is None:
-            return cls.custom_individual_error(
-                "Not Found",
-                404,
-                f"No {cls._get_type()} found with id {id}."
-            )
         return cls.Meta.detail_schema.dump(model_instance)

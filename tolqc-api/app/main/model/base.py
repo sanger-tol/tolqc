@@ -16,6 +16,11 @@ class ExtraFieldsNotPermittedException(Exception):
         return ', '.join(self._ext_fields.keys())
 
 
+class InstanceDoesNotExistException(Exception):
+    def __init__(self, id):
+        self.id = id
+
+
 class ExtColumn(db.Column):
     def __init__(self, **kwargs):
         super().__init__(
@@ -90,7 +95,10 @@ class Base(db.Model):
 
     @classmethod
     def find_by_id(cls, _id):
-        return cls.query.filter_by(id=_id).one_or_none()
+        instance = cls.query.filter_by(id=_id).one_or_none()
+        if instance is None:
+            raise InstanceDoesNotExistException(_id)
+        return instance
 
     @classmethod
     def _get_columns(cls):
