@@ -54,7 +54,6 @@ class BaseService:
 
     @classmethod
     def custom_errors(cls, status_code=500, errors=[]):
-        # TODO move this into an "error schema"
         """Expects a list of dicts, with keys 'title', 'code', and 'detail"""
 
         titles, codes, details = cls._split_error_components(errors)
@@ -80,7 +79,7 @@ class BaseService:
             "code": code,
             "detail": detail
         }])
-    
+
     @classmethod
     def get_by_id(cls, id):
         model_instance = cls.Meta.model.find_by_id(id)
