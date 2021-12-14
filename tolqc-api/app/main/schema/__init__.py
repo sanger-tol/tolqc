@@ -7,5 +7,3 @@ from .base import InstanceDoesNotExistException, \
                   ExtraFieldsNotPermittedException # noqa
 from .centre import CentreDetailSchema, \
                                  CentreListSchema # noqa
-from .run import RunDetailSchema, \
-                              RunListSchema # noqa

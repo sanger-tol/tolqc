@@ -311,8 +311,6 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
 
     document_meta = DocumentMeta()
 
-    # TODO move functions out of here, into the correct detail/list inheritor
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, many=True, **kwargs)
 

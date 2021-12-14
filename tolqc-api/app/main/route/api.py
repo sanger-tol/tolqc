@@ -7,7 +7,6 @@ from flask_restx import Api
 
 from main.auth import authorizations
 from main.resource import api_centre, api_environment
-from main.resource.run import run_namespace
 
 
 def _get_environment_string(app):
@@ -26,7 +25,6 @@ def _setup_api(blueprint, app):
     )
     api.add_namespace(api_centre, path='/centres')
     api.add_namespace(api_environment, path='/environments')
-    api.add_namespace(run_namespace, path='/runs')
 
 
 def init_blueprint(app):
