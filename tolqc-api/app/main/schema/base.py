@@ -230,7 +230,8 @@ class BaseSchema():
     def _get_validation_error(self, data):
         if 'id' in data.keys():
             return 'An id must not be specified in the body of a request to this endpoint.'
-        required_fields = self._get_required_fields(exclude_fields=['id', 'ext', 'created_by', 'created_at'])
+        required_fields = self._get_required_fields(exclude_fields=['id', 'ext', 'created_by',
+                                                                    'created_at'])
         for field in required_fields:
             if field not in data.keys():
                 return f"The field '{field}' is required on this endpoint."

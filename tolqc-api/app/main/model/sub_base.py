@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy.orm import defaultload
 from .base import Base, db
 from sqlalchemy.ext.declarative import declared_attr
 from .tolqc_user import get_user_id

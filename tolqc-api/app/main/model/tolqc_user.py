@@ -31,5 +31,6 @@ class TolqcUser(Base):
         auth_user_id = user_id
         return user_id
 
+
 def get_user_id():
     return auth_user_id[0]
