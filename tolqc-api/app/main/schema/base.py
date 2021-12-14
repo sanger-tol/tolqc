@@ -31,14 +31,6 @@ class RequiredFieldExcludedException(Exception):
         )
 
 
-class InstanceDoesNotExistException(Exception):
-    def __init__(self, id, schema):
-        super().__init__(
-            f"No {schema.get_type()} instance"
-            f"exists with id {id}."
-        )
-
-
 class ValidationError(Exception):
     def __init__(self, message):
         self.message = message
@@ -284,17 +276,8 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
             'type': 'object',
         }
 
-    def _find_model_by_id(self, id):
-        model = self.Meta.model.find_by_id(id)
-        if model is None:
-            raise InstanceDoesNotExistException(id, self)
-        return model
-
-    def read_by_id(self, id):
-        model_instance = self._find_model_by_id(id)
-        return self.dump(model_instance)
-
     def update_by_id(self, id, data):
+        return
         validation_error = self._get_validation_error(data)
         if validation_error is not None:
             raise ValidationError(validation_error)
@@ -307,6 +290,7 @@ class BaseDetailSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         return self.dump(model_instance)
 
     def delete_by_id(self, id):
+        return
         model_instance = self._find_model_by_id(id)
         model_instance.delete()
         model_instance.commit()

@@ -2,13 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema.centre import CentreDetailSchema
+from main.model import TolqcCentre
+from main.schema import CentreDetailSchema
 
+from .base import BaseService
 
-class CentreService:
-    @classmethod
-    def get_by_id(self, id):
-        CentreDetailSchema().read_by_id(id)
+class CentreService(BaseService):
+    class Meta:
+        model = TolqcCentre
+        detail_schema = CentreDetailSchema
 
     @classmethod
     def put_by_id(self, id, data):

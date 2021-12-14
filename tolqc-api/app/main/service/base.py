@@ -5,9 +5,22 @@
 import json
 
 from flask import Response
+from flask_sqlalchemy import model
+
+
+class InstanceDoesNotExistException(Exception):
+    def __init__(self, id, model_instance):
+        super().__init__(
+            f"No {model_instance.__tablename__}"
+            f" instance exists with id {id}."
+        )
 
 
 class BaseService:
+    @classmethod
+    def _get_type(cls):
+        return cls.Meta.model.__tablename__
+
     @classmethod
     def _split_error_components(cls, errors):
         titles = [e.get('title', None) for e in errors]
@@ -40,7 +53,8 @@ class BaseService:
         }
 
     @classmethod
-    def custom_error(cls, status_code=500, errors=[]):
+    def custom_errors(cls, status_code=500, errors=[]):
+        # TODO move this into an "error schema"
         """Expects a list of dicts, with keys 'title', 'code', and 'detail"""
 
         titles, codes, details = cls._split_error_components(errors)
@@ -58,3 +72,22 @@ class BaseService:
             response=json.dumps(response),
             status=status_code
         )
+
+    @classmethod
+    def custom_individual_error(cls, title, code, detail):
+        return cls.custom_errors(code, errors=[{
+            "title": title,
+            "code": code,
+            "detail": detail
+        }])
+    
+    @classmethod
+    def get_by_id(cls, id):
+        model_instance = cls.Meta.model.find_by_id(id)
+        if model_instance is None:
+            return cls.custom_individual_error(
+                "Not Found",
+                404,
+                f"No {cls._get_type()} found with id {id}."
+            )
+        return cls.Meta.detail_schema.dump(model_instance)

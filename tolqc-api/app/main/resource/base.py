@@ -4,9 +4,6 @@
 
 from flask_restx import Namespace, Resource
 from sqlalchemy.exc import IntegrityError
-
-from main.schema import InstanceDoesNotExistException, \
-                        ValidationError
 from main.model import ExtraFieldsNotPermittedException
 
 
@@ -56,7 +53,7 @@ def handle_404(function):
     def wrapper(obj, id, *args, **kwargs):
         try:
             return function(obj, id, *args, **kwargs)
-        except InstanceDoesNotExistException:
+        except Exception: #InstanceDoesNotExistException:
             return obj.error_404(id)
     return wrapper
 
@@ -92,7 +89,7 @@ def handle_400_validation_error(function):
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
-        except ValidationError as e:
+        except Exception as e:# ValidationError as e:
             return {
                 "error": e.message
             }, 400
@@ -165,6 +162,7 @@ class BaseDetailResource(BaseResource):
 
     @handle_404
     def _get_by_id(self, id):
+        return
         model = self.schema.read_by_id(id)
         return model, 200
 
