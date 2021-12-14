@@ -61,7 +61,7 @@ class BaseSchema():
         return {
             f: cls._get_field_schema_model_type(f)
             for f in cls._get_fields(
-                exclude_fields=exclude_fields + ['ext']
+                exclude_fields=exclude_fields + ['ext', 'created_by', 'created_at']
             )
         }
 
@@ -95,7 +95,7 @@ class BaseSchema():
                 },
                 "id": id_field,
                 "attributes": cls._individual_attributes_schem_model_dict(
-                    exclude_fields=exclude_fields+['id']
+                    exclude_fields=exclude_fields+['id', 'created_by', 'created_at']
                 )
             }
         }
@@ -108,7 +108,7 @@ class BaseSchema():
     @classmethod
     def _to_model_dict(cls, exclude_fields=[], ignore_required=None):
         fields = cls._get_fields(
-            exclude_fields=exclude_fields+['id', 'ext']
+            exclude_fields=exclude_fields+['id', 'ext', 'created_by', 'created_at']
         )
         return {
             f: cls._get_field_model_type(f, ignore_required)
@@ -230,7 +230,7 @@ class BaseSchema():
     def _get_validation_error(self, data):
         if 'id' in data.keys():
             return 'An id must not be specified in the body of a request to this endpoint.'
-        required_fields = self._get_required_fields(exclude_fields=['id', 'ext'])
+        required_fields = self._get_required_fields(exclude_fields=['id', 'ext', 'created_by', 'created_at'])
         for field in required_fields:
             if field not in data.keys():
                 return f"The field '{field}' is required on this endpoint."
@@ -412,6 +412,6 @@ class BaseListSchema(SQLAlchemyAutoSchema, JsonapiSchema, BaseSchema):
         return {
             'type': 'array',
             'items': cls._individual_attributes_schem_model_dict(
-                exclude_fields=exclude_fields+['id']
+                exclude_fields=exclude_fields+['id', 'created_by', 'created_at']
             )
         }
