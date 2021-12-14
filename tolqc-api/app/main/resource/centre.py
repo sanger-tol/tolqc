@@ -54,5 +54,3 @@ class CentreDetailResource(Resource):
     @auth(api_centre)
     def put(self, id, data):
         return CentreService.put_by_id(id, data)
-
-api_centre.add_resource(CentreDetailResource)
