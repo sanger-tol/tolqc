@@ -20,6 +20,7 @@ authorizations = {
 def check_key_valid(api_key):
     user_id = TolqcUser.get_user_infos_by_api_key(api_key)
     if not user_id:
+        # TODO make this an error on service
         abort(401, "User does not exist")
     return user_id
 
