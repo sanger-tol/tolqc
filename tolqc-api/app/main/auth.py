@@ -26,7 +26,7 @@ def check_key_valid(api_key):
 
 
 def auth_dec():
-    def warp_decorator(function):
+    def wrap_decorator(function):
         @wraps(function)
         def decorated(*args, **kwargs):
             api_key = request.headers.get('Authorization')
@@ -36,7 +36,7 @@ def auth_dec():
             user_id = check_key_valid(api_key)
             return function(*args, user_id=user_id, **kwargs)
         return decorated
-    return warp_decorator
+    return wrap_decorator
 
 
 def auth(namespace: Namespace):
