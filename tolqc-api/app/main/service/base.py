@@ -139,5 +139,5 @@ class BaseService:
         #could this be the key to having just one schema!??? many=True on load
         schema = cls.Meta.schema
         model_instance = schema.load(data)#, sess=session)#, session=session)
-        cls.Meta.model.add(model_instance)
+        cls.Meta.model.save(model_instance)
         return schema.dump(model_instance), 200
