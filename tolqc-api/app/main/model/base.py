@@ -62,6 +62,7 @@ class Base(db.Model):
                 self._update_ext(item)
             else:
                 setattr(self, key, item)
+        self.save()
 
     def delete(self):
         db.session.delete(self)

@@ -30,6 +30,7 @@ def auth_dec():
         def decorated(*args, **kwargs):
             api_key = request.headers.get('Authorization')
             if not api_key:
+                # TODO make this an error on service
                 abort(401, "Api key is missing")
             user_id = check_key_valid(api_key)
             return function(*args, user_id=user_id, **kwargs)
