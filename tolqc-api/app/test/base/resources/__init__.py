@@ -1,6 +1,0 @@
-# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
-#
-# SPDX-License-Identifier: MIT
-
-from .resources import b_namespace, c_namespace, \
-                       d_namespace, f_namespace # noqa

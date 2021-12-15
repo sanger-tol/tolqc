@@ -7,13 +7,16 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
-from marshmallow_jsonapi.fields import DocumentMeta
-
 
 
 class BaseMeta:
     strict = True
 
+    @classmethod
+    def add_views(cls):
+        cls.self_view = cls.type_
+        cls.self_view_kwargs = {cls.type_: "<id>"}
+        cls.self_view_many = cls.type_
 
 class CombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
     pass
@@ -28,9 +31,13 @@ class ValidationError(Exception):
 class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     OPTIONS_CLASS = CombinedOpts
 
+    def __init__(self, *args, **kwargs):
+        self.Meta.add_views()
+        super().__init__(*args, **kwargs)
+
     @classmethod
     def get_type(cls):
-        return cls.Meta.model.__tablename__
+        return cls.Meta.type_
 
     @classmethod
     def _get_dict_schema(cls, exclude_fields=[]):

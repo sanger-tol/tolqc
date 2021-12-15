@@ -29,6 +29,7 @@ def provide_body_data(function):
 
 
 class BaseService:
+    """In meta class, requires a model class, and a schema object"""
     @classmethod
     def _get_type(cls):
         return cls.Meta.model.__tablename__
@@ -104,7 +105,7 @@ class BaseService:
     @handle_404
     def read_by_id(cls, id):
         model_instance = cls.Meta.model.find_by_id(id)
-        #return cls.Meta.detail_schema.dump(model_instance), 200
+        return cls.Meta.schema.dump(model_instance), 200
     
     @classmethod
     @provide_body_data

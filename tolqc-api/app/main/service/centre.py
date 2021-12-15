@@ -10,4 +10,4 @@ from .base import BaseService
 class CentreService(BaseService):
     class Meta:
         model = TolqcCentre
-        schema = CentreSchema
+        schema = CentreSchema()
