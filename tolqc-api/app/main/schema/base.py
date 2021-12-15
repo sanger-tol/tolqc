@@ -23,6 +23,7 @@ class BaseMeta:
         cls.self_view_kwargs = {cls.type_: "<id>"}
         cls.self_view_many = cls.type_
 
+
 class CombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
     pass
 
@@ -54,7 +55,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
-    def _individual_attributes_schem_model_dict(cls, exclude_fields=[]):
+    def _individual_attributes_schema_model_dict(cls, exclude_fields=[]):
         dict_schema = cls._get_dict_schema(exclude_fields=exclude_fields)
 
         required_fields = cls._get_required_fields(exclude_fields=exclude_fields)
@@ -86,19 +87,20 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                     'default': cls.get_type(),
                 },
                 "id": id_field,
-                "attributes": cls._individual_attributes_schem_model_dict(
+                "attributes": cls._individual_attributes_schema_model_dict(
                     exclude_fields=['id']
                 )
             }
         }
 
-    def ext_field_should_not_be_specified(self, data):
-        if 'ext' in data.keys() and self.Meta.model.has_ext_column():
-            return True
-        return False
-
     @classmethod
     def _get_field_schema_model_type(cls, field):
+        # id must be converted to string
+        if field == 'id':
+            return {
+                'type': 'string'
+            }
+
         model = cls.Meta.model
         python_type = model.get_column_python_type(
             field
@@ -253,19 +255,21 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
            the specified list of fields, for a POST
            request"""
         return {
-            "data": {
-                "type": "object",
-                'properties': {
-                    'type': {
-                        'type': 'string',
-                        'default': cls.get_type()
-                    },
-                    'attributes': cls._individual_attributes_schem_model_dict(
-                        exclude_fields=['id']
-                    )
+            'type': 'object',
+            'required': ['data'],
+            'properties': {
+                "data": {
+                    "type": "object",
+                    'required': ['type', 'attributes'],
+                    'properties': {
+                        'type': {
+                            'type': 'string',
+                            'default': cls.get_type()
+                        },
+                        'attributes': cls._individual_attributes_schema_model_dict(
+                            exclude_fields=['id']
+                        )
+                    }
                 }
             }
         }
-        return cls._individual_attributes_schem_model_dict(
-            exclude_fields=['id']
-        )
