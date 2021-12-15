@@ -3,9 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-from flask_restx import fields
-
-from main.model import ExtraFieldsNotPermittedException
 
 class ValidationError(Exception):
     def __init__(self, message):
@@ -38,6 +35,14 @@ class BaseSchema():
             'properties': dict_schema,
             'type': 'object',
         }
+    
+    @classmethod
+    def to_put_request_schema_model_dict(cls):
+        dict_schema = cls._get_dict_schema(exclude_fields=['id'])
+        return {
+            'properties': dict_schema,
+            'type': 'object',
+        }
 
     @classmethod
     def _individual_schema_model_dict(cls):
@@ -62,16 +67,6 @@ class BaseSchema():
         if 'ext' in data.keys() and self.Meta.model.has_ext_column():
             return True
         return False
-
-    @classmethod
-    def _to_model_dict(cls, exclude_fields=[], ignore_required=None):
-        fields = cls._get_fields(
-            exclude_fields=exclude_fields+['id', 'ext']
-        )
-        return {
-            f: cls._get_field_model_type(f, ignore_required)
-            for f in fields
-        }
 
     @classmethod
     def _get_field_schema_model_type(cls, field):
@@ -105,32 +100,6 @@ class BaseSchema():
 
         raise NotImplementedError(
             "Type f'{python_type}' has not been implemented yet."
-        )
-
-    @classmethod
-    def _get_field_model_type(cls, field, ignore_required=None):
-        model = cls.Meta.model
-        python_type = model.get_column_python_type(
-            field
-        )
-        if not ignore_required:
-            required = not model.column_is_nullable(field)
-        else:
-            required = False
-
-        if python_type == int:
-            return fields.Integer(required=required)
-        if python_type == str:
-            return fields.String(required=required)
-        if python_type == bool:
-            return fields.Boolean(required=required)
-        if python_type == datetime:
-            return fields.DateTime(required=required)
-        if python_type == float:
-            return fields.Float(required=required)
-
-        raise NotImplementedError(
-            f"Type '{python_type}' has not been implemented yet."
         )
 
     @classmethod
@@ -168,8 +137,6 @@ class BaseSchema():
             for f in request_fields
             if f not in base_fields
         }
-        if ext_data and not self.Meta.model.has_ext_column():
-            raise ExtraFieldsNotPermittedException(ext_data)
         return base_data, ext_data
 
     def _get_validation_error(self, data):
@@ -181,13 +148,6 @@ class BaseSchema():
                 return f"The field '{field}' is required on this endpoint."
         # TODO add type checking
         return None
-
-    @classmethod
-    def to_put_request_model_dict(cls):
-        """Returns a dict for a Model, excluding
-           the specified list of fields, for a PUT
-           request"""
-        return cls._to_model_dict(ignore_required=True)
 
     @classmethod
     def to_detail_response_schema_model_dict(cls):

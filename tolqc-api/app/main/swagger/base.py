@@ -32,9 +32,9 @@ class BaseSwagger:
             schema.to_post_request_schema_model_dict()
         )
 
-        cls.put_request_model = cls.api.model(
+        cls.put_request_model = cls.api.schema_model(
             f'{type_} PUT Request',
-            schema.to_put_request_model_dict()
+            schema.to_put_request_schema_model_dict()
         )
 
         cls.list_response_model = cls.api.schema_model(
