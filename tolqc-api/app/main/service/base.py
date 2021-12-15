@@ -30,7 +30,7 @@ class BaseService:
     """In meta class, requires a model class, and a schema object"""
     @classmethod
     def _get_type(cls):
-        return cls.Meta.model.__tablename__
+        return cls.Meta.schema.get_type()
     
     @classmethod
     def error_404(cls, id):
