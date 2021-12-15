@@ -3,6 +3,21 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
+from marshmallow_jsonapi import Schema as JsonapiSchema, \
+                                SchemaOpts as JsonapiSchemaOpts
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
+                                   SQLAlchemyAutoSchemaOpts
+from marshmallow_jsonapi.fields import DocumentMeta
+
+
+
+class BaseMeta:
+    strict = True
+
+
+class CombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
+    pass
+
 
 class ValidationError(Exception):
     def __init__(self, message):
@@ -10,7 +25,9 @@ class ValidationError(Exception):
         super().__init__(message)
 
 
-class BaseSchema():
+class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
+    OPTIONS_CLASS = CombinedOpts
+
     @classmethod
     def get_type(cls):
         return cls.Meta.model.__tablename__
