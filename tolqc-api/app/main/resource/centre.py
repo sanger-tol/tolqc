@@ -23,7 +23,7 @@ class CentreDetailResource(Resource):
         description='Not Found'
     )
     def get(self, id):
-        return CentreService.get_by_id(id)
+        return CentreService.read_by_id(id)
 
     @api_centre.response(
         204,
@@ -34,8 +34,8 @@ class CentreDetailResource(Resource):
         description='Not Found'
     )
     @auth(api_centre)
-    def delete(self, id):
-        return CentreService.delete_by_id(id)
+    def delete(self, id, user_id=None):
+        return CentreService.delete_by_id(id, user_id=user_id)
 
     @api_centre.expect(CentreSwagger.put_request_model)
     @api_centre.response(
@@ -52,5 +52,16 @@ class CentreDetailResource(Resource):
         description='Not Found'
     )
     @auth(api_centre)
-    def put(self, id, data):
-        return CentreService.put_by_id(id, data)
+    def put(self, id, user_id=None):
+        return CentreService.put_by_id(id, user_id=user_id)
+
+
+@api_centre.route('')
+class BaseListResource(Resource):
+    @api_centre.expect(CentreSwagger.post_request_model)
+    @auth(api_centre)
+    def post(self, user_id=None):
+        # N.B., the provide_body_decorator adds the data,
+        # _do not_ provide it in the call signature, i.e.
+        # use _post() not _post(data)
+        return CentreService.post_bulk(user_id=user_id)

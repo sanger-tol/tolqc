@@ -2,21 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Namespace
+from main.schema import CentreSchema
 
-from main.schema import CentreDetailSchema, \
-                        CentreListSchema
-
-from .base import BaseSwagger
+from .base import BaseSwagger, BaseNamespace
 
 
 class CentreSwagger(BaseSwagger):
-    detail_schema = CentreDetailSchema
-    list_schema = CentreListSchema
+    class Meta:
+        schema = CentreSchema
     
-    api = Namespace(
+    api = BaseNamespace(
         'centres',
-        description='Centre related methods',
+        description='Centre related methods'
     )
 
 

@@ -31,8 +31,8 @@ def auth_dec():
             api_key = request.headers.get('Authorization')
             if not api_key:
                 abort(401, "Api key is missing")
-            check_key_valid(api_key)
-            return function(*args, **kwargs)
+            user_id = check_key_valid(api_key)
+            return function(*args, user_id=user_id, **kwargs)
         return decorated
     return warp_decorator
 

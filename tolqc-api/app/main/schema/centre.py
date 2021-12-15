@@ -4,19 +4,9 @@
 
 from main.model import TolqcCentre
 
-from .base import BaseDetailSchema, BaseListSchema, BaseMeta
+from .base import BaseSchema
 
 
-class CentreMeta(BaseMeta):
-    pass
-
-
-CentreMeta.add_model(TolqcCentre)
-
-
-class CentreDetailSchema(BaseDetailSchema):
-    Meta = CentreMeta
-
-
-class CentreListSchema(BaseListSchema):
-    Meta = CentreMeta
+class CentreSchema(BaseSchema):
+    class Meta:
+        model = TolqcCentre

@@ -89,7 +89,7 @@ class Base(db.Model):
         db.session.rollback()
 
     @staticmethod
-    def bulk_update(data):
+    def bulk_add(data):
         db.session.add_all(data)
         db.session.commit()
 

@@ -4,7 +4,10 @@
 
 import json
 
-from flask import Response
+from flask import Response, request
+from sqlalchemy import engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+
 
 from main.model import InstanceDoesNotExistException
 
@@ -15,6 +18,13 @@ def handle_404(function):
             return function(cls, id, *args, **kwargs)
         except InstanceDoesNotExistException:
             return cls.error_404(id)
+    return wrapper
+
+
+def provide_body_data(function):
+    def wrapper(*args, **kwargs):
+        data = request.get_json()
+        return function(*args, data, **kwargs)
     return wrapper
 
 
@@ -44,7 +54,7 @@ class BaseService:
         return {
             "title": title if title else "Internal Server Error",
             "code": code if code else 500,
-            "detail": detail if detail else "An unknown error occured"
+            "detail": detail if detail else "An unknown error occurred."
         }
 
     @classmethod
@@ -92,6 +102,43 @@ class BaseService:
 
     @classmethod
     @handle_404
-    def get_by_id(cls, id):
+    def read_by_id(cls, id):
         model_instance = cls.Meta.model.find_by_id(id)
-        return cls.Meta.detail_schema.dump(model_instance)
+        #return cls.Meta.detail_schema.dump(model_instance), 200
+    
+    @classmethod
+    @provide_body_data
+    @handle_404
+    def update_by_id(cls, id, data, user_id=None):
+        return
+        #detail_schema = cls.Meta.detail_schema
+        old_model_instance = cls.Meta.model.find_by_id(id)
+        # new_model_instance = detail_schema.load(
+        #     data,
+        #     instance=old_model_instance,
+        #     partial=True
+        # )
+        # TODO think about ext fields again!
+        new_model_instance.save()
+        #return detail_schema.dump(new_model_instance), 200
+
+    @classmethod
+    def delete_by_id(cls, id, user_id=None):
+        pass
+
+    def _post_individual(cls, datum, user_id):
+        pass
+        #model_instance = cls.Meta.detail_schema.load(datum)
+        
+
+    @classmethod
+    @provide_body_data
+    def post_bulk(cls, data, user_id=None):
+        return
+        #list_schema = cls.Meta.list_schema
+        session = scoped_session(sessionmaker(bind=engine))
+        #could this be the key to having just one schema!??? many=True on load
+        
+        #model_instances = list_schema.load(data, session=session, many=True)
+        cls.Meta.model.bulk_add(model_instances)
+        #return list_schema.dump(model_instances), 200

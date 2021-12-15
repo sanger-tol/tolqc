@@ -2,7 +2,5 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import ValidationError, \
-                  ExtraFieldsNotPermittedException # noqa
-from .centre import CentreDetailSchema, \
-                                 CentreListSchema # noqa
+from .base import ValidationError # noqa
+from .centre import CentreSchema
