@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 # Testing
 
-Core - tests the base classes in isolation, as there is a lot of bespoke logic in them
+Base - tests the base classes in isolation, as there is a lot of bespoke logic in them
 
 Main - tests the main logic of ToLQC
 
