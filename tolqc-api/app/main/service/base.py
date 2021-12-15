@@ -6,7 +6,6 @@ import json
 
 from flask import Response, request
 
-
 from main.model import InstanceDoesNotExistException
 
 
