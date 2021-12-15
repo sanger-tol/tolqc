@@ -61,7 +61,4 @@ class BaseListResource(Resource):
     @api_centre.expect(CentreSwagger.post_request_model)
     @auth(api_centre)
     def post(self, user_id=None):
-        # N.B., the provide_body_decorator adds the data,
-        # _do not_ provide it in the call signature, i.e.
-        # use _post() not _post(data)
         return CentreService.post_bulk(user_id=user_id)
