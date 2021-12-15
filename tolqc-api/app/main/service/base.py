@@ -5,8 +5,6 @@
 import json
 
 from flask import Response, request
-from sqlalchemy import engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 
 
 from main.model import InstanceDoesNotExistException
@@ -125,19 +123,12 @@ class BaseService:
 
     @classmethod
     def delete_by_id(cls, id, user_id=None):
-        pass
-
-    def _post_individual(cls, datum, user_id):
-        pass
-        #model_instance = cls.Meta.detail_schema.load(datum)
-        
+        pass        
 
     @classmethod
     @provide_body_data
     def create(cls, data, user_id=None):
-        #session = scoped_session(sessionmaker(bind=engine))
-        #could this be the key to having just one schema!??? many=True on load
         schema = cls.Meta.schema
-        model_instance = schema.load(data)#, sess=session)#, session=session)
+        model_instance = schema.load(data)
         cls.Meta.model.save(model_instance)
         return schema.dump(model_instance), 200
