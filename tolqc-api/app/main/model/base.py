@@ -66,6 +66,7 @@ class Base(db.Model):
 
     def delete(self):
         db.session.delete(self)
+        self.commit()
 
     @classmethod
     def commit(cls):

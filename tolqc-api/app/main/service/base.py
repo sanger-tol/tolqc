@@ -122,8 +122,11 @@ class BaseService:
         #return detail_schema.dump(new_model_instance), 200
 
     @classmethod
+    @handle_404
     def delete_by_id(cls, id, user_id=None):
-        pass        
+        model_instance = cls.Meta.model.find_by_id(id)
+        model_instance.delete()
+        return None, 204
 
     @classmethod
     @provide_body_data
