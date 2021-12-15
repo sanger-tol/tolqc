@@ -11,6 +11,7 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
 
 class BaseMeta:
     strict = True
+    include_resource_linkage = True
 
     @classmethod
     def add_views(cls):

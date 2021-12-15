@@ -12,7 +12,7 @@ class CentreSwagger(BaseSwagger):
         schema = CentreSchema
     
     api = BaseNamespace(
-        'centres',
+        CentreSchema.get_type(),
         description='Centre related methods'
     )
 
