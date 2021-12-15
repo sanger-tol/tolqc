@@ -134,12 +134,10 @@ class BaseService:
 
     @classmethod
     @provide_body_data
-    def post_bulk(cls, data, user_id=None):
-        return
-        #list_schema = cls.Meta.list_schema
-        session = scoped_session(sessionmaker(bind=engine))
+    def create(cls, data, user_id=None):
+        #session = scoped_session(sessionmaker(bind=engine))
         #could this be the key to having just one schema!??? many=True on load
-        
-        #model_instances = list_schema.load(data, session=session, many=True)
-        cls.Meta.model.bulk_add(model_instances)
-        #return list_schema.dump(model_instances), 200
+        schema = cls.Meta.schema
+        model_instance = schema.load(data)#, sess=session)#, session=session)
+        cls.Meta.model.add(model_instance)
+        return schema.dump(model_instance), 200

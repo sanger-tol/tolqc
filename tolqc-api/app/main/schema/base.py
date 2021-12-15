@@ -8,10 +8,14 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
 
+from main.model import db
+
 
 class BaseMeta:
     strict = True
     include_resource_linkage = True
+    load_instance = True
+    sqla_session = db.session
 
     @classmethod
     def add_views(cls):
@@ -249,8 +253,19 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
            the specified list of fields, for a POST
            request"""
         return {
-            'type': 'array',
-            'items': cls._individual_attributes_schem_model_dict(
-                exclude_fields=['id']
-            )
+            "data": {
+                "type": "object",
+                'properties': {
+                    'type': {
+                        'type': 'string',
+                        'default': cls.get_type()
+                    },
+                    'attributes': cls._individual_attributes_schem_model_dict(
+                        exclude_fields=['id']
+                    )
+                }
+            }
         }
+        return cls._individual_attributes_schem_model_dict(
+            exclude_fields=['id']
+        )
