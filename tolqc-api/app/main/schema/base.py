@@ -28,12 +28,6 @@ class CombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
     pass
 
 
-class ValidationError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(message)
-
-
 class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     OPTIONS_CLASS = CombinedOpts
 
@@ -169,16 +163,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             if f not in base_fields
         }
         return base_data, ext_data
-
-    def _get_validation_error(self, data):
-        if 'id' in data.keys():
-            return 'An id must not be specified in the body of a request to this endpoint.'
-        required_fields = self._get_required_fields(exclude_fields=['id', 'ext'])
-        for field in required_fields:
-            if field not in data.keys():
-                return f"The field '{field}' is required on this endpoint."
-        # TODO add type checking
-        return None
 
     @classmethod
     def to_detail_response_schema_model_dict(cls):

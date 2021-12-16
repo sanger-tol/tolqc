@@ -12,6 +12,8 @@ Main - tests the main logic of ToLQC
 
 ## Generic Requirements List
 
+- That id converts from string (in request) to integer (in db) correctly
+
 - Nullable fields in SQLAlchemy models are not set as required when processed into Swagger OpenAPI models
 - Methods requiring auth are not authorized to unauthenticated users, and those without sufficient permissions
 - Excluding fields corresponding to non-nullable model-columns in a schema throws an exception
