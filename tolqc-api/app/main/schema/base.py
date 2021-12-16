@@ -89,12 +89,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _get_field_schema_model_type(cls, field):
-        # id must be converted to string
-        if field == 'id':
-            return {
-                'type': 'string'
-            }
-
         model = cls.Meta.model
         python_type = model.get_column_python_type(
             field
@@ -164,55 +158,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
         return base_data, ext_data
 
-    @classmethod
-    def to_detail_response_schema_model_dict(cls):
-        """Returns a dict for a SchemaModel in JSON:API format"""
-        return {
-            'required': ['data'],
-            'properties': {
-                "data": cls._individual_schema_model_dict()
-            },
-            'type': 'object',
-        }
-
     def read_bulk(self):
         model = self.Meta.model
         return self.dump(model.find_bulk())
-
-    @classmethod
-    def to_list_response_schema_model_dict(cls):
-        """Returns a dict for a SchemaModel in JSON:API format"""
-        return {
-            'required': ['data'],
-            'properties': {
-                "data": {
-                    'type': 'array',
-                    'items': cls._individual_schema_model_dict()
-                },
-                'meta': {
-                    'type': 'object',
-                    'properties': {
-                        "errors": {
-                            'type': 'array'
-                        }
-                    }
-                }
-            },
-            'type': 'object',
-        }
-
-    @classmethod
-    def _error_schema_model_dict(cls):
-        return {
-            'required': ['error'],
-            'type': 'object',
-            'properties': {
-                'error': {
-                    'type': 'string',
-                    'default': 'The error message for this failed create.'
-                }
-            },
-        }
 
     @classmethod
     def to_post_request_schema_model_dict(cls):

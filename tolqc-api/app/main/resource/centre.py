@@ -16,8 +16,7 @@ api_centre = CentreSwagger.api
 class CentreDetailResource(Resource):
     @api_centre.response(
         200,
-        description='Success',
-        model=CentreSwagger.detail_response_model,
+        description='Success'
     )
     @api_centre.response(
         404,
