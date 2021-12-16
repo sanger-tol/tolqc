@@ -2,17 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .sub_base import SubBase, db
 
 
-class TolqcSpecimen(Base):
+class TolqcSpecimen(SubBase):
     __tablename__ = "specimen"
     id = db.Column(db.Integer(), primary_key=True)
     specimen_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    species_row_id = db.Column(db.Integer(), db.ForeignKey("species.id"),
-                               nullable=False)
+    species_instance_id = db.Column(db.Integer(), db.ForeignKey("species.id"),
+                                    nullable=False)
     lims_id = db.Column(db.Integer())
     supplier_name = db.Column(db.String())
     accession_id = db.Column(db.Integer())
@@ -25,5 +25,5 @@ class TolqcSpecimen(Base):
     current = db.Column(db.Boolean())
     allocation = db.relationship("TolqcAllocation", back_populates="specimen")
     species = db.relationship("TolqcSpecies", back_populates="specimen",
-                              foreign_keys=[species_row_id])
+                              foreign_keys=[species_instance_id])
     sample = db.relationship("TolqcSample", back_populates="specimen")

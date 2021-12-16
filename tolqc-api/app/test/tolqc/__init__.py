@@ -31,8 +31,6 @@ class BaseTestCase(TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.query(TolqcRole).delete()
-        db.session.query(TolqcUser).delete()
         db.session.query(TolqcAllocation).delete()
         db.session.query(TolqcCentre).delete()
         db.session.query(TolqcLibrary).delete()
@@ -44,6 +42,8 @@ class BaseTestCase(TestCase):
         db.session.query(TolqcSeq).delete()
         db.session.query(TolqcSpecies).delete()
         db.session.query(TolqcSpecimen).delete()
+        db.session.query(TolqcRole).delete()
+        db.session.query(TolqcUser).delete()
         db.session.commit()
 
     def create_app(self):

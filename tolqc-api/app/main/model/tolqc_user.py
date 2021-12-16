@@ -4,6 +4,8 @@
 
 from .base import Base, db
 
+auth_user_id = -1
+
 
 class TolqcUser(Base):
     __tablename__ = "user"
@@ -22,7 +24,13 @@ class TolqcUser(Base):
                 'roles': cls.roles}
 
     @classmethod
-    def get_user_infos_by_api_key(cls, api_key):
+    def get_user_id_via_api_key(cls, api_key):
         user_id = cls.query.with_entities(cls.id) \
             .filter(cls.api_key == api_key).first()
+        global auth_user_id
+        auth_user_id = user_id
         return user_id
+
+
+def get_user_id():
+    return auth_user_id[0]

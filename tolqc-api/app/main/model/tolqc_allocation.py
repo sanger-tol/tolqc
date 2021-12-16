@@ -2,15 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .sub_base import SubBase, db
 
 
-class TolqcAllocation(Base):
+class TolqcAllocation(SubBase):
     __tablename__ = "allocation"
-    id = db.Column(db.Integer(), db.ForeignKey("project.id"), primary_key=True)
-    specimen_row_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
+    project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
+    specimen_instance_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"))
     is_primary = db.Column(db.Boolean())
     project = db.relationship("TolqcProject", back_populates="allocation",
-                              foreign_keys=[id])
+                              foreign_keys=[project_id])
     specimen = db.relationship("TolqcSpecimen", back_populates="allocation",
-                               foreign_keys=[specimen_row_id])
+                               foreign_keys=[specimen_instance_id])
