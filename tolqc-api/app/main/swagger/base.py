@@ -27,5 +27,5 @@ class BaseSwagger:
 
         cls.patch_request_model = cls.api.schema_model(
             f'{type_} PUT Request',
-            schema.to_put_request_schema_model_dict()
+            schema.to_patch_request_schema_model_dict()
         )

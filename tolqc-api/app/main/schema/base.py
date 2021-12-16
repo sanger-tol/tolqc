@@ -49,7 +49,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
-    def _individual_attributes_schema_model_dict(cls, exclude_fields=[]):
+    def _post_attributes_schema_model_dict(cls, exclude_fields=[]):
         dict_schema = cls._get_dict_schema(exclude_fields=exclude_fields)
 
         required_fields = cls._get_required_fields(exclude_fields=exclude_fields)
@@ -59,10 +59,11 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             'properties': dict_schema,
             'type': 'object',
         }
-
+    
     @classmethod
-    def to_put_request_schema_model_dict(cls):
-        dict_schema = cls._get_dict_schema(exclude_fields=['id'])
+    def _patch_attributes_schema_model_dict(cls, exclude_fields=[]):
+        dict_schema = cls._get_dict_schema(exclude_fields=exclude_fields)
+
         return {
             'properties': dict_schema,
             'type': 'object',
@@ -81,7 +82,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                     'default': cls.get_type(),
                 },
                 "id": id_field,
-                "attributes": cls._individual_attributes_schema_model_dict(
+                "attributes": cls._post_attributes_schema_model_dict(
                     exclude_fields=['id']
                 )
             }
@@ -161,12 +162,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def read_bulk(self):
         model = self.Meta.model
         return self.dump(model.find_bulk())
-
+    
     @classmethod
-    def to_post_request_schema_model_dict(cls):
-        """Returns a dict for a Model, excluding
-           the specified list of fields, for a POST
-           request"""
+    def _to_request_schema_model_dict(cls, attributes):
         return {
             'type': 'object',
             'required': ['data'],
@@ -179,10 +177,24 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                             'type': 'string',
                             'default': cls.get_type()
                         },
-                        'attributes': cls._individual_attributes_schema_model_dict(
-                            exclude_fields=['id']
-                        )
+                        'attributes': attributes
                     }
                 }
             }
         }
+
+    @classmethod
+    def to_post_request_schema_model_dict(cls):
+        """Returns a dict for a Model for a POST request"""
+        attributes =  cls._post_attributes_schema_model_dict(
+            exclude_fields=['id']
+        )
+        return cls._to_request_schema_model_dict(attributes)
+
+    @classmethod
+    def to_patch_request_schema_model_dict(cls):
+        """Returns a dict for a Model for a PATCH request"""
+        attributes = cls._patch_attributes_schema_model_dict(
+            exclude_fields=['id']
+        )
+        return cls._to_request_schema_model_dict(attributes)
