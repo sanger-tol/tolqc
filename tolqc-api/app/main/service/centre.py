@@ -7,6 +7,7 @@ from main.schema import CentreSchema
 
 from .base import BaseService
 
+
 class CentreService(BaseService):
     class Meta:
         model = TolqcCentre

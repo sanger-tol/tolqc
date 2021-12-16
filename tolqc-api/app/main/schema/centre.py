@@ -13,5 +13,5 @@ class CentreSchema(BaseSchema):
         model = TolqcCentre
         type_ = Types.CENTRE
 
-#TODO see if this can be moved into __init__ safely
+
 CentreSchema.setup()

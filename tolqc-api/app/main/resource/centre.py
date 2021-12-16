@@ -11,6 +11,7 @@ from main.swagger import CentreSwagger
 
 api_centre = CentreSwagger.api
 
+
 @api_centre.route('/<int:id>')
 class CentreDetailResource(Resource):
     @api_centre.response(

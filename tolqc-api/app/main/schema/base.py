@@ -59,7 +59,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             'properties': dict_schema,
             'type': 'object',
         }
-    
+
     @classmethod
     def to_put_request_schema_model_dict(cls):
         dict_schema = cls._get_dict_schema(exclude_fields=['id'])
@@ -174,25 +174,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             },
             'type': 'object',
         }
-
-    def update_by_id(self, id, data):
-        return
-        validation_error = self._get_validation_error(data)
-        if validation_error is not None:
-            raise ValidationError(validation_error)
-        base_data, ext_data = self._separate_extra_data(data)
-        if ext_data:
-            base_data['ext'] = ext_data
-        model_instance = self._find_model_by_id(id)
-        model_instance.update(base_data)
-        model_instance.commit()
-        return self.dump(model_instance)
-
-    def delete_by_id(self, id):
-        return
-        model_instance = self._find_model_by_id(id)
-        model_instance.delete()
-        model_instance.commit()
 
     def read_bulk(self):
         model = self.Meta.model

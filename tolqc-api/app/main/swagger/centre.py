@@ -10,7 +10,7 @@ from .base import BaseSwagger, BaseNamespace
 class CentreSwagger(BaseSwagger):
     class Meta:
         schema = CentreSchema
-    
+
     api = BaseNamespace(
         CentreSchema.get_type(),
         description='Centre related methods'

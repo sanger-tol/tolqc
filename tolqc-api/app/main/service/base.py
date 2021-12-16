@@ -30,7 +30,7 @@ class BaseService:
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
-    
+
     @classmethod
     def error_404(cls, id):
         return cls.custom_individual_error(
@@ -44,9 +44,9 @@ class BaseService:
         titles = [e.get('title', None) for e in errors]
         codes = [e.get('code', None) for e in errors]
         details = [e.get('detail', None) for e in errors]
-    
+
         return titles, codes, details
-    
+
     @classmethod
     def _format_error(cls, title, code, detail):
         return {
@@ -60,7 +60,7 @@ class BaseService:
         titles, codes, details = cls._split_error_components(errors)
 
         error_messages = [
-            None 
+            None
             if t is None and c is None and d is None
             else cls._format_error(t, c, d)
             for (t, c, d) in zip(titles, codes, details)
@@ -103,22 +103,6 @@ class BaseService:
     def read_by_id(cls, id, user_id=None):
         model_instance = cls.Meta.model.find_by_id(id)
         return cls.Meta.schema.dump(model_instance), 200
-    
-    @classmethod
-    @provide_body_data
-    @handle_404
-    def update_by_id(cls, id, data, user_id=None):
-        return
-        #detail_schema = cls.Meta.detail_schema
-        old_model_instance = cls.Meta.model.find_by_id(id)
-        # new_model_instance = detail_schema.load(
-        #     data,
-        #     instance=old_model_instance,
-        #     partial=True
-        # )
-        # TODO think about ext fields again!
-        #new_model_instance.save()
-        #return detail_schema.dump(new_model_instance), 200
 
     @classmethod
     @handle_404

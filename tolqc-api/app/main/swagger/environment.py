@@ -10,7 +10,7 @@ class EnvironmentSwagger:
         'environments',
         description='Deployment environment related methods',
     )
-    
+
     response_model = api.model('Environment', {
         'environment': fields.String("dev", required=True),
     })

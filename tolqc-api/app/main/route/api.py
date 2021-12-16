@@ -16,8 +16,10 @@ def _get_environment_string(app):
         return ""
     return f" ({environment})"
 
+
 def _get_path(type):
     return f"/{type}"
+
 
 def _setup_api(blueprint, app):
     api = Api(
@@ -28,6 +30,7 @@ def _setup_api(blueprint, app):
     )
     api.add_namespace(api_centre, path=_get_path(Types.CENTRE))
     api.add_namespace(api_environment, path=_get_path(Types.ENVIRONMENT))
+
 
 def init_blueprint(app):
     blueprint = Blueprint('api', __name__, url_prefix='/api/v1')

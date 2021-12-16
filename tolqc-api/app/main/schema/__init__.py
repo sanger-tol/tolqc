@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .centre import CentreSchema
+from .centre import CentreSchema # noqa
