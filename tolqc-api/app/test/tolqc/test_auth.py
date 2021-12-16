@@ -4,6 +4,7 @@
 
 from . import BaseTestCase
 from main.model import db
+import logging
 
 
 api_key = {"Authorization": "AnyThingBecAuseThIsIsATEST567890"}
@@ -49,16 +50,17 @@ class TestAuthentication(BaseTestCase):
         )
         expect_data = {
             "hierarchy_name": "Hierarchy Tester",
-            "name": "David"
+            "name": "David",
+            "created_at": response.json['data'][0]['attributes']['created_at'],
+            "created_by": 100
         }
         expect_errors = [None]
         self.assert200(response)
         self.assertEqual(expect_data, response.json['data'][0]['attributes'])
         self.assertEqual(expect_errors, response.json['meta']['errors'])
 
-        id = response.json['data'][0]['id']
-
         # GET data without api key
+        id = response.json['data'][0]['id']
         response = self.client.open(
             f'/api/v1/centres/{id}',
             method='GET',
@@ -68,7 +70,9 @@ class TestAuthentication(BaseTestCase):
               "type": "centre",
               "attributes": {
                 "hierarchy_name": "Hierarchy Tester",
-                "name": "David"
+                "name": "David",
+                "created_at": response.json['data']['attributes']['created_at'],
+                "created_by": 100
               },
               "id": 1
             }
@@ -82,15 +86,5 @@ class TestAuthentication(BaseTestCase):
             method='GET',
             headers=api_key
         )
-        expect_data = {
-            "data": {
-              "type": "centre",
-              "attributes": {
-                "hierarchy_name": "Hierarchy Tester",
-                "name": "David"
-              },
-              "id": 1
-            }
-        }
         self.assert200(response)
         self.assertEqual(expect_data, response.json)
