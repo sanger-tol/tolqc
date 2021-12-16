@@ -15,7 +15,7 @@ class BaseSwagger:
     def populate_default_models(cls):
         """Defines each of a:
         - post request model
-        - put request model
+        - patch request model
         """
         schema = cls.Meta.schema
         type_ = schema.get_type().title()
@@ -25,7 +25,7 @@ class BaseSwagger:
             schema.to_post_request_schema_model_dict()
         )
 
-        cls.put_request_model = cls.api.schema_model(
+        cls.patch_request_model = cls.api.schema_model(
             f'{type_} PUT Request',
             schema.to_put_request_schema_model_dict()
         )

@@ -103,6 +103,21 @@ class BaseService:
     def read_by_id(cls, id, user_id=None):
         model_instance = cls.Meta.model.find_by_id(id)
         return cls.Meta.schema.dump(model_instance), 200
+    
+    @classmethod
+    @provide_body_data
+    @handle_404
+    def update_by_id(cls, id, data, user_id=None):
+        schema = cls.Meta.schema
+        old_model_instance = cls.Meta.model.find_by_id(id)
+        new_model_instance = schema.load(
+            data,
+            instance=old_model_instance,
+            partial=True
+        )
+        # TODO add ext column procedure here
+        new_model_instance.save()
+        return schema.dump(new_model_instance), 200
 
     @classmethod
     @handle_404
@@ -117,4 +132,4 @@ class BaseService:
         schema = cls.Meta.schema
         model_instance = schema.load(data)
         cls.Meta.model.save(model_instance)
-        return schema.dump(model_instance), 200
+        return schema.dump(model_instance), 201

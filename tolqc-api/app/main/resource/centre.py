@@ -22,8 +22,8 @@ class CentreDetailResource(Resource):
         404,
         description='Not Found'
     )
-    def get(self, id):
-        return CentreService.read_by_id(id)
+    def get(self, id, user_id=None):
+        return CentreService.read_by_id(id, user_id=user_id)
 
     @api_centre.response(
         204,
@@ -37,10 +37,27 @@ class CentreDetailResource(Resource):
     def delete(self, id, user_id=None):
         return CentreService.delete_by_id(id, user_id=user_id)
 
+    @api_centre.expect(CentreSwagger.patch_request_model)
+    @api_centre.response(
+        200,
+        description='Success'
+    )
+    @api_centre.response(
+        404,
+        description='Not Found'
+    )
+    @auth(api_centre)
+    def patch(self, id, user_id=None):
+        return CentreService.update_by_id(id, user_id=user_id)
+
 
 @api_centre.route('')
 class BaseListResource(Resource):
     @api_centre.expect(CentreSwagger.post_request_model)
+    @api_centre.response(
+        201,
+        description='Created'
+    )
     @auth(api_centre)
     def post(self, user_id=None):
         return CentreService.create(user_id=user_id)
