@@ -100,7 +100,7 @@ class BaseService:
 
     @classmethod
     @handle_404
-    def read_by_id(cls, id):
+    def read_by_id(cls, id, user_id=None):
         model_instance = cls.Meta.model.find_by_id(id)
         return cls.Meta.schema.dump(model_instance), 200
     
@@ -117,7 +117,7 @@ class BaseService:
         #     partial=True
         # )
         # TODO think about ext fields again!
-        new_model_instance.save()
+        #new_model_instance.save()
         #return detail_schema.dump(new_model_instance), 200
 
     @classmethod

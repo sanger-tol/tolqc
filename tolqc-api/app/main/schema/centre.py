@@ -10,4 +10,6 @@ from .base import BaseSchema, BaseMeta
 class CentreSchema(BaseSchema):
     class Meta(BaseMeta):
         model = TolqcCentre
-        type_ = 'centres'
+        type_ = "centres"
+
+CentreSchema.setup()

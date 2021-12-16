@@ -37,9 +37,9 @@ class ValidationError(Exception):
 class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     OPTIONS_CLASS = CombinedOpts
 
-    def __init__(self, *args, **kwargs):
-        self.Meta.add_views()
-        super().__init__(*args, **kwargs)
+    @classmethod
+    def setup(cls):
+        cls.Meta.add_views()
 
     @classmethod
     def get_type(cls):
