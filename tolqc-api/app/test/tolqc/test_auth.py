@@ -4,7 +4,6 @@
 
 from . import BaseTestCase
 from main.model import db
-import logging
 
 
 api_key = {"Authorization": "AnyThingBecAuseThIsIsATEST567890"}
