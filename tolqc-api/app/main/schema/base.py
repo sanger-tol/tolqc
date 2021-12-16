@@ -140,7 +140,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.model.get_nullable_column_names()
 
     @classmethod
-    def _get_required_fields(cls, exclude_fields):
+    def _get_required_fields(cls, exclude_fields=[]):
         all_fields = cls._get_fields(exclude_fields)
         non_required_fields = cls._get_non_required_fields()
         return [
@@ -151,7 +151,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     def _separate_extra_data(self, data):
         request_fields = data.keys()
-        base_fields = self._get_fields([])
+        base_fields = self._get_fields()
         base_data = {
             f: data[f]
             for f in request_fields

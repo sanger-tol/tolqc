@@ -2,5 +2,4 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import ValidationError # noqa
 from .centre import CentreSchema
