@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Resource
-
 from main.auth import auth
 from main.service import CentreService
 from main.swagger import CentreSwagger
