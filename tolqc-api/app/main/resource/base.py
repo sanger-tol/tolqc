@@ -3,38 +3,28 @@
 # SPDX-License-Identifier: MIT
 
 from flask_restx import Resource
-from functools import wraps
 
 from main.auth import auth
 
-
-def make_auth(func):
-    def wrapper(cls, *args, **kwargs):
-        import logging
-        logging.warning("HELLO THERE")
-        if getattr(cls, "Meta", None) is None:
-            logging.warning("no meta class on class " + cls.__name__)
-            return func(cls, *args, **kwargs)
-        logging.warning("api exists on class " + cls.__name__)
-        api = cls.Meta.swagger.api
-        return auth(api)(func(cls, *args, **kwargs))
-    return wrapper
-
-def compose(*functions):
-    #TODO see if reversed() works instead
-    functions = functions[::-1] 
-    def wrapper(val):
-        for d in functions:
-            val = d(val)
-        return val
-    return wrapper
+def _compose_decorators(function, *decorators):
+    decorators = reversed(decorators)
+    func = function.__func__
+    for d in decorators:
+        func = d(func)
+    return func
             
 
 def _document_list_resource(cls):
     swagger = cls.Meta.swagger
     api = swagger.api
 
-    cls.post = api.expect(swagger.post_request_model)(cls.post.__func__)
+    #cls.post = api.expect(swagger.post_request_model)(cls.post.__func__)
+    decorators = (
+        api.expect(swagger.post_request_model),
+        api.response(201, description="Created"),
+        auth(api)
+    )
+    cls.post = _compose_decorators(cls.post, *decorators)
 
     return api.route('')(cls)
 
