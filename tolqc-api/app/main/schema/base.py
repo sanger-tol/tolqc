@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-from marshmallow import pre_load, ValidationError
+from marshmallow.decorators import post_load
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
@@ -21,9 +21,8 @@ def setup_schema(cls):
 class BaseMeta:
     strict = True
     include_resource_linkage = True
-    load_instance = True
     sqla_session = db.session
-    exclude = ('ext',)
+    load_instance = True
 
     @classmethod
     def add_views(cls):
@@ -154,7 +153,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
-        schema_model_dict = {
+        return {
             'type': 'object',
             'required': ['data'],
             'properties': {
@@ -171,18 +170,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 }
             }
         }
-        if not cls.Meta.model.has_ext_column():
-            return schema_model_dict
-        
-        schema_model_dict['properties']['data']['properties']['meta'] = {
-            'type': 'object',
-            'properties': {
-                'ext': {
-                    'type': 'object'
-                }
-            }
-        }
-        return schema_model_dict
 
     @classmethod
     def to_post_request_schema_model_dict(cls):
@@ -199,3 +186,39 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             exclude_fields=['id']
         )
         return cls._to_request_schema_model_dict(attributes)
+
+
+
+class BaseExtMeta(BaseMeta):
+    exclude = ('ext',)
+
+
+class BaseExtSchema(BaseSchema):
+    resource_meta = ResourceMeta(required=False)
+
+    @post_load
+    def make_instance(self, data, instance=None, **kwargs):
+        instance = self.instance
+        meta = data.pop('resource_meta', {})
+        ext = meta.pop('ext', {})
+        ext = ext if ext is not None else {}
+        if instance is None:
+            return self.Meta.model(**data, ext=ext)
+        for field, value in data.items():
+            setattr(instance, field, value)
+        instance.update_ext(ext)
+        return instance
+
+    @classmethod
+    def _to_request_schema_model_dict(cls, attributes):
+        schema_model_dict = super()._to_request_schema_model_dict(attributes)
+        # add resource level meta
+        schema_model_dict['properties']['data']['properties']['meta'] = {
+            'type': 'object',
+            'properties': {
+                'ext': {
+                    'type': 'object'
+                }
+            }
+        }
+        return schema_model_dict

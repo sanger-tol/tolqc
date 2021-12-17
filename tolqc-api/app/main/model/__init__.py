@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import db, Base, ExtColumn, \
+from .base import db, Base, \
                   ExtraFieldsNotPermittedException, \
                   InstanceDoesNotExistException # noqa
 

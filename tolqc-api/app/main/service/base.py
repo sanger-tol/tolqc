@@ -40,9 +40,7 @@ def provide_body_data(function):
     @wraps(function)
     def wrapper(cls, *args, **kwargs):
         data = request.get_json()
-        meta = data.pop('meta', {})
-        extra_data = meta.pop('ext', {})
-        return function(cls, *args, data, extra_data, **kwargs)
+        return function(cls, *args, data, **kwargs)
     return wrapper
 
 
@@ -138,7 +136,7 @@ class BaseService:
     @provide_body_data
     @handle_400_db_integrity_error
     @handle_404
-    def update_by_id(cls, id, data, extra_data, user_id=None):
+    def update_by_id(cls, id, data, user_id=None):
         schema = cls.Meta.schema
         old_model_instance = cls.Meta.model.find_by_id(id)
         new_model_instance = schema.load(
@@ -146,7 +144,6 @@ class BaseService:
             instance=old_model_instance,
             partial=True
         )
-        new_model_instance.update_ext(extra_data)
         #TODO pull ext data out of model, into resource-level meta in dump
         new_model_instance.save()
         return schema.dump(new_model_instance), 200
@@ -162,7 +159,7 @@ class BaseService:
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
-    def create(cls, data, extra_data, user_id=None):
+    def create(cls, data, user_id=None):
         schema = cls.Meta.schema
         model_instance = schema.load(data)
         cls.Meta.model.save(model_instance)

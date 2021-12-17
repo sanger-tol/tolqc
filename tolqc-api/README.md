@@ -59,7 +59,8 @@ Services contain the main backend logic for fulfilling an HTTP request:
 
 ### Extra fields
 
-Models may support extra fields, that are not defined in the schema, by specifying an ExtColumn named 'ext'.
+Models may support extra fields, that are not defined in the schema, by inheriting adding an ExtColumn to the model (named 'ext'),
+inheriting the schema from BaseExtSchema, and the Meta class in said schema from BaseExtSchemaMeta
 
 These can be added to, in POST/PATCH requests, by specifying key:value pairs that should be added in the
 resource-level meta (see JSON:API spec), in a field named "ext".
