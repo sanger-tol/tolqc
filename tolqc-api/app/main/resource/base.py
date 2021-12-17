@@ -24,8 +24,8 @@ def _get_api_swagger(cls):
 def _document_detail_get(cls):
     api, _ = _get_api_swagger(cls)
     decorators = (
-        api.response(200,description='Success'),
-        api.response(404,description='Not Found')
+        api.response(200, description='Success'),
+        api.response(404, description='Not Found')
     )
     cls.get = _compose_decorators(cls.get, decorators)
 
