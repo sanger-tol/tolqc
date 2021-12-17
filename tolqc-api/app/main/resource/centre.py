@@ -8,25 +8,21 @@ from main.auth import auth
 from main.service import CentreService
 from main.swagger import CentreSwagger
 
-from .base import BaseListResource, document_resource
+from .base import BaseListResource, BaseDetailResource, document_resource
 
 
 api_centre = CentreSwagger.api
 
 
-@api_centre.route('/<int:id>')
-class CentreDetailResource(Resource):
-    @api_centre.response(
-        200,
-        description='Success'
-    )
-    @api_centre.response(
-        404,
-        description='Not Found'
-    )
-    def get(self, id, user_id=None):
-        return CentreService.read_by_id(id, user_id=user_id)
+class CentreResourceMeta:
+    service = CentreService
+    swagger = CentreSwagger
 
+
+@document_resource
+class CentreDetailResource(BaseDetailResource):
+    Meta = CentreResourceMeta
+    
     @api_centre.response(
         204,
         description='Success'
@@ -54,6 +50,4 @@ class CentreDetailResource(Resource):
 
 @document_resource
 class CentreListResource(BaseListResource):
-    class Meta:
-        service = CentreService
-        swagger = CentreSwagger
+    Meta = CentreResourceMeta

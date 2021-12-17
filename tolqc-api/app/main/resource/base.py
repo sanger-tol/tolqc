@@ -21,6 +21,15 @@ def _get_api_swagger(cls):
     return api, swagger
 
 
+def _document_detail_get(cls):
+    api, _ = _get_api_swagger(cls)
+    decorators = (
+        api.response(200,description='Success'),
+        api.response(404,description='Not Found')
+    )
+    cls.get = _compose_decorators(cls.get, decorators)
+
+
 def _document_post(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
@@ -37,9 +46,16 @@ def _document_list_resource(cls):
     return api.route('')(cls)
 
 
+def _document_detail_resource(cls):
+    api, _ = _get_api_swagger(cls)
+    _document_detail_get(cls)
+    return api.route('/<int:id>')(cls)
+
+
 def document_resource(cls):
     if cls.is_list_resource():
         return _document_list_resource(cls)
+    return _document_detail_resource(cls)
         
 
 class BaseListResource(Resource):        
@@ -50,3 +66,13 @@ class BaseListResource(Resource):
     @classmethod
     def post(cls, user_id=None):
         return cls.Meta.service.create(user_id=user_id)
+
+
+class BaseDetailResource(Resource):
+    @classmethod
+    def is_list_resource(cls):
+        return False
+    
+    @classmethod
+    def get(cls, id, user_id=None):
+        return cls.Meta.service.read_by_id(id, user_id=user_id)
