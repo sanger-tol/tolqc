@@ -6,6 +6,7 @@ import json
 
 from flask import Response, request
 from functools import wraps
+from sqlalchemy.exc import IntegrityError
 
 from main.model import InstanceDoesNotExistException
 
@@ -17,6 +18,21 @@ def handle_404(function):
             return function(cls, id, *args, **kwargs)
         except InstanceDoesNotExistException:
             return cls.error_404(id)
+    return wrapper
+
+
+def handle_400_db_integrity_error(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            return function(cls, *args, **kwargs)
+        except IntegrityError:
+            return cls.error_400(
+                "An integrity error occured in the database. "
+                "This is most likely due to either a dependency on "
+                "this instance, if deleting, or a foreign reference "
+                "to an object that does not exist, if creating/updating."
+            )
     return wrapper
 
 
@@ -34,6 +50,14 @@ class BaseService:
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
+    
+    @classmethod
+    def error_400(cls, message):
+        return cls.custom_individual_error(
+            "Bad Request",
+            400,
+            message
+        )
 
     @classmethod
     def error_404(cls, id):
@@ -110,6 +134,7 @@ class BaseService:
 
     @classmethod
     @provide_body_data
+    @handle_400_db_integrity_error
     @handle_404
     def update_by_id(cls, id, data, user_id=None):
         schema = cls.Meta.schema
@@ -124,6 +149,7 @@ class BaseService:
         return schema.dump(new_model_instance), 200
 
     @classmethod
+    @handle_400_db_integrity_error
     @handle_404
     def delete_by_id(cls, id, user_id=None):
         model_instance = cls.Meta.model.find_by_id(id)
@@ -132,6 +158,7 @@ class BaseService:
 
     @classmethod
     @provide_body_data
+    @handle_400_db_integrity_error
     def create(cls, data, user_id=None):
         schema = cls.Meta.schema
         model_instance = schema.load(data)

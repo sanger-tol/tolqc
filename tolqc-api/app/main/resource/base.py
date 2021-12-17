@@ -35,6 +35,7 @@ def _document_patch(cls):
     decorators = (
         api.expect(swagger.patch_request_model),
         api.response(200, description='Success'),
+        api.response(400, description='Bad Request'),
         api.response(404, description='Not Found'),
         auth(api)
     )
@@ -45,6 +46,7 @@ def _document_delete(cls):
     api, _ = _get_api_swagger(cls)
     decorators = (
         api.response(204, description='Success'),
+        api.response(400, description='Bad Request'),
         api.response(404, description='Not Found'),
         auth(api)
     )
@@ -56,6 +58,7 @@ def _document_post(cls):
     decorators = (
         api.expect(swagger.post_request_model),
         api.response(201, description="Created"),
+        api.response(400, description='Bad Request'),
         auth(api)
     )
     cls.post = _compose_decorators(cls.post, decorators)
