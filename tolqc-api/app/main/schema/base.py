@@ -11,6 +11,11 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
 from main.model import db
 
 
+def setup_schema(cls):
+    cls.setup()
+    return cls
+
+
 class BaseMeta:
     strict = True
     include_resource_linkage = True
