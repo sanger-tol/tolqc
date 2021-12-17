@@ -5,11 +5,13 @@
 import json
 
 from flask import Response, request
+from functools import wraps
 
 from main.model import InstanceDoesNotExistException
 
 
 def handle_404(function):
+    @wraps(function)
     def wrapper(cls, id, *args, **kwargs):
         try:
             return function(cls, id, *args, **kwargs)
@@ -19,6 +21,7 @@ def handle_404(function):
 
 
 def provide_body_data(function):
+    @wraps(function)
     def wrapper(*args, **kwargs):
         data = request.get_json()
         return function(*args, data, **kwargs)
