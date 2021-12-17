@@ -164,10 +164,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
         return base_data, ext_data
 
-    def read_bulk(self):
-        model = self.Meta.model
-        return self.dump(model.find_bulk())
-
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
         return {
