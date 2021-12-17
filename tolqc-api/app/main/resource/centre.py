@@ -22,7 +22,7 @@ class CentreResourceMeta:
 @document_resource
 class CentreDetailResource(BaseDetailResource):
     Meta = CentreResourceMeta
-    
+
     @api_centre.response(
         204,
         description='Success'
@@ -35,18 +35,6 @@ class CentreDetailResource(BaseDetailResource):
     def delete(self, id, user_id=None):
         return CentreService.delete_by_id(id, user_id=user_id)
 
-    @api_centre.expect(CentreSwagger.patch_request_model)
-    @api_centre.response(
-        200,
-        description='Success'
-    )
-    @api_centre.response(
-        404,
-        description='Not Found'
-    )
-    @auth(api_centre)
-    def patch(self, id, user_id=None):
-        return CentreService.update_by_id(id, user_id=user_id)
 
 @document_resource
 class CentreListResource(BaseListResource):

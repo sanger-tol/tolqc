@@ -30,6 +30,17 @@ def _document_detail_get(cls):
     cls.get = _compose_decorators(cls.get, decorators)
 
 
+def _document_patch(cls):
+    api, swagger = _get_api_swagger(cls)
+    decorators = (
+        api.expect(swagger.patch_request_model),
+        api.response(200, description='Success'),
+        api.response(404, description='Not Found'),
+        auth(api)
+    )
+    cls.patch = _compose_decorators(cls.patch, decorators)
+
+
 def _document_post(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
@@ -49,6 +60,7 @@ def _document_list_resource(cls):
 def _document_detail_resource(cls):
     api, _ = _get_api_swagger(cls)
     _document_detail_get(cls)
+    _document_patch(cls)
     return api.route('/<int:id>')(cls)
 
 
@@ -76,3 +88,7 @@ class BaseDetailResource(Resource):
     @classmethod
     def get(cls, id, user_id=None):
         return cls.Meta.service.read_by_id(id, user_id=user_id)
+    
+    @classmethod
+    def patch(cls, id, user_id=None):
+        return cls.Meta.service.update_by_id(id, user_id=user_id)
