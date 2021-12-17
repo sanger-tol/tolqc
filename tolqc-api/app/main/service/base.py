@@ -103,7 +103,7 @@ class BaseService:
     def read_by_id(cls, id, user_id=None):
         model_instance = cls.Meta.model.find_by_id(id)
         return cls.Meta.schema.dump(model_instance), 200
-    
+
     @classmethod
     @provide_body_data
     @handle_404

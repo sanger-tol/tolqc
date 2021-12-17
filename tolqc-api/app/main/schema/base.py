@@ -59,7 +59,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             'properties': dict_schema,
             'type': 'object',
         }
-    
+
     @classmethod
     def _patch_attributes_schema_model_dict(cls, exclude_fields=[]):
         dict_schema = cls._get_dict_schema(exclude_fields=exclude_fields)
@@ -162,7 +162,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def read_bulk(self):
         model = self.Meta.model
         return self.dump(model.find_bulk())
-    
+
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
         return {
@@ -186,7 +186,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def to_post_request_schema_model_dict(cls):
         """Returns a dict for a Model for a POST request"""
-        attributes =  cls._post_attributes_schema_model_dict(
+        attributes = cls._post_attributes_schema_model_dict(
             exclude_fields=['id']
         )
         return cls._to_request_schema_model_dict(attributes)

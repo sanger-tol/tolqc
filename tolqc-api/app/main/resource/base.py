@@ -59,10 +59,10 @@ def _document_post(cls):
         auth(api)
     )
     cls.post = _compose_decorators(cls.post, decorators)
-            
+
 
 def _document_list_resource(cls):
-    api, _ = _get_api_swagger(cls)    
+    api, _ = _get_api_swagger(cls)
     _document_post(cls)
     return api.route('')(cls)
 
@@ -79,9 +79,9 @@ def document_resource(cls):
     if cls.is_list_resource():
         return _document_list_resource(cls)
     return _document_detail_resource(cls)
-        
 
-class BaseListResource(Resource):        
+
+class BaseListResource(Resource):
     @classmethod
     def is_list_resource(cls):
         return True
@@ -95,15 +95,15 @@ class BaseDetailResource(Resource):
     @classmethod
     def is_list_resource(cls):
         return False
-    
+
     @classmethod
     def get(cls, id, user_id=None):
         return cls.Meta.service.read_by_id(id, user_id=user_id)
-    
+
     @classmethod
     def patch(cls, id, user_id=None):
         return cls.Meta.service.update_by_id(id, user_id=user_id)
-    
+
     @classmethod
     def delete(cls, id, user_id=None):
         return cls.Meta.service.delete_by_id(id, user_id=user_id)
