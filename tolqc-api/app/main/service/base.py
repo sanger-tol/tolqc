@@ -26,7 +26,8 @@ def provide_body_data(function):
 
 
 class BaseService:
-    """In meta class, requires a model class, and a schema object"""
+    """In meta class, requires a model class, and a schema **instance**,
+    i.e. not a class"""
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
