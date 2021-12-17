@@ -41,6 +41,16 @@ def _document_patch(cls):
     cls.patch = _compose_decorators(cls.patch, decorators)
 
 
+def _document_delete(cls):
+    api, _ = _get_api_swagger(cls)
+    decorators = (
+        api.response(204, description='Success'),
+        api.response(404, description='Not Found'),
+        auth(api)
+    )
+    cls.delete = _compose_decorators(cls.delete, decorators)
+
+
 def _document_post(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
@@ -61,6 +71,7 @@ def _document_detail_resource(cls):
     api, _ = _get_api_swagger(cls)
     _document_detail_get(cls)
     _document_patch(cls)
+    _document_delete(cls)
     return api.route('/<int:id>')(cls)
 
 
@@ -92,3 +103,7 @@ class BaseDetailResource(Resource):
     @classmethod
     def patch(cls, id, user_id=None):
         return cls.Meta.service.update_by_id(id, user_id=user_id)
+    
+    @classmethod
+    def delete(cls, id, user_id=None):
+        return cls.Meta.service.delete_by_id(id, user_id=user_id)

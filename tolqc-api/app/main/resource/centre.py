@@ -21,18 +21,6 @@ class CentreResourceMeta:
 class CentreDetailResource(BaseDetailResource):
     Meta = CentreResourceMeta
 
-    @api_centre.response(
-        204,
-        description='Success'
-    )
-    @api_centre.response(
-        404,
-        description='Not Found'
-    )
-    @auth(api_centre)
-    def delete(self, id, user_id=None):
-        return CentreService.delete_by_id(id, user_id=user_id)
-
 
 @document_resource
 class CentreListResource(BaseListResource):
