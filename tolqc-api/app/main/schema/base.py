@@ -3,10 +3,12 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
+from marshmallow import pre_load, ValidationError
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
+from marshmallow_jsonapi.fields import ResourceMeta
 
 from main.model import db
 
@@ -21,6 +23,7 @@ class BaseMeta:
     include_resource_linkage = True
     load_instance = True
     sqla_session = db.session
+    exclude = ('ext',)
 
     @classmethod
     def add_views(cls):
@@ -171,7 +174,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         if not cls.Meta.model.has_ext_column():
             return schema_model_dict
         
-        schema_model_dict['properties']['meta'] = {
+        schema_model_dict['properties']['data']['properties']['meta'] = {
             'type': 'object',
             'properties': {
                 'ext': {

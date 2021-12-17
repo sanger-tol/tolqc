@@ -62,6 +62,6 @@ Services contain the main backend logic for fulfilling an HTTP request:
 Models may support extra fields, that are not defined in the schema, by specifying an ExtColumn named 'ext'.
 
 These can be added to, in POST/PATCH requests, by specifying key:value pairs that should be added in the
-document-level meta (see JSON:API spec), in a field named "ext".
+resource-level meta (see JSON:API spec), in a field named "ext".
 
 ## TODO
