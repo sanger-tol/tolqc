@@ -48,3 +48,6 @@ class BaseTestCase(TestCase):
 
     def create_app(self):
         return application()
+
+    def assert201(self, response):
+        self.assertEqual(response.status_code, 201)

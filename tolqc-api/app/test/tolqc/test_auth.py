@@ -72,7 +72,7 @@ class TestAuthentication(BaseTestCase):
               "id": 1
             }
         }
-        self.assert200(response)
+        self.assert201(response)
         self.assertEqual(expect_data, response.json)
 
         # GET data without api key
