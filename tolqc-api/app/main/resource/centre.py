@@ -8,7 +8,7 @@ from main.auth import auth
 from main.service import CentreService
 from main.swagger import CentreSwagger
 
-from .base import BaseListResource, document_list_resource
+from .base import BaseListResource, document_resource
 
 
 api_centre = CentreSwagger.api
@@ -52,10 +52,8 @@ class CentreDetailResource(Resource):
     def patch(self, id, user_id=None):
         return CentreService.update_by_id(id, user_id=user_id)
 
-
-@document_list_resource
+@document_resource
 class CentreListResource(BaseListResource):
     class Meta:
-        api = api_centre
         service = CentreService
         swagger = CentreSwagger
