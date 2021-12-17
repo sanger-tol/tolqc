@@ -4,17 +4,10 @@
 
 from main.schema import CentreSchema
 
-from .base import BaseSwagger, BaseNamespace
+from .base import BaseSwagger, setup_swagger
 
 
+@setup_swagger
 class CentreSwagger(BaseSwagger):
     class Meta:
         schema = CentreSchema
-
-    api = BaseNamespace(
-        CentreSchema.get_type(),
-        description='Centre related methods'
-    )
-
-
-CentreSwagger.populate_default_models()
