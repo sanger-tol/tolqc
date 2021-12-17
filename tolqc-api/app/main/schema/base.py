@@ -48,7 +48,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def _get_dict_schema(cls, exclude_fields=[]):
         return {
             f: cls._get_field_schema_model_type(f)
-            for f in cls._get_fields(
+            for f in cls.get_fields(
                 exclude_fields=exclude_fields+['ext']
             )
         }
@@ -128,7 +128,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         )
 
     @classmethod
-    def _get_fields(cls, exclude_fields=[]):
+    def get_fields(cls, exclude_fields=[]):
         column_names = cls.Meta.model.get_column_names()
         return [
             c for c in column_names
@@ -141,7 +141,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _get_required_fields(cls, exclude_fields=[]):
-        all_fields = cls._get_fields(exclude_fields)
+        all_fields = cls.get_fields(exclude_fields)
         non_required_fields = cls._get_non_required_fields()
         return [
             f for f in all_fields
@@ -149,24 +149,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             and f not in exclude_fields
         ]
 
-    def _separate_extra_data(self, data):
-        request_fields = data.keys()
-        base_fields = self._get_fields()
-        base_data = {
-            f: data[f]
-            for f in request_fields
-            if f in base_fields
-        }
-        ext_data = {
-            f: data[f]
-            for f in request_fields
-            if f not in base_fields
-        }
-        return base_data, ext_data
-
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
-        return {
+        schema_model_dict = {
             'type': 'object',
             'required': ['data'],
             'properties': {
@@ -183,6 +168,18 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 }
             }
         }
+        if not cls.Meta.model.has_ext_column():
+            return schema_model_dict
+        
+        schema_model_dict['properties']['meta'] = {
+            'type': 'object',
+            'properties': {
+                'ext': {
+                    'type': 'object'
+                }
+            }
+        }
+        return schema_model_dict
 
     @classmethod
     def to_post_request_schema_model_dict(cls):

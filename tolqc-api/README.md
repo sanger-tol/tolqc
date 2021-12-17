@@ -53,9 +53,15 @@ Services contain the main backend logic for fulfilling an HTTP request:
 
 - Their methods are called by resources
 - They dump and load data using schemas
-- They interact with the database using models 
+- They interact with the database using models
+
+## Additional features
+
+### Extra fields
+
+Models may support extra fields, that are not defined in the schema, by specifying an ExtColumn named 'ext'.
+
+These can be added to, in POST/PATCH requests, by specifying key:value pairs that should be added in the
+document-level meta (see JSON:API spec), in a field named "ext".
 
 ## TODO
-
-- Research how to unify Detail and List schemas into one class
-- Get schema validation working, especially concerning required fields

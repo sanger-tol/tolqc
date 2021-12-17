@@ -42,7 +42,7 @@ class Base(db.Model):
     def add(self):
         db.session.add(self)
 
-    def _update_ext(self, ext_data_changes):
+    def update_ext(self, ext_data_changes):
         if not self.has_ext_column():
             raise ExtraFieldsNotPermittedException(
                 ext_data_changes
@@ -55,14 +55,6 @@ class Base(db.Model):
             else:
                 ext_data[key] = item
         self.ext = ext_data
-
-    def update(self, data):
-        for key, item in data.items():
-            if key == 'ext':
-                self._update_ext(item)
-            else:
-                setattr(self, key, item)
-        self.save()
 
     def delete(self):
         db.session.delete(self)
