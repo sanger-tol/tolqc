@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-from marshmallow.decorators import post_load
+from marshmallow.decorators import post_dump, pre_dump, post_load, pre_load
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
@@ -197,18 +197,48 @@ class BaseExtSchema(BaseSchema):
     resource_meta = ResourceMeta(required=False)
 
     @post_load
-    def make_instance(self, data, instance=None, **kwargs):
+    def make_instance(self, data, **kwargs):
+        # self.instance is part of a private API
+        #TODO document license borrowing
+        #TODO come up with better solution
         instance = self.instance
         meta = data.pop('resource_meta', {})
-        ext = meta.pop('ext', {})
-        ext = ext if ext is not None else {}
+        ext = self._none_coalesce_ext(meta.pop('ext', {}))
         if instance is None:
             return self.Meta.model(**data, ext=ext)
         for field, value in data.items():
             setattr(instance, field, value)
-        instance.update_ext(ext)
+            instance.update_ext(ext)
         return instance
-
+    
+    def _none_coalesce_ext(self, ext):
+        return ext if ext is not None else {}
+    
+    @pre_dump
+    def store_ext_data_dump(self, data, many, **kwargs):
+        if not many:
+            self.ext = self._none_coalesce_ext(data.ext)
+        else:
+            self.ext = [
+                self._none_coalesce_ext(datum.ext)
+                for datum in data
+            ]
+            raise NotImplementedError()
+        return data
+    
+    @post_dump
+    def add_ext_data(self, data, many, **kwargs):
+        import logging#reeemove
+        logging.warning(data)
+        if many:
+            raise NotImplementedError(
+                'Many has not been implemented yet.'
+            )
+        data['_resource_meta'] = {
+            'ext': self.ext
+        }
+        return data
+    
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
         schema_model_dict = super()._to_request_schema_model_dict(attributes)

@@ -45,8 +45,8 @@ def provide_body_data(function):
 
 
 class BaseService:
-    """In meta class, requires a model class, and a schema **instance**,
-    i.e. not a class"""
+    """In meta class, requires a model class, and a schema class,
+    neither of which are an instantiated instance"""
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
@@ -129,15 +129,16 @@ class BaseService:
     @classmethod
     @handle_404
     def read_by_id(cls, id, user_id=None):
+        schema = cls.Meta.schema()
         model_instance = cls.Meta.model.find_by_id(id)
-        return cls.Meta.schema.dump(model_instance), 200
+        return schema.dump(model_instance), 200
 
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
     @handle_404
     def update_by_id(cls, id, data, user_id=None):
-        schema = cls.Meta.schema
+        schema = cls.Meta.schema()
         old_model_instance = cls.Meta.model.find_by_id(id)
         new_model_instance = schema.load(
             data,
@@ -160,7 +161,7 @@ class BaseService:
     @provide_body_data
     @handle_400_db_integrity_error
     def create(cls, data, user_id=None):
-        schema = cls.Meta.schema
+        schema = cls.Meta.schema()
         model_instance = schema.load(data)
         cls.Meta.model.save(model_instance)
         return schema.dump(model_instance), 201
