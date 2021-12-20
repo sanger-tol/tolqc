@@ -41,9 +41,8 @@ There are two kinds:
     - An ID must be supplied in the endpoint URL
     - Provide GET, PUT, and DELETE methods
 - **List Resources**
-    - Operate on multiple instances at a time
     - Do not require an ID in the endpoint URL
-    - Provide GET and POST methods
+    - Provide (bulk-) GET and POST methods
 
 They originate from flask-restx (like namespaces).
 
@@ -64,5 +63,31 @@ inheriting the schema from BaseExtSchema, and the Meta class in said schema from
 
 These can be added to, in POST/PATCH requests, by specifying key:value pairs that should be added in the
 resource-level meta (see JSON:API spec), in a field named "ext".
+
+## To add a new endpoint
+
+New endpoints can easily be created.
+
+### A default endpoint
+
+For a default endpoint, i.e. one that has all methods, all of which (except GET id/GET bulk) require auth, create:
+
+- A Model
+    - Add an ExtColumn (from .base) if you want optional extra fields
+- A schema, inheriting from BaseSchema with a meta class inheriting from BaseMeta
+    - or BaseExtSchema + BaseExtMeta if you want optional extra fields
+- A swagger, inheriting from BaseSwagger
+- A service, inheriting from BaseService
+- A list and detail resource (or just a choice of one), inheriting from
+BaseListResource and BaseDetailResource respectively
+
+Finally the entire api (from the resource file) should be added to the
+blueprint in route/api.py .
+
+(At the time of writing) Centre is the canonical example of a default endpoint - follow its structure.
+
+### A bespoke endpoint
+
+Bespoke endpoints do not need to (and probably shouldn't) inherit from the base classes.
 
 ## TODO
