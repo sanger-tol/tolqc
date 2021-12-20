@@ -5,7 +5,7 @@
 from main.service import CentreService
 from main.swagger import CentreSwagger
 
-from .base import BaseListResource, BaseDetailResource, document_resource
+from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
 api_centre = CentreSwagger.api
@@ -16,11 +16,11 @@ class CentreResourceMeta:
     swagger = CentreSwagger
 
 
-@document_resource
+@setup_resource
 class CentreDetailResource(BaseDetailResource):
     Meta = CentreResourceMeta
 
 
-@document_resource
+@setup_resource
 class CentreListResource(BaseListResource):
     Meta = CentreResourceMeta

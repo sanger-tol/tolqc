@@ -87,7 +87,7 @@ def _document_detail_resource(cls):
     return api.route('/<int:id>')(cls)
 
 
-def document_resource(cls):
+def setup_resource(cls):
     if cls.is_list_resource():
         return _document_list_resource(cls)
     return _document_detail_resource(cls)
