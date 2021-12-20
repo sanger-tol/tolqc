@@ -32,14 +32,14 @@ They are listed as the **api** class variable under a swagger class.
 
 ### resource
 
-Resources document HTTP methods on namespaces, such as GET, PUT, and POST.
+Resources document HTTP methods on namespaces, such as GET, PATCH, and POST.
 
 There are two kinds:
 
 - **Detail Resources**
     - Operate only on a single **DB model** instance (_via_ services)
     - An ID must be supplied in the endpoint URL
-    - Provide GET, PUT, and DELETE methods
+    - Provide GET, PATCH, and DELETE methods
 - **List Resources**
     - Do not require an ID in the endpoint URL
     - Provide (bulk-) GET and POST methods
