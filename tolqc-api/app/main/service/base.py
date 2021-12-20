@@ -84,21 +84,6 @@ class BaseService:
         }
 
     @classmethod
-    def custom_post_partial_error(cls, errors=[]):
-        titles, codes, details = cls._split_error_components(errors)
-
-        error_messages = [
-            None
-            if t is None and c is None and d is None
-            else cls._format_error(t, c, d)
-            for (t, c, d) in zip(titles, codes, details)
-        ]
-
-        return {
-            'errors': error_messages
-        }
-
-    @classmethod
     def custom_errors(cls, status_code=500, errors=[]):
         """Expects a list of dicts, with keys 'title', 'code', and 'detail"""
 
@@ -145,7 +130,6 @@ class BaseService:
             instance=old_model_instance,
             partial=True
         )
-        #TODO pull ext data out of model, into resource-level meta in dump
         new_model_instance.save()
         return schema.dump(new_model_instance), 200
 
