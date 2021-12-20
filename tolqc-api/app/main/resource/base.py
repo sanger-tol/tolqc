@@ -56,7 +56,7 @@ def _document_delete(cls):
 def _document_list_get(cls):
     api, _ = _get_api_swagger(cls)
     decorators = (
-        api.response(200, description='Success')
+        api.response(200, description='Success'),
     )
     cls.get = _compose_decorators(cls.get, decorators)
 
