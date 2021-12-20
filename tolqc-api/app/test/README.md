@@ -13,6 +13,8 @@ Main - tests the main logic of ToLQC
 ## Generic Requirements List
 
 - That id converts from string (in request) to integer (in db) correctly
+    - may not be necessary at this stage, as id's don't currently have to comply with JSON:API string requirement
+- Make sure that a "many=True" dump behaves properly with ext data
 
 - Nullable fields in SQLAlchemy models are not set as required when processed into Swagger OpenAPI models
 - Methods requiring auth are not authorized to unauthenticated users, and those without sufficient permissions

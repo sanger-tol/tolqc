@@ -199,8 +199,6 @@ class BaseExtSchema(BaseSchema):
     @post_load
     def make_instance(self, data, **kwargs):
         # self.instance is part of a private API
-        #TODO document license borrowing
-        #TODO come up with better solution
         instance = self.instance
         meta = data.pop('resource_meta', {})
         ext = self._none_coalesce_ext(meta.pop('ext', {}))
@@ -223,17 +221,18 @@ class BaseExtSchema(BaseSchema):
                 self._none_coalesce_ext(datum.ext)
                 for datum in data
             ]
-            raise NotImplementedError()
         return data
     
     @post_dump
     def add_ext_data(self, data, many, **kwargs):
-        import logging#reeemove
-        logging.warning(data)
         if many:
-            raise NotImplementedError(
-                'Many has not been implemented yet.'
-            )
+            return [
+                datum.update(_resource_meta={
+                    'ext': ext_datum
+                })
+                for datum, ext_datum
+                in zip(data, self.ext)
+            ]
         data['_resource_meta'] = {
             'ext': self.ext
         }
