@@ -53,6 +53,14 @@ def _document_delete(cls):
     cls.delete = _compose_decorators(cls.delete, decorators)
 
 
+def _document_list_get(cls):
+    api, _ = _get_api_swagger(cls)
+    decorators = (
+        api.response(200, description='Success')
+    )
+    cls.get = _compose_decorators(cls.get, decorators)
+
+
 def _document_post(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
@@ -66,6 +74,7 @@ def _document_post(cls):
 
 def _document_list_resource(cls):
     api, _ = _get_api_swagger(cls)
+    _document_list_get(cls)
     _document_post(cls)
     return api.route('')(cls)
 
@@ -88,10 +97,9 @@ class BaseListResource(Resource):
     @classmethod
     def is_list_resource(cls):
         return True
-    
+
     @classmethod
     def get(cls, user_id=None):
-        #TODO document!
         return cls.Meta.service.find_bulk(user_id=user_id)
 
     @classmethod

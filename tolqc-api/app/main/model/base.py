@@ -55,7 +55,7 @@ class Base(db.Model):
             else:
                 ext_data[key] = item
         self.ext = ext_data
-    
+
     def update(self, data):
         for key, item in data.items():
             setattr(self, key, item)

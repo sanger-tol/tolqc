@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-from marshmallow.decorators import post_dump, pre_dump, post_load, pre_load
+from marshmallow.decorators import post_dump, pre_dump, post_load
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
@@ -188,9 +188,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls._to_request_schema_model_dict(attributes)
 
 
-
 class BaseExtMeta(BaseMeta):
-    """The base Schema (Meta) class for a model containing an 
+    """The base Schema (Meta) class for a model containing an
     ext column"""
     exclude = ('ext',)
 
@@ -211,10 +210,10 @@ class BaseExtSchema(BaseSchema):
             setattr(instance, field, value)
             instance.update_ext(ext)
         return instance
-    
+
     def _none_coalesce_ext(self, ext):
         return ext if ext is not None else {}
-    
+
     @pre_dump(pass_many=True)
     def store_ext_data_dump(self, data, many, **kwargs):
         if not many:
@@ -225,7 +224,7 @@ class BaseExtSchema(BaseSchema):
                 for datum in data
             ]
         return data
-    
+
     def _add_ext_to_datum(self, datum, ext_datum):
         datum['_resource_meta'] = {
             'ext': ext_datum
@@ -241,7 +240,7 @@ class BaseExtSchema(BaseSchema):
                 in zip(data, self.ext)
             ]
         return self._add_ext_to_datum(data, self.ext)
-    
+
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
         schema_model_dict = super()._to_request_schema_model_dict(attributes)
