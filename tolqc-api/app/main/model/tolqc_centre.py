@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
-from .base import Base, ExtColumn, db
+from .base import Base, db
 
 
 class TolqcCentre(Base):
@@ -10,4 +10,3 @@ class TolqcCentre(Base):
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
     run = db.relationship("TolqcRun", back_populates="centre")
-    ext = ExtColumn() #reeeeemove

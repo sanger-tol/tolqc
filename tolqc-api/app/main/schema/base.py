@@ -190,6 +190,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
 
 class BaseExtMeta(BaseMeta):
+    """The base Schema (Meta) class for a model containing an 
+    ext column"""
     exclude = ('ext',)
 
 
