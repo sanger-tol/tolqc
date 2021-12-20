@@ -88,6 +88,11 @@ class BaseListResource(Resource):
     @classmethod
     def is_list_resource(cls):
         return True
+    
+    @classmethod
+    def get(cls, user_id=None):
+        #TODO document!
+        return cls.Meta.service.find_bulk(user_id=user_id)
 
     @classmethod
     def post(cls, user_id=None):

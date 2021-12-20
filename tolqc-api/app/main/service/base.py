@@ -6,6 +6,7 @@ import json
 
 from flask import Response, request
 from functools import wraps
+from flask_sqlalchemy import model
 from sqlalchemy.exc import IntegrityError
 
 from main.model import InstanceDoesNotExistException
@@ -149,3 +150,9 @@ class BaseService:
         model_instance = schema.load(data)
         cls.Meta.model.save(model_instance)
         return schema.dump(model_instance), 201
+    
+    @classmethod
+    def find_bulk(cls, user_id=None):
+        schema = cls.Meta.schema(many=True)
+        model_instances = cls.Meta.model.find_bulk()
+        return schema.dump(model_instances)

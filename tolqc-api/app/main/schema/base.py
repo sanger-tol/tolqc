@@ -212,7 +212,7 @@ class BaseExtSchema(BaseSchema):
     def _none_coalesce_ext(self, ext):
         return ext if ext is not None else {}
     
-    @pre_dump
+    @pre_dump(pass_many=True)
     def store_ext_data_dump(self, data, many, **kwargs):
         if not many:
             self.ext = self._none_coalesce_ext(data.ext)
@@ -223,20 +223,21 @@ class BaseExtSchema(BaseSchema):
             ]
         return data
     
-    @post_dump
+    def _add_ext_to_datum(self, datum, ext_datum):
+        datum['_resource_meta'] = {
+            'ext': ext_datum
+        }
+        return datum
+
+    @post_dump(pass_many=True)
     def add_ext_data(self, data, many, **kwargs):
         if many:
             return [
-                datum.update(_resource_meta={
-                    'ext': ext_datum
-                })
+                self._add_ext_to_datum(datum, ext_datum)
                 for datum, ext_datum
                 in zip(data, self.ext)
             ]
-        data['_resource_meta'] = {
-            'ext': self.ext
-        }
-        return data
+        return self._add_ext_to_datum(data, self.ext)
     
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
