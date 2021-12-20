@@ -16,7 +16,7 @@ class TolqcSpecimen(SubBase):
     lims_id = db.Column(db.Integer())
     supplier_name = db.Column(db.String())
     accession_id = db.Column(db.Integer())
-    sex_id = db.Column(db.Integer())
+    sex_id = db.Column(db.Integer(), db.ForeignKey("sex.id"))
     ploidy = db.Column(db.String())
     karyotype = db.Column(db.String())
     father_id = db.Column(db.Integer())
@@ -27,3 +27,7 @@ class TolqcSpecimen(SubBase):
     species = db.relationship("TolqcSpecies", back_populates="specimen",
                               foreign_keys=[species_instance_id])
     sample = db.relationship("TolqcSample", back_populates="specimen")
+    status = db.relationship("TolqcStatus", back_populates="specimen", uselist=False)
+    cobiont = db.relationship("TolqcCobiont", back_populates="specimen")
+    sex = db.relationship("TolqcSex", back_populates="specimen",
+                              foreign_keys=[sex_id])

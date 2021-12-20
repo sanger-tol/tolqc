@@ -19,3 +19,6 @@ from .tolqc_platform import TolqcPlatform  # noqa
 from .tolqc_centre import TolqcCentre  # noqa
 from .tolqc_seq import TolqcSeq  # noqa
 from .tolqc_run import TolqcRun  # noqa
+from .tolqc_status import TolqcStatus  # noqa
+from .tolqc_cobiont import TolqcCobiont  # noqa
+from .tolqc_sex import TolqcSex  # noqa

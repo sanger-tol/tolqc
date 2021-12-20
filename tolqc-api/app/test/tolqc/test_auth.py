@@ -49,9 +49,7 @@ class TestAuthentication(BaseTestCase):
         )
         expect_data = {
             "hierarchy_name": "Hierarchy Tester",
-            "name": "David",
-            "created_at": response.json['data'][0]['attributes']['created_at'],
-            "created_by": 100
+            "name": "David"
         }
         expect_errors = [None]
         self.assert200(response)
@@ -69,9 +67,7 @@ class TestAuthentication(BaseTestCase):
               "type": "centre",
               "attributes": {
                 "hierarchy_name": "Hierarchy Tester",
-                "name": "David",
-                "created_at": response.json['data']['attributes']['created_at'],
-                "created_by": 100
+                "name": "David"
               },
               "id": 1
             }

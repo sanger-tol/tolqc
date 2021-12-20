@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import SubBase, db
+from .base import Base, db
 
 
-class TolqcPlatform(SubBase):
+class TolqcPlatform(Base):
     __tablename__ = "platform"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
