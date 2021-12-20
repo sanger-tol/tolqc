@@ -7,18 +7,18 @@ from sqlalchemy import Enum
 
 
 StatusEnum = Enum("na",
-                   "pending",
-                   "topup",
-                   "complete",
-                   "archived",
-                   name="status enum", create_type=False)
+                  "pending",
+                  "topup",
+                  "complete",
+                  "archived",
+                  name="status enum", create_type=False)
 
 QCEnum = Enum("no_qc",
-               "pending",
-               "pass",
-               "fail",
-               "investigate",
-               name="qc enum", create_type=False)
+              "pending",
+              "pass",
+              "fail",
+              "investigate",
+              name="qc enum", create_type=False)
 
 TechEnum = Enum("hifi",
                 "hic",
@@ -33,6 +33,7 @@ TechEnum = Enum("hifi",
                 "scaffold_asm",
                 "asm2curation",
                 name="tech enum", create_type=False)
+
 
 class TolqcStatus(Base):
     __tablename__ = "status"

@@ -30,4 +30,4 @@ class TolqcSpecimen(SubBase):
     status = db.relationship("TolqcStatus", back_populates="specimen", uselist=False)
     cobiont = db.relationship("TolqcCobiont", back_populates="specimen")
     sex = db.relationship("TolqcSex", back_populates="specimen",
-                              foreign_keys=[sex_id])
+                          foreign_keys=[sex_id])
