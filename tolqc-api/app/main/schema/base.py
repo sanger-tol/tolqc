@@ -194,6 +194,7 @@ class BaseExtMeta(BaseMeta):
 
 
 class BaseExtSchema(BaseSchema):
+    """The base Schema class for a model containing an ext column"""
     resource_meta = ResourceMeta(required=False)
 
     @post_load
