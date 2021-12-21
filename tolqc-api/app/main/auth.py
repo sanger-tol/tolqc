@@ -38,7 +38,11 @@ def auth_dec():
 
 
 def auth(namespace: Namespace):
-    decs = (namespace.doc(security=['ApiKeyAuth']), auth_dec())
+    decs = (
+        namespace.response(401, description='Unauthorized'),
+        namespace.doc(security=['ApiKeyAuth']),
+        auth_dec()
+    )
 
     def deco(func):
         for dec in reversed(decs):
