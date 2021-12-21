@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from main.schema.base import BaseSchema, BaseMeta, \
-                             BaseExtSchema, BaseExtMeta, \
+                             BaseSchema, BaseMeta, \
                              setup_schema
 
 from test.base.models import ModelRelationshipB, \
@@ -42,11 +42,11 @@ class D_Schema(BaseSchema):
     Meta = D_Meta
 
 
-class F_Meta(BaseExtMeta):
+class F_Meta(BaseMeta):
     type_ = 'F'
     model = ModelWithExtField
 
 
 @setup_schema
-class F_Schema(BaseExtSchema):
+class F_Schema(BaseSchema):
     Meta = F_Meta

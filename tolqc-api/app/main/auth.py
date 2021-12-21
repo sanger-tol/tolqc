@@ -18,7 +18,7 @@ authorizations = {
 
 
 def check_key_valid(api_key):
-    user_id = TolqcUser.get_user_infos_by_api_key(api_key)
+    user_id = TolqcUser.get_user_id_via_api_key(api_key)
     return user_id
 
 
