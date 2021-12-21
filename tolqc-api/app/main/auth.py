@@ -4,7 +4,7 @@
 
 from main.model import TolqcUser
 from functools import wraps
-from flask import request, abort
+from flask import request
 from flask_restx import Namespace
 
 
@@ -19,22 +19,20 @@ authorizations = {
 
 def check_key_valid(api_key):
     user_id = TolqcUser.get_user_infos_by_api_key(api_key)
-    if not user_id:
-        # TODO make this an error on service
-        abort(401, "User does not exist")
     return user_id
 
 
 def auth_dec():
     def wrap_decorator(function):
         @wraps(function)
-        def decorated(*args, **kwargs):
+        def decorated(resource, *args, **kwargs):
             api_key = request.headers.get('Authorization')
             if not api_key:
-                # TODO make this an error on service
-                abort(401, "Api key is missing")
+                return resource.auth_error("Api key is missing")
             user_id = check_key_valid(api_key)
-            return function(*args, user_id=user_id, **kwargs)
+            if user_id is None:
+                return resource.auth_error("User does not exist")
+            return function(resource, *args, user_id=user_id, **kwargs)
         return decorated
     return wrap_decorator
 

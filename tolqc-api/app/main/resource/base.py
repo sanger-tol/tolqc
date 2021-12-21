@@ -105,6 +105,10 @@ class BaseListResource(Resource):
     @classmethod
     def post(cls, user_id=None):
         return cls.Meta.service.create(user_id=user_id)
+    
+    @classmethod
+    def auth_error(cls, message):
+        return cls.Meta.service.error_401(message)
 
 
 class BaseDetailResource(Resource):
@@ -123,3 +127,7 @@ class BaseDetailResource(Resource):
     @classmethod
     def delete(cls, id, user_id=None):
         return cls.Meta.service.delete_by_id(id, user_id=user_id)
+
+    @classmethod
+    def auth_error(cls, message):
+        return cls.Meta.service.error_401(message)
