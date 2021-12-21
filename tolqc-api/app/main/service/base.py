@@ -58,7 +58,7 @@ class BaseService:
             400,
             message
         )
-    
+
     @classmethod
     def error_401(cls, message):
         return cls.custom_individual_error(
