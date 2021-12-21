@@ -50,7 +50,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def _get_dict_schema(cls, exclude_fields=[]):
         return {
             f: cls._get_field_schema_model_type(f)
-            for f in cls._get_fields(
+            for f in cls.get_fields(
                 exclude_fields=exclude_fields + ['ext', 'created_by', 'created_at']
             )
         }
