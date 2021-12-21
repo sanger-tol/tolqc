@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .sub_base import SubBase, db
 
 
-class TolqcSpecies(Base):
+class TolqcSpecies(SubBase):
     __tablename__ = "species"
     id = db.Column(db.Integer(), primary_key=True)
     species_id = db.Column(db.Integer(), nullable=False)

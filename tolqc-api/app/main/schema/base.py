@@ -50,8 +50,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def _get_dict_schema(cls, exclude_fields=[]):
         return {
             f: cls._get_field_schema_model_type(f)
-            for f in cls.get_fields(
-                exclude_fields=exclude_fields+['ext']
+            for f in cls._get_fields(
+                exclude_fields=exclude_fields + ['ext', 'created_by', 'created_at']
             )
         }
 
@@ -89,8 +89,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                     'default': cls.get_type(),
                 },
                 "id": id_field,
-                "attributes": cls._post_attributes_schema_model_dict(
-                    exclude_fields=['id']
+                "attributes": cls._individual_attributes_schem_model_dict(
+                    exclude_fields=['id', 'created_by', 'created_at']
                 )
             }
         }

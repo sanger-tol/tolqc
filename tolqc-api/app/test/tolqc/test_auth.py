@@ -67,7 +67,9 @@ class TestAuthentication(BaseTestCase):
               "type": "centres",
               "attributes": {
                 "hierarchy_name": "Hierarchy Tester",
-                "name": "David"
+                "name": "David",
+                "created_at": response.json['data']['attributes']['created_at'],
+                "created_by": 100
               },
               "id": 1
             }

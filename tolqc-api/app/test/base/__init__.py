@@ -11,16 +11,12 @@ from flask_restx import Api
 from main import encoder
 from main.model import db
 
-from test.core.models import ModelRelationshipA, \
+from test.base.models import ModelRelationshipA, \
                              ModelRelationshipB, \
                              ModelWithNullableColumn, \
                              ModelWithNonNullableColumn, \
                              ModelRelationshipE, \
                              ModelWithExtField
-from test.core.resources import b_namespace, \
-                                c_namespace, \
-                                d_namespace, \
-                                f_namespace
 
 
 def _setup_api(blueprint):
@@ -29,10 +25,6 @@ def _setup_api(blueprint):
         doc='/ui',
         title="Tree of Life Quality Control"
     )
-    api.add_namespace(b_namespace)
-    api.add_namespace(c_namespace)
-    api.add_namespace(d_namespace)
-    api.add_namespace(f_namespace)
 
 
 class BaseTestCase(TestCase):

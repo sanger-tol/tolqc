@@ -5,6 +5,7 @@
 from .base import db, Base, \
                   ExtraFieldsNotPermittedException, \
                   InstanceDoesNotExistException # noqa
+from .sub_base import SubBase  # noqa
 
 from .tolqc_user import TolqcUser  # noqa
 from .tolqc_role import TolqcRole  # noqa
