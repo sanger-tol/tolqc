@@ -8,7 +8,8 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
-from marshmallow_jsonapi.fields import ResourceMeta
+from marshmallow_jsonapi.fields import ResourceMeta, Integer
+from marshmallow_sqlalchemy.schema import auto_field
 
 from main.model import db
 
@@ -37,9 +38,28 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     OPTIONS_CLASS = CombinedOpts
 
+    created_by = Integer(dump_only=True)
+
+    #created_at = auto_field(dump_only=True)
+    #created_by = auto_field(dump_only=True)
+
     @classmethod
     def setup(cls):
         cls.Meta.add_views()
+        #cls._re_add_excluded_fields()
+    
+    @classmethod
+    def _re_add_excluded_fields(cls):
+        import logging####reemove
+        logging.warning('test lol')
+        if cls.has_creation_details():
+            #cls.created_by = auto_field('created_by', model=cls.Meta.model, dump_only=True)
+            vars()['created_by'] = auto_field('created_by', model=cls.Meta.model, dump_only=True)
+            import logging#reeemove
+            #logging.warning(cls.created_by)
+            logging.warning(cls.Meta.model)
+        if cls.Meta.model.has_ext_column():
+            pass
 
     @classmethod
     def get_type(cls):
@@ -47,7 +67,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     
     @classmethod
     def get_non_excluded_columns(cls):
-        exclude_columns = ('ext', 'created_by')
+        exclude_columns = ('ext', 'created_by', 'created_at') \
+                          if not cls.has_creation_details() \
+                          else ('ext',)
         return [
             f for f in cls.get_model_fields()
             if f not in exclude_columns

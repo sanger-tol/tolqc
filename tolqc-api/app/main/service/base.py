@@ -55,11 +55,6 @@ class BaseService:
     def _instantiate_schema(cls):
         schema_class = cls.Meta.schema
         only = schema_class.get_non_excluded_columns()
-        if schema_class.has_creation_details():
-            return schema_class(
-                only=only,
-                dump_only=('created_at', 'created_by')
-            )
         return schema_class(only=only)
 
     @classmethod
