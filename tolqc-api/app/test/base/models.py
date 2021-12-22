@@ -22,7 +22,7 @@ class ModelRelationshipB(Base):
     test_E = db.relationship('ModelRelationshipE', back_populates='test_B')
 
 
-class ModelWithNullableColumn(Base):
+class ModelWithNullableColumnC(Base):
     __tablename__ = 'test_C'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +30,7 @@ class ModelWithNullableColumn(Base):
     other_column = db.Column(db.String, nullable=True)
 
 
-class ModelWithNonNullableColumn(Base):
+class ModelWithNonNullableColumnD(Base):
     __tablename__ = 'test_D'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +46,7 @@ class ModelRelationshipE(Base):
     test_B = db.relationship(ModelRelationshipB, back_populates='test_E', foreign_keys=[b_id])
 
 
-class ModelWithExtField(Base):
+class ModelWithExtFieldF(Base):
     __tablename__ = 'test_F'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)

@@ -13,10 +13,10 @@ from main.model import db
 
 from test.base.models import ModelRelationshipA, \
                              ModelRelationshipB, \
-                             ModelWithNullableColumn, \
-                             ModelWithNonNullableColumn, \
+                             ModelWithNullableColumnC, \
+                             ModelWithNonNullableColumnD, \
                              ModelRelationshipE, \
-                             ModelWithExtField
+                             ModelWithExtFieldF
 
 
 def _setup_api(blueprint):
@@ -39,9 +39,9 @@ class BaseTestCase(TestCase):
         db.session.query(ModelRelationshipE).delete()
         db.session.query(ModelRelationshipB).delete()
         db.session.query(ModelRelationshipA).delete()
-        db.session.query(ModelWithNullableColumn).delete()
-        db.session.query(ModelWithNonNullableColumn).delete()
-        db.session.query(ModelWithExtField).delete()
+        db.session.query(ModelWithNullableColumnC).delete()
+        db.session.query(ModelWithNonNullableColumnD).delete()
+        db.session.query(ModelWithExtFieldF).delete()
         db.session.commit()
 
     def create_app(self):
@@ -67,16 +67,16 @@ class BaseTestCase(TestCase):
         self._add_model_instance(ModelRelationshipB, **kwargs)
 
     def add_C(self, **kwargs):
-        self._add_model_instance(ModelWithNullableColumn, **kwargs)
+        self._add_model_instance(ModelWithNullableColumnC, **kwargs)
 
     def add_D(self, **kwargs):
-        self._add_model_instance(ModelWithNonNullableColumn, **kwargs)
+        self._add_model_instance(ModelWithNonNullableColumnD, **kwargs)
 
     def add_E(self, **kwargs):
         self._add_model_instance(ModelRelationshipE, **kwargs)
 
     def add_F(self, **kwargs):
-        self._add_model_instance(ModelWithExtField, **kwargs)
+        self._add_model_instance(ModelWithExtFieldF, **kwargs)
 
     def to_json_api(self, id, type, attributes):
         return {
