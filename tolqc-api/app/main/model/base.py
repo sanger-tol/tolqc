@@ -33,7 +33,7 @@ class ExtColumn(db.Column):
 
 class Base(db.Model):
     """The base model class. Its primary key must be called
-    id."""
+    id. Do not call anything other than an ExtColumn 'ext'."""
     __abstract__ = True
 
     def to_dict(cls):

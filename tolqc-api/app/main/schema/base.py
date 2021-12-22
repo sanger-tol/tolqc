@@ -9,7 +9,7 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
 from marshmallow_jsonapi.fields import ResourceMeta, Integer
-from marshmallow_sqlalchemy.schema import auto_field
+from marshmallow_sqlalchemy import schema
 
 from main.model import db
 
@@ -39,6 +39,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     OPTIONS_CLASS = CombinedOpts
 
     created_by = Integer(dump_only=True)
+    resource_meta = ResourceMeta(dump_only=True)
 
     @classmethod
     def setup(cls):
@@ -61,6 +62,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def has_creation_details(cls):
         return cls.Meta.model.has_creation_details()
+    
+    @classmethod
+    def has_ext_field(cls):
+        return cls.Meta.model.has_ext_column()
 
     @classmethod
     def _get_dict_schema(cls, exclude_fields=[]):
@@ -169,7 +174,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
-        return {
+        schema_model_dict = {
             'type': 'object',
             'required': ['data'],
             'properties': {
@@ -186,6 +191,18 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 }
             }
         }
+        if not cls.has_ext_field():
+            return schema_model_dict
+        # add resource level meta
+        schema_model_dict['properties']['data']['properties']['meta'] = {
+            'type': 'object',
+            'properties': {
+                'ext': {
+                    'type': 'object'
+                }
+            }
+        }
+        return schema_model_dict
 
     @classmethod
     def to_post_request_schema_model_dict(cls):
@@ -202,15 +219,16 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             exclude_fields=['id']
         )
         return cls._to_request_schema_model_dict(attributes)
-
-
-class BaseExtSchema(BaseSchema):
-    """The base Schema class for a model containing an ext column"""
-    resource_meta = ResourceMeta(required=False)
-
-    @post_load
-    def make_instance(self, data, **kwargs):
-        # self.instance is part of a private API
+    
+    def _make_instance_without_ext(self, data, **kwargs):
+        instance = self.instance
+        if instance is None:
+            return self.Meta.model(**data)
+        for field, value in data.items():
+            setattr(instance, field, value)
+        return instance
+    
+    def _make_instance_including_ext(self, data, **kwargs):
         instance = self.instance
         meta = data.pop('resource_meta', {})
         ext = self._none_coalesce_ext(meta.pop('ext', {}))
@@ -221,11 +239,21 @@ class BaseExtSchema(BaseSchema):
             instance.update_ext(ext)
         return instance
 
+    @post_load
+    def make_instance(self, data, **kwargs):
+        # self.instance is part of a private API
+        if self.has_ext_field():
+            return self._make_instance_including_ext(data, **kwargs)
+        return self._make_instance_without_ext(data, **kwargs)
+        
+
     def _none_coalesce_ext(self, ext):
         return ext if ext is not None else {}
 
     @pre_dump(pass_many=True)
     def store_ext_data_dump(self, data, many, **kwargs):
+        if not self.has_ext_field():
+            return data
         if not many:
             self.ext = self._none_coalesce_ext(data.ext)
         else:
@@ -243,6 +271,8 @@ class BaseExtSchema(BaseSchema):
 
     @post_dump(pass_many=True)
     def add_ext_data(self, data, many, **kwargs):
+        if not self.has_ext_field():
+            return data
         if many:
             return [
                 self._add_ext_to_datum(datum, ext_datum)
@@ -250,17 +280,3 @@ class BaseExtSchema(BaseSchema):
                 in zip(data, self.ext)
             ]
         return self._add_ext_to_datum(data, self.ext)
-
-    @classmethod
-    def _to_request_schema_model_dict(cls, attributes):
-        schema_model_dict = super()._to_request_schema_model_dict(attributes)
-        # add resource level meta
-        schema_model_dict['properties']['data']['properties']['meta'] = {
-            'type': 'object',
-            'properties': {
-                'ext': {
-                    'type': 'object'
-                }
-            }
-        }
-        return schema_model_dict
