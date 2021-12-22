@@ -74,8 +74,7 @@ For a default endpoint, i.e. one that has all methods, all of which (except GET 
 
 - A Model
     - Add an ExtColumn (from .base) if you want optional extra fields
-- A schema, inheriting from BaseSchema with a meta class inheriting from BaseMeta
-    - or BaseExtSchema + BaseExtMeta if you want optional extra fields
+- A schema, inheriting from BaseSchema with a meta class inheriting from BaseSchema.BaseMeta
 - A swagger, inheriting from BaseSwagger
 - A service, inheriting from BaseService
 - A list and detail resource (or just a choice of one), inheriting from

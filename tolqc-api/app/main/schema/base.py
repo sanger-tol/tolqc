@@ -40,26 +40,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     created_by = Integer(dump_only=True)
 
-    #created_at = auto_field(dump_only=True)
-    #created_by = auto_field(dump_only=True)
-
     @classmethod
     def setup(cls):
         cls.Meta.add_views()
-        #cls._re_add_excluded_fields()
-    
-    @classmethod
-    def _re_add_excluded_fields(cls):
-        import logging####reemove
-        logging.warning('test lol')
-        if cls.has_creation_details():
-            #cls.created_by = auto_field('created_by', model=cls.Meta.model, dump_only=True)
-            vars()['created_by'] = auto_field('created_by', model=cls.Meta.model, dump_only=True)
-            import logging#reeemove
-            #logging.warning(cls.created_by)
-            logging.warning(cls.Meta.model)
-        if cls.Meta.model.has_ext_column():
-            pass
 
     @classmethod
     def get_type(cls):
