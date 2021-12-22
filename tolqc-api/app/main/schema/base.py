@@ -39,7 +39,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     created_by = Integer(dump_only=True)
     resource_meta = ResourceMeta(required=False)
-    ext = None
+
+    def __init__(self, **kwargs):
+        only = self.get_non_excluded_columns()
+        return super().__init__(only=only, **kwargs)
 
     @classmethod
     def setup(cls):
