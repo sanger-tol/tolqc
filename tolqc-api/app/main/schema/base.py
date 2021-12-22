@@ -251,16 +251,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return instance
     
     @pre_load(pass_many=True)
-    def test(self, data, many, **kwargs):
-        import logging#reeemove
-        logging.warning(data)
-        # pull out the resource-level metadata. This is likely
-        # necessary due to a bug in Marshmallow-Jsonapi
+    def remove_resource_metadata(self, data, **kwargs):
         self._resource_meta = data['data'].pop('meta', {})
-        #this shouldn't be necessary >:(
-        #if '_resource_meta' in data:
-        #    data['resource_meta'] = data.pop('_resource_meta')
-        logging.warning(data)
         return data
 
     @post_load
@@ -284,7 +276,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @pre_dump(pass_many=True)
     def pre_process_dump_data(self, data, many, **kwargs):
-        self._store_ext_data(data, many)
+        if self.has_ext_field():
+            self._store_ext_data(data, many)
 
         if many:
             return [
@@ -300,8 +293,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             for f in model_instance.get_column_names()
             if f != 'ext'
         }
-        if not self.has_ext_field():
-            return data
 
         return data
     
@@ -313,6 +304,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     
     @post_dump(pass_many=True)
     def re_insert_ext_data(self, data, many, **kwargs):
+        if not self.has_ext_field():
+            return data
+
         if many:
             data['data'] = [
                 self._re_insert_ext_datum(datum, ext)
@@ -324,6 +318,5 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 data['data'],
                 self._ext_data
             )
-        import logging#reeemove
-        logging.warning(data)
+
         return data
