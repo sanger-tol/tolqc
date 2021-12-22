@@ -51,7 +51,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def get_type(cls):
         return cls.Meta.type_
-    
+
     @classmethod
     def get_non_excluded_columns(cls):
         exclude_columns = ('ext', 'created_by', 'created_at') \
@@ -61,11 +61,11 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             f for f in cls.get_model_fields()
             if f not in exclude_columns
         ]
-    
+
     @classmethod
     def has_creation_details(cls):
         return cls.Meta.model.has_creation_details()
-    
+
     @classmethod
     def has_ext_field(cls):
         return cls.Meta.model.has_ext_column()
@@ -222,7 +222,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             exclude_fields=['id']
         )
         return cls._to_request_schema_model_dict(attributes)
-    
+
     def _make_instance_without_ext(self, data, **kwargs):
         instance = self.instance
         if instance is None:
@@ -230,13 +230,13 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         for field, value in data.items():
             setattr(instance, field, value)
         return instance
-    
+
     def _remove_null_ext_entries_on_create(self, ext):
         return {
             key: value for key, value in ext.items()
             if value is not None
         }
-    
+
     def _make_instance_including_ext(self, data, **kwargs):
         instance = self.instance
         ext = self._none_coalesce_ext(self._resource_meta.pop('ext', {}))
@@ -249,7 +249,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             setattr(instance, field, value)
             instance.update_ext(ext)
         return instance
-    
+
     @pre_load(pass_many=True)
     def remove_resource_metadata(self, data, **kwargs):
         self._resource_meta = data['data'].pop('meta', {})
@@ -261,11 +261,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         if self.has_ext_field():
             return self._make_instance_including_ext(data, **kwargs)
         return self._make_instance_without_ext(data, **kwargs)
-        
 
     def _none_coalesce_ext(self, ext):
         return ext if ext is not None else {}
-    
+
     def _store_ext_data(self, data, many):
         if many:
             self._ext_data = [
@@ -284,7 +283,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 self._model_instance_to_datum(m)
                 for m in data
             ]
-        
+
         return self._model_instance_to_datum(data)
 
     def _model_instance_to_datum(self, model_instance):
@@ -295,13 +294,13 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
         return data
-    
+
     def _re_insert_ext_datum(self, datum, ext_data):
         datum['meta'] = {
             'ext': ext_data
         }
         return datum
-    
+
     @post_dump(pass_many=True)
     def re_insert_ext_data(self, data, many, **kwargs):
         if not self.has_ext_field():

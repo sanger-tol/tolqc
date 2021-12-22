@@ -20,11 +20,12 @@ from test.base.models import ModelRelationshipA, \
 
 
 def _setup_api(blueprint):
-    api = Api(
+    api = Api( # noqa
         blueprint,
         doc='/ui',
         title="Tree of Life Quality Control"
     )
+    # add api's here
 
 
 class BaseTestCase(TestCase):

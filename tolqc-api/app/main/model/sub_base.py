@@ -9,6 +9,7 @@ from .base import Base, db
 
 class CreationLogMixin(object):
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
+
     @declared_attr
     def created_by(cls):
         return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -16,7 +17,7 @@ class CreationLogMixin(object):
 
 class CreationLogBase(Base, CreationLogMixin):
     __abstract__ = True
-    
+
     @classmethod
     def has_creation_details(cls):
         return True

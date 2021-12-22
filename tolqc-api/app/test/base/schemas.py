@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema.base import BaseSchema, BaseMeta, \
-                             BaseSchema, BaseMeta, \
-                             setup_schema
+from main.schema.base import BaseSchema, setup_schema
 
 from test.base.models import ModelRelationshipB, \
                              ModelWithNullableColumn, \
@@ -12,7 +10,7 @@ from test.base.models import ModelRelationshipB, \
                              ModelWithExtField
 
 
-class B_Meta(BaseMeta):
+class B_Meta(BaseSchema.BaseMeta):
     type_ = 'B'
     model = ModelRelationshipB
 
@@ -22,7 +20,7 @@ class B_Schema(BaseSchema):
     Meta = B_Meta
 
 
-class C_Meta(BaseMeta):
+class C_Meta(BaseSchema.BaseMeta):
     type_ = 'C'
     model = ModelWithNullableColumn
 
@@ -32,7 +30,7 @@ class C_Schema(BaseSchema):
     Meta = C_Meta
 
 
-class D_Meta(BaseMeta):
+class D_Meta(BaseSchema.BaseMeta):
     type_ = 'D'
     model = ModelWithNonNullableColumn
 
@@ -42,7 +40,7 @@ class D_Schema(BaseSchema):
     Meta = D_Meta
 
 
-class F_Meta(BaseMeta):
+class F_Meta(BaseSchema.BaseMeta):
     type_ = 'F'
     model = ModelWithExtField
 

@@ -22,8 +22,7 @@ class BaseSwagger:
 
         cls.api = Namespace(
             type_,
-            description=f'Methods relating to {type_}',
-            #validate=True - idk why this changes anythihng :shrug: it sees columns it shouldn't
+            description=f'Methods relating to {type_}'
         )
 
         cls.post_request_model = cls.api.schema_model(
