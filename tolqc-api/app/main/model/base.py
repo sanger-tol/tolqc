@@ -25,7 +25,7 @@ class ExtColumn(db.Column):
     def __init__(self, **kwargs):
         super().__init__(
             db.JSON,
-            nullable=True,
+            nullable=False, #if something goes wrong during testing, suspect this line
             default={},
             **kwargs
         )
