@@ -8,7 +8,7 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
-from marshmallow_jsonapi.fields import ResourceMeta, DateTime as MarshmallowDateTime
+from marshmallow_jsonapi.fields import ResourceMeta
 
 from main.model import db
 
@@ -37,24 +37,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     OPTIONS_CLASS = CombinedOpts
 
-    #created_at = MarshmallowDateTime(dump_only=True, required=False)
-    #created_by = auto_field(dump_only=True, required=False)
-
-    @classmethod #rreeeeename
-    def _remove_columns(cls):
-        bad_columns = ('ext', 'created_at', 'created_by')
-        existing_bad_columns = [
-            f for f in cls.get_model_fields()
-            if f in bad_columns
-        ]
-        cls.Meta.exclude = existing_bad_columns
-
     @classmethod
     def setup(cls):
-        #cls._remove_columns()
         cls.Meta.add_views()
-        #cls.OPTIONS_CLASS.model = cls.Meta.model
-        #cls._add_creation_details()
 
     @classmethod
     def get_type(cls):
@@ -62,7 +47,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     
     @classmethod
     def get_non_excluded_columns(cls):
-        # exclude extra-fields column, and created_by (as otherwise this breaks)
         exclude_columns = ('ext', 'created_by')
         return [
             f for f in cls.get_model_fields()
