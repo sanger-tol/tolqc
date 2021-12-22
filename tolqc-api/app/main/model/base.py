@@ -72,11 +72,9 @@ class Base(db.Model):
         try:
             self.add()
             self.commit()
-            return None
-        except IntegrityError:
+        except IntegrityError as e:
             self.rollback()
-            # TODO make better error message, in separate module
-            return "DB integrity error"
+            raise(e)
 
     @classmethod
     def find_bulk(cls, **kwargs):
