@@ -34,3 +34,6 @@ class TolqcSeq(SubBase):
     library = db.relationship("TolqcLibrary", back_populates="seq",
                               foreign_keys=[library_instance_id])
     run = db.relationship("TolqcRun", back_populates="seq", foreign_keys=[run_instance_id])
+    seq_data = db.relationship("TolqcSeqData", back_populates="seq")
+    file = db.relationship("TolqcFile", back_populates="seq")
+    
