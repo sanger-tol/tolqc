@@ -62,19 +62,19 @@ class Base(db.Model):
 
     def delete(self):
         db.session.delete(self)
-        self.commit()
+        self.save()
 
     @classmethod
     def commit(cls):
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            raise(e)
 
     def save(self):
-        try:
-            self.add()
-            self.commit()
-        except IntegrityError as e:
-            self.rollback()
-            raise(e)
+        self.add()
+        self.commit()
 
     @classmethod
     def find_bulk(cls, **kwargs):
