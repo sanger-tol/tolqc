@@ -2,10 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcUser
 from functools import wraps
 from flask import request
 from flask_restx import Namespace
+
+from main.model.tolqc_user import get_user_id_via_api_key
 
 
 authorizations = {
@@ -17,11 +18,6 @@ authorizations = {
 }
 
 
-def check_key_valid(api_key):
-    user_id = TolqcUser.get_user_id_via_api_key(api_key)
-    return user_id
-
-
 def auth_dec():
     def wrap_decorator(function):
         @wraps(function)
@@ -29,7 +25,7 @@ def auth_dec():
             api_key = request.headers.get('Authorization')
             if not api_key:
                 return resource.auth_error("Api key is missing")
-            user_id = check_key_valid(api_key)
+            user_id = get_user_id_via_api_key(api_key)
             if user_id is None:
                 return resource.auth_error("User does not exist")
             return function(resource, *args, user_id=user_id, **kwargs)

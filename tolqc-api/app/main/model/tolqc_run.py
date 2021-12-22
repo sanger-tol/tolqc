@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import SubBase, db
+from .sub_base import CreationLogBase, db
 
 
-class TolqcRun(SubBase):
+class TolqcRun(CreationLogBase):
     __tablename__ = "run"
     id = db.Column(db.Integer(), primary_key=True)
     run_id = db.Column(db.Integer(), nullable=False)

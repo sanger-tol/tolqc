@@ -2,19 +2,20 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
 from sqlalchemy.ext.declarative import declared_attr
-from .tolqc_user import get_user_id
+
+from .base import Base, db
 
 
-class SubBase(Base):
-    __abstract__ = True
+class CreationLogMixin(object):
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
-
     @declared_attr
     def created_by(cls):
-        return db.Column(db.Integer, db.ForeignKey('user.id'),
-                         nullable=False, default=get_user_id)
+        return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
+class CreationLogBase(Base, CreationLogMixin):
+    __abstract__ = True
     
     @classmethod
     def has_creation_details(cls):

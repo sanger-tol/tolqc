@@ -62,7 +62,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     
     @classmethod
     def get_non_excluded_columns(cls):
-        exclude_columns = ('ext')
+        # exclude extra-fields column, and created_by (as otherwise this breaks)
+        exclude_columns = ('ext', 'created_by')
         return [
             f for f in cls.get_model_fields()
             if f not in exclude_columns

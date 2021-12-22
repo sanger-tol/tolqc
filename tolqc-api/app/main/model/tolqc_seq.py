@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import SubBase, db
+from .sub_base import CreationLogBase, db
 
 
-class TolqcSeq(SubBase):
+class TolqcSeq(CreationLogBase):
     __tablename__ = "seq"
     id = db.Column(db.Integer(), primary_key=True)
     seq_id = db.Column(db.Integer(), nullable=False)

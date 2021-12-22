@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import SubBase, db
+from .sub_base import CreationLogBase, db
 
 
-class TolqcSpecimen(SubBase):
+class TolqcSpecimen(CreationLogBase):
     __tablename__ = "specimen"
     id = db.Column(db.Integer(), primary_key=True)
     specimen_id = db.Column(db.Integer(), nullable=False)

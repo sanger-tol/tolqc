@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import SubBase, db
+from .sub_base import CreationLogBase, db
 
 
-class TolqcAllocation(SubBase):
+class TolqcAllocation(CreationLogBase):
     __tablename__ = "allocation"
     id = db.Column(db.Integer(), primary_key=True)
     project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))

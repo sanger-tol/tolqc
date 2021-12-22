@@ -166,6 +166,7 @@ class BaseService:
     def create(cls, data, user_id=None):
         schema = cls._instantiate_schema()
         model_instance = schema.load(data)
+        model_instance.created_by = user_id
         cls.Meta.model.save(model_instance)
         return schema.dump(model_instance), 201
 
