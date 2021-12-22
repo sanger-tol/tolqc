@@ -17,4 +17,4 @@ class TolqcFile(SubBase):
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
     seq = db.relationship("TolqcSeq", back_populates="file",
-                              foreign_keys=[seq_instance_id])
+                          foreign_keys=[seq_instance_id])

@@ -13,6 +13,6 @@ class TolqcSeqData(SubBase):
     data_instance_id = db.Column(db.Integer(), db.ForeignKey("data.id"),
                                  nullable=False)
     seq = db.relationship("TolqcSeq", back_populates="seq_data",
-                              foreign_keys=[seq_instance_id])
+                          foreign_keys=[seq_instance_id])
     data = db.relationship("TolqcData", back_populates="seq_data",
-                               foreign_keys=[data_instance_id])
+                           foreign_keys=[data_instance_id])
