@@ -8,7 +8,7 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
-from marshmallow_jsonapi.fields import ResourceMeta
+from marshmallow_jsonapi.fields import ResourceMeta, DateTime as MarshmallowDateTime
 
 from main.model import db
 
@@ -18,39 +18,65 @@ def setup_schema(cls):
     return cls
 
 
-class BaseMeta:
-    strict = True
-    include_resource_linkage = True
-    sqla_session = db.session
-    load_instance = True
-
-    @classmethod
-    def add_views(cls):
-        cls.self_view = cls.type_
-        cls.self_view_kwargs = {cls.type_: "<id>"}
-        cls.self_view_many = cls.type_
-
-
-class CombinedOpts(SQLAlchemyAutoSchemaOpts, JsonapiSchemaOpts):
+class CombinedOpts(JsonapiSchemaOpts, SQLAlchemyAutoSchemaOpts):
     pass
 
 
 class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
+    class BaseMeta(SQLAlchemyAutoSchema.Meta):
+        strict = True
+        include_resource_linkage = True
+        sqla_session = db.session
+        load_instance = True
+
+        @classmethod
+        def add_views(cls):
+            cls.self_view = cls.type_
+            cls.self_view_kwargs = {cls.type_: "<id>"}
+            cls.self_view_many = cls.type_
+
     OPTIONS_CLASS = CombinedOpts
+
+    #created_at = MarshmallowDateTime(dump_only=True, required=False)
+    #created_by = auto_field(dump_only=True, required=False)
+
+    @classmethod #rreeeeename
+    def _remove_columns(cls):
+        bad_columns = ('ext', 'created_at', 'created_by')
+        existing_bad_columns = [
+            f for f in cls.get_model_fields()
+            if f in bad_columns
+        ]
+        cls.Meta.exclude = existing_bad_columns
 
     @classmethod
     def setup(cls):
+        #cls._remove_columns()
         cls.Meta.add_views()
+        #cls.OPTIONS_CLASS.model = cls.Meta.model
+        #cls._add_creation_details()
 
     @classmethod
     def get_type(cls):
         return cls.Meta.type_
+    
+    @classmethod
+    def get_non_excluded_columns(cls):
+        exclude_columns = ('ext')
+        return [
+            f for f in cls.get_model_fields()
+            if f not in exclude_columns
+        ]
+    
+    @classmethod
+    def has_creation_details(cls):
+        return cls.Meta.model.has_creation_details()
 
     @classmethod
     def _get_dict_schema(cls, exclude_fields=[]):
         return {
             f: cls._get_field_schema_model_type(f)
-            for f in cls.get_fields(
+            for f in cls.get_model_fields(
                 exclude_fields=exclude_fields + ['ext', 'created_by', 'created_at']
             )
         }
@@ -130,7 +156,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         )
 
     @classmethod
-    def get_fields(cls, exclude_fields=[]):
+    def get_model_fields(cls, exclude_fields=[]):
         column_names = cls.Meta.model.get_column_names()
         return [
             c for c in column_names
@@ -143,7 +169,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _get_required_fields(cls, exclude_fields=[]):
-        all_fields = cls.get_fields(exclude_fields)
+        all_fields = cls.get_model_fields(exclude_fields)
         non_required_fields = cls._get_non_required_fields()
         return [
             f for f in all_fields
@@ -186,12 +212,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             exclude_fields=['id']
         )
         return cls._to_request_schema_model_dict(attributes)
-
-
-class BaseExtMeta(BaseMeta):
-    """The base Schema (Meta) class for a model containing an
-    ext column"""
-    exclude = ('ext',)
 
 
 class BaseExtSchema(BaseSchema):

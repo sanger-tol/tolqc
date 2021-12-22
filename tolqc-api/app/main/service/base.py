@@ -50,6 +50,17 @@ class BaseService:
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
+    
+    @classmethod
+    def _instantiate_schema(cls):
+        schema_class = cls.Meta.schema
+        only = schema_class.get_non_excluded_columns()
+        if schema_class.has_creation_details():
+            return schema_class(
+                only=only,
+                dump_only=('created_at', 'created_by')
+            )
+        return schema_class(only=only)
 
     @classmethod
     def error_400(cls, message):
@@ -122,7 +133,7 @@ class BaseService:
     @classmethod
     @handle_404
     def read_by_id(cls, id, user_id=None):
-        schema = cls.Meta.schema()
+        schema = cls._instantiate_schema()
         model_instance = cls.Meta.model.find_by_id(id)
         return schema.dump(model_instance), 200
 
@@ -131,7 +142,7 @@ class BaseService:
     @handle_400_db_integrity_error
     @handle_404
     def update_by_id(cls, id, data, user_id=None):
-        schema = cls.Meta.schema()
+        schema = cls._instantiate_schema()
         old_model_instance = cls.Meta.model.find_by_id(id)
         new_model_instance = schema.load(
             data,
@@ -153,7 +164,7 @@ class BaseService:
     @provide_body_data
     @handle_400_db_integrity_error
     def create(cls, data, user_id=None):
-        schema = cls.Meta.schema()
+        schema = cls._instantiate_schema()
         model_instance = schema.load(data)
         cls.Meta.model.save(model_instance)
         return schema.dump(model_instance), 201

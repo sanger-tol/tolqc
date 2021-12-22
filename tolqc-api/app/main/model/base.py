@@ -125,3 +125,7 @@ class Base(db.Model):
     @classmethod
     def has_ext_column(cls):
         return 'ext' in cls.get_column_names()
+    
+    @classmethod
+    def has_creation_details(cls):
+        return False

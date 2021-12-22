@@ -15,3 +15,7 @@ class SubBase(Base):
     def created_by(cls):
         return db.Column(db.Integer, db.ForeignKey('user.id'),
                          nullable=False, default=get_user_id)
+    
+    @classmethod
+    def has_creation_details(cls):
+        return True
