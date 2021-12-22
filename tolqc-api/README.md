@@ -14,7 +14,7 @@ Models are sqlalchemy (ORM) classes. These represent SQL concepts in python obje
 
 ### schema
 
-Schemas are from Marshmallow. These serialise models, deserialise requests, and validate deserialised requests.
+Schemas are from Marshmallow. These serialise models, deserialise (an _individual_) request into a model, and validate a deserialised request 
 
 ### swagger
 

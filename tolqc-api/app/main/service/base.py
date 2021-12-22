@@ -53,6 +53,7 @@ class BaseService:
     
     @classmethod
     def _instantiate_schema(cls):
+        #TODO move this into schema __init__
         schema_class = cls.Meta.schema
         only = schema_class.get_non_excluded_columns()
         return schema_class(only=only)

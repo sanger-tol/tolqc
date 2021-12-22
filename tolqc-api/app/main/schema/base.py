@@ -3,13 +3,12 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-from marshmallow.decorators import post_dump, pre_dump, post_load
+from marshmallow.decorators import post_dump, pre_dump, post_load, pre_load
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
 from marshmallow_jsonapi.fields import ResourceMeta, Integer
-from marshmallow_sqlalchemy import schema
 
 from main.model import db
 
@@ -39,7 +38,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     OPTIONS_CLASS = CombinedOpts
 
     created_by = Integer(dump_only=True)
-    resource_meta = ResourceMeta(dump_only=True)
+    resource_meta = ResourceMeta(required=False)
+    ext = None
 
     @classmethod
     def setup(cls):
@@ -228,16 +228,37 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             setattr(instance, field, value)
         return instance
     
+    def _remove_null_ext_entries_on_create(self, ext):
+        return {
+            key: value for key, value in ext.items()
+            if value is not None
+        }
+    
     def _make_instance_including_ext(self, data, **kwargs):
         instance = self.instance
-        meta = data.pop('resource_meta', {})
-        ext = self._none_coalesce_ext(meta.pop('ext', {}))
+        ext = self._none_coalesce_ext(self._resource_meta.pop('ext', {}))
         if instance is None:
-            return self.Meta.model(**data, ext=ext)
+            return self.Meta.model(
+                **data,
+                ext=self._remove_null_ext_entries_on_create(ext)
+            )
         for field, value in data.items():
             setattr(instance, field, value)
             instance.update_ext(ext)
         return instance
+    
+    @pre_load(pass_many=True)
+    def test(self, data, many, **kwargs):
+        import logging#reeemove
+        logging.warning(data)
+        # pull out the resource-level metadata. This is likely
+        # necessary due to a bug in Marshmallow-Jsonapi
+        self._resource_meta = data['data'].pop('meta', {})
+        #this shouldn't be necessary >:(
+        #if '_resource_meta' in data:
+        #    data['resource_meta'] = data.pop('_resource_meta')
+        logging.warning(data)
+        return data
 
     @post_load
     def make_instance(self, data, **kwargs):
@@ -249,34 +270,57 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     def _none_coalesce_ext(self, ext):
         return ext if ext is not None else {}
+    
+    def _store_ext_data(self, data, many):
+        if many:
+            self._ext_data = [
+                m.ext for m in data
+            ]
+        else:
+            self._ext_data = data.ext
 
     @pre_dump(pass_many=True)
-    def store_ext_data_dump(self, data, many, **kwargs):
-        if not self.has_ext_field():
-            return data
-        if not many:
-            self.ext = self._none_coalesce_ext(data.ext)
-        else:
-            self.ext = [
-                self._none_coalesce_ext(datum.ext)
-                for datum in data
-            ]
-        return data
+    def pre_process_dump_data(self, data, many, **kwargs):
+        self._store_ext_data(data, many)
 
-    def _add_ext_to_datum(self, datum, ext_datum):
-        datum['_resource_meta'] = {
-            'ext': ext_datum
-        }
-        return datum
-
-    @post_dump(pass_many=True)
-    def add_ext_data(self, data, many, **kwargs):
-        if not self.has_ext_field():
-            return data
         if many:
             return [
-                self._add_ext_to_datum(datum, ext_datum)
-                for datum, ext_datum
-                in zip(data, self.ext)
+                self._model_instance_to_datum(m)
+                for m in data
             ]
-        return self._add_ext_to_datum(data, self.ext)
+        
+        return self._model_instance_to_datum(data)
+
+    def _model_instance_to_datum(self, model_instance):
+        data = {
+            f: getattr(model_instance, f)
+            for f in model_instance.get_column_names()
+            if f != 'ext'
+        }
+        if not self.has_ext_field():
+            return data
+
+        return data
+    
+    def _re_insert_ext_datum(self, datum, ext_data):
+        datum['meta'] = {
+            'ext': ext_data
+        }
+        return datum
+    
+    @post_dump(pass_many=True)
+    def re_insert_ext_data(self, data, many, **kwargs):
+        if many:
+            data['data'] = [
+                self._re_insert_ext_datum(datum, ext)
+                for datum, ext
+                in zip(data['data'], self._ext_data)
+            ]
+        else:
+            data['data'] = self._re_insert_ext_datum(
+                data['data'],
+                self._ext_data
+            )
+        import logging#reeemove
+        logging.warning(data)
+        return data
