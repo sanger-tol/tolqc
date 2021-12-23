@@ -223,8 +223,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def _make_instance_without_ext(self, data, **kwargs):
         instance = self.instance
         if instance is None:
-            import logging#reeemove
-            logging.warning(data)
             return self.Meta.model(**data)
         for field, value in data.items():
             setattr(instance, field, value)

@@ -9,10 +9,6 @@ class TestBadForeignKey400(BaseTestCase):
     def test_post_B_with_bad_foreign_key_error(self):
         self.add_A(id=20)
 
-        import logging#reeemove
-        from test.base.schemas import B_Schema
-        logging.warning(B_Schema.get_excluded_columns())
-
         response = self.client.open(
             '/api/v1/B',
             method='POST',
@@ -21,7 +17,7 @@ class TestBadForeignKey400(BaseTestCase):
                     "type": 'B',
                     "attributes": {},
                     "relationships": {
-                        "test_A": {
+                        "A": {
                             "data": {
                                 "type": 'A',
                                 "id": 9999

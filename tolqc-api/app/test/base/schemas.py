@@ -37,9 +37,9 @@ class B_Schema(BaseSchema):
 
     # everything below this needs to be dynamic, on BaseSchema
     # this is just to get an understanding!!!!
-    test_A = Relationship(
+    A = Relationship(
         '/A/{id}',
-        related_url_kwargs={'id': '<test_A.id>'},
+        related_url_kwargs={'id': '<A.id>'},
         include_resource_linkage=True,
         type_='A',
         attribute='a_id'
