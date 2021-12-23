@@ -32,10 +32,3 @@ class TestBadForeignKey400(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
-    def test_fail(self):
-        import logging
-        from test.base.schemas import B_Schema
-        logging.warning(B_Schema.get_excluded_columns())
-        #self.assertEqual(False, True)
-
