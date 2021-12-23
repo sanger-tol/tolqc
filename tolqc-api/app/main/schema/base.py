@@ -8,14 +8,21 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
-from marshmallow_jsonapi.fields import ResourceMeta, Integer
+from marshmallow_jsonapi.fields import ResourceMeta, Integer, Relationship
 
 from main.model import db
 
 
-def setup_schema(cls):
-    cls.setup()
-    return cls
+def setup_schema(OldCls):
+    import logging #reeemove
+    logging.warning(OldCls.create_relationship_fields())
+    NewCls = type(
+        f'_{OldCls.get_type().title()}Schema',
+        (OldCls,),
+        OldCls.create_relationship_fields()
+    )
+    NewCls.setup()
+    return NewCls
 
 
 class CombinedOpts(JsonapiSchemaOpts, SQLAlchemyAutoSchemaOpts):
@@ -48,6 +55,30 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def setup(cls):
         cls.Meta.add_views()
+    
+    @classmethod
+    def _create_relationship_field_by_name(cls, foreign_key_name):
+        #TODO need to make Schema.type_ and Model.__tablename__ the same for every base!!!
+        #TODO is target_column always id???
+        target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(foreign_key_name)
+        return target_table, Relationship(
+            f'/{target_table}/{target_column}',
+            related_url_kwargs={f'{target_column}': f'<{foreign_key_name}>'},
+            include_resource_linkage=True,
+            type_=target_table,
+            attribute=foreign_key_name
+        )
+    
+    @classmethod
+    def create_relationship_fields(cls):
+        foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
+        pairs = [
+            cls._create_relationship_field_by_name(foreign_key_name)
+            for foreign_key_name in foreign_key_names
+        ]
+        return {
+            field_name: field for (field_name, field) in pairs
+        }
 
     @classmethod
     def get_type(cls):
