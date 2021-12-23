@@ -28,7 +28,7 @@ class B_Meta(BaseSchema.BaseMeta):
     type_ = 'B'
     model = B_ModelRelationship
     # this below needs to be in the constructor
-    exclude=('a_id',)
+    #exclude=('a_id',)
 
 
 @setup_schema

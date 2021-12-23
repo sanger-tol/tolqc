@@ -127,3 +127,10 @@ class Base(db.Model):
     @classmethod
     def has_creation_details(cls):
         return False
+    
+    @classmethod
+    def get_foreign_key_column_names(cls):
+        return [
+            c.name for c in cls._get_columns()
+            if c.foreign_keys
+        ]

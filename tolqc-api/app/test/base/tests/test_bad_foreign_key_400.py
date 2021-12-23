@@ -32,4 +32,10 @@ class TestBadForeignKey400(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+    
+    def test_fail(self):
+        from test.base.models import B_ModelRelationship
+        import logging
+        logging.warning(B_ModelRelationship.get_foreign_key_column_names())
+        #self.assertEqual(False, True)
 
