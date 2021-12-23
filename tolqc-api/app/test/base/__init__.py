@@ -11,12 +11,12 @@ from flask_restx import Api
 from main import encoder
 from main.model import db
 
-from test.base.models import ModelRelationshipA, \
-                             ModelRelationshipB, \
-                             ModelWithNullableColumnC, \
-                             ModelWithNonNullableColumnD, \
-                             ModelRelationshipE, \
-                             ModelWithExtFieldF
+from test.base.models import A_ModelRelationship, \
+                             B_ModelRelationship, \
+                             C_ModelWithNullableColumn, \
+                             D_ModelWithNonNullableColumn, \
+                             E_ModelRelationship, \
+                             F_ModelWithExtField
 
 
 def _setup_api(blueprint):
@@ -36,12 +36,12 @@ class BaseTestCase(TestCase):
 
     def tearDown(self):
         db.session.rollback()
-        db.session.query(ModelRelationshipE).delete()
-        db.session.query(ModelRelationshipB).delete()
-        db.session.query(ModelRelationshipA).delete()
-        db.session.query(ModelWithNullableColumnC).delete()
-        db.session.query(ModelWithNonNullableColumnD).delete()
-        db.session.query(ModelWithExtFieldF).delete()
+        db.session.query(E_ModelRelationship).delete()
+        db.session.query(B_ModelRelationship).delete()
+        db.session.query(A_ModelRelationship).delete()
+        db.session.query(C_ModelWithNullableColumn).delete()
+        db.session.query(D_ModelWithNonNullableColumn).delete()
+        db.session.query(F_ModelWithExtField).delete()
         db.session.commit()
 
     def create_app(self):
@@ -61,22 +61,22 @@ class BaseTestCase(TestCase):
         model(**kwargs).save()
 
     def add_A(self, **kwargs):
-        self._add_model_instance(ModelRelationshipA, **kwargs)
+        self._add_model_instance(A_ModelRelationship, **kwargs)
 
     def add_B(self, **kwargs):
-        self._add_model_instance(ModelRelationshipB, **kwargs)
+        self._add_model_instance(B_ModelRelationship, **kwargs)
 
     def add_C(self, **kwargs):
-        self._add_model_instance(ModelWithNullableColumnC, **kwargs)
+        self._add_model_instance(C_ModelWithNullableColumn, **kwargs)
 
     def add_D(self, **kwargs):
-        self._add_model_instance(ModelWithNonNullableColumnD, **kwargs)
+        self._add_model_instance(D_ModelWithNonNullableColumn, **kwargs)
 
     def add_E(self, **kwargs):
-        self._add_model_instance(ModelRelationshipE, **kwargs)
+        self._add_model_instance(E_ModelRelationship, **kwargs)
 
     def add_F(self, **kwargs):
-        self._add_model_instance(ModelWithExtFieldF, **kwargs)
+        self._add_model_instance(F_ModelWithExtField, **kwargs)
 
     def to_json_api(self, id, type, attributes):
         return {

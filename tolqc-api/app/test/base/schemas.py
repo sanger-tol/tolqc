@@ -4,15 +4,15 @@
 
 from main.schema.base import BaseSchema, setup_schema
 
-from test.base.models import ModelRelationshipB, \
-                             ModelWithNullableColumnC, \
-                             ModelWithNonNullableColumnD, \
-                             ModelWithExtFieldF
+from test.base.models import B_ModelRelationship, \
+                             C_ModelWithNullableColumn, \
+                             D_ModelWithNonNullableColumn, \
+                             F_ModelWithExtField
 
 
 class B_Meta(BaseSchema.BaseMeta):
     type_ = 'B'
-    model = ModelRelationshipB
+    model = B_ModelRelationship
 
 
 @setup_schema
@@ -22,7 +22,7 @@ class B_Schema(BaseSchema):
 
 class C_Meta(BaseSchema.BaseMeta):
     type_ = 'C'
-    model = ModelWithNullableColumnC
+    model = C_ModelWithNullableColumn
 
 
 @setup_schema
@@ -32,7 +32,7 @@ class C_Schema(BaseSchema):
 
 class D_Meta(BaseSchema.BaseMeta):
     type_ = 'D'
-    model = ModelWithNonNullableColumnD
+    model = D_ModelWithNonNullableColumn
 
 
 @setup_schema
@@ -42,7 +42,7 @@ class D_Schema(BaseSchema):
 
 class F_Meta(BaseSchema.BaseMeta):
     type_ = 'F'
-    model = ModelWithExtFieldF
+    model = F_ModelWithExtField
 
 
 @setup_schema
