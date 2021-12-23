@@ -67,8 +67,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     
     @classmethod
     def _create_relationship_field_by_name(cls, foreign_key_name):
-        #TODO need to make Schema.type_ and Model.__tablename__ the same for every model!!!
-        #THIS IS REALLY IMPORTANT!!!! THis won't work otherwise
         target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(foreign_key_name)
         special_name = cls._lookup_special_relationship_name(foreign_key_name)
 
