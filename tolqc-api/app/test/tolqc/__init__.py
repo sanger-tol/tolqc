@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from main import application
-from main.model import db, TolqcUser, TolqcRole
 
 from test.test_case import TestCase
 
