@@ -28,6 +28,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         include_resource_linkage = True
         sqla_session = db.session
         load_instance = True
+        include_fk = True
 
         @classmethod
         def add_views(cls):
@@ -41,8 +42,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     resource_meta = ResourceMeta(required=False)
 
     def __init__(self, **kwargs):
-        only = self.get_non_excluded_columns()
-        return super().__init__(only=only, **kwargs)
+        exclude = self.get_excluded_columns()
+        return super().__init__(exclude=exclude, **kwargs)
 
     @classmethod
     def setup(cls):
@@ -53,14 +54,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.type_
 
     @classmethod
-    def get_non_excluded_columns(cls):
-        exclude_columns = ('ext', 'created_by', 'created_at') \
-                          if not cls.has_creation_details() \
-                          else ('ext',)
-        return [
-            f for f in cls.get_model_fields()
-            if f not in exclude_columns
-        ]
+    def get_excluded_columns(cls):
+        if cls.has_ext_field():
+            return ('ext',)
+        return ()
 
     @classmethod
     def has_creation_details(cls):
@@ -226,6 +223,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def _make_instance_without_ext(self, data, **kwargs):
         instance = self.instance
         if instance is None:
+            import logging#reeemove
+            logging.warning(data)
             return self.Meta.model(**data)
         for field, value in data.items():
             setattr(instance, field, value)

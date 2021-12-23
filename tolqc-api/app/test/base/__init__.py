@@ -32,6 +32,9 @@ def _setup_api(blueprint):
 
 
 class BaseTestCase(TestCase):
+    def _get_api_key(self):
+        return {"Authorization": self.api_key}
+
     def create_app(self):
         app = Flask(__name__)
         blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
