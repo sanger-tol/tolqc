@@ -6,44 +6,21 @@ from marshmallow_jsonapi.fields import Relationship
 
 from main.schema.base import BaseSchema, setup_schema
 
-from test.base.models import A_ModelRelationship, \
-                             B_ModelRelationship, \
+from test.base.models import B_ModelRelationship, \
                              C_ModelWithNullableColumn, \
                              D_ModelWithNonNullableColumn, \
-                             F_ModelWithExtField, \
-                             E_ModelRelationship
-
-
-class A_Meta(BaseSchema.BaseMeta):
-    type_ = 'A'
-    model = A_ModelRelationship
-
-
-@setup_schema
-class A_Schema(BaseSchema):
-    Meta = A_Meta
+                             F_ModelWithExtField
 
 
 class B_Meta(BaseSchema.BaseMeta):
     type_ = 'B'
     model = B_ModelRelationship
-    # this below needs to be in the constructor
-    #exclude=('a_id',)
 
 
 @setup_schema
 class B_Schema(BaseSchema):
     Meta = B_Meta
-
-    # everything below this needs to be dynamic, on BaseSchema
-    # this is just to get an understanding!!!!
-    # A = Relationship(
-    #     '/A/{id}',
-    #     related_url_kwargs={'id': '<a_id>'},
-    #     include_resource_linkage=True,
-    #     type_='A',
-    #     attribute='a_id'
-    # )
+    #TODO make resources dynamically generated for related urls
     E = Relationship(
         '/B/{id}/E',
         related_url_kwargs={'id': '<id>'},
