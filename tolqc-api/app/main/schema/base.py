@@ -57,12 +57,21 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         cls.Meta.add_views()
     
     @classmethod
+    def _lookup_special_relationship_name(cls, foreign_key_name):
+        lookup_map = {
+            'created_by': 'creator'
+        }
+        return lookup_map.get(foreign_key_name, None)
+    
+    @classmethod
     def _create_relationship_field_by_name(cls, foreign_key_name):
         #TODO need to make Schema.type_ and Model.__tablename__ the same for every base!!!
         #TODO is target_column always id???
         target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(foreign_key_name)
-        return target_table, Relationship(
-            f'/{target_table}/{target_column}',
+        special_name = cls._lookup_special_relationship_name(foreign_key_name)
+
+        return special_name if special_name is not None else target_table, Relationship(
+            f'/{target_table}/{{{target_column}}}',
             related_url_kwargs={f'{target_column}': f'<{foreign_key_name}>'},
             include_resource_linkage=True,
             type_=target_table,
@@ -89,9 +98,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         excluded_columns = cls.Meta.model.get_foreign_key_column_names()
         if cls.has_ext_field():
             excluded_columns += ['ext']
-        # don't exclude (the foreign key) created_by
-        if cls.has_creation_details():
-            excluded_columns.remove('created_by')
         return excluded_columns
 
     @classmethod
