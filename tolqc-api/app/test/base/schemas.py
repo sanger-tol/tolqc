@@ -49,7 +49,7 @@ class B_Schema(BaseSchema):
         related_url_kwargs={'id': '<id>'},
         many=True,
         type_='E',
-        default=lambda: []
+        dump_default=lambda: []
     )
 
 
