@@ -16,12 +16,12 @@ from main.model import db
 def setup_schema(OldCls):
     """Dynamically adds relationship fields to a Schema Class inheriting
     from BaseSchema"""
+    OldCls.setup()
     NewCls = type(
         f'_{OldCls.get_type().title()}Schema',
         (OldCls,),
         OldCls.create_relationship_fields()
     )
-    NewCls.setup()
     return NewCls
 
 
@@ -38,7 +38,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         include_fk = True
 
         @classmethod
-        def add_views(cls):
+        def setup_meta(cls):
+            cls.type_ = cls.model.__tablename__
             cls.self_view = cls.type_
             cls.self_view_kwargs = {cls.type_: "<id>"}
             cls.self_view_many = cls.type_
@@ -55,7 +56,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def setup(cls):
-        cls.Meta.add_views()
+        cls.Meta.setup_meta()
     
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name):
@@ -66,7 +67,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     
     @classmethod
     def _create_relationship_field_by_name(cls, foreign_key_name):
-        #TODO need to make Schema.type_ and Model.__tablename__ the same for every base!!!
+        #TODO need to make Schema.type_ and Model.__tablename__ the same for every model!!!
         #THIS IS REALLY IMPORTANT!!!! THis won't work otherwise
         target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(foreign_key_name)
         special_name = cls._lookup_special_relationship_name(foreign_key_name)

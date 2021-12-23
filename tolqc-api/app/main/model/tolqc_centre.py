@@ -6,8 +6,8 @@ from .sub_base import CreationLogBase, db
 
 
 class TolqcCentre(CreationLogBase):
-    __tablename__ = "centre"
+    __tablename__ = "centres"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    run = db.relationship("TolqcRun", back_populates="centre")
+    run = db.relationship("TolqcRun", back_populates="centres")

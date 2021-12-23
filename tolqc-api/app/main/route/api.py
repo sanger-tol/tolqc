@@ -6,7 +6,6 @@ from flask import Blueprint
 from flask_restx import Api
 
 from main.auth import authorizations
-from main.constant import Types
 from main.resource import api_centre, api_environment
 
 
@@ -17,8 +16,8 @@ def _get_environment_string(app):
     return f" ({environment})"
 
 
-def _get_path(type):
-    return f"/{type}"
+def _get_path(api_):
+    return f"/{api_.type_}"
 
 
 def _setup_api(blueprint, app):
@@ -28,8 +27,8 @@ def _setup_api(blueprint, app):
         title=f"Tree of Life Quality Control{_get_environment_string(app)}",
         authorizations=authorizations
     )
-    api.add_namespace(api_centre, path=_get_path(Types.CENTRE))
-    api.add_namespace(api_environment, path=_get_path(Types.ENVIRONMENT))
+    api.add_namespace(api_centre, path=_get_path(api_centre))
+    api.add_namespace(api_environment, path='/environment')
 
 
 def init_blueprint(app):

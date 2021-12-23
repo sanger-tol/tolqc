@@ -33,8 +33,12 @@ class ExtColumn(db.Column):
 
 
 class Base(db.Model):
-    """The base model class. Its primary key must be called
-    id. Do not call anything other than an ExtColumn 'ext'."""
+    """The base model class:
+    - Its primary key must be called id.
+    - Do not call anything other than an ExtColumn 'ext'.
+    - The declared tablename will be the endpoint stem
+        - It should be plural
+    """
     __abstract__ = True
 
     def to_dict(cls):

@@ -8,8 +8,6 @@ from main.model import db
 
 class TestAuthentication(TolqcTestCase):
     def test_api_key_auth(self):
-        db.engine.execute("ALTER SEQUENCE centre_id_seq RESTART WITH 1;")
-
         good_api_key = {"Authorization": self.api_key}
         false_api_key = {"Authorization": "IamAhacker"}
 
