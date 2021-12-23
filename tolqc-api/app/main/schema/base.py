@@ -174,6 +174,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
+        #TODO move foreign keys/relationships 
+        #under relationships!
         schema_model_dict = {
             'type': 'object',
             'required': ['data'],
