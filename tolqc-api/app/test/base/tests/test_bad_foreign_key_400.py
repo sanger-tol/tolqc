@@ -36,6 +36,8 @@ class TestBadForeignKey400(BaseTestCase):
     def test_fail(self):
         from test.base.models import B_ModelRelationship
         import logging
-        logging.warning(B_ModelRelationship.get_foreign_key_column_names())
-        #self.assertEqual(False, True)
+        stuff = B_ModelRelationship.get_foreign_key_column_names()
+        logging.warning(B_ModelRelationship.get_relationship_from_foreign_key(stuff[0]))
+        relationships_dict = B_ModelRelationship.get_relationships_dict()
+        self.assertEqual(False, True)
 

@@ -6,24 +6,24 @@ from main.model.base import Base, db, ExtColumn
 
 
 class A_ModelRelationship(Base):
-    __tablename__ = 'test_A'
+    __tablename__ = 'A'
     # the variable below is necessary on every test model!
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    test_B = db.relationship('B_ModelRelationship', back_populates='test_A')
+    B = db.relationship('B_ModelRelationship', back_populates='A')
 
 
 class B_ModelRelationship(Base):
-    __tablename__ = 'test_B'
+    __tablename__ = 'B'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    a_id = db.Column(db.Integer, db.ForeignKey("test_A.id"), nullable=False)
-    test_A = db.relationship(A_ModelRelationship, back_populates='test_B', foreign_keys=[a_id])
-    test_E = db.relationship('E_ModelRelationship', back_populates='test_B')
+    a_id = db.Column(db.Integer, db.ForeignKey("A.id"), nullable=False)
+    A = db.relationship(A_ModelRelationship, back_populates='B', foreign_keys=[a_id])
+    E = db.relationship('E_ModelRelationship', back_populates='B')
 
 
 class C_ModelWithNullableColumn(Base):
-    __tablename__ = 'test_C'
+    __tablename__ = 'C'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     nullable_column = db.Column(db.String, nullable=True)
@@ -31,7 +31,7 @@ class C_ModelWithNullableColumn(Base):
 
 
 class D_ModelWithNonNullableColumn(Base):
-    __tablename__ = 'test_D'
+    __tablename__ = 'D'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     non_nullable_column = db.Column(db.String, nullable=False)
@@ -39,15 +39,15 @@ class D_ModelWithNonNullableColumn(Base):
 
 
 class E_ModelRelationship(Base):
-    __tablename__ = 'test_E'
+    __tablename__ = 'E'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    b_id = db.Column(db.Integer, db.ForeignKey("test_B.id"), nullable=False)
-    test_B = db.relationship(B_ModelRelationship, back_populates='test_E', foreign_keys=[b_id])
+    b_id = db.Column(db.Integer, db.ForeignKey("B.id"), nullable=False)
+    B = db.relationship(B_ModelRelationship, back_populates='E', foreign_keys=[b_id])
 
 
 class F_ModelWithExtField(Base):
-    __tablename__ = 'test_F'
+    __tablename__ = 'F'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     ext = ExtColumn()

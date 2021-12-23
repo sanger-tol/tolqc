@@ -4,6 +4,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.inspection import inspect
 
 db = SQLAlchemy()
 
@@ -134,3 +135,18 @@ class Base(db.Model):
             c.name for c in cls._get_columns()
             if c.foreign_keys
         ]
+    
+    @classmethod
+    def get_relationship_from_foreign_key(cls, column_name):
+        """Returns a pair:
+        - The target table's name
+        - The name of the target column on the target table
+        """
+        # TODO make this support composite/compound keys
+        foreign_key = list(cls.__table__.columns[column_name].foreign_keys)[0]
+        target_table, target_column = foreign_key.target_fullname.split('.')
+        return target_table, target_column
+
+    @classmethod
+    def get_relationships_dict(cls):
+        return inspect(cls).relationships.items()

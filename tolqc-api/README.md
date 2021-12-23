@@ -89,4 +89,6 @@ blueprint in route/api.py .
 
 Bespoke endpoints do not need to (and probably shouldn't) inherit from the base classes.
 
-## TODO
+## Limitations
+
+- Compound/composite keys are not supported
