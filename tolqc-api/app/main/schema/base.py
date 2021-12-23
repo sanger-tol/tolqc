@@ -57,17 +57,19 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def setup(cls):
         cls.Meta.setup_meta()
-    
+
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name):
         lookup_map = {
             'created_by': 'creator'
         }
         return lookup_map.get(foreign_key_name, None)
-    
+
     @classmethod
     def _create_relationship_field_by_name(cls, foreign_key_name):
-        target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(foreign_key_name)
+        target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(
+            foreign_key_name
+        )
         special_name = cls._lookup_special_relationship_name(foreign_key_name)
 
         return special_name if special_name is not None else target_table, Relationship(
@@ -77,7 +79,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             type_=target_table,
             attribute=foreign_key_name
         )
-    
+
     @classmethod
     def create_relationship_fields(cls):
         foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
@@ -196,8 +198,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
-        #TODO move foreign keys/relationships 
-        #under relationships!
+        # TODO move foreign keys/relationships
+        # under relationships!
         schema_model_dict = {
             'type': 'object',
             'required': ['data'],

@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from test.tolqc import TolqcTestCase
-from main.model import db
 
 
 class TestAuthentication(TolqcTestCase):

@@ -26,7 +26,7 @@ class ExtColumn(db.Column):
     def __init__(self, **kwargs):
         super().__init__(
             db.JSON,
-            nullable=False, #if something goes wrong during testing, suspect this line
+            nullable=False,
             default={},
             **kwargs
         )
@@ -132,14 +132,14 @@ class Base(db.Model):
     @classmethod
     def has_creation_details(cls):
         return False
-    
+
     @classmethod
     def get_foreign_key_column_names(cls):
         return [
             c.name for c in cls._get_columns()
             if c.foreign_keys
         ]
-    
+
     @classmethod
     def get_relationship_from_foreign_key(cls, column_name):
         """Returns a pair:

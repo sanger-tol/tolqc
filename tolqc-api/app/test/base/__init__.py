@@ -19,6 +19,7 @@ from test.base.models import A_ModelRelationship, \
                              F_ModelWithExtField
 from test.base.resources import api_B, api_C, api_D, api_F
 
+
 def _setup_api(blueprint):
     api = Api(
         blueprint,
@@ -66,4 +67,3 @@ class BaseTestCase(TestCase):
 
     def add_F(self, **kwargs):
         self._add_model_instance(F_ModelWithExtField, **kwargs)
-

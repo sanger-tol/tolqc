@@ -20,7 +20,7 @@ class B_Meta(BaseSchema.BaseMeta):
 @setup_schema
 class B_Schema(BaseSchema):
     Meta = B_Meta
-    #TODO make resources dynamically generated for related urls
+    # TODO make resources dynamically generated for related urls
     E = Relationship(
         '/B/{id}/E',
         related_url_kwargs={'id': '<id>'},
