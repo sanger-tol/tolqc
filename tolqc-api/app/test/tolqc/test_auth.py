@@ -2,17 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-from . import BaseTestCase
+from test.tolqc import TolqcTestCase
 from main.model import db
 
-
-api_key = {"Authorization": "AnyThingBecAuseThIsIsATEST567890"}
 false_api_key = {"Authorization": "IamAhacker"}
 
 
-class TestAuthentication(BaseTestCase):
+class TestAuthentication(TolqcTestCase):
     def test_api_key_auth(self):
         db.engine.execute("ALTER SEQUENCE centre_id_seq RESTART WITH 1;")
+
+        good_api_key = {"Authorization": self.api_key}
 
         # no api key
         response = self.client.open(
@@ -60,8 +60,9 @@ class TestAuthentication(BaseTestCase):
                     }
                 },
             },
-            headers=api_key
+            headers=good_api_key
         )
+        self.assert201(response)
         expect_data = {
             "data": {
               "type": "centres",
@@ -71,10 +72,9 @@ class TestAuthentication(BaseTestCase):
                 "created_at": response.json['data']['attributes']['created_at'],
                 "created_by": 100
               },
-              "id": 1
+              "id": response.json['data']['id']
             }
         }
-        self.assert201(response)
         self.assertEqual(expect_data, response.json)
 
         # GET data without api key
@@ -89,7 +89,7 @@ class TestAuthentication(BaseTestCase):
         response = self.client.open(
             '/api/v1/centres/1',
             method='GET',
-            headers=api_key
+            headers=good_api_key
         )
         self.assert200(response)
         self.assertEqual(expect_data, response.json)

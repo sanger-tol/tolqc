@@ -4,13 +4,13 @@
 
 import os
 
-from flask_testing import TestCase
 from flask import Flask, Blueprint
 from flask_restx import Api
 
 from main import encoder
 from main.model import db
 
+from test.test_case import TestCase
 from test.base.models import A_ModelRelationship, \
                              B_ModelRelationship, \
                              C_ModelWithNullableColumn, \
@@ -18,7 +18,6 @@ from test.base.models import A_ModelRelationship, \
                              E_ModelRelationship, \
                              F_ModelWithExtField
 from test.base.resources import api_B, api_C, api_D, api_F
-
 
 def _setup_api(blueprint):
     api = Api(
@@ -33,30 +32,13 @@ def _setup_api(blueprint):
 
 
 class BaseTestCase(TestCase):
-    def setUp(self):
-        self.maxDiff = None
-        db.create_all()
-        db.session.commit()
-
-    def tearDown(self):
-        db.session.rollback()
-        db.session.query(E_ModelRelationship).delete()
-        db.session.query(B_ModelRelationship).delete()
-        db.session.query(A_ModelRelationship).delete()
-        db.session.query(C_ModelWithNullableColumn).delete()
-        db.session.query(D_ModelWithNonNullableColumn).delete()
-        db.session.query(F_ModelWithExtField).delete()
-        db.session.commit()
-
     def create_app(self):
         app = Flask(__name__)
         blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
         _setup_api(blueprint)
         app.register_blueprint(blueprint)
         app.json_encoder = encoder.JSONEncoder
-        db_uri = f"postgresql://{os.environ['POSTGRES_USER']}:" \
-                 f"{os.environ['POSTGRES_PASSWORD']}@tolqc-db-core-test/core-test"
-        app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
         return app
@@ -82,11 +64,3 @@ class BaseTestCase(TestCase):
     def add_F(self, **kwargs):
         self._add_model_instance(F_ModelWithExtField, **kwargs)
 
-    def to_json_api(self, id, type, attributes):
-        return {
-            'data': {
-                'type': type,
-                'id': id,
-                'attributes': attributes
-            }
-        }

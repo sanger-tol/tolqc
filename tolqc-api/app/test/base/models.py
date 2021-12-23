@@ -10,7 +10,7 @@ class A_ModelRelationship(Base):
     # the variable below is necessary on every test model!
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    test_B = db.relationship('ModelRelationshipB', back_populates='test_A')
+    test_B = db.relationship('B_ModelRelationship', back_populates='test_A')
 
 
 class B_ModelRelationship(Base):
@@ -19,7 +19,7 @@ class B_ModelRelationship(Base):
     id = db.Column(db.Integer, primary_key=True)
     a_id = db.Column(db.Integer, db.ForeignKey("test_A.id"), nullable=False)
     test_A = db.relationship(A_ModelRelationship, back_populates='test_B', foreign_keys=[a_id])
-    test_E = db.relationship('ModelRelationshipE', back_populates='test_B')
+    test_E = db.relationship('E_ModelRelationship', back_populates='test_B')
 
 
 class C_ModelWithNullableColumn(Base):

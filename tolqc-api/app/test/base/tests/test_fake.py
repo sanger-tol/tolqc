@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-from unittest import TestCase
+from test.base import BaseTestCase
 
 
-class TestFake(TestCase):
+class TestFake(BaseTestCase):
     def test_fake(self):
         self.assertTrue(True)

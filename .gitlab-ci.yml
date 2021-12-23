@@ -131,7 +131,7 @@ test-api:
   script:
     - sleep 60
     - docker exec $(docker ps -q -f name="tolqc_tolqc-api") 
-      bash -c "pytest -v --ignore=/app/test/tolqc/ && pytest -v --ignore=/app/test/base/"
+      bash -c "pytest -v"
   except:
     - staging
     - production
