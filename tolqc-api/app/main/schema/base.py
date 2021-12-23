@@ -8,7 +8,7 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
-from marshmallow_jsonapi.fields import ResourceMeta, Integer, Relationship
+from marshmallow_jsonapi.fields import ResourceMeta, Integer, Relationship, String
 
 from main.model import db
 
@@ -45,6 +45,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     OPTIONS_CLASS = CombinedOpts
 
+    id = String(dump_only=True)
     created_by = Integer(dump_only=True)
     resource_meta = ResourceMeta(required=False)
 
