@@ -17,15 +17,19 @@ from test.base.models import A_ModelRelationship, \
                              D_ModelWithNonNullableColumn, \
                              E_ModelRelationship, \
                              F_ModelWithExtField
+from test.base.resources import api_B, api_C, api_D, api_F
 
 
 def _setup_api(blueprint):
-    api = Api( # noqa
+    api = Api(
         blueprint,
         doc='/ui',
         title="Tree of Life Quality Control"
     )
-    # add api's here
+    api.add_namespace(api_B, '/B')
+    api.add_namespace(api_C, '/C')
+    api.add_namespace(api_D, '/D')
+    api.add_namespace(api_F, '/F')
 
 
 class BaseTestCase(TestCase):
