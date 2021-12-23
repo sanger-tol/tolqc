@@ -102,25 +102,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
-    def _individual_schema_model_dict(cls):
-        id_field = cls._get_dict_schema().pop('id', None)
-
-        return {
-            'type': 'object',
-            'required': ['type', 'attributes', 'id'],
-            'properties': {
-                "type": {
-                    'type': 'string',
-                    'default': cls.get_type(),
-                },
-                "id": id_field,
-                "attributes": cls._individual_attributes_schem_model_dict(
-                    exclude_fields=['id', 'created_by', 'created_at']
-                )
-            }
-        }
-
-    @classmethod
     def _get_field_schema_model_type(cls, field):
         model = cls.Meta.model
         python_type = model.get_column_python_type(
