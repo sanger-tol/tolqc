@@ -14,8 +14,8 @@ from main.model import db
 
 
 def setup_schema(OldCls):
-    import logging #reeemove
-    logging.warning(OldCls.create_relationship_fields())
+    """Dynamically adds relationship fields to a Schema Class inheriting
+    from BaseSchema"""
     NewCls = type(
         f'_{OldCls.get_type().title()}Schema',
         (OldCls,),
