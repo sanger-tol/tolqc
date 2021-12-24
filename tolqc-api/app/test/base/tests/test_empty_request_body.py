@@ -34,4 +34,35 @@ class TestEmptyRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    #TODO add 200 tests with PATCH
+    
+    
+    def test_patch_C_with_empty_request_body_400(self):
+        self.add_C(id=9099)
+        response = self.client.open(
+            '/api/v1/C/9099',
+            method='PATCH',
+            json={},
+            headers=self._get_api_key()
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+    
+    def test_patch_C_with_no_attributes_200(self):
+        self.add_C(id=9099)
+        response = self.client.open(
+            '/api/v1/C/9099',
+            method='PATCH',
+            json={
+                'data': {
+                    'type': 'C',
+                    'attributes': {}
+                }
+            },
+            headers=self._get_api_key()
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
