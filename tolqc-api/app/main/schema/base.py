@@ -275,7 +275,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @pre_load(pass_many=True)
     def remove_resource_metadata(self, data, **kwargs):
-        self._resource_meta = data['data'].pop('meta', {})
+        self._resource_meta = data.get('data', {}).pop('meta', {})
         return data
 
     @post_load
