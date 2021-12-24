@@ -64,5 +64,5 @@ class TestCase(FlaskTestCase):
 
         db.session.commit()
 
-    def assert201(self, response):
+    def assert201(self, response, *args):
         self.assertEqual(response.status_code, 201)

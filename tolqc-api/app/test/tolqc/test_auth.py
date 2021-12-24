@@ -59,6 +59,7 @@ class TestAuthentication(TolqcTestCase):
             headers=good_api_key
         )
         self.assert201(response)
+        created_id = response.json['data']['id']
         expect_data = {
             "data": {
                 "type": "centres",
@@ -67,7 +68,7 @@ class TestAuthentication(TolqcTestCase):
                     "name": "David",
                     "created_at": response.json['data']['attributes']['created_at'],
                 },
-                "id": response.json['data']['id'],
+                "id": created_id,
                 "relationships": {
                     "creator": {
                         "data": {
@@ -85,7 +86,7 @@ class TestAuthentication(TolqcTestCase):
 
         # GET data without api key
         response = self.client.open(
-            '/api/v1/centres/1',
+            f'/api/v1/centres/{created_id}',
             method='GET',
         )
         self.assert200(response)
@@ -93,7 +94,7 @@ class TestAuthentication(TolqcTestCase):
 
         # GET data with api key
         response = self.client.open(
-            '/api/v1/centres/1',
+            f'/api/v1/centres/{created_id}',
             method='GET',
             headers=good_api_key
         )
