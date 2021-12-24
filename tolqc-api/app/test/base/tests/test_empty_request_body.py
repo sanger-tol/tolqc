@@ -17,7 +17,7 @@ class TestEmptyRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_post_D_with_no_data_400(self):
         response = self.client.open(
             '/api/v1/D',
@@ -34,8 +34,7 @@ class TestEmptyRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
-    
+
     def test_patch_C_with_empty_request_body_400(self):
         self.add_C(id=9099)
         response = self.client.open(
@@ -48,7 +47,7 @@ class TestEmptyRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_patch_C_with_no_attributes_200(self):
         self.add_C(id=9099)
         response = self.client.open(

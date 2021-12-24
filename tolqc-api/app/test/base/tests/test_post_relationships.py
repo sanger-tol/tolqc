@@ -26,7 +26,7 @@ class TestPostRelationships(BaseTestCase):
                     }
                 }
             },
-            headers = self._get_api_key()
+            headers=self._get_api_key()
         )
         self.assert201(
             response,
@@ -79,7 +79,7 @@ class TestPostRelationships(BaseTestCase):
                     }
                 }
             },
-            headers = self._get_api_key()
+            headers=self._get_api_key()
         )
         self.assert400(
             response,

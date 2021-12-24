@@ -68,7 +68,7 @@ class BaseService:
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
-        
+
     @classmethod
     def error_400(cls, message):
         return cls.custom_individual_error(

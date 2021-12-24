@@ -61,7 +61,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         )
         F_instance = F_ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.ext, extra_fields)
-    
+
     def test_no_extra_fields_post_F_201(self):
         response = self.client.open(
             '/api/v1/F',
@@ -77,7 +77,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             headers=self._get_api_key()
         )
         self.assert201(response)
-    
+
         id = response.json['data']['id']
         self.assertEqual(
             response.json,
@@ -121,7 +121,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
     def test_no_extra_fields_get_F_200(self):
         self.add_F(id=290)
 
@@ -149,7 +149,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
                 }
             }
         )
-    
+
     def test_variety_type_extra_fields_get_F_200(self):
         ext_data = {
             "arrayData": [27, {
@@ -183,7 +183,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
                 }
             }
         )
-    
+
     def test_extra_fields_overwrite_patch_F_200(self):
         self.add_F(
             id=90900,
