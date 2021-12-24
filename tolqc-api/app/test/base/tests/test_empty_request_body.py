@@ -34,3 +34,4 @@ class TestEmptyRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+    #TODO add 200 tests with PATCH
