@@ -184,7 +184,7 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             }
         )
     
-    def test_extra_fields_patch_F_200(self):
+    def test_extra_fields_overwrite_patch_F_200(self):
         self.add_F(
             id=90900,
             ext={
@@ -236,5 +236,3 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             }
         }
         self.assertEqual(response.json, expected)
-
-    #TODO add post with relationship test
