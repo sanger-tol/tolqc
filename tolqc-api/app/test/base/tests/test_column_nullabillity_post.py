@@ -42,15 +42,18 @@ class TestColumnNullabilityPost(BaseTestCase):
         response = self.client.open(
             '/api/v1/D',
             method='POST',
-            json=[{
-                "other_column": "no matter"
-            }]
+            json={
+                "data": {
+                    "type": "D",
+                    "attributes": {
+                        "other_column": "no matter"
+                    }
+                }
+            },
+            headers=self._get_api_key()
         )
-        self.assert200(
+        self.assert400(
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        errors = response.json['meta']['errors']
-        self.assertEqual(len(errors), 1)
-        self.assertNotEqual(errors[0], None)
 

@@ -7,6 +7,7 @@ import json
 from flask import Response, request
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
+from marshmallow import ValidationError
 
 from main.model import InstanceDoesNotExistException
 
@@ -32,6 +33,18 @@ def handle_400_db_integrity_error(function):
                 "This is most likely due to either a dependency on "
                 "this instance, if deleting, or a foreign reference "
                 "to an object that does not exist, if creating/updating."
+            )
+    return wrapper
+
+
+def handle_400_validation_error(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            return function(cls, *args, **kwargs)
+        except ValidationError as e:
+            return cls.error_400(
+                e.messages
             )
     return wrapper
 
@@ -129,6 +142,7 @@ class BaseService:
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
+    @handle_400_validation_error
     @handle_404
     def update_by_id(cls, id, data, user_id=None):
         schema = cls.Meta.schema()
@@ -152,6 +166,7 @@ class BaseService:
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
+    @handle_400_validation_error
     def create(cls, data, user_id=None):
         schema = cls.Meta.schema()
         model_instance = schema.load(data)
