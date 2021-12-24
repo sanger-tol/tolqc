@@ -96,3 +96,28 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
         )
         F_instance = F_ModelWithExtField.find_by_id(id)
         self.assertEqual(F_instance.ext, {})
+
+    def test_extra_fields_patch_B_400(self):
+        self.add_A(id=50)
+        self.add_B(id=20, a_id=50)
+
+        response = self.client.open(
+            '/api/v1/B/20',
+            method='PATCH',
+            json={
+                'data': {
+                    'type': 'B',
+                    'attributes': {},
+                    'meta': {
+                        'ext': {
+                            'extra_field': 'superfluity'
+                        }
+                    }
+                }
+            },
+            headers=self._get_api_key()
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )

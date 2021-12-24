@@ -4,6 +4,7 @@
 
 from datetime import datetime
 from marshmallow.decorators import post_dump, pre_dump, post_load, pre_load
+from marshmallow.exceptions import ValidationError
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
@@ -276,6 +277,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @pre_load(pass_many=True)
     def remove_resource_metadata(self, data, **kwargs):
         self._resource_meta = data.get('data', {}).pop('meta', {})
+        if not self.has_ext_field() and 'ext' in self._resource_meta:
+            raise ValidationError(
+                f'Extra fields are not permitted on {self.get_type()}.'
+            )
         return data
 
     @post_load
