@@ -92,3 +92,5 @@ Bespoke endpoints do not need to (and probably shouldn't) inherit from the base 
 ## Limitations
 
 - Compound/composite keys are not supported
+- Model tablenames must be plural
+    - This is because the endpoint and "JSON:API Resource type" is equal to this
