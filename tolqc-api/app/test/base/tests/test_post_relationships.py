@@ -58,3 +58,30 @@ class TestPostRelationships(BaseTestCase):
                 }
             }
         )
+
+    def test_post_B_bad_relationship_400(self):
+        self.add_A(id=300)
+
+        response = self.client.open(
+            '/api/v1/B',
+            method='POST',
+            json={
+                'data': {
+                    'type': 'B',
+                    'attributes': {},
+                    'relationships': {
+                        'A': {
+                            'data': {
+                                'type': 'A',
+                                'id': '57900'
+                            }
+                        }
+                    }
+                }
+            },
+            headers = self._get_api_key()
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
