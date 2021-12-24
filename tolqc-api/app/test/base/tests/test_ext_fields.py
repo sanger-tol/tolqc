@@ -149,4 +149,38 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
                 }
             }
         )
+    
+    def test_variety_type_extra_fields_get_F_200(self):
+        ext_data = {
+            "arrayData": [27, {
+                "testElement": "123"
+            }],
+            "float": 9090.248,
+            "null": [None]
+        }
+        self.add_F(id=297, ext=ext_data)
+
+        response = self.client.open(
+            '/api/v1/F/297',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(
+            response.json,
+            {
+                'data': {
+                    'type': 'F',
+                    'id': '297',
+                    'attributes': {
+                        'other_column': None
+                    },
+                    'meta': {
+                        'ext': ext_data
+                    }
+                }
+            }
+        )
     #TODO add post with relationship test
