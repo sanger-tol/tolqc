@@ -121,3 +121,32 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+    
+    def test_no_extra_fields_get_F_200(self):
+        self.add_F(id=290)
+
+        response = self.client.open(
+            '/api/v1/F/290',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+
+        self.assertEqual(
+            response.json,
+            {
+                'data': {
+                    'type': 'F',
+                    'id': '290',
+                    'attributes': {
+                        'other_column': None
+                    },
+                    'meta': {
+                        'ext': {}
+                    }
+                }
+            }
+        )
+    #TODO add post with relationship test
