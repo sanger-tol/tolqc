@@ -183,4 +183,58 @@ class TestExtraFieldsInRequestBody(BaseTestCase):
                 }
             }
         )
+    
+    def test_extra_fields_patch_F_200(self):
+        self.add_F(
+            id=90900,
+            ext={
+                "first": "nice",
+                "second": "nicer",
+                "third": "nicest",
+                "fourth": "irrelevant"
+            }
+        )
+        # overwrite 1,2 ; remove 3, leave 4 unchanged, add 5
+        response = self.client.open(
+            '/api/v1/F/90900',
+            method='PATCH',
+            json={
+                'data': {
+                    'type': 'F',
+                    'attributes': {},
+                    'meta': {
+                        'ext': {
+                            "first": "not very nice",
+                            "second": "much less nice",
+                            "third": None,
+                            "fifth": "the worst of the bunch"
+                        }
+                    }
+                }
+            },
+            headers=self._get_api_key()
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        expected = {
+            'data': {
+                'type': 'F',
+                'id': '90900',
+                'attributes': {
+                    'other_column': None
+                },
+                'meta': {
+                    "ext": {
+                        "first": "not very nice",
+                        "second": "much less nice",
+                        "fourth": "irrelevant",
+                        "fifth": "the worst of the bunch",
+                    },
+                }
+            }
+        }
+        self.assertEqual(response.json, expected)
+
     #TODO add post with relationship test

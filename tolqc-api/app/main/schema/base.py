@@ -271,7 +271,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             )
         for field, value in data.items():
             setattr(instance, field, value)
-            instance.update_ext(ext)
+        instance.update_ext(ext)
         return instance
 
     @pre_load(pass_many=True)
