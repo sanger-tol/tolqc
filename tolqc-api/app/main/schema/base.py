@@ -68,6 +68,16 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return lookup_map.get(foreign_key_name, target_table)
 
     @classmethod
+    def _create_relationship_field(cls, target_table, target_column, foreign_key_name):
+        return Relationship(
+            f'/{target_table}/{{{target_column}}}',
+            related_url_kwargs={f'{target_column}': f'<{foreign_key_name}>'},
+            include_resource_linkage=True,
+            type_=target_table,
+            attribute=foreign_key_name
+        )
+
+    @classmethod
     def _create_relationship_field_by_name(cls, foreign_key_name):
         target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(
             foreign_key_name
@@ -76,13 +86,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             foreign_key_name,
             target_table
         )
-
-        return special_name, Relationship(
-            f'/{target_table}/{{{target_column}}}',
-            related_url_kwargs={f'{target_column}': f'<{foreign_key_name}>'},
-            include_resource_linkage=True,
-            type_=target_table,
-            attribute=foreign_key_name
+        return special_name, cls._create_relationship_field(
+            target_table,
+            target_column,
+            foreign_key_name
         )
 
     @classmethod
