@@ -71,7 +71,7 @@ class BaseService:
 
     @classmethod
     def error_400(cls, message):
-        return cls.custom_individual_error(
+        return cls.custom_error(
             "Bad Request",
             400,
             message
@@ -83,7 +83,7 @@ class BaseService:
 
     @classmethod
     def error_401(cls, message):
-        return cls.custom_individual_error(
+        return cls.custom_error(
             "Unauthorized",
             401,
             message
@@ -91,55 +91,27 @@ class BaseService:
 
     @classmethod
     def error_404(cls, id):
-        return cls.custom_individual_error(
+        return cls.custom_error(
             "Not Found",
             404,
             f"No {cls._get_type()} found with id {id}."
         )
 
     @classmethod
-    def _split_error_components(cls, errors):
-        titles = [e.get('title', None) for e in errors]
-        codes = [e.get('code', None) for e in errors]
-        details = [e.get('detail', None) for e in errors]
-
-        return titles, codes, details
-
-    @classmethod
-    def _format_error(cls, title, code, detail):
-        return {
-            "title": title if title else "Internal Server Error",
-            "code": code if code else 500,
-            "detail": detail if detail else "An unknown error occurred."
-        }
-
-    @classmethod
-    def custom_errors(cls, status_code=500, errors=[]):
-        """Expects a list of dicts, with keys 'title', 'code', and 'detail"""
-
-        titles, codes, details = cls._split_error_components(errors)
-        error_messages = [
-            cls._format_error(t, c, d)
-            for (t, c, d) in zip(titles, codes, details)
-        ]
-
-        response = {
-            'errors': error_messages
-        }
-
-        return Response(
-            mimetype="application/json",
-            response=json.dumps(response),
-            status=status_code
-        )
-
-    @classmethod
-    def custom_individual_error(cls, title, code, detail):
-        return cls.custom_errors(code, errors=[{
+    def custom_error(cls, title, code, detail):
+        errors=[{
             "title": title,
             "code": code,
             "detail": detail
-        }])
+        }]
+        response = {
+            'errors': errors
+        }
+        return Response(
+            mimetype="application/json",
+            response=json.dumps(response),
+            status=code
+        )
 
     @classmethod
     @handle_404
