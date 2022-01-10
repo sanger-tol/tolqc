@@ -4,3 +4,4 @@
 
 from .centre import CentreService # noqa
 from .environment import EnvironmentService # noqa
+from .user import UserService # noqa

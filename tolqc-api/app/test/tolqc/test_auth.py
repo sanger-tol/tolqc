@@ -73,10 +73,10 @@ class TestAuthentication(TolqcTestCase):
                     "creator": {
                         "data": {
                             "id": "100",
-                            "type": "user"
+                            "type": "users"
                         },
                         "links": {
-                            "related": "/user/100"
+                            "related": "/users/100"
                         }
                     }
                 }

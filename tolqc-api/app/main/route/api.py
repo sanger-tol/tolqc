@@ -6,7 +6,8 @@ from flask import Blueprint
 from flask_restx import Api
 
 from main.auth import authorizations
-from main.resource import api_centre, api_environment
+from main.resource import api_centre, api_environment, \
+                          api_user
 
 
 def _get_environment_string(app):
@@ -28,6 +29,7 @@ def _setup_api(blueprint, app):
         authorizations=authorizations
     )
     api.add_namespace(api_centre, path=_get_path(api_centre))
+    api.add_namespace(api_user, path=_get_path(api_user))
     api.add_namespace(api_environment, path='/environment')
 
 

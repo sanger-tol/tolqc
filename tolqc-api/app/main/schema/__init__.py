@@ -3,3 +3,4 @@
 # SPDX-License-Identifier: MIT
 
 from .centre import CentreSchema # noqa
+from .user import UserSchema # noqa
