@@ -43,11 +43,7 @@ def handle_400_marshmallow_error(function):
     def wrapper(cls, *args, **kwargs):
         try:
             return function(cls, *args, **kwargs)
-        except ValidationError as e:
-            return cls.error_400_marshmallow(
-                e.messages
-            )
-        except IncorrectTypeError as e:
+        except (ValidationError, IncorrectTypeError) as e:
             return cls.error_400_marshmallow(
                 e.messages
             )
