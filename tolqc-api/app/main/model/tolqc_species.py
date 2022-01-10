@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import CreationLogBase, db
+from .creation_log_base import CreationLogBase, db
 
 
 class TolqcSpecies(CreationLogBase):

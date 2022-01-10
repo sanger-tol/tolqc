@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import CreationLogBase, db
+from .creation_log_base import CreationLogBase, db
 
 
 class TolqcPlatform(CreationLogBase):
@@ -10,4 +10,4 @@ class TolqcPlatform(CreationLogBase):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     model = db.Column(db.String(), nullable=False)
-    run = db.relationship("TolqcRun", back_populates="platform")
+    runs = db.relationship("TolqcRun", back_populates="platform")

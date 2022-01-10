@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import CreationLogBase, db
+from .creation_log_base import CreationLogBase, db
 
 
 class TolqcSeq(CreationLogBase):
@@ -16,7 +16,7 @@ class TolqcSeq(CreationLogBase):
     library_instance_id = db.Column(db.Integer(), db.ForeignKey("library.id"),
                                     nullable=False)
     accession_id = db.Column(db.Integer())
-    run_instance_id = db.Column(db.Integer(), db.ForeignKey("run.id"),
+    run_instance_id = db.Column(db.Integer(), db.ForeignKey("runs.id"),
                                 nullable=False)
     processed = db.Column(db.Integer())
     tag1_id = db.Column(db.String())
@@ -33,4 +33,4 @@ class TolqcSeq(CreationLogBase):
                              foreign_keys=[sample_instance_id])
     library = db.relationship("TolqcLibrary", back_populates="seq",
                               foreign_keys=[library_instance_id])
-    run = db.relationship("TolqcRun", back_populates="seq", foreign_keys=[run_instance_id])
+    runs = db.relationship("TolqcRun", back_populates="seq", foreign_keys=[run_instance_id])
