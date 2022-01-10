@@ -112,6 +112,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         excluded_columns = cls.Meta.model.get_foreign_key_column_names()
         if cls.has_ext_field():
             excluded_columns += ['ext']
+        if not cls.has_creation_details():
+            excluded_columns += ['created_by']
         return excluded_columns
 
     @classmethod
