@@ -60,20 +60,24 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         cls.Meta.setup_meta()
 
     @classmethod
-    def _lookup_special_relationship_name(cls, foreign_key_name):
+    def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
         lookup_map = {
             'created_by': 'creator'
         }
-        return lookup_map.get(foreign_key_name, None)
+        # default to the target table if no special name
+        return lookup_map.get(foreign_key_name, target_table)
 
     @classmethod
     def _create_relationship_field_by_name(cls, foreign_key_name):
         target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(
             foreign_key_name
         )
-        special_name = cls._lookup_special_relationship_name(foreign_key_name)
+        special_name = cls._lookup_special_relationship_name(
+            foreign_key_name,
+            target_table
+        )
 
-        return special_name if special_name is not None else target_table, Relationship(
+        return special_name, Relationship(
             f'/{target_table}/{{{target_column}}}',
             related_url_kwargs={f'{target_column}': f'<{foreign_key_name}>'},
             include_resource_linkage=True,
