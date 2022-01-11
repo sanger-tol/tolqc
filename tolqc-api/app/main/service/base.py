@@ -67,7 +67,7 @@ class BaseService:
 
     @classmethod
     def error_400(cls, message):
-        return cls.custom_error(
+        return cls._custom_error(
             "Bad Request",
             400,
             message
@@ -79,7 +79,7 @@ class BaseService:
 
     @classmethod
     def error_401(cls, message):
-        return cls.custom_error(
+        return cls._custom_error(
             "Unauthorized",
             401,
             message
@@ -87,14 +87,14 @@ class BaseService:
 
     @classmethod
     def error_404(cls, id):
-        return cls.custom_error(
+        return cls._custom_error(
             "Not Found",
             404,
             f"No {cls._get_type()} found with id {id}."
         )
 
     @classmethod
-    def custom_error(cls, title, code, detail):
+    def _custom_error(cls, title, code, detail):
         errors = [{
             "title": title,
             "code": code,
