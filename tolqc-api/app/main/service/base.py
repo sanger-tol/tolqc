@@ -95,7 +95,7 @@ class BaseService:
 
     @classmethod
     def custom_error(cls, title, code, detail):
-        errors=[{
+        errors = [{
             "title": title,
             "code": code,
             "detail": detail
