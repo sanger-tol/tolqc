@@ -5,3 +5,4 @@
 from .centre import CentreSwagger # noqa
 from .environment import EnvironmentSwagger # noqa
 from .user import UserSwagger # noqa
+from .run import RunSwagger # noqa

@@ -4,3 +4,4 @@
 
 from .centre import CentreSchema # noqa
 from .user import UserSchema # noqa
+from .run import RunSchema # noqa
