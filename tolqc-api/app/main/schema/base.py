@@ -226,7 +226,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                         },
                         'id': {
                             'type': 'string',
-                            'default': 1
+                            'default': "1"
                         }
                     }
                 }
