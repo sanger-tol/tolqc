@@ -51,9 +51,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     created_by = Str(dump_only=True)
     resource_meta = ResourceMeta(required=False)
 
-    # maps the relationship name to its target table
-    relationship_target_tables = {}
-
     def __init__(self, **kwargs):
         exclude = self.get_excluded_columns()
         return super().__init__(exclude=exclude, **kwargs)
@@ -99,6 +96,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def create_relationship_fields(cls):
         foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
+        # maps the relationship name to its target table
+        cls.relationship_target_tables = {}
         pairs = [
             cls._create_relationship_field_by_name(foreign_key_name)
             for foreign_key_name in foreign_key_names
