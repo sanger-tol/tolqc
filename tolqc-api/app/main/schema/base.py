@@ -211,7 +211,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             if f not in non_required_fields
             and f not in exclude_fields
         ]
-    
+
     @classmethod
     def _get_individual_relationship_dict(cls, target_table):
         return {
@@ -232,7 +232,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 }
             }
         }
-    
+
     @classmethod
     def _get_relationships_dict(cls):
         excluded_relationships = ['creator']
