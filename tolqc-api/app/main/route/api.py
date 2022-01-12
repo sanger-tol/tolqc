@@ -31,7 +31,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_centre, path=_get_path(api_centre))
     api.add_namespace(api_user, path=_get_path(api_user))
     api.add_namespace(api_run, path=_get_path(api_run))
-    api.add_namespace(api_environment, path='/environment')
+    api.add_namespace(api_environment, path='/environments')
 
 
 def init_blueprint(app):
