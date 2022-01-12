@@ -99,9 +99,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             cls._create_relationship_field_by_name(foreign_key_name)
             for foreign_key_name in foreign_key_names
         ]
-        return {
+        cls.relationship_fields = {
             field_name: field for (field_name, field) in pairs
         }
+        return cls.relationship_fields
 
     @classmethod
     def get_type(cls):
