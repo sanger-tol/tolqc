@@ -86,6 +86,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             foreign_key_name,
             target_table
         )
+        cls.relationship_target_tables[special_name] = target_table
         return special_name, cls._create_relationship_field(
             target_table,
             target_column,
@@ -95,14 +96,14 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def create_relationship_fields(cls):
         foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
+        cls.relationship_target_tables = {}
         pairs = [
             cls._create_relationship_field_by_name(foreign_key_name)
             for foreign_key_name in foreign_key_names
         ]
-        cls.relationship_fields = {
+        return {
             field_name: field for (field_name, field) in pairs
         }
-        return cls.relationship_fields
 
     @classmethod
     def get_type(cls):
@@ -210,11 +211,45 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             if f not in non_required_fields
             and f not in exclude_fields
         ]
+    
+    @classmethod
+    def _get_individual_relationship_dict(cls, target_table):
+        return {
+            'type': 'object',
+            'properties': {
+                'data': {
+                    'type': 'object',
+                    'properties': {
+                        'type': {
+                            'type': 'string',
+                            'default': target_table
+                        },
+                        'id': {
+                            'type': 'string',
+                            'default': 1
+                        }
+                    }
+                }
+            }
+        }
+    
+    @classmethod
+    def _get_relationships_dict(cls):
+        excluded_relationships = ['creator']
+        return {
+            'type': 'object',
+            'properties': {
+                special_name: cls._get_individual_relationship_dict(
+                    target_table
+                )
+                for (special_name, target_table)
+                in cls.relationship_target_tables.items()
+                if special_name not in excluded_relationships
+            }
+        }
 
     @classmethod
     def _to_request_schema_model_dict(cls, attributes):
-        # TODO move foreign keys/relationships
-        # under relationships!
         schema_model_dict = {
             'type': 'object',
             'required': ['data'],
@@ -229,7 +264,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                         },
                         'attributes': attributes
                     }
-                }
+                },
+                "relationships": cls._get_relationships_dict()
             }
         }
         if not cls.has_ext_field():
