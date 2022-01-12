@@ -285,7 +285,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def to_post_request_schema_model_dict(cls):
         """Returns a dict for a Model for a POST request"""
         attributes = cls._post_attributes_schema_model_dict(
-            exclude_fields=['id']
+            exclude_fields=['id'] + cls.get_excluded_columns()
         )
         return cls._to_request_schema_model_dict(attributes)
 
@@ -293,7 +293,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def to_patch_request_schema_model_dict(cls):
         """Returns a dict for a Model for a PATCH request"""
         attributes = cls._patch_attributes_schema_model_dict(
-            exclude_fields=['id']
+            exclude_fields=['id'] + cls.get_excluded_columns()
         )
         return cls._to_request_schema_model_dict(attributes)
 
