@@ -17,10 +17,6 @@ def _get_environment_string(app):
     return f" ({environment})"
 
 
-def _get_path(api_):
-    return f"/{api_.type_}"
-
-
 def _setup_api(blueprint, app):
     api = Api(
         blueprint,
@@ -28,10 +24,10 @@ def _setup_api(blueprint, app):
         title=f"Tree of Life Quality Control{_get_environment_string(app)}",
         authorizations=authorizations
     )
-    api.add_namespace(api_centre, path=_get_path(api_centre))
-    api.add_namespace(api_user, path=_get_path(api_user))
-    api.add_namespace(api_run, path=_get_path(api_run))
-    api.add_namespace(api_environment, path='/environments')
+    api.add_namespace(api_centre)
+    api.add_namespace(api_user)
+    api.add_namespace(api_run)
+    api.add_namespace(api_environment)
 
 
 def init_blueprint(app):

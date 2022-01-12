@@ -22,9 +22,9 @@ class BaseSwagger:
 
         cls.api = Namespace(
             type_,
-            description=f'Methods relating to {type_}'
+            description=f'Methods relating to {type_}',
+            path=f'/{type_}'
         )
-        cls.api.type_ = type_
 
         cls.post_request_model = cls.api.schema_model(
             f'{type_.title()} POST Request',
