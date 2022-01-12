@@ -96,3 +96,6 @@ Bespoke endpoints do not need to (and probably shouldn't) inherit from the base 
 - Compound/composite keys are not supported
 - Model tablenames must be plural
     - This is because the endpoint and "JSON:API Resource type" is equal to this
+
+It is worth noting that these limitations can be overcome by hardcoding the various classes for an endpoint,
+instead of inheriting from the base classes and letting them dynamically generate the details.
