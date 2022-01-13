@@ -11,7 +11,7 @@ class TolqcRun(CreationLogBase):
     run_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    platform_id = db.Column(db.Integer(), db.ForeignKey("platform.id"),
+    platform_id = db.Column(db.Integer(), db.ForeignKey("platforms.id"),
                             nullable=False)
     centre_id = db.Column(db.Integer(), db.ForeignKey("centres.id"),
                           nullable=False)
@@ -20,5 +20,5 @@ class TolqcRun(CreationLogBase):
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
     seq = db.relationship("TolqcSeq", back_populates="runs")
-    platform = db.relationship("TolqcPlatform", back_populates="runs", foreign_keys=[platform_id])
+    platforms = db.relationship("TolqcPlatform", back_populates="runs", foreign_keys=[platform_id])
     centres = db.relationship("TolqcCentre", back_populates="runs", foreign_keys=[centre_id])
