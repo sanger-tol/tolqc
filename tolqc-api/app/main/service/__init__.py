@@ -10,6 +10,7 @@ from .library import LibraryService # noqa
 from .platform import PlatformService # noqa
 from .project import ProjectService # noqa
 from .role import RoleService # noqa
+from .sample import SampleService # noqa
 from .seq import SeqService # noqa
 from .species import SpeciesService # noqa
 from .specimen import SpecimenService # noqa

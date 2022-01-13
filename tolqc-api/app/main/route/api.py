@@ -7,7 +7,10 @@ from flask_restx import Api
 
 from main.auth import authorizations
 from main.resource import api_centre, api_environment, \
-                          api_user, api_run
+                          api_user, api_run, api_specimen, \
+                          api_species, api_seq, api_sample, \
+                          api_project, api_platform, api_library, \
+                          api_library_type, api_allocation
 
 
 def _get_environment_string(app):
@@ -28,6 +31,15 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_user)
     api.add_namespace(api_run)
     api.add_namespace(api_environment)
+    api.add_namespace(api_specimen)
+    api.add_namespace(api_species)
+    api.add_namespace(api_seq)
+    api.add_namespace(api_sample)
+    api.add_namespace(api_project)
+    api.add_namespace(api_platform)
+    api.add_namespace(api_library)
+    api.add_namespace(api_library_type)
+    api.add_namespace(api_allocation)
 
 
 def init_blueprint(app):
