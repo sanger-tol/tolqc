@@ -26,4 +26,4 @@ class TolqcSpecimen(CreationLogBase):
     allocations = db.relationship("TolqcAllocation", back_populates="specimen")
     species = db.relationship("TolqcSpecies", back_populates="specimen",
                               foreign_keys=[species_instance_id])
-    sample = db.relationship("TolqcSample", back_populates="specimen")
+    samples = db.relationship("TolqcSample", back_populates="specimen")

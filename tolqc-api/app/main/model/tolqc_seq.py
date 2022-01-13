@@ -11,7 +11,7 @@ class TolqcSeq(CreationLogBase):
     seq_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    sample_instance_id = db.Column(db.Integer(), db.ForeignKey("sample.id"),
+    sample_instance_id = db.Column(db.Integer(), db.ForeignKey("samples.id"),
                                    nullable=False)
     library_instance_id = db.Column(db.Integer(), db.ForeignKey("libraries.id"),
                                     nullable=False)
@@ -29,7 +29,7 @@ class TolqcSeq(CreationLogBase):
     date = db.Column(db.DateTime())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    sample = db.relationship("TolqcSample", back_populates="seq",
+    samples = db.relationship("TolqcSample", back_populates="seq",
                              foreign_keys=[sample_instance_id])
     libraries = db.relationship("TolqcLibrary", back_populates="seq",
                               foreign_keys=[library_instance_id])

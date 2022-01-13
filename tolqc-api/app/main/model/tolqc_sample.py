@@ -6,7 +6,7 @@ from .creation_log_base import CreationLogBase, db
 
 
 class TolqcSample(CreationLogBase):
-    __tablename__ = "sample"
+    __tablename__ = "samples"
     id = db.Column(db.Integer(), primary_key=True)
     sample_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
@@ -17,6 +17,6 @@ class TolqcSample(CreationLogBase):
     accession_id = db.Column(db.Integer())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    specimen = db.relationship("TolqcSpecimen", back_populates="sample",
+    specimen = db.relationship("TolqcSpecimen", back_populates="samples",
                                foreign_keys=[specimen_instance_id])
-    seq = db.relationship("TolqcSeq", back_populates="sample")
+    seq = db.relationship("TolqcSeq", back_populates="samples")
