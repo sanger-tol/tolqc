@@ -6,7 +6,7 @@ from .base import Base, db
 
 
 class TolqcRole(Base):
-    __tablename__ = "role"
+    __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
