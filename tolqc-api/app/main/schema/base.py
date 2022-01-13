@@ -37,6 +37,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         sqla_session = db.session
         load_instance = True
         include_fk = True
+        excluded_relationships = ['creator']
 
         @classmethod
         def setup_meta(cls):
@@ -86,7 +87,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             foreign_key_name,
             target_table
         )
-        cls.relationship_target_tables[special_name] = target_table
+        cls.relationship_target_info[special_name] = {
+            "target_table": target_table,
+            "foreign_key_name": foreign_key_name
+        }
         return special_name, cls._create_relationship_field(
             target_table,
             target_column,
@@ -97,7 +101,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def create_relationship_fields(cls):
         foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
         # maps the relationship name to its target table
-        cls.relationship_target_tables = {}
+        cls.relationship_target_info = {}
         pairs = [
             cls._create_relationship_field_by_name(foreign_key_name)
             for foreign_key_name in foreign_key_names
@@ -236,16 +240,15 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _get_relationships_dict(cls):
-        excluded_relationships = ['creator']
         return {
             'type': 'object',
             'properties': {
                 special_name: cls._get_individual_relationship_dict(
-                    target_table
+                    cls.relationship_target_info[special_name]["target_table"]
                 )
-                for (special_name, target_table)
-                in cls.relationship_target_tables.items()
-                if special_name not in excluded_relationships
+                for special_name
+                in cls.relationship_target_info.keys()
+                if special_name not in cls.Meta.excluded_relationships
             }
         }
 
@@ -299,6 +302,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls._to_request_schema_model_dict(attributes)
 
     def _make_instance_without_ext(self, data, **kwargs):
+        #REEmove
+        import logging
+        logging.warning(data)
         instance = self.instance
         if instance is None:
             return self.Meta.model(**data)
@@ -325,17 +331,40 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         instance.update_ext(ext)
         return instance
 
-    @pre_load(pass_many=True)
-    def remove_resource_metadata(self, data, **kwargs):
+    def _remove_resource_metadata(self, data):
         self._resource_meta = data.get('data', {}).pop('meta', {})
         if not self.has_ext_field() and 'ext' in self._resource_meta:
             raise ValidationError(
                 f'Extra fields are not permitted on {self.get_type()}.'
             )
+
+    def _get_relationship_id(self, data, special_name):
+        return data.get('relationships', {}) \
+                   .get(special_name, {}) \
+                   .get('data', {}) \
+                   .get('id', None)
+    
+    def _store_relationship_ids(self, data):
+        self._relationship_ids = {
+            self.relationship_target_info[special_name][
+                'foreign_key_name'
+            ]: self._get_relationship_id(data, special_name)
+            for special_name
+            in self.relationship_target_info.keys()
+            if special_name not in self.Meta.excluded_relationships
+        }
+
+    @pre_load(pass_many=True)
+    def preprocess_instance(self, data, **kwargs):
+        self._remove_resource_metadata(data)
+        self._store_relationship_ids(data)
         return data
 
     @post_load
     def make_instance(self, data, **kwargs):
+        # add in stored relationship variables
+        data = {**data, **self._relationship_ids}
+        
         # self.instance is part of a private API
         if self.has_ext_field():
             return self._make_instance_including_ext(data, **kwargs)
