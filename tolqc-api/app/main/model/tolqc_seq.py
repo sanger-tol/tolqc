@@ -30,7 +30,7 @@ class TolqcSeq(CreationLogBase):
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
     samples = db.relationship("TolqcSample", back_populates="seqs",
-                             foreign_keys=[sample_instance_id])
+                              foreign_keys=[sample_instance_id])
     libraries = db.relationship("TolqcLibrary", back_populates="seqs",
-                              foreign_keys=[library_instance_id])
+                                foreign_keys=[library_instance_id])
     runs = db.relationship("TolqcRun", back_populates="seqs", foreign_keys=[run_instance_id])

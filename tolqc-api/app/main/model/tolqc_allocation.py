@@ -12,6 +12,6 @@ class TolqcAllocation(CreationLogBase):
     specimen_instance_id = db.Column(db.Integer(), db.ForeignKey("specimens.id"))
     is_primary = db.Column(db.Boolean())
     projects = db.relationship("TolqcProject", back_populates="allocations",
-                              foreign_keys=[project_id])
+                               foreign_keys=[project_id])
     specimens = db.relationship("TolqcSpecimen", back_populates="allocations",
-                               foreign_keys=[specimen_instance_id])
+                                foreign_keys=[specimen_instance_id])
