@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from .allocation import AllocationService # noqa
 from .centre import CentreService # noqa
 from .environment import EnvironmentService # noqa
 from .library_type import LibraryTypeService # noqa
