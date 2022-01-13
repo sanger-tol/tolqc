@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import SubBase, db
+from .creation_log_base import CreationLogBase, db
 
 
-class TolqcCentre(SubBase):
-    __tablename__ = "centre"
+class TolqcCentre(CreationLogBase):
+    __tablename__ = "centres"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    run = db.relationship("TolqcRun", back_populates="centre")
+    runs = db.relationship("TolqcRun", back_populates="centres")

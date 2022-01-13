@@ -10,7 +10,7 @@ Flask-SQLAlchemy == 2.4.4
 flask-restx == 0.5.1
 marshmallow == 3.14.1
 flask-marshmallow == 0.14.0
-marshmallow-sqlalchemy == 0.26.1
+marshmallow-sqlalchemy == 0.27.0
 marshmallow-jsonapi == 0.24.0
 psycopg2-binary == 2.8.6
 responses

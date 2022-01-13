@@ -4,6 +4,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.inspection import inspect
 
 db = SQLAlchemy()
 
@@ -14,6 +15,11 @@ class ExtraFieldsNotPermittedException(Exception):
 
     def get_extra_fields_str(self):
         return ', '.join(self._ext_fields.keys())
+
+
+class InstanceDoesNotExistException(Exception):
+    def __init__(self, id):
+        self.id = id
 
 
 class ExtColumn(db.Column):
@@ -27,8 +33,12 @@ class ExtColumn(db.Column):
 
 
 class Base(db.Model):
-    """The base model class. Its primary key must be called
-    id"""
+    """The base model class:
+    - Its primary key must be called id.
+    - Do not call anything other than an ExtColumn 'ext'.
+    - The declared tablename will be the endpoint stem
+        - It should be plural
+    """
     __abstract__ = True
 
     def to_dict(cls):
@@ -37,7 +47,7 @@ class Base(db.Model):
     def add(self):
         db.session.add(self)
 
-    def _update_ext(self, ext_data_changes):
+    def update_ext(self, ext_data_changes):
         if not self.has_ext_column():
             raise ExtraFieldsNotPermittedException(
                 ext_data_changes
@@ -45,7 +55,7 @@ class Base(db.Model):
         ext_data = {**self.ext}
         for key, item in ext_data_changes.items():
             if item is None:
-                if ext_data[key]:
+                if key in ext_data:
                     del ext_data[key]
             else:
                 ext_data[key] = item
@@ -53,27 +63,23 @@ class Base(db.Model):
 
     def update(self, data):
         for key, item in data.items():
-            if key == 'ext':
-                self._update_ext(item)
-            else:
-                setattr(self, key, item)
+            setattr(self, key, item)
 
     def delete(self):
         db.session.delete(self)
+        self.commit()
 
     @classmethod
     def commit(cls):
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            raise(e)
 
     def save(self):
-        try:
-            self.add()
-            self.commit()
-            return None
-        except IntegrityError:
-            self.rollback()
-            # TODO make better error message, in separate module
-            return "DB integrity error"
+        self.add()
+        self.commit()
 
     @classmethod
     def find_bulk(cls, **kwargs):
@@ -84,13 +90,16 @@ class Base(db.Model):
         db.session.rollback()
 
     @staticmethod
-    def bulk_update(data):
+    def bulk_add(data):
         db.session.add_all(data)
         db.session.commit()
 
     @classmethod
     def find_by_id(cls, _id):
-        return cls.query.filter_by(id=_id).one_or_none()
+        instance = cls.query.filter_by(id=_id).one_or_none()
+        if instance is None:
+            raise InstanceDoesNotExistException(_id)
+        return instance
 
     @classmethod
     def _get_columns(cls):
@@ -119,3 +128,29 @@ class Base(db.Model):
     @classmethod
     def has_ext_column(cls):
         return 'ext' in cls.get_column_names()
+
+    @classmethod
+    def has_creation_details(cls):
+        return False
+
+    @classmethod
+    def get_foreign_key_column_names(cls):
+        return [
+            c.name for c in cls._get_columns()
+            if c.foreign_keys
+        ]
+
+    @classmethod
+    def get_relationship_from_foreign_key(cls, column_name):
+        """Returns a pair:
+        - The target table's name
+        - The name of the target column on the target table
+        """
+        # TODO make this support composite/compound keys
+        foreign_key = list(cls.__table__.columns[column_name].foreign_keys)[0]
+        target_table, target_column = foreign_key.target_fullname.split('.')
+        return target_table, target_column
+
+    @classmethod
+    def get_relationships_dict(cls):
+        return inspect(cls).relationships.items()

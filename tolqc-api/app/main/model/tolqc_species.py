@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import SubBase, db
+from .creation_log_base import CreationLogBase, db
 
 
-class TolqcSpecies(SubBase):
+class TolqcSpecies(CreationLogBase):
     __tablename__ = "species"
     id = db.Column(db.Integer(), primary_key=True)
     species_id = db.Column(db.Integer(), nullable=False)
@@ -22,4 +22,4 @@ class TolqcSpecies(SubBase):
     chromosome_number = db.Column(db.Integer())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    specimen = db.relationship("TolqcSpecimen", back_populates="species")
+    specimens = db.relationship("TolqcSpecimen", back_populates="species")

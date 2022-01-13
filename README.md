@@ -13,7 +13,7 @@ To run the app on a Docker container, first you will need to set up a file with 
 docker-compose --env-file .env.dev up --build --abort-on-container-exit tolqc-api tolqc-ui tolqc-db
 
 # Running API tests
-docker-compose --env-file .env.dev up --build --abort-on-container-exit tolqc-api-test tolqc-db-core-test
+docker-compose --env-file .env.dev up --build --abort-on-container-exit tolqc-api-test
 
 # Running UI tests (watch mode)
 docker-compose --env-file .env.dev up --build --abort-on-container-exit tolqc-ui-test

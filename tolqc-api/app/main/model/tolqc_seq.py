@@ -2,21 +2,21 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sub_base import SubBase, db
+from .creation_log_base import CreationLogBase, db
 
 
-class TolqcSeq(SubBase):
-    __tablename__ = "seq"
+class TolqcSeq(CreationLogBase):
+    __tablename__ = "seqs"
     id = db.Column(db.Integer(), primary_key=True)
     seq_id = db.Column(db.Integer(), nullable=False)
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
-    sample_instance_id = db.Column(db.Integer(), db.ForeignKey("sample.id"),
+    sample_instance_id = db.Column(db.Integer(), db.ForeignKey("samples.id"),
                                    nullable=False)
-    library_instance_id = db.Column(db.Integer(), db.ForeignKey("library.id"),
+    library_instance_id = db.Column(db.Integer(), db.ForeignKey("libraries.id"),
                                     nullable=False)
     accession_id = db.Column(db.Integer())
-    run_instance_id = db.Column(db.Integer(), db.ForeignKey("run.id"),
+    run_instance_id = db.Column(db.Integer(), db.ForeignKey("runs.id"),
                                 nullable=False)
     processed = db.Column(db.Integer())
     tag1_id = db.Column(db.String())
@@ -29,8 +29,8 @@ class TolqcSeq(SubBase):
     date = db.Column(db.DateTime())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    sample = db.relationship("TolqcSample", back_populates="seq",
-                             foreign_keys=[sample_instance_id])
-    library = db.relationship("TolqcLibrary", back_populates="seq",
-                              foreign_keys=[library_instance_id])
-    run = db.relationship("TolqcRun", back_populates="seq", foreign_keys=[run_instance_id])
+    samples = db.relationship("TolqcSample", back_populates="seqs",
+                              foreign_keys=[sample_instance_id])
+    libraries = db.relationship("TolqcLibrary", back_populates="seqs",
+                                foreign_keys=[library_instance_id])
+    runs = db.relationship("TolqcRun", back_populates="seqs", foreign_keys=[run_instance_id])
