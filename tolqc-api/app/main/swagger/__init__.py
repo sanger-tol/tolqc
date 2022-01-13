@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from .allocation import AllocationSwagger # noqa
 from .centre import CentreSwagger # noqa
 from .environment import EnvironmentSwagger # noqa
 from .library_type import LibraryTypeSwagger # noqa
