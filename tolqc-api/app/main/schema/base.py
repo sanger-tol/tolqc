@@ -302,9 +302,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls._to_request_schema_model_dict(attributes)
 
     def _make_instance_without_ext(self, data, **kwargs):
-        #REEmove
-        import logging
-        logging.warning(data)
         instance = self.instance
         if instance is None:
             return self.Meta.model(**data)
