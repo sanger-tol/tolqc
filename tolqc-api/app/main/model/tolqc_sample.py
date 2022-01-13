@@ -12,11 +12,11 @@ class TolqcSample(CreationLogBase):
     name = db.Column(db.String(), nullable=False)
     hierarchy_name = db.Column(db.String(), nullable=False)
     lims_id = db.Column(db.Integer())
-    specimen_instance_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"),
+    specimen_instance_id = db.Column(db.Integer(), db.ForeignKey("specimens.id"),
                                      nullable=False)
     accession_id = db.Column(db.Integer())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    specimen = db.relationship("TolqcSpecimen", back_populates="samples",
+    specimens = db.relationship("TolqcSpecimen", back_populates="samples",
                                foreign_keys=[specimen_instance_id])
     seqs = db.relationship("TolqcSeq", back_populates="samples")

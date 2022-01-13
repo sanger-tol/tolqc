@@ -22,4 +22,4 @@ class TolqcSpecies(CreationLogBase):
     chromosome_number = db.Column(db.Integer())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    specimen = db.relationship("TolqcSpecimen", back_populates="species")
+    specimens = db.relationship("TolqcSpecimen", back_populates="species")
