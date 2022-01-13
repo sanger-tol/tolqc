@@ -6,7 +6,7 @@ from test.base import BaseTestCase
 
 
 class TestPostRelationships(BaseTestCase):
-    def test_post_B_good_relationship_200(self):
+    def test_post_B_good_relationship_201(self):
         self.add_A(id=300)
 
         response = self.client.open(

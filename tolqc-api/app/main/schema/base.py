@@ -266,10 +266,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                             'type': 'string',
                             'default': cls.get_type()
                         },
-                        'attributes': attributes
+                        'attributes': attributes,
+                        'relationships': cls._get_relationships_dict()
                     }
-                },
-                "relationships": cls._get_relationships_dict()
+                }
             }
         }
         if not cls.has_ext_field():
@@ -338,33 +338,13 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 f'Extra fields are not permitted on {self.get_type()}.'
             )
 
-    def _get_relationship_id(self, data, special_name):
-        return data.get('relationships', {}) \
-                   .get(special_name, {}) \
-                   .get('data', {}) \
-                   .get('id', None)
-    
-    def _store_relationship_ids(self, data):
-        self._relationship_ids = {
-            self.relationship_target_info[special_name][
-                'foreign_key_name'
-            ]: self._get_relationship_id(data, special_name)
-            for special_name
-            in self.relationship_target_info.keys()
-            if special_name not in self.Meta.excluded_relationships
-        }
-
     @pre_load(pass_many=True)
     def preprocess_instance(self, data, **kwargs):
         self._remove_resource_metadata(data)
-        self._store_relationship_ids(data)
         return data
 
     @post_load
     def make_instance(self, data, **kwargs):
-        # add in stored relationship variables
-        data = {**data, **self._relationship_ids}
-        
         # self.instance is part of a private API
         if self.has_ext_field():
             return self._make_instance_including_ext(data, **kwargs)
