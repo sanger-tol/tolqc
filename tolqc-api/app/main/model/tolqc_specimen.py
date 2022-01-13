@@ -23,7 +23,7 @@ class TolqcSpecimen(CreationLogBase):
     mother_id = db.Column(db.Integer())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    allocation = db.relationship("TolqcAllocation", back_populates="specimen")
+    allocations = db.relationship("TolqcAllocation", back_populates="specimen")
     species = db.relationship("TolqcSpecies", back_populates="specimen",
                               foreign_keys=[species_instance_id])
     sample = db.relationship("TolqcSample", back_populates="specimen")

@@ -6,12 +6,12 @@ from .creation_log_base import CreationLogBase, db
 
 
 class TolqcAllocation(CreationLogBase):
-    __tablename__ = "allocation"
+    __tablename__ = "allocations"
     id = db.Column(db.Integer(), primary_key=True)
     project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
     specimen_instance_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"))
     is_primary = db.Column(db.Boolean())
-    project = db.relationship("TolqcProject", back_populates="allocation",
+    project = db.relationship("TolqcProject", back_populates="allocations",
                               foreign_keys=[project_id])
-    specimen = db.relationship("TolqcSpecimen", back_populates="allocation",
+    specimen = db.relationship("TolqcSpecimen", back_populates="allocations",
                                foreign_keys=[specimen_instance_id])
