@@ -123,10 +123,10 @@ class Base(db.Model):
         db.session.commit()
 
     @classmethod
-    def find_by_id(cls, _id):
-        instance = cls.query.filter_by(id=_id).one_or_none()
+    def find_by_id(cls, id_):
+        instance = cls.query.filter_by(id=id_).one_or_none()
         if instance is None:
-            raise InstanceDoesNotExistException(_id)
+            raise InstanceDoesNotExistException(id_)
         return instance
 
     @classmethod
