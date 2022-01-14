@@ -100,7 +100,7 @@ class BaseListResource(Resource):
 
     @classmethod
     def get(cls, user_id=None):
-        return cls.Meta.service.find_bulk(user_id=user_id)
+        return cls.Meta.service.read_bulk(user_id=user_id)
 
     @classmethod
     def post(cls, user_id=None):

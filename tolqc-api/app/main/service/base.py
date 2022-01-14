@@ -152,7 +152,7 @@ class BaseService:
         return schema.dump(model_instance), 201
 
     @classmethod
-    def find_bulk(cls, user_id=None):
+    def read_bulk(cls, user_id=None):
         schema = cls.Meta.schema(many=True)
         model_instances = cls.Meta.model.find_bulk()
         return schema.dump(model_instances), 200

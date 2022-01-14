@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from sqlalchemy import and_
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
@@ -20,6 +21,17 @@ class ExtraFieldsNotPermittedException(Exception):
 class InstanceDoesNotExistException(Exception):
     def __init__(self, id):
         self.id = id
+
+
+class BadFilterKeyException(Exception):
+    def __init__(self, filter_key):
+        super().__init__(
+            f"The filter key '{filter_key}' is invalid."
+        )
+
+
+def raise_bad_filter_key_exception(filter_key):
+    raise BadFilterKeyException(filter_key)
 
 
 class ExtColumn(db.Column):
@@ -82,8 +94,25 @@ class Base(db.Model):
         self.commit()
 
     @classmethod
-    def find_bulk(cls, **kwargs):
-        return db.session.query(cls).limit(50).all()
+    def _get_eq_filter_terms(cls, eq_filters):
+        return [
+            getattr(
+                cls,
+                filter_key,
+                lambda: raise_bad_filter_key_exception(
+                    filter_key
+                )).eq(filter_value)
+            for (filter_key, filter_value)
+            in eq_filters.items()
+        ]
+
+    @classmethod
+    def find_bulk(cls, page=1, eq_filters={}):
+        eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
+        query = db.session.query(cls)
+        if eq_filter_terms:
+            query.filter(and_(*eq_filter_terms))
+        return query.limit(50).all()
 
     @staticmethod
     def rollback():
