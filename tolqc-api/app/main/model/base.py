@@ -25,9 +25,8 @@ class InstanceDoesNotExistException(Exception):
 
 class BadFilterKeyException(Exception):
     def __init__(self, filter_key):
-        super().__init__(
-            f"The filter key '{filter_key}' is invalid."
-        )
+        self.message = f"The filter key '{filter_key}' is invalid."
+        super().__init__(self.message)
 
 
 def raise_bad_filter_key_exception(filter_key):

@@ -10,7 +10,8 @@ from sqlalchemy.exc import IntegrityError
 from marshmallow import ValidationError
 from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
-from main.model import InstanceDoesNotExistException
+from main.model import InstanceDoesNotExistException, \
+                       BadFilterKeyException
 
 
 def handle_404(function):
@@ -46,6 +47,18 @@ def handle_400_marshmallow_error(function):
         except (ValidationError, IncorrectTypeError) as e:
             return cls.error_400_marshmallow(
                 e.messages
+            )
+    return wrapper
+
+
+def handle_400_bad_filter(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            return function(cls, *args, **kwargs)
+        except (BadFilterKeyException,) as e:
+            return cls.error_400(
+                e.message
             )
     return wrapper
 
@@ -152,6 +165,7 @@ class BaseService:
         return schema.dump(model_instance), 201
 
     @classmethod
+    @handle_400_bad_filter
     def read_bulk(cls, user_id=None):
         schema = cls.Meta.schema(many=True)
         model_instances = cls.Meta.model.find_bulk()
