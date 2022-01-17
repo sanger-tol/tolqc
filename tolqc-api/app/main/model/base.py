@@ -123,9 +123,28 @@ class Base(db.Model):
         return query
 
     @classmethod
+    def _preprocess_page(cls, page):
+        if not page:
+            return None
+        try:
+            page = int(page)
+        except ValueError:
+            raise BadFilterException(
+                "The page number must be an integer."
+            )
+        if page < 1:
+            raise BadFilterException(
+                "The page number must be 1 or greater."
+            )
+        return page
+
+    @classmethod
     def _get_result_page(cls, query, page):
         #TODO test for off by one errors. E.g. insert 47 results and look on page 3 for just 7
-        return query.limit(50).all()
+        page = cls._preprocess_page(page)
+        if page is not None:
+            query = query.offset((page - 1) * PAGE_SIZE)
+        return query.limit(PAGE_SIZE).all()
 
     @classmethod
     def find_bulk(cls, page=1, eq_filters={}):
