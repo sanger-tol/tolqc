@@ -139,7 +139,7 @@ class Base(db.Model):
         return page
 
     @classmethod
-    def _get_result_page(cls, query, page):
+    def _get_results_page(cls, query, page):
         #TODO test for off by one errors. E.g. insert 47 results and look on page 3 for just 7
         page = cls._preprocess_page(page)
         if page is not None:
@@ -149,7 +149,7 @@ class Base(db.Model):
     @classmethod
     def find_bulk(cls, page=1, eq_filters={}):
         query = cls._get_find_bulk_query(eq_filters)
-        return cls._get_result_page(query, page)
+        return cls._get_results_page(query, page)
 
     @staticmethod
     def rollback():
