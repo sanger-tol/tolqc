@@ -14,6 +14,10 @@ from main.model import InstanceDoesNotExistException, \
                        BadFilterKeyException
 
 
+class MalformedFilterStringException(Exception):
+    pass
+
+
 def handle_404(function):
     @wraps(function)
     def wrapper(cls, id, *args, **kwargs):
@@ -56,6 +60,7 @@ def handle_400_bad_filter(function):
     def wrapper(cls, *args, **kwargs):
         try:
             return function(cls, *args, **kwargs)
+        #TODO add type checking of values
         except (BadFilterKeyException,) as e:
             return cls.error_400(
                 e.message
@@ -71,12 +76,69 @@ def provide_body_data(function):
     return wrapper
 
 
+def provide_parameters(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            #TODO consider string delimiters - what if someone uses ' instead of "
+            page, eq_filters = cls.parse_parameters()
+            return function(
+                cls,
+                *args,
+                page=page,
+                eq_filters=eq_filters,
+                **kwargs
+            )
+        except MalformedFilterStringException:
+            return cls.error_400(
+                "The filter query parameter in the URL is malformed."
+            )
+    return wrapper
+
+
 class BaseService:
     """In meta class, requires a model class, and a schema class,
     neither of which are an instantiated instance"""
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
+
+    @classmethod
+    def _split_filter_term(cls, filter_term):
+        (filter_key, filter_value) = filter_term.split('==', 1)
+        if (
+            filter_value.startswith('"') and \
+            filter_value.endswith('"')
+        ):
+            filter_value = filter_value[1:-1]
+        return filter_key, filter_value
+
+    @classmethod
+    def _parse_filters(cls, filter_string):
+        if not filter_string:
+            return None
+        if not (
+            filter_string.startswith('[') and \
+            filter_string.endswith(']')
+        ):
+            raise MalformedFilterStringException()
+        filter_terms = [
+            cls._split_filter_term(filter_term)
+            for filter_term
+            in filter_string[1:-1].split(',')
+        ]
+        return {
+            filter_key: filter_value
+            for (filter_key, filter_value)
+            in filter_terms
+        }
+
+    @classmethod
+    def parse_parameters(cls):
+        page = request.args.get('page')
+        filter_string = request.args.get('filter')
+        eq_filters = cls._parse_filters(filter_string)
+        return page, eq_filters
 
     @classmethod
     def error_400(cls, message):
@@ -165,8 +227,12 @@ class BaseService:
         return schema.dump(model_instance), 201
 
     @classmethod
+    @provide_parameters
     @handle_400_bad_filter
-    def read_bulk(cls, user_id=None):
+    def read_bulk(cls, page=1, eq_filters={}, user_id=None):
         schema = cls.Meta.schema(many=True)
-        model_instances = cls.Meta.model.find_bulk()
+        model_instances = cls.Meta.model.find_bulk(
+            page=page,
+            eq_filters=eq_filters
+        )
         return schema.dump(model_instances), 200

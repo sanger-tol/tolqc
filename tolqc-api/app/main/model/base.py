@@ -47,8 +47,8 @@ class Base(db.Model):
     """The base model class:
     - Its primary key must be called id.
     - Do not call anything other than an ExtColumn 'ext'.
-    - The declared tablename will be the endpoint stem
-        - It should be plural
+    - The declared tablename will be the HTTP endpoint stem
+        - It should be plural, e.g. centres
     """
     __abstract__ = True
 
@@ -94,13 +94,15 @@ class Base(db.Model):
 
     @classmethod
     def _get_eq_filter_terms(cls, eq_filters):
+        if not eq_filters:
+            return None
         return [
             getattr(
                 cls,
                 filter_key,
                 lambda: raise_bad_filter_key_exception(
                     filter_key
-                )).eq(filter_value)
+                )) == filter_value
             for (filter_key, filter_value)
             in eq_filters.items()
         ]
@@ -109,8 +111,8 @@ class Base(db.Model):
     def find_bulk(cls, page=1, eq_filters={}):
         eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
         query = db.session.query(cls)
-        if eq_filter_terms:
-            query.filter(and_(*eq_filter_terms))
+        if eq_filter_terms is not None:
+            query = query.filter(and_(*eq_filter_terms))
         return query.limit(50).all()
 
     @staticmethod
