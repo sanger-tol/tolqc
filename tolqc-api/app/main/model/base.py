@@ -111,7 +111,7 @@ class Base(db.Model):
                     filter_key
                 )) == filter_value
             for (filter_key, filter_value)
-            in eq_filters.items()
+            in cls._preprocess_filters(eq_filters).items()
         ]
 
     @classmethod
@@ -124,11 +124,11 @@ class Base(db.Model):
 
     @classmethod
     def _get_result_page(cls, query, page):
+        #TODO test for off by one errors. E.g. insert 47 results and look on page 3 for just 7
         return query.limit(50).all()
 
     @classmethod
     def find_bulk(cls, page=1, eq_filters={}):
-        eq_filters = cls._preprocess_filters(eq_filters)
         query = cls._get_find_bulk_query(eq_filters)
         return cls._get_result_page(query, page)
 
