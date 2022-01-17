@@ -11,7 +11,7 @@ from marshmallow import ValidationError
 from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
 from main.model import InstanceDoesNotExistException, \
-                       BadFilterKeyException
+                       BadFilterException
 
 
 class MalformedFilterStringException(Exception):
@@ -61,7 +61,7 @@ def handle_400_bad_filter(function):
         try:
             return function(cls, *args, **kwargs)
         #TODO add type checking of values
-        except (BadFilterKeyException,) as e:
+        except (BadFilterException,) as e:
             return cls.error_400(
                 e.message
             )

@@ -2,12 +2,23 @@
 #
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
 from sqlalchemy import and_
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
 
+
+PAGE_SIZE = 20
+
+
 db = SQLAlchemy()
+
+
+class BadFilterException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
 
 
 class ExtraFieldsNotPermittedException(Exception):
@@ -23,14 +34,10 @@ class InstanceDoesNotExistException(Exception):
         self.id = id
 
 
-class BadFilterKeyException(Exception):
-    def __init__(self, filter_key):
-        self.message = f"The filter key '{filter_key}' is invalid."
-        super().__init__(self.message)
-
-
 def raise_bad_filter_key_exception(filter_key):
-    raise BadFilterKeyException(filter_key)
+    raise BadFilterException(
+        f"The filter key '{filter_key}' is invalid."
+    )
 
 
 class ExtColumn(db.Column):
@@ -121,6 +128,7 @@ class Base(db.Model):
 
     @classmethod
     def find_bulk(cls, page=1, eq_filters={}):
+        eq_filters = cls._preprocess_filters(eq_filters)
         query = cls._get_find_bulk_query(eq_filters)
         return cls._get_result_page(query, page)
 
@@ -193,3 +201,59 @@ class Base(db.Model):
     @classmethod
     def get_relationships_dict(cls):
         return inspect(cls).relationships.items()
+
+    @classmethod
+    def _filter_value_is_float(cls, filter_value):
+        try:
+            float(filter_value)
+            return True
+        except ValueError:
+            return False
+
+    #TODO test all of these filter value types
+    @classmethod
+    def _filter_value_is_datetime(cls, filter_value):
+        try:
+            datetime.strptime(filter_value)
+            return True
+        except ValueError:
+            return False
+
+    @classmethod
+    def _filter_value_is_bool(cls, filter_value):
+        return filter_value.lower() in ['true', 'false']
+
+    @classmethod
+    def _preprocess_filter_value(cls, filter_key, filter_value):
+        python_type = cls.get_column_python_type(filter_key)
+        if python_type == int and not filter_value.isdigit():
+            raise BadFilterException(
+                f"The filter value '{filter_value}' must be an integer."
+            )
+        if python_type == float and not cls._filter_value_is_float(filter_value):
+            raise BadFilterException(
+                f"The filter value '{filter_value}' must be a float (number)."
+            )
+        if python_type == datetime and not cls._filter_value_is_datetime(filter_value):
+            raise BadFilterException(
+                f"The filter value '{filter_value}' must be a valid datetime."
+            )
+        if python_type == bool:
+            if not cls._filter_value_is_bool(filter_value):
+                raise BadFilterException(
+                    f"The filter value '{filter_value}' must be a boolean"
+                )
+            # convert to boolean
+            return filter_value.lower() == 'true'
+        # nothing needs to change, return unmodified filter value
+        return filter_value
+
+    @classmethod
+    def _preprocess_filters(cls, eq_filters):
+        if not eq_filters:
+            return None
+        return {
+            filter_key: cls._preprocess_filter_value(filter_key, filter_value)
+            for (filter_key, filter_value)
+            in eq_filters.items()
+        }
