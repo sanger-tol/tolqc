@@ -274,6 +274,10 @@ class Base(db.Model):
     def _preprocess_filters(cls, eq_filters):
         if not eq_filters:
             return None
+        if cls.has_ext_column() and 'ext' in eq_filters.keys():
+            raise BadFilterException(
+                f"This API cannot filter against 'extra' columns."
+            )
         return {
             filter_key: cls._preprocess_filter_value(filter_key, filter_value)
             for (filter_key, filter_value)
