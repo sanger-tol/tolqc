@@ -34,12 +34,6 @@ class InstanceDoesNotExistException(Exception):
         self.id = id
 
 
-def raise_bad_filter_key_exception(filter_key):
-    raise BadParameterException(
-        f"The filter key '{filter_key}' is invalid."
-    )
-
-
 class ExtColumn(db.Column):
     def __init__(self, **kwargs):
         super().__init__(
@@ -104,12 +98,7 @@ class Base(db.Model):
         if not eq_filters:
             return None
         return [
-            getattr(
-                cls,
-                filter_key,
-                lambda: raise_bad_filter_key_exception(
-                    filter_key
-                )) == filter_value
+            getattr(cls, filter_key) == filter_value
             for (filter_key, filter_value)
             in cls._preprocess_filters(eq_filters).items()
         ]
@@ -258,6 +247,10 @@ class Base(db.Model):
 
     @classmethod
     def _preprocess_filter_value(cls, filter_key, filter_value):
+        if getattr(cls, filter_key, None) is None:
+            raise BadParameterException(
+                f"The filter key '{filter_key}' is invalid."
+            )
         python_type = cls.get_column_python_type(filter_key)
         if python_type == str:
             if not cls._filter_value_is_delimited_string(filter_value):
