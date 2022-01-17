@@ -6,7 +6,7 @@ from test.base import BaseTestCase
 
 
 class TestListGet(BaseTestCase):
-    def test_get_multiple_inserted_C(self):
+    def test_get_multiple_inserted_C_200(self):
         c_1 = {
             "id": 9090,
         }
@@ -62,7 +62,7 @@ class TestListGet(BaseTestCase):
             }
         )
 
-    def test_paged_correct_quantity(self):
+    def test_paged_correct_quantity_C_200(self):
         for i in range(47):
             self.add_C(
                 id=i,
@@ -104,3 +104,25 @@ class TestListGet(BaseTestCase):
         )
         # should not be populated at all
         self.assertEqual(len(response.json['data']), 0)
+
+    def test_all_parameters_simultaneously_get_C_200(self):
+        # add 50 C's, half of which the filter should match
+        for i in range(50):
+            self.add_C(
+                id=i,
+                nullable_column="monoclonal antibodies" \
+                if i % 2 == 0 \
+                else "something about clones"
+            )
+        
+        response = self.client.open(
+            '/api/v1/C?page=2&filter='
+            '[nullable_column=="something about clones"]',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # 5 = 50/2 - 20
+        self.assertEqual(len(response.json['data']), 5)
