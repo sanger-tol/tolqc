@@ -220,12 +220,34 @@ class Base(db.Model):
             return False
 
     @classmethod
+    def _filter_value_is_delimited_by(cls, filter_value, delimiter):
+        return (
+            filter_value.startswith(delimiter) and
+            filter_value.endswith(delimiter)
+        )
+
+    @classmethod
+    def _filter_value_is_delimited_string(cls, filter_value):
+        return (
+            cls._filter_value_is_delimited_by(filter_value, '"') or
+            cls._filter_value_is_delimited_by(filter_value, "'")
+        )
+
+    @classmethod
     def _filter_value_is_bool(cls, filter_value):
         return filter_value.lower() in ['true', 'false']
 
     @classmethod
     def _preprocess_filter_value(cls, filter_key, filter_value):
         python_type = cls.get_column_python_type(filter_key)
+        if python_type == str:
+            if not cls._filter_value_is_delimited_string(filter_value):
+                raise BadFilterException(
+                    f"The string filter value '{filter_value}' must be surrounded "
+                    "by quotation marks (either ' or \")"
+                )
+            # strip surrounding quotes
+            return filter_value[1:-1]
         if python_type == int and not filter_value.isdigit():
             raise BadFilterException(
                 f"The filter value '{filter_value}' must be an integer."

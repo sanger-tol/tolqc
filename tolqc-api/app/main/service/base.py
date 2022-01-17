@@ -106,11 +106,6 @@ class BaseService:
     @classmethod
     def _split_filter_term(cls, filter_term):
         (filter_key, filter_value) = filter_term.split('==', 1)
-        if (
-            filter_value.startswith('"') and \
-            filter_value.endswith('"')
-        ):
-            filter_value = filter_value[1:-1]
         return filter_key, filter_value
 
     @classmethod

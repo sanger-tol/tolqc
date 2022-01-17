@@ -66,7 +66,7 @@ def _document_list_get(cls):
                     'in': 'query',
                     'description': 'Filters by equality. Formatted '
                                    'like [key1==value1,key2==value2]. '
-                                   'Delimit strings with ", e.g. "string".'
+                                   'Delimit strings with " or \', e.g. "string".'
                 }
             }
         ),
