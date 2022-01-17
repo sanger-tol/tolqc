@@ -68,6 +68,20 @@ class TestListGet(BaseTestCase):
                 id=i,
                 nullable_column="attack of the clones"
             )
+
+        # (implictly) first page
+        response = self.client.open(
+            '/api/v1/C',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # should be fully populated 
+        self.assertEqual(len(response.json['data']), 20)
+
+        # last (partially) populated page
         response = self.client.open(
             '/api/v1/C?page=3',
             method='GET'
@@ -78,3 +92,15 @@ class TestListGet(BaseTestCase):
         )
         # 7 = 47 - 20*2
         self.assertEqual(len(response.json['data']), 7)
+
+        # obviously out of range page
+        response = self.client.open(
+            '/api/v1/C?page=9999',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # should not be populated at all
+        self.assertEqual(len(response.json['data']), 0)
