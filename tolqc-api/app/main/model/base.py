@@ -108,12 +108,21 @@ class Base(db.Model):
         ]
 
     @classmethod
-    def find_bulk(cls, page=1, eq_filters={}):
+    def _get_find_bulk_query(cls, eq_filters):
         eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
         query = db.session.query(cls)
         if eq_filter_terms is not None:
             query = query.filter(and_(*eq_filter_terms))
+        return query
+
+    @classmethod
+    def _get_result_page(cls, query, page):
         return query.limit(50).all()
+
+    @classmethod
+    def find_bulk(cls, page=1, eq_filters={}):
+        query = cls._get_find_bulk_query(eq_filters)
+        return cls._get_result_page(query, page)
 
     @staticmethod
     def rollback():
