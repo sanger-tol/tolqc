@@ -113,7 +113,7 @@ class BaseService:
         if not filter_string:
             return None
         if not (
-            filter_string.startswith('[') and \
+            filter_string.startswith('[') and
             filter_string.endswith(']')
         ):
             raise MalformedFilterStringException()
