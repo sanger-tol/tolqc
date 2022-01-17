@@ -93,6 +93,17 @@ class TestListGet(BaseTestCase):
         # 7 = 47 - 20*2
         self.assertEqual(len(response.json['data']), 7)
 
+        # first unpopulated page
+        response = self.client.open(
+            '/api/v1/C?page=4',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(len(response.json['data']), 0)
+
         # obviously out of range page
         response = self.client.open(
             '/api/v1/C?page=9999',
