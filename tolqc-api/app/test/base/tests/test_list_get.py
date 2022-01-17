@@ -116,7 +116,7 @@ class TestListGet(BaseTestCase):
         # should not be populated at all
         self.assertEqual(len(response.json['data']), 0)
 
-    def test_all_parameters_simultaneously_get_C_200(self):
+    def test_quantity_all_parameters_simultaneously_get_C_200(self):
         # add 50 C's, half of which the filter should match
         for i in range(50):
             self.add_C(
