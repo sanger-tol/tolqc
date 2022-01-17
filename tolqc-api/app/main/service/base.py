@@ -11,7 +11,7 @@ from marshmallow import ValidationError
 from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
 from main.model import InstanceDoesNotExistException, \
-                       BadFilterException
+                       BadParameterException
 
 
 class MalformedFilterStringException(Exception):
@@ -55,13 +55,13 @@ def handle_400_marshmallow_error(function):
     return wrapper
 
 
-def handle_400_bad_filter(function):
+def handle_400_bad_parameter(function):
     @wraps(function)
     def wrapper(cls, *args, **kwargs):
         try:
             return function(cls, *args, **kwargs)
         #TODO add type checking of values
-        except (BadFilterException,) as e:
+        except BadParameterException as e:
             return cls.error_400(
                 e.message
             )
@@ -80,7 +80,6 @@ def provide_parameters(function):
     @wraps(function)
     def wrapper(cls, *args, **kwargs):
         try:
-            #TODO consider string delimiters - what if someone uses ' instead of "
             page, eq_filters = cls.parse_parameters()
             return function(
                 cls,
@@ -223,11 +222,8 @@ class BaseService:
 
     @classmethod
     @provide_parameters
-    @handle_400_bad_filter
+    @handle_400_bad_parameter
     def read_bulk(cls, page=1, eq_filters={}, user_id=None):
         schema = cls.Meta.schema(many=True)
-        model_instances = cls.Meta.model.find_bulk(
-            page=page,
-            eq_filters=eq_filters
-        )
+        model_instances = cls.Meta.model.find_bulk(page, eq_filters)
         return schema.dump(model_instances), 200

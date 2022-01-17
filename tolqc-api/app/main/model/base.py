@@ -15,7 +15,7 @@ PAGE_SIZE = 20
 db = SQLAlchemy()
 
 
-class BadFilterException(Exception):
+class BadParameterException(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(message)
@@ -35,7 +35,7 @@ class InstanceDoesNotExistException(Exception):
 
 
 def raise_bad_filter_key_exception(filter_key):
-    raise BadFilterException(
+    raise BadParameterException(
         f"The filter key '{filter_key}' is invalid."
     )
 
@@ -129,11 +129,11 @@ class Base(db.Model):
         try:
             page = int(page)
         except ValueError:
-            raise BadFilterException(
+            raise BadParameterException(
                 "The page number must be an integer."
             )
         if page < 1:
-            raise BadFilterException(
+            raise BadParameterException(
                 "The page number must be 1 or greater."
             )
         return page
@@ -147,7 +147,7 @@ class Base(db.Model):
         return query.limit(PAGE_SIZE).all()
 
     @classmethod
-    def find_bulk(cls, page=1, eq_filters={}):
+    def find_bulk(cls, page, eq_filters):
         query = cls._get_find_bulk_query(eq_filters)
         return cls._get_results_page(query, page)
 
@@ -261,27 +261,27 @@ class Base(db.Model):
         python_type = cls.get_column_python_type(filter_key)
         if python_type == str:
             if not cls._filter_value_is_delimited_string(filter_value):
-                raise BadFilterException(
+                raise BadParameterException(
                     f"The string filter value '{filter_value}' must be surrounded "
                     "by quotation marks (either ' or \")"
                 )
             # strip surrounding quotes
             return filter_value[1:-1]
         if python_type == int and not filter_value.isdigit():
-            raise BadFilterException(
+            raise BadParameterException(
                 f"The filter value '{filter_value}' must be an integer."
             )
         if python_type == float and not cls._filter_value_is_float(filter_value):
-            raise BadFilterException(
+            raise BadParameterException(
                 f"The filter value '{filter_value}' must be a float (number)."
             )
         if python_type == datetime and not cls._filter_value_is_datetime(filter_value):
-            raise BadFilterException(
+            raise BadParameterException(
                 f"The filter value '{filter_value}' must be a valid datetime."
             )
         if python_type == bool:
             if not cls._filter_value_is_bool(filter_value):
-                raise BadFilterException(
+                raise BadParameterException(
                     f"The filter value '{filter_value}' must be a boolean"
                 )
             # convert to boolean
@@ -294,7 +294,7 @@ class Base(db.Model):
         if not eq_filters:
             return None
         if cls.has_ext_column() and 'ext' in eq_filters.keys():
-            raise BadFilterException(
+            raise BadParameterException(
                 f"This API cannot filter against 'extra' columns."
             )
         return {
