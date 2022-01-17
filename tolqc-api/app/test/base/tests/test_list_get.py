@@ -26,7 +26,10 @@ class TestListGet(BaseTestCase):
             '/api/v1/C',
             method='GET'
         )
-        self.assert200(response)
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
         self.assertEqual(
             response.json,
             {
@@ -58,3 +61,20 @@ class TestListGet(BaseTestCase):
                 ]
             }
         )
+
+    def test_paged_correct_quantity(self):
+        for i in range(47):
+            self.add_C(
+                id=i,
+                nullable_column="attack of the clones"
+            )
+        response = self.client.open(
+            '/api/v1/C?page=3',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # 7 = 47 - 20*2
+        self.assertEqual(len(response.json['data']), 7)
