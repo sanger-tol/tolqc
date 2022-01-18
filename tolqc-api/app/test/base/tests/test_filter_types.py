@@ -60,3 +60,54 @@ class TestFilterTypes(BaseTestCase):
                 ]
             }
         )
+
+    def test_float_filter_correct_list_get_G_200(self):
+        self.add_G(id=501, string_column="laughter", float_column=9.16)
+        self.add_G(id=17890, string_column="good medicine", float_column=1.89)
+
+        # filter for one
+        response = self.client.open(
+            '/api/v1/G?filter=[float_column==1.89]'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+    
+        # check only 1 retrieved result
+        self.assertEqual(len(response.json['data']), 1)
+
+        # check the result is the correct one
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'type': 'G',
+                        'id': '17890',
+                        'attributes': {
+                            'float_column': 1.89,
+                            'bool_column': None,
+                            'datetime_column': None,
+                            'string_column': "good medicine"
+                        }
+                    }
+                ]
+            }
+        )
+
+        # filter for none
+        response = self.client.open(
+            '/api/v1/G?filter=[float_column==42.9]'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert no results
+        self.assertEqual(
+            response.json,
+            {
+                'data': []
+            }
+        )
