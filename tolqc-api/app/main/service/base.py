@@ -15,7 +15,9 @@ from main.model import InstanceDoesNotExistException, \
 
 
 class MalformedFilterStringException(Exception):
-    pass
+    def __init__(self, message):
+        self.message = message
+        super().__init__()
 
 
 def handle_404(function):
@@ -87,9 +89,9 @@ def provide_parameters(function):
                 eq_filters=eq_filters,
                 **kwargs
             )
-        except MalformedFilterStringException:
+        except MalformedFilterStringException as e:
             return cls.error_400(
-                "The filter query parameter in the URL is malformed."
+                e.message
             )
     return wrapper
 
@@ -103,6 +105,11 @@ class BaseService:
 
     @classmethod
     def _split_filter_term(cls, filter_term):
+        if '==' not in filter_term:
+            raise MalformedFilterStringException(
+                "There is no double equals sign in filter "
+                f"term: '{filter_term}'."
+            )
         (filter_key, filter_value) = filter_term.split('==', 1)
         return filter_key, filter_value
 
@@ -114,7 +121,10 @@ class BaseService:
             filter_string.startswith('[') and
             filter_string.endswith(']')
         ):
-            raise MalformedFilterStringException()
+            raise MalformedFilterStringException(
+                'The entire filter query parameter must '
+                'be enclosed in square brackets.'
+            )
         filter_terms = [
             cls._split_filter_term(filter_term)
             for filter_term
