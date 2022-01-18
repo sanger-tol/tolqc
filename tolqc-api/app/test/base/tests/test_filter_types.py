@@ -40,7 +40,7 @@ class TestFilterTypes(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
         # check only 1 retrieved result
         self.assertEqual(len(response.json['data']), 1)
 
@@ -75,7 +75,7 @@ class TestFilterTypes(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-    
+
         # check only 1 retrieved result
         self.assertEqual(len(response.json['data']), 1)
 

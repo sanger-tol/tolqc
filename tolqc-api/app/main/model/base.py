@@ -219,7 +219,6 @@ class Base(db.Model):
         except ValueError:
             return False
 
-    #TODO test all of these filter value types
     @classmethod
     def _filter_value_is_datetime(cls, filter_value):
         try:
