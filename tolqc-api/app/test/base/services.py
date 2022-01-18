@@ -7,9 +7,11 @@ from main.service.base import BaseService
 from test.base.models import B_ModelRelationship, \
                              C_ModelWithNullableColumn, \
                              D_ModelWithNonNullableColumn, \
-                             F_ModelWithExtField
+                             F_ModelWithExtField, \
+                             G_ModelWithFilterableFields
 from test.base.schemas import B_Schema, C_Schema, \
-                              D_Schema, F_Schema
+                              D_Schema, F_Schema, \
+                              G_Schema
 
 
 class B_Service(BaseService):
@@ -34,3 +36,9 @@ class F_Service(BaseService):
     class Meta:
         model = F_ModelWithExtField
         schema = F_Schema
+
+
+class G_Service(BaseService):
+    class Meta:
+        model = G_ModelWithFilterableFields
+        schema = G_Schema

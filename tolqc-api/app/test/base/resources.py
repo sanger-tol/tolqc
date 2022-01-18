@@ -5,14 +5,15 @@
 
 from main.resource.base import BaseListResource, BaseDetailResource, setup_resource
 
-from test.base.services import B_Service, C_Service, D_Service, F_Service
-from test.base.swaggers import B_Swagger, C_Swagger, D_Swagger, F_Swagger
+from test.base.services import B_Service, C_Service, D_Service, F_Service, G_Service
+from test.base.swaggers import B_Swagger, C_Swagger, D_Swagger, F_Swagger, G_Swagger
 
 
 api_B = B_Swagger.api
 api_C = C_Swagger.api
 api_D = D_Swagger.api
 api_F = F_Swagger.api
+api_G = G_Swagger.api
 
 
 class B_ResourceMeta:
@@ -73,3 +74,13 @@ class F_DetailResource(BaseDetailResource):
 @setup_resource
 class F_ListResource(BaseListResource):
     Meta = F_ResourceMeta
+
+
+class G_ResourceMeta:
+    service = G_Service
+    swagger = G_Swagger
+
+
+@setup_resource
+class G_ListResource(BaseListResource):
+    Meta = G_ResourceMeta
