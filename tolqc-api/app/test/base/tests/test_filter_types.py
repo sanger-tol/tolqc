@@ -174,8 +174,6 @@ class TestFilterTypes(BaseTestCase):
 
         # get none
         response = self.client.open(
-            #TODO if there is not a double equals ==, in any search term
-            #, throw malformed string exception
             '/api/v1/G?filter=[float_column==898.34,bool_column==True]'
         )
         self.assert200(
