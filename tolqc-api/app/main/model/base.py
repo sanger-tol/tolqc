@@ -129,7 +129,6 @@ class Base(db.Model):
 
     @classmethod
     def _get_results_page(cls, query, page):
-        #TODO test for off by one errors. E.g. insert 47 results and look on page 3 for just 7
         page = cls._preprocess_page(page)
         if page is not None:
             query = query.offset((page - 1) * PAGE_SIZE)

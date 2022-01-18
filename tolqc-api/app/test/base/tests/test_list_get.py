@@ -137,3 +137,29 @@ class TestListGet(BaseTestCase):
         )
         # 5 = 50/2 - 20
         self.assertEqual(len(response.json['data']), 5)
+
+    def test_bad_page_get_C_400(self):
+        self.add_C(
+            id=100,
+            nullable_column="test not clone"
+        )
+
+        # out of range page
+        response = self.client.open(
+            '/api/v1/C?page=0',
+            method='GET'
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+
+        # non int page
+        response = self.client.open(
+            '/api/v1/C?page=not_int',
+            method='GET'
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
