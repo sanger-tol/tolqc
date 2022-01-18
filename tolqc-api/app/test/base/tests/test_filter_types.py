@@ -183,3 +183,30 @@ class TestFilterTypes(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         self.assertEqual(len(response.json['data']), 0)
+
+        # get one
+        response = self.client.open(
+            '/api/v1/G?filter=[float_column==1.0,bool_column==True]'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(len(response.json['data']), 1)
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'type': 'G',
+                        'id': '999',
+                        'attributes': {
+                            'float_column': 1.0,
+                            'bool_column': True,
+                            'datetime_column': None,
+                            'string_column': None
+                        }
+                    }
+                ]
+            }
+        )
