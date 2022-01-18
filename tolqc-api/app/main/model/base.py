@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import dateutil.parser
+
 from datetime import datetime
 from sqlalchemy import and_
 from flask_sqlalchemy import SQLAlchemy
@@ -221,7 +223,7 @@ class Base(db.Model):
     @classmethod
     def _filter_value_is_datetime(cls, filter_value):
         try:
-            datetime.strptime(filter_value)
+            dateutil.parser.parse(filter_value)
             return True
         except ValueError:
             return False

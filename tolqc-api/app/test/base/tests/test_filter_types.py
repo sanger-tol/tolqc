@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
+
 from test.base import BaseTestCase
 
 
@@ -111,3 +113,56 @@ class TestFilterTypes(BaseTestCase):
                 'data': []
             }
         )
+
+    def test_datetime_filter_correct_list_get_G_200(self):
+        first_datetime = datetime.now()
+        second_datetime = datetime.now()
+        self.add_G(id=501, string_column="hamburger", datetime_column=first_datetime)
+        self.add_G(id=17890, string_column="cat", datetime_column=second_datetime)
+
+        # filter for none
+        response = self.client.open(
+            f'/api/v1/G?filter=[datetime_column=={str(datetime.now())}]'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert no results
+        self.assertEqual(
+            response.json,
+            {
+                'data': []
+            }
+        )
+
+        # filter for one
+        response = self.client.open(
+            f'/api/v1/G?filter=[datetime_column=={str(first_datetime)}]'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # one result, and is correct
+        self.assertEqual(len(response.json['data']), 1)
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'type': 'G',
+                        'id': '501',
+                        'attributes': {
+                            'float_column': None,
+                            'bool_column': None,
+                            'datetime_column': first_datetime.strftime(
+                                '%Y-%m-%dT%H:%M:%S.%f'
+                            ),
+                            'string_column': 'hamburger'
+                        }
+                    }
+                ]
+            }
+        )
+
