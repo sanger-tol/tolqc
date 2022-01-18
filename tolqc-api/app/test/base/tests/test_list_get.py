@@ -78,7 +78,7 @@ class TestListGet(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        # should be fully populated 
+        # should be fully populated
         self.assertEqual(len(response.json['data']), 20)
 
         # last (partially) populated page
@@ -121,11 +121,11 @@ class TestListGet(BaseTestCase):
         for i in range(50):
             self.add_C(
                 id=i,
-                nullable_column="monoclonal antibodies" \
-                if i % 2 == 0 \
+                nullable_column="monoclonal antibodies"
+                if i % 2 == 0
                 else "something about clones"
             )
-        
+
         response = self.client.open(
             '/api/v1/C?page=2&filter='
             '[nullable_column=="something about clones"]',
