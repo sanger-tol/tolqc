@@ -13,3 +13,5 @@ class TolqcData(SubBase):
     avg_read_len = db.Column(db.Float())
     read_len_n50 = db.Column(db.Float())
     seq_data = db.relationship("TolqcSeqData", back_populates="data")
+    merqury = db.relationship("TolqcMerqury", back_populates="data")
+    asm = db.relationship("TolqcAsm", back_populates="data")

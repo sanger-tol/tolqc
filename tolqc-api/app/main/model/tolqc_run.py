@@ -22,3 +22,4 @@ class TolqcRun(SubBase):
     seq = db.relationship("TolqcSeq", back_populates="run")
     platform = db.relationship("TolqcPlatform", back_populates="run", foreign_keys=[platform_id])
     centre = db.relationship("TolqcCentre", back_populates="run", foreign_keys=[centre_id])
+    pacbio_run_stats = db.relationship("TolqcPacbioRunStats", back_populates="run")

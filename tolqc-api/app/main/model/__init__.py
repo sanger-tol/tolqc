@@ -25,3 +25,9 @@ from .tolqc_sex import TolqcSex  # noqa
 from .tolqc_data import TolqcData  # noqa
 from .tolqc_seq_data import TolqcSeqData  # noqa
 from .tolqc_file import TolqcFile  # noqa
+from .tolqc_pacbio_run_stats import TolqcPacbioRunStats  # noqa
+from .tolqc_asm_stats import TolqcAsmStats  # noqa
+from .tolqc_asm import TolqcAsm  # noqa
+from .tolqc_software_version import TolqcSoftwareVersion  # noqa
+from .tolqc_merqury import TolqcMerqury  # noqa
+from .tolqc_busco import TolqcBusco  # noqa
