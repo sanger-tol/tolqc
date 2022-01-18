@@ -60,7 +60,6 @@ def handle_400_bad_parameter(function):
     def wrapper(cls, *args, **kwargs):
         try:
             return function(cls, *args, **kwargs)
-        #TODO add type checking of values
         except BadParameterException as e:
             return cls.error_400(
                 e.message

@@ -287,7 +287,7 @@ class Base(db.Model):
             return None
         if cls.has_ext_column() and 'ext' in eq_filters.keys():
             raise BadParameterException(
-                f"This API cannot filter against 'extra' columns."
+                "This API cannot filter against 'extra' columns."
             )
         return {
             filter_key: cls._preprocess_filter_value(filter_key, filter_value)
