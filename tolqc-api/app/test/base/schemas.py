@@ -10,6 +10,7 @@ from test.base.models import B_ModelRelationship, \
                              F_ModelWithExtField, \
                              G_ModelWithFilterableFields
 
+
 @setup_schema
 class B_Schema(BaseSchema):
     class Meta(BaseSchema.BaseMeta):
