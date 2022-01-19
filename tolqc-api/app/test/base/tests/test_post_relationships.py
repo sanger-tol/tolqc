@@ -40,11 +40,6 @@ class TestPostRelationships(BaseTestCase):
                     'type': 'B',
                     'id': id,
                     'relationships': {
-                        'E': {
-                            'links': {
-                                'related': f'/B/{id}/E'
-                            }
-                        },
                         'A': {
                             'links': {
                                 'related': '/A/300'

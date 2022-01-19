@@ -52,11 +52,6 @@ class TestUpdatedCorrectly200(BaseTestCase):
                             'links': {
                                 'related': f'/A/{new_a_id}'
                             }
-                        },
-                        'E': {
-                            'links': {
-                                'related': f'/B/{b_id}/E'
-                            }
                         }
                     }
                 }

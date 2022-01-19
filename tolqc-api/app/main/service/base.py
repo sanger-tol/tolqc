@@ -10,7 +10,14 @@ from sqlalchemy.exc import IntegrityError
 from marshmallow import ValidationError
 from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
-from main.model import InstanceDoesNotExistException
+from main.model import InstanceDoesNotExistException, \
+                       BadParameterException
+
+
+class MalformedFilterStringException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__()
 
 
 def handle_404(function):
@@ -50,11 +57,42 @@ def handle_400_marshmallow_error(function):
     return wrapper
 
 
+def handle_400_bad_parameter(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            return function(cls, *args, **kwargs)
+        except BadParameterException as e:
+            return cls.error_400(
+                e.message
+            )
+    return wrapper
+
+
 def provide_body_data(function):
     @wraps(function)
     def wrapper(cls, *args, **kwargs):
         data = request.get_json()
         return function(cls, *args, data, **kwargs)
+    return wrapper
+
+
+def provide_parameters(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            page, eq_filters = cls.parse_parameters()
+            return function(
+                cls,
+                *args,
+                page=page,
+                eq_filters=eq_filters,
+                **kwargs
+            )
+        except MalformedFilterStringException as e:
+            return cls.error_400(
+                e.message
+            )
     return wrapper
 
 
@@ -64,6 +102,46 @@ class BaseService:
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
+
+    @classmethod
+    def _split_filter_term(cls, filter_term):
+        if '==' not in filter_term:
+            raise MalformedFilterStringException(
+                "There is no double equals sign in filter "
+                f"term: '{filter_term}'."
+            )
+        (filter_key, filter_value) = filter_term.split('==', 1)
+        return filter_key, filter_value
+
+    @classmethod
+    def _parse_filters(cls, filter_string):
+        if not filter_string:
+            return None
+        if not (
+            filter_string.startswith('[') and
+            filter_string.endswith(']')
+        ):
+            raise MalformedFilterStringException(
+                'The entire filter query parameter must '
+                'be enclosed in square brackets.'
+            )
+        filter_terms = [
+            cls._split_filter_term(filter_term)
+            for filter_term
+            in filter_string[1:-1].split(',')
+        ]
+        return {
+            filter_key: filter_value
+            for (filter_key, filter_value)
+            in filter_terms
+        }
+
+    @classmethod
+    def parse_parameters(cls):
+        page = request.args.get('page')
+        filter_string = request.args.get('filter')
+        eq_filters = cls._parse_filters(filter_string)
+        return page, eq_filters
 
     @classmethod
     def error_400(cls, message):
@@ -152,7 +230,9 @@ class BaseService:
         return schema.dump(model_instance), 201
 
     @classmethod
-    def find_bulk(cls, user_id=None):
+    @provide_parameters
+    @handle_400_bad_parameter
+    def read_bulk(cls, page=1, eq_filters={}, user_id=None):
         schema = cls.Meta.schema(many=True)
-        model_instances = cls.Meta.model.find_bulk()
+        model_instances = cls.Meta.model.find_bulk(page, eq_filters)
         return schema.dump(model_instances), 200

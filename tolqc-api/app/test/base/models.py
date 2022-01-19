@@ -52,3 +52,13 @@ class F_ModelWithExtField(Base):
     id = db.Column(db.Integer, primary_key=True)
     ext = ExtColumn()
     other_column = db.Column(db.String, nullable=True)
+
+
+class G_ModelWithFilterableFields(Base):
+    __tablename__ = 'G'
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    float_column = db.Column(db.Float, nullable=True)
+    bool_column = db.Column(db.Boolean, nullable=True)
+    datetime_column = db.Column(db.DateTime, nullable=True)
+    string_column = db.Column(db.String, nullable=True)

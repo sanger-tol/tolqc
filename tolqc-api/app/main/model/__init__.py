@@ -4,7 +4,8 @@
 
 from .base import db, Base, \
                   ExtraFieldsNotPermittedException, \
-                  InstanceDoesNotExistException # noqa
+                  InstanceDoesNotExistException, \
+                  BadParameterException # noqa
 from .creation_log_base import CreationLogBase  # noqa
 
 from .tolqc_user import TolqcUser  # noqa

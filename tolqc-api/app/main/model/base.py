@@ -2,11 +2,25 @@
 #
 # SPDX-License-Identifier: MIT
 
+import dateutil.parser
+
+from datetime import datetime
+from sqlalchemy import and_
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
 
+
+PAGE_SIZE = 20
+
+
 db = SQLAlchemy()
+
+
+class BadParameterException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
 
 
 class ExtraFieldsNotPermittedException(Exception):
@@ -36,8 +50,8 @@ class Base(db.Model):
     """The base model class:
     - Its primary key must be called id.
     - Do not call anything other than an ExtColumn 'ext'.
-    - The declared tablename will be the endpoint stem
-        - It should be plural
+    - The declared tablename will be the HTTP endpoint stem
+        - It should be plural, e.g. centres
     """
     __abstract__ = True
 
@@ -82,8 +96,50 @@ class Base(db.Model):
         self.commit()
 
     @classmethod
-    def find_bulk(cls, **kwargs):
-        return db.session.query(cls).limit(50).all()
+    def _get_eq_filter_terms(cls, eq_filters):
+        if not eq_filters:
+            return None
+        return [
+            getattr(cls, filter_key) == filter_value
+            for (filter_key, filter_value)
+            in cls._preprocess_filters(eq_filters).items()
+        ]
+
+    @classmethod
+    def _get_find_bulk_query(cls, eq_filters):
+        eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
+        query = db.session.query(cls)
+        if eq_filter_terms is not None:
+            query = query.filter(and_(*eq_filter_terms))
+        return query
+
+    @classmethod
+    def _preprocess_page(cls, page):
+        if not page:
+            return None
+        try:
+            page = int(page)
+        except ValueError:
+            raise BadParameterException(
+                "The page number must be an integer."
+            )
+        if page < 1:
+            raise BadParameterException(
+                "The page number must be 1 or greater."
+            )
+        return page
+
+    @classmethod
+    def _get_results_page(cls, query, page):
+        page = cls._preprocess_page(page)
+        if page is not None:
+            query = query.offset((page - 1) * PAGE_SIZE)
+        return query.limit(PAGE_SIZE).all()
+
+    @classmethod
+    def find_bulk(cls, page, eq_filters):
+        query = cls._get_find_bulk_query(eq_filters)
+        return cls._get_results_page(query, page)
 
     @staticmethod
     def rollback():
@@ -95,10 +151,10 @@ class Base(db.Model):
         db.session.commit()
 
     @classmethod
-    def find_by_id(cls, _id):
-        instance = cls.query.filter_by(id=_id).one_or_none()
+    def find_by_id(cls, id_):
+        instance = cls.query.filter_by(id=id_).one_or_none()
         if instance is None:
-            raise InstanceDoesNotExistException(_id)
+            raise InstanceDoesNotExistException(id_)
         return instance
 
     @classmethod
@@ -154,3 +210,88 @@ class Base(db.Model):
     @classmethod
     def get_relationships_dict(cls):
         return inspect(cls).relationships.items()
+
+    @classmethod
+    def _filter_value_is_float(cls, filter_value):
+        try:
+            float(filter_value)
+            return True
+        except ValueError:
+            return False
+
+    @classmethod
+    def _filter_value_is_datetime(cls, filter_value):
+        try:
+            dateutil.parser.parse(filter_value)
+            return True
+        except ValueError:
+            return False
+
+    @classmethod
+    def _filter_value_is_delimited_by(cls, filter_value, delimiter):
+        return (
+            filter_value.startswith(delimiter) and
+            filter_value.endswith(delimiter)
+        )
+
+    @classmethod
+    def _filter_value_is_delimited_string(cls, filter_value):
+        return (
+            cls._filter_value_is_delimited_by(filter_value, '"') or
+            cls._filter_value_is_delimited_by(filter_value, "'")
+        )
+
+    @classmethod
+    def _filter_value_is_bool(cls, filter_value):
+        return filter_value.lower() in ['true', 'false']
+
+    @classmethod
+    def _preprocess_filter_value(cls, filter_key, filter_value):
+        if getattr(cls, filter_key, None) is None:
+            raise BadParameterException(
+                f"The filter key '{filter_key}' is invalid."
+            )
+        python_type = cls.get_column_python_type(filter_key)
+        if python_type == str:
+            if not cls._filter_value_is_delimited_string(filter_value):
+                raise BadParameterException(
+                    f"The string filter value '{filter_value}' must be surrounded "
+                    "by quotation marks (either ' or \")"
+                )
+            # strip surrounding quotes
+            return filter_value[1:-1]
+        if python_type == int and not filter_value.isdigit():
+            raise BadParameterException(
+                f"The filter value '{filter_value}' must be an integer."
+            )
+        if python_type == float and not cls._filter_value_is_float(filter_value):
+            raise BadParameterException(
+                f"The filter value '{filter_value}' must be a float (number)."
+            )
+        if python_type == datetime and not cls._filter_value_is_datetime(filter_value):
+            raise BadParameterException(
+                f"The filter value '{filter_value}' must be a valid datetime."
+            )
+        if python_type == bool:
+            if not cls._filter_value_is_bool(filter_value):
+                raise BadParameterException(
+                    f"The filter value '{filter_value}' must be a boolean"
+                )
+            # convert to boolean
+            return filter_value.lower() == 'true'
+        # nothing needs to change, return unmodified filter value
+        return filter_value
+
+    @classmethod
+    def _preprocess_filters(cls, eq_filters):
+        if not eq_filters:
+            return None
+        if cls.has_ext_column() and 'ext' in eq_filters.keys():
+            raise BadParameterException(
+                "This API cannot filter against 'extra' columns."
+            )
+        return {
+            filter_key: cls._preprocess_filter_value(filter_key, filter_value)
+            for (filter_key, filter_value)
+            in eq_filters.items()
+        }

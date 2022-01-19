@@ -12,7 +12,8 @@ from main.model import db, TolqcUser, TolqcRole, TolqcAllocation, \
 from test.base.models import A_ModelRelationship, B_ModelRelationship, \
                              C_ModelWithNullableColumn, \
                              D_ModelWithNonNullableColumn, \
-                             E_ModelRelationship, F_ModelWithExtField
+                             E_ModelRelationship, F_ModelWithExtField, \
+                             G_ModelWithFilterableFields
 
 
 class TestCase(FlaskTestCase):
@@ -46,6 +47,7 @@ class TestCase(FlaskTestCase):
         db.session.query(C_ModelWithNullableColumn).delete()
         db.session.query(D_ModelWithNonNullableColumn).delete()
         db.session.query(F_ModelWithExtField).delete()
+        db.session.query(G_ModelWithFilterableFields).delete()
 
         # ToLQC models
         db.session.query(TolqcAllocation).delete()

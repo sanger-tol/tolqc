@@ -16,8 +16,9 @@ from test.base.models import A_ModelRelationship, \
                              C_ModelWithNullableColumn, \
                              D_ModelWithNonNullableColumn, \
                              E_ModelRelationship, \
-                             F_ModelWithExtField
-from test.base.resources import api_B, api_C, api_D, api_F
+                             F_ModelWithExtField, \
+                             G_ModelWithFilterableFields
+from test.base.resources import api_B, api_C, api_D, api_F, api_G
 
 
 def _setup_api(blueprint):
@@ -26,10 +27,11 @@ def _setup_api(blueprint):
         doc='/ui',
         title="Tree of Life Quality Control"
     )
-    api.add_namespace(api_B, '/B')
-    api.add_namespace(api_C, '/C')
-    api.add_namespace(api_D, '/D')
-    api.add_namespace(api_F, '/F')
+    api.add_namespace(api_B)
+    api.add_namespace(api_C)
+    api.add_namespace(api_D)
+    api.add_namespace(api_F)
+    api.add_namespace(api_G)
 
 
 class BaseTestCase(TestCase):
@@ -67,3 +69,6 @@ class BaseTestCase(TestCase):
 
     def add_F(self, **kwargs):
         self._add_model_instance(F_ModelWithExtField, **kwargs)
+
+    def add_G(self, **kwargs):
+        self._add_model_instance(G_ModelWithFilterableFields, **kwargs)

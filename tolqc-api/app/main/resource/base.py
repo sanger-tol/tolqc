@@ -56,7 +56,22 @@ def _document_delete(cls):
 def _document_list_get(cls):
     api, _ = _get_api_swagger(cls)
     decorators = (
+        api.doc(
+            params={
+                'page': {
+                    'in': 'query',
+                    'description': 'The page of the results'
+                },
+                'filter': {
+                    'in': 'query',
+                    'description': 'Filters by equality. Formatted '
+                                   'like [key1==value1,key2==value2]. '
+                                   'Delimit strings with " or \', e.g. "string".'
+                }
+            }
+        ),
         api.response(200, description='Success'),
+        api.response(400, description='Bad Request'),
     )
     cls.get = _compose_decorators(cls.get, decorators)
 
@@ -100,7 +115,7 @@ class BaseListResource(Resource):
 
     @classmethod
     def get(cls, user_id=None):
-        return cls.Meta.service.find_bulk(user_id=user_id)
+        return cls.Meta.service.read_bulk(user_id=user_id)
 
     @classmethod
     def post(cls, user_id=None):
