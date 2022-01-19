@@ -141,6 +141,8 @@ class BaseService:
     @classmethod
     def _parse_sort_by(cls):
         sort_by_string = request.args.get('sort_by')
+        if not sort_by_string:
+            return None
         # if starts with minus sign, descending and strip the first character
         ascending = not sort_by_string.startswith('-')
         sort_by_string = sort_by_string if ascending else sort_by_string[1:]
