@@ -81,12 +81,13 @@ def provide_parameters(function):
     @wraps(function)
     def wrapper(cls, *args, **kwargs):
         try:
-            page, eq_filters = cls.parse_parameters()
+            page, eq_filters, sort_by = cls.parse_parameters()
             return function(
                 cls,
                 *args,
                 page=page,
                 eq_filters=eq_filters,
+                sort_by=sort_by,
                 **kwargs
             )
         except MalformedFilterStringException as e:
@@ -114,7 +115,8 @@ class BaseService:
         return filter_key, filter_value
 
     @classmethod
-    def _parse_filters(cls, filter_string):
+    def _parse_filters(cls):
+        filter_string = request.args.get('filter')
         if not filter_string:
             return None
         if not (
@@ -137,11 +139,15 @@ class BaseService:
         }
 
     @classmethod
+    def _parse_sort_by(cls):
+        sort_by_string = request.args.get('sort_by')
+
+    @classmethod
     def parse_parameters(cls):
         page = request.args.get('page')
-        filter_string = request.args.get('filter')
-        eq_filters = cls._parse_filters(filter_string)
-        return page, eq_filters
+        eq_filters = cls._parse_filters()
+        sort_by = cls._parse_sort_by()
+        return page, eq_filters, sort_by
 
     @classmethod
     def error_400(cls, message):
@@ -232,7 +238,7 @@ class BaseService:
     @classmethod
     @provide_parameters
     @handle_400_bad_parameter
-    def read_bulk(cls, page=1, eq_filters={}, user_id=None):
+    def read_bulk(cls, page=1, eq_filters=None, sort_by=None, user_id=None):
         schema = cls.Meta.schema(many=True)
         model_instances = cls.Meta.model.find_bulk(page, eq_filters)
         return schema.dump(model_instances), 200
