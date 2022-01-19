@@ -14,7 +14,7 @@ from main.model import InstanceDoesNotExistException, \
                        BadParameterException
 
 
-class MalformedFilterStringException(Exception):
+class MalformedParameterStringException(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__()
@@ -90,7 +90,7 @@ def provide_parameters(function):
                 sort_by=sort_by,
                 **kwargs
             )
-        except MalformedFilterStringException as e:
+        except MalformedParameterStringException as e:
             return cls.error_400(
                 e.message
             )
@@ -107,7 +107,7 @@ class BaseService:
     @classmethod
     def _split_filter_term(cls, filter_term):
         if '==' not in filter_term:
-            raise MalformedFilterStringException(
+            raise MalformedParameterStringException(
                 "There is no double equals sign in filter "
                 f"term: '{filter_term}'."
             )
@@ -123,7 +123,7 @@ class BaseService:
             filter_string.startswith('[') and
             filter_string.endswith(']')
         ):
-            raise MalformedFilterStringException(
+            raise MalformedParameterStringException(
                 'The entire filter query parameter must '
                 'be enclosed in square brackets.'
             )
