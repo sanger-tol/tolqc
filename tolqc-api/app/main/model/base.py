@@ -126,7 +126,7 @@ class Base(db.Model):
         return query.order_by(sort_by_column)        
 
     @classmethod
-    def _get_find_bulk_query(cls, eq_filters, sort_by):
+    def _filter_query(cls, eq_filters, sort_by):
         eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
         query = db.session.query(cls)
         if eq_filter_terms is not None:
@@ -150,7 +150,7 @@ class Base(db.Model):
         return page
 
     @classmethod
-    def _get_results_page(cls, query, page):
+    def _paginate_query(cls, query, page):
         page = cls._preprocess_page(page)
         if page is not None:
             query = query.offset((page - 1) * PAGE_SIZE)
@@ -158,9 +158,9 @@ class Base(db.Model):
 
     @classmethod
     def find_bulk(cls, page, eq_filters, sort_by):
-        query = cls._get_find_bulk_query(eq_filters, sort_by)
+        query = cls._filter_query(eq_filters, sort_by)
         query = cls._sort_by_query(query, sort_by)
-        return cls._get_results_page(query, page)
+        return cls._paginate_query(query, page)
 
     @staticmethod
     def rollback():
