@@ -106,7 +106,27 @@ class Base(db.Model):
         ]
 
     @classmethod
-    def _get_find_bulk_query(cls, eq_filters):
+    def _get_sort_by_column(cls, sort_by_column_name, ascending):
+        sort_by_column = getattr(cls, sort_by_column_name, None)
+        if sort_by_column is None:
+            raise BadParameterException(
+                f'The field "{sort_by_column_name}" does not exist.'
+            )
+        return sort_by_column if ascending else sort_by_column.desc()
+
+    @classmethod
+    def _sort_by_query(cls, query, sort_by):
+        if sort_by is None:
+            return query.order_by(cls.id)
+        (sort_by_column_name, ascending) = sort_by
+        sort_by_column = cls._get_sort_by_column(
+            sort_by_column_name,
+            ascending
+        )
+        return query.order_by(sort_by_column)        
+
+    @classmethod
+    def _get_find_bulk_query(cls, eq_filters, sort_by):
         eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
         query = db.session.query(cls)
         if eq_filter_terms is not None:
@@ -137,8 +157,9 @@ class Base(db.Model):
         return query.limit(PAGE_SIZE).all()
 
     @classmethod
-    def find_bulk(cls, page, eq_filters):
-        query = cls._get_find_bulk_query(eq_filters)
+    def find_bulk(cls, page, eq_filters, sort_by):
+        query = cls._get_find_bulk_query(eq_filters, sort_by)
+        query = cls._sort_by_query(query, sort_by)
         return cls._get_results_page(query, page)
 
     @staticmethod

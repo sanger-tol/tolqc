@@ -246,5 +246,5 @@ class BaseService:
     @handle_400_bad_parameter
     def read_bulk(cls, page=1, eq_filters=None, sort_by=None, user_id=None):
         schema = cls.Meta.schema(many=True)
-        model_instances = cls.Meta.model.find_bulk(page, eq_filters)
+        model_instances = cls.Meta.model.find_bulk(page, eq_filters, sort_by)
         return schema.dump(model_instances), 200
