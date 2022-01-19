@@ -60,6 +60,7 @@ def _document_list_get(cls):
             params={
                 'page': {
                     'in': 'query',
+                    'type': 'integer',
                     'description': 'The page of the results'
                 },
                 'sort_by': {
