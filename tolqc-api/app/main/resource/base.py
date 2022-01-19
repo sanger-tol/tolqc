@@ -68,7 +68,8 @@ def _document_list_get(cls):
                     'description': 'The field by which to order results. '
                                    'Prepend with a minus sign to sort '
                                    'descending, e.g. -name, otherwise sorting '
-                                   'will be ascending.'
+                                   'will be ascending. (Sorts by id ascending '
+                                   'by default).'
                 },
                 'filter': {
                     'in': 'query',
