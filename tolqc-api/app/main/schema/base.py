@@ -133,42 +133,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.model.has_ext_column()
 
     @classmethod
-    def _get_field_schema_model_type(cls, field):
-        model = cls.Meta.model
-        python_type = model.get_column_python_type(
-            field
-        )
-
-        if python_type == int:
-            return {
-                'type': 'integer'
-            }
-        if python_type == str:
-            return {
-                'type': 'string'
-            }
-        if python_type == bool:
-            return {
-                'type': 'boolean'
-            }
-        if python_type == datetime:
-            return {
-                'type': 'string',
-                'format': 'date-time'
-            }
-        if python_type == float:
-            return {
-                'type': 'number',
-                'format': 'float'
-            }
-
-        raise NotImplementedError(
-            "Type f'{python_type}' has not been implemented yet."
-        )
-
-    #TODO remove every unecessary function, strip right back
-    #TODO unify patch/post request model into just a request model
-    @classmethod
     def _get_attribute_names(cls):
         model = cls.Meta.model
         return [
