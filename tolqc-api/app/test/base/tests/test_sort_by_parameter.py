@@ -76,7 +76,7 @@ class TestBadSortByParameter200(BaseTestCase):
             }
         )
 
-    def test_sort_by_and_filter_200(self):    
+    def test_sort_by_and_filter_200(self):
         self.add_G(id=90909, bool_column=True)
         self.add_G(id=45878, bool_column=False)
         self.add_G(id=7482, bool_column=True)
@@ -105,7 +105,7 @@ class TestBadSortByParameter200(BaseTestCase):
                             'datetime_column': None,
                             'bool_column': True,
                             'string_column': None
-                        } 
+                        }
                     },
                     {
                         'type': 'G',
@@ -115,7 +115,7 @@ class TestBadSortByParameter200(BaseTestCase):
                             'datetime_column': None,
                             'bool_column': True,
                             'string_column': None
-                        } 
+                        }
                     }
                 ]
             }

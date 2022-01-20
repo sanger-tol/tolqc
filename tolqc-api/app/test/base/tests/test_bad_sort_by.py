@@ -16,5 +16,3 @@ class TestBadSortByParameter400(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-
-
