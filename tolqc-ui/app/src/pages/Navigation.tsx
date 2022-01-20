@@ -56,6 +56,8 @@ const getBackgroundClass = (environment: string): string => {
       return "bg-info"
     case "staging":
       return "bg-success";
+    case "qa":
+      return "bg-secondary";
   }
   return "";
 }
