@@ -14,7 +14,7 @@ from main.model import InstanceDoesNotExistException, \
                        BadParameterException
 
 
-class MalformedFilterStringException(Exception):
+class MalformedParameterStringException(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__()
@@ -81,15 +81,16 @@ def provide_parameters(function):
     @wraps(function)
     def wrapper(cls, *args, **kwargs):
         try:
-            page, eq_filters = cls.parse_parameters()
+            page, eq_filters, sort_by = cls.parse_parameters()
             return function(
                 cls,
                 *args,
                 page=page,
                 eq_filters=eq_filters,
+                sort_by=sort_by,
                 **kwargs
             )
-        except MalformedFilterStringException as e:
+        except MalformedParameterStringException as e:
             return cls.error_400(
                 e.message
             )
@@ -106,7 +107,7 @@ class BaseService:
     @classmethod
     def _split_filter_term(cls, filter_term):
         if '==' not in filter_term:
-            raise MalformedFilterStringException(
+            raise MalformedParameterStringException(
                 "There is no double equals sign in filter "
                 f"term: '{filter_term}'."
             )
@@ -114,14 +115,15 @@ class BaseService:
         return filter_key, filter_value
 
     @classmethod
-    def _parse_filters(cls, filter_string):
+    def _parse_filters(cls):
+        filter_string = request.args.get('filter')
         if not filter_string:
             return None
         if not (
             filter_string.startswith('[') and
             filter_string.endswith(']')
         ):
-            raise MalformedFilterStringException(
+            raise MalformedParameterStringException(
                 'The entire filter query parameter must '
                 'be enclosed in square brackets.'
             )
@@ -137,11 +139,21 @@ class BaseService:
         }
 
     @classmethod
+    def _parse_sort_by(cls):
+        sort_by_string = request.args.get('sort_by')
+        if not sort_by_string:
+            return None
+        # if starts with minus sign, descending and strip the first character
+        ascending = not sort_by_string.startswith('-')
+        sort_by_string = sort_by_string if ascending else sort_by_string[1:]
+        return (sort_by_string, ascending)
+
+    @classmethod
     def parse_parameters(cls):
         page = request.args.get('page')
-        filter_string = request.args.get('filter')
-        eq_filters = cls._parse_filters(filter_string)
-        return page, eq_filters
+        eq_filters = cls._parse_filters()
+        sort_by = cls._parse_sort_by()
+        return page, eq_filters, sort_by
 
     @classmethod
     def error_400(cls, message):
@@ -232,7 +244,7 @@ class BaseService:
     @classmethod
     @provide_parameters
     @handle_400_bad_parameter
-    def read_bulk(cls, page=1, eq_filters={}, user_id=None):
+    def read_bulk(cls, page=1, eq_filters=None, sort_by=None, user_id=None):
         schema = cls.Meta.schema(many=True)
-        model_instances = cls.Meta.model.find_bulk(page, eq_filters)
+        model_instances = cls.Meta.model.find_bulk(page, eq_filters, sort_by)
         return schema.dump(model_instances), 200

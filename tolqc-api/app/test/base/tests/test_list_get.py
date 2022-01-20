@@ -127,7 +127,7 @@ class TestListGet(BaseTestCase):
             )
 
         response = self.client.open(
-            '/api/v1/C?page=2&filter='
+            '/api/v1/C?page=2&sort_by=-nullable_column&filter='
             '[nullable_column=="something about clones"]',
             method='GET'
         )

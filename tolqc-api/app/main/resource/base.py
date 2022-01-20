@@ -60,7 +60,16 @@ def _document_list_get(cls):
             params={
                 'page': {
                     'in': 'query',
+                    'type': 'integer',
                     'description': 'The page of the results'
+                },
+                'sort_by': {
+                    'in': 'query',
+                    'description': 'The field by which to order results. '
+                                   'Prepend with a minus sign to sort '
+                                   'descending, e.g. -name, otherwise sorting '
+                                   'will be ascending. (Sorts by id ascending '
+                                   'by default).'
                 },
                 'filter': {
                     'in': 'query',
