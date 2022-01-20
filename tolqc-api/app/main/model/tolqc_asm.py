@@ -15,6 +15,6 @@ class TolqcAsm(SubBase):
     asm_stats_instance_id = db.Column(db.Integer(), db.ForeignKey("asm_stats.id"),
                                       nullable=False)
     data = db.relationship("TolqcData", back_populates="asm",
-                          foreign_keys=[data_instance_id])
+                           foreign_keys=[data_instance_id])
     asm_stats = db.relationship("TolqcAsmStats", back_populates="asm",
-                          foreign_keys=[asm_stats_instance_id])
+                                foreign_keys=[asm_stats_instance_id])

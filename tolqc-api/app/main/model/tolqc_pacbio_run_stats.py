@@ -9,7 +9,7 @@ class TolqcPacbioRunStats(SubBase):
     __tablename__ = "pacbio_run_stats"
     id = db.Column(db.Integer(), primary_key=True)
     run_instance_id = db.Column(db.Integer(), db.ForeignKey("run.id"),
-                                 nullable=False)
+                                nullable=False)
     move_time = db.Column(db.Integer())
     pre_Extention_time = db.Column(db.String())
     total_bases = db.Column(db.String())
