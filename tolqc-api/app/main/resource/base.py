@@ -33,7 +33,7 @@ def _document_detail_get(cls):
 def _document_patch(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
-        api.expect(swagger.patch_request_model),
+        api.expect(swagger.request_model),
         api.response(200, description='Success'),
         api.response(400, description='Bad Request'),
         api.response(404, description='Not Found'),
@@ -88,7 +88,7 @@ def _document_list_get(cls):
 def _document_post(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
-        api.expect(swagger.post_request_model),
+        api.expect(swagger.request_model),
         api.response(201, description="Created"),
         api.response(400, description='Bad Request'),
         auth(api)
