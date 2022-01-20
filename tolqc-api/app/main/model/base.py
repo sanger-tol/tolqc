@@ -123,7 +123,7 @@ class Base(db.Model):
             sort_by_column_name,
             ascending
         )
-        return query.order_by(sort_by_column)        
+        return query.order_by(sort_by_column)
 
     @classmethod
     def _filter_query(cls, eq_filters):
