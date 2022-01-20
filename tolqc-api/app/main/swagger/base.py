@@ -114,6 +114,15 @@ class BaseSwagger:
                 'type': 'string',
                 'default': '1'
             }
+        if cls.Meta.schema.has_ext_field():
+            schema_model['properties']['data']['properties']['meta'] = {
+                'type': 'object',
+                'propeties': {
+                    'ext': {
+                        'type': 'object'
+                    }
+                }
+            }
         return schema_model
 
     @classmethod
