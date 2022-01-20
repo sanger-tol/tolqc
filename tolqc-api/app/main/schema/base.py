@@ -34,6 +34,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     class BaseMeta(SQLAlchemyAutoSchema.Meta):
         strict = True
         include_resource_linkage = True
+        ordered = True
         sqla_session = db.session
         load_instance = True
         include_fk = True

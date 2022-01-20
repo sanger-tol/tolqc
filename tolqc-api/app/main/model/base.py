@@ -126,7 +126,7 @@ class Base(db.Model):
         return query.order_by(sort_by_column)        
 
     @classmethod
-    def _filter_query(cls, eq_filters, sort_by):
+    def _filter_query(cls, eq_filters):
         eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
         query = db.session.query(cls)
         if eq_filter_terms is not None:
@@ -158,7 +158,7 @@ class Base(db.Model):
 
     @classmethod
     def find_bulk(cls, page, eq_filters, sort_by):
-        query = cls._filter_query(eq_filters, sort_by)
+        query = cls._filter_query(eq_filters)
         query = cls._sort_by_query(query, sort_by)
         return cls._paginate_query(query, page)
 
