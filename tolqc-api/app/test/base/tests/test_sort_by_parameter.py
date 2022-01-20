@@ -18,6 +18,64 @@ class TestBadSortByParameter200(BaseTestCase):
         )
         self.assertEqual(len(response.json['data']), 1)
 
+    def test_sort_by_default_id_ascending_200(self):
+        self.add_C(id=89)
+        self.add_C(id=39489)
+        self.add_C(id=768)
+        self.add_C(id=78)
+
+        # no sort_by parameter specified
+        response = self.client.open(
+            '/api/v1/C',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(len(response.json['data']), 4)
+
+        # in correct (ascending) order of id
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'type': 'C',
+                        'id': '78',
+                        'attributes': {
+                            'nullable_column': None,
+                            'other_column': None
+                        }
+                    },
+                    {
+                        'type': 'C',
+                        'id': '89',
+                        'attributes': {
+                            'nullable_column': None,
+                            'other_column': None
+                        }
+                    },
+                    {
+                        'type': 'C',
+                        'id': '768',
+                        'attributes': {
+                            'nullable_column': None,
+                            'other_column': None
+                        }
+                    },
+                    {
+                        'type': 'C',
+                        'id': '39489',
+                        'attributes': {
+                            'nullable_column': None,
+                            'other_column': None
+                        }
+                    },
+                ]
+            }
+        )
+
     def test_sort_by_and_filter_200(self):    
         self.add_G(id=90909, bool_column=True)
         self.add_G(id=45878, bool_column=False)
