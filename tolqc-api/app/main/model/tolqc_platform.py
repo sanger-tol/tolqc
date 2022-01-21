@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .base import Base, db
 
 
-class TolqcPlatform(CreationLogBase):
+class TolqcPlatform(Base):
     __tablename__ = "platforms"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)

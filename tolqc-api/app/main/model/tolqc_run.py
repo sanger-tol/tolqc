@@ -19,6 +19,7 @@ class TolqcRun(CreationLogBase):
     element = db.Column(db.String())
     changed = db.Column(db.DateTime())
     current = db.Column(db.Boolean())
-    seqs = db.relationship("TolqcSeq", back_populates="runs")
+    seq = db.relationship("TolqcSeq", back_populates="runs")
     platforms = db.relationship("TolqcPlatform", back_populates="runs", foreign_keys=[platform_id])
     centres = db.relationship("TolqcCentre", back_populates="runs", foreign_keys=[centre_id])
+    pacbio_run_stats = db.relationship("TolqcPacbioRunStats", back_populates="runs")

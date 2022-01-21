@@ -19,4 +19,4 @@ class TolqcSample(CreationLogBase):
     current = db.Column(db.Boolean())
     specimens = db.relationship("TolqcSpecimen", back_populates="samples",
                                 foreign_keys=[specimen_instance_id])
-    seqs = db.relationship("TolqcSeq", back_populates="samples")
+    seq = db.relationship("TolqcSeq", back_populates="samples")
