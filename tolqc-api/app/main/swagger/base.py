@@ -11,7 +11,6 @@ def setup_swagger(cls):
     return cls
 
 
-#TODO reintroduce ext data
 class BaseSwagger:
     @classmethod
     def _get_field_schema_model_type(cls, python_type):
@@ -90,32 +89,22 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_schema_model(cls, is_request=True):
+    def _get_resource_object_schema_model(cls, type_, is_request=True):
         schema_model = {
-            'type': 'object',
+            "type": "object",
             'properties': {
-                "data": {
-                    "type": "object",
-                    'properties': {
-                        'type': {
-                            'type': 'string',
-                            'default': cls.type_
-                        },
-                        'attributes': cls._get_attributes_dict(
-                            is_request=is_request
-                        ),
-                        'relationships': cls._get_relationships_dict()
-                    }
-                }
+                'type': {
+                    'type': 'string',
+                    'default': type_
+                },
+                'attributes': cls._get_attributes_dict(
+                    is_request=is_request
+                ),
+                'relationships': cls._get_relationships_dict()
             }
         }
-        if not is_request:
-            schema_model['properties']['data']['properties']['id'] = {
-                'type': 'string',
-                'default': '1'
-            }
         if cls.Meta.schema.has_ext_field():
-            schema_model['properties']['data']['properties']['meta'] = {
+            schema_model['properties']['meta'] = {
                 'type': 'object',
                 'propeties': {
                     'ext': {
@@ -126,13 +115,48 @@ class BaseSwagger:
         return schema_model
 
     @classmethod
+    def _get_request_schema_model(cls, type_):
+        return {
+            'type': 'object',
+            'properties': {
+                "data": cls._get_resource_object_schema_model(
+                    type_,
+                    is_request=True
+                )
+            }
+        }
+
+    @classmethod
+    def _get_individual_response_schema_model(cls, type_):
+        return {
+            'type': 'object',
+            'properties': {
+                "data": cls._get_resource_object_schema_model(
+                    type_,
+                    is_request=False
+                )
+            }
+        }
+
+    @classmethod
+    def _get_bulk_response_schema_model(cls, type_):
+        return {
+            'type': 'object',
+            'properties': {
+                'data': {
+                    'type': 'array',
+                    'items': cls._get_resource_object_schema_model(
+                        type_,
+                        is_request=False
+                    )
+                }
+            }
+        }
+
+    @classmethod
     def populate_default_models(cls):
-        """Defines each of a:
-        - post request model
-        - patch request model
-        """
         schema = cls.Meta.schema
-        cls.type_ = type_ = schema.get_type()
+        type_ = schema.get_type()
         cls.attributes, cls.relationships = schema.get_swagger_details()
 
         cls.api = Namespace(
@@ -143,5 +167,15 @@ class BaseSwagger:
 
         cls.request_model = cls.api.schema_model(
             f'{type_.title()} Request',
-            cls._get_schema_model(is_request=True)
+            cls._get_request_schema_model(type_)
+        )
+
+        cls.individual_response_model = cls.api.schema_model(
+            f'{type_.title()} Individual Response',
+            cls._get_individual_response_schema_model(type_)
+        )
+
+        cls.bulk_response_model = cls.api.schema_model(
+            f'{type_.title()} Bulk Response',
+            cls._get_bulk_response_schema_model(type_)
         )

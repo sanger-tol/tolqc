@@ -22,9 +22,13 @@ def _get_api_swagger(cls):
 
 
 def _document_detail_get(cls):
-    api, _ = _get_api_swagger(cls)
+    api, swagger = _get_api_swagger(cls)
     decorators = (
-        api.response(200, description='Success'),
+        api.response(
+            200,
+            description='Success',
+            model=swagger.individual_response_model
+        ),
         api.response(404, description='Not Found')
     )
     cls.get = _compose_decorators(cls.get, decorators)
@@ -34,7 +38,11 @@ def _document_patch(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
         api.expect(swagger.request_model),
-        api.response(200, description='Success'),
+        api.response(
+            200,
+            description='Success',
+            model=swagger.individual_response_model
+        ),
         api.response(400, description='Bad Request'),
         api.response(404, description='Not Found'),
         auth(api)
@@ -54,8 +62,15 @@ def _document_delete(cls):
 
 
 def _document_list_get(cls):
-    api, _ = _get_api_swagger(cls)
+    api, swagger = _get_api_swagger(cls)
+    response_model = swagger.bulk_response_model
     decorators = (
+        api.response(
+            200,
+            description='Success',
+            model=swagger.bulk_response_model
+        ),
+        api.response(400, description='Bad Request'),
         api.doc(
             params={
                 'page': {
@@ -79,8 +94,6 @@ def _document_list_get(cls):
                 }
             }
         ),
-        api.response(200, description='Success'),
-        api.response(400, description='Bad Request'),
     )
     cls.get = _compose_decorators(cls.get, decorators)
 
@@ -89,7 +102,11 @@ def _document_post(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
         api.expect(swagger.request_model),
-        api.response(201, description="Created"),
+        api.response(
+            201,
+            description="Created",
+            model=swagger.individual_response_model
+        ),
         api.response(400, description='Bad Request'),
         auth(api)
     )
