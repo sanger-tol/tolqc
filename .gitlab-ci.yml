@@ -56,8 +56,9 @@ test-ui:
   script:
     - docker run -e CI=true $CI_REGISTRY_IMAGE/tolqc-ui-test:$CI_COMMIT_SHA yarn test
   except:
-    - production
+    - qa
     - staging
+    - production
   allow_failure: true
 
 push-api:
@@ -83,6 +84,20 @@ push-ui-test:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ''
     NAME: tolqc-ui-test
+
+deploy-qa:
+  extends: .swarm-deploy-template
+  environment:
+    name: qa
+    url: http://172.27.27.72:8000
+  variables:
+    DOCKER_HOST: "ssh://ubuntu@172.27.27.72"
+    EXTRA_DEPLOY_FILES: ""
+    STACK_NAME: tolqc
+  script:
+    - echo "Deployed to qa"
+  only:
+    - qa
 
 deploy-staging:
   extends: .swarm-deploy-template
@@ -133,5 +148,6 @@ test-api:
     - docker exec $(docker ps -q -f name="tolqc_tolqc-api") 
       bash -c "pytest -v"
   except:
+    - qa
     - staging
     - production
