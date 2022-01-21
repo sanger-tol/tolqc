@@ -63,7 +63,6 @@ def _document_delete(cls):
 
 def _document_list_get(cls):
     api, swagger = _get_api_swagger(cls)
-    response_model = swagger.bulk_response_model
     decorators = (
         api.response(
             200,
