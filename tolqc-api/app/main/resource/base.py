@@ -18,7 +18,7 @@ def no_op_decorator(function):
 
 def _compose_decorators(function, decorators):
     decorators = reversed(decorators)
-    func = function
+    func = function.__func__
     for d in decorators:
         func = d(func)
     return func
