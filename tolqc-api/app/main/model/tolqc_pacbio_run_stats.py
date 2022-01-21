@@ -11,7 +11,7 @@ class TolqcPacbioRunStats(CreationLogBase):
     run_instance_id = db.Column(db.Integer(), db.ForeignKey("runs.id"),
                                 nullable=False)
     move_time = db.Column(db.Integer())
-    pre_Extention_time = db.Column(db.String())
+    pre_extension_time = db.Column(db.String())
     total_bases = db.Column(db.String())
     polymerase_reads = db.Column(db.String())
     polymerase_reads_bases = db.Column(db.String())
