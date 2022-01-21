@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from datetime import datetime
 from marshmallow.decorators import post_dump, pre_dump, post_load, pre_load
 from marshmallow.exceptions import ValidationError
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
@@ -133,174 +132,25 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.model.has_ext_column()
 
     @classmethod
-    def _get_dict_schema(cls, exclude_fields=[]):
-        return {
-            f: cls._get_field_schema_model_type(f)
-            for f in cls.get_model_fields(
-                exclude_fields=exclude_fields + ['ext', 'created_by', 'created_at']
-            )
-        }
-
-    @classmethod
-    def _post_attributes_schema_model_dict(cls, exclude_fields=[]):
-        dict_schema = cls._get_dict_schema(exclude_fields=exclude_fields)
-
-        required_fields = cls._get_required_fields(exclude_fields=exclude_fields)
-
-        return {
-            'required': required_fields,
-            'properties': dict_schema,
-            'type': 'object',
-        }
-
-    @classmethod
-    def _patch_attributes_schema_model_dict(cls, exclude_fields=[]):
-        dict_schema = cls._get_dict_schema(exclude_fields=exclude_fields)
-
-        return {
-            'properties': dict_schema,
-            'type': 'object',
-        }
-
-    @classmethod
-    def _get_field_schema_model_type(cls, field):
+    def _get_attribute_names(cls):
         model = cls.Meta.model
-        python_type = model.get_column_python_type(
-            field
-        )
-
-        if python_type == int:
-            return {
-                'type': 'integer'
-            }
-        if python_type == str:
-            return {
-                'type': 'string'
-            }
-        if python_type == bool:
-            return {
-                'type': 'boolean'
-            }
-        if python_type == datetime:
-            return {
-                'type': 'string',
-                'format': 'date-time'
-            }
-        if python_type == float:
-            return {
-                'type': 'number',
-                'format': 'float'
-            }
-
-        raise NotImplementedError(
-            "Type f'{python_type}' has not been implemented yet."
-        )
-
-    @classmethod
-    def get_model_fields(cls, exclude_fields=[]):
-        column_names = cls.Meta.model.get_column_names()
         return [
-            c for c in column_names
-            if c not in exclude_fields
+            column for column in model.get_column_names()
+            if column not in ['id', 'ext'] + model.get_foreign_key_column_names()
         ]
 
     @classmethod
-    def _get_non_required_fields(cls):
-        return cls.Meta.model.get_nullable_column_names()
-
-    @classmethod
-    def _get_required_fields(cls, exclude_fields=[]):
-        all_fields = cls.get_model_fields(exclude_fields)
-        non_required_fields = cls._get_non_required_fields()
-        return [
-            f for f in all_fields
-            if f not in non_required_fields
-            and f not in exclude_fields
+    def get_swagger_details(cls):
+        attributes = [
+            (name, cls.Meta.model.get_column_python_type(name))
+            for name in cls._get_attribute_names()
         ]
-
-    @classmethod
-    def _get_individual_relationship_dict(cls, target_table):
-        return {
-            'type': 'object',
-            'properties': {
-                'data': {
-                    'type': 'object',
-                    'properties': {
-                        'type': {
-                            'type': 'string',
-                            'default': target_table
-                        },
-                        'id': {
-                            'type': 'string',
-                            'default': "1"
-                        }
-                    }
-                }
-            }
+        relationships = {
+            key: value
+            for key, value in cls.relationship_target_info.items()
+            if key not in cls.Meta.excluded_relationships
         }
-
-    @classmethod
-    def _get_relationships_dict(cls):
-        return {
-            'type': 'object',
-            'properties': {
-                special_name: cls._get_individual_relationship_dict(
-                    cls.relationship_target_info[special_name]["target_table"]
-                )
-                for special_name
-                in cls.relationship_target_info.keys()
-                if special_name not in cls.Meta.excluded_relationships
-            }
-        }
-
-    @classmethod
-    def _to_request_schema_model_dict(cls, attributes):
-        schema_model_dict = {
-            'type': 'object',
-            'required': ['data'],
-            'properties': {
-                "data": {
-                    "type": "object",
-                    'required': ['type', 'attributes'],
-                    'properties': {
-                        'type': {
-                            'type': 'string',
-                            'default': cls.get_type()
-                        },
-                        'attributes': attributes,
-                        'relationships': cls._get_relationships_dict()
-                    }
-                }
-            }
-        }
-        if not cls.has_ext_field():
-            return schema_model_dict
-        # add resource level meta
-        schema_model_dict['properties']['data']['properties']['meta'] = {
-            'type': 'object',
-            'properties': {
-                'ext': {
-                    'type': 'object'
-                }
-            }
-        }
-        return schema_model_dict
-
-    @classmethod
-    def to_post_request_schema_model_dict(cls):
-        """Returns a dict for a Model for a POST request"""
-        attributes = cls._post_attributes_schema_model_dict(
-            exclude_fields=['id'] + cls.get_excluded_columns()
-        )
-        return cls._to_request_schema_model_dict(attributes)
-
-    @classmethod
-    def to_patch_request_schema_model_dict(cls):
-        """Returns a dict for a Model for a PATCH request"""
-        attributes = cls._patch_attributes_schema_model_dict(
-            exclude_fields=['id'] + cls.get_excluded_columns()
-        )
-        return cls._to_request_schema_model_dict(attributes)
+        return attributes, relationships
 
     def _make_instance_without_ext(self, data, **kwargs):
         instance = self.instance

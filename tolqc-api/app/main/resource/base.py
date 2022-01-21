@@ -3,8 +3,17 @@
 # SPDX-License-Identifier: MIT
 
 from flask_restx import Resource
+from functools import wraps
 
 from main.auth import auth
+
+
+def no_op_decorator(function):
+    """Necessary as a substitute for the auth decorator"""
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        return function(*args, **kwargs)
+    return wrapper
 
 
 def _compose_decorators(function, decorators):
@@ -22,10 +31,15 @@ def _get_api_swagger(cls):
 
 
 def _document_detail_get(cls):
-    api, _ = _get_api_swagger(cls)
+    api, swagger = _get_api_swagger(cls)
     decorators = (
-        api.response(200, description='Success'),
-        api.response(404, description='Not Found')
+        api.response(
+            200,
+            description='Success',
+            model=swagger.individual_response_model
+        ),
+        api.response(404, description='Not Found'),
+        no_op_decorator
     )
     cls.get = _compose_decorators(cls.get, decorators)
 
@@ -33,8 +47,12 @@ def _document_detail_get(cls):
 def _document_patch(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
-        api.expect(swagger.patch_request_model),
-        api.response(200, description='Success'),
+        api.expect(swagger.request_model),
+        api.response(
+            200,
+            description='Success',
+            model=swagger.individual_response_model
+        ),
         api.response(400, description='Bad Request'),
         api.response(404, description='Not Found'),
         auth(api)
@@ -54,7 +72,7 @@ def _document_delete(cls):
 
 
 def _document_list_get(cls):
-    api, _ = _get_api_swagger(cls)
+    api, swagger = _get_api_swagger(cls)
     decorators = (
         api.doc(
             params={
@@ -77,10 +95,16 @@ def _document_list_get(cls):
                                    'like [key1==value1,key2==value2]. '
                                    'Delimit strings with " or \', e.g. "string".'
                 }
+            },
+            responses={
+                '200': (
+                    'Success',
+                    swagger.bulk_response_model,
+                ),
+                '400': 'Bad Request'
             }
         ),
-        api.response(200, description='Success'),
-        api.response(400, description='Bad Request'),
+        no_op_decorator
     )
     cls.get = _compose_decorators(cls.get, decorators)
 
@@ -88,8 +112,12 @@ def _document_list_get(cls):
 def _document_post(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
-        api.expect(swagger.post_request_model),
-        api.response(201, description="Created"),
+        api.expect(swagger.request_model),
+        api.response(
+            201,
+            description="Created",
+            model=swagger.individual_response_model
+        ),
         api.response(400, description='Bad Request'),
         auth(api)
     )
