@@ -26,4 +26,4 @@ class TolqcMerqury(CreationLogBase):
                                 foreign_keys=[asm_stats_instance_id])
     data = db.relationship("TolqcData", back_populates="merqury", foreign_keys=[data_id])
     software_versions = db.relationship("TolqcSoftwareVersion", back_populates="merqury",
-                                       foreign_keys=[software_version_instance_id])
+                                        foreign_keys=[software_version_instance_id])

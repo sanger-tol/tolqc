@@ -32,4 +32,4 @@ class TolqcPacbioRunStats(CreationLogBase):
     demux_pass = db.Column(db.String())
     demux_fail = db.Column(db.String())
     runs = db.relationship("TolqcRun", back_populates="pacbio_run_stats",
-                          foreign_keys=[run_instance_id])
+                           foreign_keys=[run_instance_id])

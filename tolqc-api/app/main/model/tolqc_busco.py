@@ -22,4 +22,4 @@ class TolqcBusco(CreationLogBase):
     asm_stats = db.relationship("TolqcAsmStats", back_populates="busco",
                                 foreign_keys=[asm_stats_instance_id])
     software_versions = db.relationship("TolqcSoftwareVersion", back_populates="busco",
-                                       foreign_keys=[software_version_instance_id])
+                                        foreign_keys=[software_version_instance_id])

@@ -16,4 +16,4 @@ class TolqcCobiont(CreationLogBase):
     changed = db.Column(db.DateTime())
     current = db.Column(db.String())
     specimens = db.relationship("TolqcSpecimen", back_populates="cobionts",
-                               foreign_keys=[specimen_instance_id])
+                                foreign_keys=[specimen_instance_id])
