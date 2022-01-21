@@ -3,13 +3,22 @@
 # SPDX-License-Identifier: MIT
 
 from flask_restx import Resource
+from functools import wraps
 
 from main.auth import auth
 
 
+def no_op_decorator(function):
+    """Necessary as a substitute for the auth decorator"""
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        return function(*args, **kwargs)
+    return wrapper
+
+
 def _compose_decorators(function, decorators):
     decorators = reversed(decorators)
-    func = function.__func__
+    func = function
     for d in decorators:
         func = d(func)
     return func
@@ -29,7 +38,8 @@ def _document_detail_get(cls):
             description='Success',
             model=swagger.individual_response_model
         ),
-        api.response(404, description='Not Found')
+        api.response(404, description='Not Found'),
+        no_op_decorator
     )
     cls.get = _compose_decorators(cls.get, decorators)
 
@@ -64,12 +74,6 @@ def _document_delete(cls):
 def _document_list_get(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
-        api.response(
-            200,
-            description='Success',
-            model=swagger.bulk_response_model
-        ),
-        api.response(400, description='Bad Request'),
         api.doc(
             params={
                 'page': {
@@ -91,8 +95,16 @@ def _document_list_get(cls):
                                    'like [key1==value1,key2==value2]. '
                                    'Delimit strings with " or \', e.g. "string".'
                 }
+            },
+            responses={
+                '200': (
+                    'Success',
+                    swagger.bulk_response_model,
+                ),
+                '400': 'Bad Request'
             }
         ),
+        no_op_decorator
     )
     cls.get = _compose_decorators(cls.get, decorators)
 
