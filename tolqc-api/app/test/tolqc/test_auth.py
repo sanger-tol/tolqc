@@ -66,20 +66,8 @@ class TestAuthentication(TolqcTestCase):
                 "attributes": {
                     "hierarchy_name": "Hierarchy Tester",
                     "name": "David",
-                    "created_at": response.json['data']['attributes']['created_at'],
                 },
-                "id": created_id,
-                "relationships": {
-                    "creator": {
-                        "data": {
-                            "id": "100",
-                            "type": "users"
-                        },
-                        "links": {
-                            "related": "/users/100"
-                        }
-                    }
-                }
+                "id": created_id
             }
         }
         self.assertEqual(expect_data, response.json)
