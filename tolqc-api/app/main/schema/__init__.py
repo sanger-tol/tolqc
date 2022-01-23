@@ -15,3 +15,15 @@ from .seq import SeqSchema # noqa
 from .species import SpeciesSchema # noqa
 from .specimen import SpecimenSchema # noqa
 from .user import UserSchema # noqa
+from .asm_stats import AsmStatsSchema # noqa
+from .asm import AsmSchema # noqa
+from .busco import BuscoSchema # noqa
+from .cobiont import CobiontSchema # noqa
+from .data import DataSchema # noqa
+from .file import FileSchema # noqa
+from .merqury import MerqurySchema # noqa
+from .pacbio_run_stats import PacbioRunStatsSchema # noqa
+from .seq_data import SeqDataSchema # noqa
+from .sex import SexSchema # noqa
+from .software_version import SoftwareVersionSchema # noqa
+from .status import StatusSchema # noqa

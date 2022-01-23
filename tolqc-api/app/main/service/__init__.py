@@ -16,3 +16,15 @@ from .species import SpeciesService # noqa
 from .specimen import SpecimenService # noqa
 from .run import RunService # noqa
 from .user import UserService # noqa
+from .asm import AsmService # noqa
+from .asm_stats import AsmStatsService # noqa
+from .busco import BuscoService # noqa
+from .cobiont import CobiontService # noqa
+from .data import DataService # noqa
+from .file import FileService # noqa
+from .merqury import MerquryService # noqa
+from .pacbio_run_stats import PacbioRunStatsService # noqa
+from .seq_data import SeqDataService # noqa
+from .sex import SexService # noqa
+from .software_version import SoftwareVersionService # noqa
+from .status import StatusService # noqa

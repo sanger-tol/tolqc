@@ -2,25 +2,25 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.service import LibraryService
-from main.swagger import LibrarySwagger
+from main.service import SoftwareVersionService
+from main.swagger import SoftwareVersionSwagger
 
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_library = LibrarySwagger.api
+api_SoftwareVersion = SoftwareVersionSwagger.api
 
 
-class LibraryResourceMeta:
-    service = LibraryService
-    swagger = LibrarySwagger
-
-
-@setup_resource
-class LibraryDetailResource(BaseDetailResource):
-    Meta = LibraryResourceMeta
+class SoftwareVersionResourceMeta:
+    service = SoftwareVersionService
+    swagger = SoftwareVersionSwagger
 
 
 @setup_resource
-class LibraryListResource(BaseListResource):
-    Meta = LibraryResourceMeta
+class SoftwareVersionDetailResource(BaseDetailResource):
+    Meta = SoftwareVersionResourceMeta
+
+
+@setup_resource
+class SoftwareVersionListResource(BaseListResource):
+    Meta = SoftwareVersionResourceMeta
