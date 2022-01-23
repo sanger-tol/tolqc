@@ -8,7 +8,7 @@ from main.swagger import SeqDataSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_SeqData = SeqDataSwagger.api
+api_seq_data = SeqDataSwagger.api
 
 
 class SeqDataResourceMeta:

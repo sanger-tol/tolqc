@@ -8,7 +8,7 @@ from main.swagger import PacbioRunStatsSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_PacbioRunStats = PacbioRunStatsSwagger.api
+api_pacbio_run_stats = PacbioRunStatsSwagger.api
 
 
 class PacbioRunStatsResourceMeta:

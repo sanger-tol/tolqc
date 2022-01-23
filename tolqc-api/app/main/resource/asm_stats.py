@@ -8,7 +8,7 @@ from main.swagger import AsmStatsSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_AsmStats = AsmStatsSwagger.api
+api_asm_stats = AsmStatsSwagger.api
 
 
 class AsmStatsResourceMeta:

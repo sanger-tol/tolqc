@@ -8,7 +8,7 @@ from main.swagger import FileSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_File = FileSwagger.api
+api_file = FileSwagger.api
 
 
 class FileResourceMeta:

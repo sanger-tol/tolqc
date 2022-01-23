@@ -8,7 +8,7 @@ from main.swagger import DataSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_Data = DataSwagger.api
+api_data = DataSwagger.api
 
 
 class DataResourceMeta:

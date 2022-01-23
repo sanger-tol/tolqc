@@ -8,7 +8,7 @@ from main.swagger import SoftwareVersionSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_SoftwareVersion = SoftwareVersionSwagger.api
+api_software_version = SoftwareVersionSwagger.api
 
 
 class SoftwareVersionResourceMeta:

@@ -8,7 +8,7 @@ from main.swagger import SexSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_Sex = SexSwagger.api
+api_sex = SexSwagger.api
 
 
 class SexResourceMeta:

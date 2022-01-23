@@ -8,7 +8,7 @@ from main.swagger import StatusSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_Status = StatusSwagger.api
+api_status = StatusSwagger.api
 
 
 class StatusResourceMeta:

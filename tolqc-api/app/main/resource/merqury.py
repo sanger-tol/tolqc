@@ -8,7 +8,7 @@ from main.swagger import MerqurySwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_Merqury = MerqurySwagger.api
+api_merqury = MerqurySwagger.api
 
 
 class MerquryResourceMeta:

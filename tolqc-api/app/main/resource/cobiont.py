@@ -8,7 +8,7 @@ from main.swagger import CobiontSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_Cobiont = CobiontSwagger.api
+api_cobiont = CobiontSwagger.api
 
 
 class CobiontResourceMeta:

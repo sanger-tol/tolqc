@@ -8,7 +8,7 @@ from main.swagger import BuscoSwagger
 from .base import BaseListResource, BaseDetailResource, setup_resource
 
 
-api_Busco = BuscoSwagger.api
+api_busco = BuscoSwagger.api
 
 
 class BuscoResourceMeta:
