@@ -16,8 +16,7 @@ from main.resource import api_centre, api_environment, \
                           api_file, api_merqury, \
                           api_pacbio_run_stats, api_seq_data, \
                           api_cobiont, api_sex, \
-                          api_software_version, api_status \
-                          
+                          api_software_version, api_status
 
 
 def _get_environment_string(app):
