@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from .sex import SexService # noqa
 from .allocation import AllocationService # noqa
 from .centre import CentreService # noqa
 from .environment import EnvironmentService # noqa
@@ -16,3 +17,14 @@ from .species import SpeciesService # noqa
 from .specimen import SpecimenService # noqa
 from .run import RunService # noqa
 from .user import UserService # noqa
+from .software_version import SoftwareVersionService # noqa
+from .pacbio_run_stats import PacbioRunStatsService # noqa
+from .data import DataService # noqa
+from .seq_data import SeqDataService # noqa
+from .status import StatusService # noqa
+from .cobiont import CobiontService # noqa
+from .asm_stats import AsmStatsService # noqa
+from .asm import AsmService # noqa
+from .busco import BuscoService # noqa
+from .merqury import MerquryService # noqa
+from .file import FileService # noqa
