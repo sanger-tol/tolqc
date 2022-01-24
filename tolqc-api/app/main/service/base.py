@@ -124,6 +124,7 @@ class BaseService:
                 f"term: '{filter_term}'."
             )
         (filter_key, filter_value) = filter_term.split('==', 1)
+        # don't allow filtering against non public attributes
         if not cls.Meta.schema.attribute_is_public(filter_key):
             raise BadParameterStringException(
                 f"The filter key '{filter_key}' is invalid."

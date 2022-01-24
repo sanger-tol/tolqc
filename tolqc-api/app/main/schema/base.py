@@ -60,6 +60,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def setup(cls):
         cls.Meta.setup_meta()
+        cls._public_attribute_names = cls.get_public_attribute_names()
 
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
@@ -148,8 +149,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def attribute_is_public(cls, attribute_name):
-        #TODO cache this
-        return attribute_name in cls.get_public_attribute_names()
+        return attribute_name in cls._public_attribute_names
 
     @classmethod
     def get_included_attributes(cls):
