@@ -60,7 +60,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def setup(cls):
         cls.Meta.setup_meta()
-        cls._public_attribute_names = cls.get_public_attribute_names()
+        cls._public_attribute_names = cls._get_public_attribute_names()
 
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
@@ -141,7 +141,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.model.has_ext_column()
 
     @classmethod
-    def get_public_attribute_names(cls):
+    def _get_public_attribute_names(cls):
         return [
             column for column in cls.Meta.model.get_column_names()
             if column not in ['id', 'ext'] + cls._get_base_excluded_columns()
@@ -155,7 +155,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def get_included_attributes(cls):
         return [
             (name, cls.Meta.model.get_column_python_type(name))
-            for name in cls.get_public_attribute_names()
+            for name in cls._get_public_attribute_names()
         ]
 
     @classmethod
