@@ -115,8 +115,15 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.type_
 
     @classmethod
+    def _get_base_excluded_columns(cls):
+        """Gets the excluded columns on both requests and responses"""
+        excluded_columns = list(getattr(cls.Meta, 'exclude', []))
+        excluded_columns += cls.Meta.model.get_foreign_key_column_names()
+        return excluded_columns
+
+    @classmethod
     def get_excluded_columns(cls):
-        excluded_columns = cls.Meta.model.get_foreign_key_column_names()
+        excluded_columns = cls._get_base_excluded_columns()
         if cls.has_ext_field():
             excluded_columns += ['ext']
         if not cls.has_creation_details():
@@ -133,10 +140,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _get_attribute_names(cls):
-        model = cls.Meta.model
         return [
-            column for column in model.get_column_names()
-            if column not in ['id', 'ext'] + model.get_foreign_key_column_names()
+            column for column in cls.Meta.model.get_column_names()
+            if column not in ['id', 'ext'] + cls._get_base_excluded_columns()
         ]
 
     @classmethod

@@ -10,3 +10,5 @@ from .base import BaseSchema, setup_schema
 class UserSchema(BaseSchema):
     class Meta(BaseSchema.BaseMeta):
         model = TolqcUser
+        # exclude access credentials
+        exclude = ('api_key', 'token')
