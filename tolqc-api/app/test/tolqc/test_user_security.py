@@ -48,3 +48,10 @@ class TestUserSecurity(TolqcTestCase):
                 "data": expected_user
             }
         )
+
+    def test_no_blind_equal_filter_credential_disclosure(self):
+        response = self.client.open(
+            f'/api/v1/users?filter=[api_key=="{self.api_key}"]',
+            method='GET'
+        )
+        self.assert400(response)
