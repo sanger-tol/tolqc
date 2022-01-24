@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from this import d
 from marshmallow.decorators import post_dump, pre_dump, post_load, pre_load
 from marshmallow.exceptions import ValidationError
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
@@ -146,17 +147,19 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         ]
 
     @classmethod
-    def get_swagger_details(cls):
-        attributes = [
+    def get_included_attributes(cls):
+        return [
             (name, cls.Meta.model.get_column_python_type(name))
             for name in cls._get_attribute_names()
         ]
-        relationships = {
+
+    @classmethod
+    def get_included_relationships(cls):
+        return {
             key: value
             for key, value in cls.relationship_target_info.items()
             if key not in cls.Meta.excluded_relationships
         }
-        return attributes, relationships
 
     def _make_instance_without_ext(self, data, **kwargs):
         instance = self.instance
