@@ -59,6 +59,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def setup(cls):
         cls.Meta.setup_meta()
+        cls._public_attribute_names = cls._get_public_attribute_names()
 
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
@@ -115,8 +116,15 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.type_
 
     @classmethod
+    def _get_base_excluded_columns(cls):
+        """Gets the excluded columns on both requests and responses"""
+        excluded_columns = list(getattr(cls.Meta, 'exclude', []))
+        excluded_columns += cls.Meta.model.get_foreign_key_column_names()
+        return excluded_columns
+
+    @classmethod
     def get_excluded_columns(cls):
-        excluded_columns = cls.Meta.model.get_foreign_key_column_names()
+        excluded_columns = cls._get_base_excluded_columns()
         if cls.has_ext_field():
             excluded_columns += ['ext']
         if not cls.has_creation_details():
@@ -132,25 +140,30 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.model.has_ext_column()
 
     @classmethod
-    def _get_attribute_names(cls):
-        model = cls.Meta.model
+    def _get_public_attribute_names(cls):
         return [
-            column for column in model.get_column_names()
-            if column not in ['id', 'ext'] + model.get_foreign_key_column_names()
+            column for column in cls.Meta.model.get_column_names()
+            if column not in ['id', 'ext'] + cls._get_base_excluded_columns()
         ]
 
     @classmethod
-    def get_swagger_details(cls):
-        attributes = [
+    def attribute_is_public(cls, attribute_name):
+        return attribute_name in cls._public_attribute_names
+
+    @classmethod
+    def get_included_attributes(cls):
+        return [
             (name, cls.Meta.model.get_column_python_type(name))
-            for name in cls._get_attribute_names()
+            for name in cls._get_public_attribute_names()
         ]
-        relationships = {
+
+    @classmethod
+    def get_included_relationships(cls):
+        return {
             key: value
             for key, value in cls.relationship_target_info.items()
             if key not in cls.Meta.excluded_relationships
         }
-        return attributes, relationships
 
     def _make_instance_without_ext(self, data, **kwargs):
         instance = self.instance

@@ -163,7 +163,8 @@ class BaseSwagger:
     def populate_default_models(cls):
         schema = cls.Meta.schema
         type_ = cls.get_type()
-        cls.attributes, cls.relationships = schema.get_swagger_details()
+        cls.attributes = schema.get_included_attributes()
+        cls.relationships = schema.get_included_relationships()
 
         cls.api = Namespace(
             type_,
