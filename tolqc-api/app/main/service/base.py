@@ -102,17 +102,6 @@ class BaseService:
     neither of which are an instantiated instance"""
 
     @classmethod
-    def _get_non_public_eq_filter(cls, eq_filters):
-        """Returns None only if all filters refer to public columns
-        on the schema"""
-        #TODO cache this????
-        public_attributes = cls.Meta.schema.get_included_attributes()
-        for eq_filter_key in eq_filters.keys():
-            if eq_filter_key not in public_attributes:
-                return eq_filter_key
-        return None
-
-    @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
 

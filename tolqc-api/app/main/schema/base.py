@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from this import d
 from marshmallow.decorators import post_dump, pre_dump, post_load, pre_load
 from marshmallow.exceptions import ValidationError
 from marshmallow_jsonapi import Schema as JsonapiSchema, \
