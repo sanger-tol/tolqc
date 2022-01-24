@@ -14,7 +14,7 @@ from main.model import InstanceDoesNotExistException, \
                        BadParameterException
 
 
-class MalformedParameterStringException(Exception):
+class BadParameterStringException(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__()
@@ -90,7 +90,7 @@ def provide_parameters(function):
                 sort_by=sort_by,
                 **kwargs
             )
-        except MalformedParameterStringException as e:
+        except BadParameterStringException as e:
             return cls.error_400(
                 e.message
             )
@@ -100,6 +100,18 @@ def provide_parameters(function):
 class BaseService:
     """In meta class, requires a model class, and a schema class,
     neither of which are an instantiated instance"""
+
+    @classmethod
+    def _get_non_public_eq_filter(cls, eq_filters):
+        """Returns None only if all filters refer to public columns
+        on the schema"""
+        #TODO cache this????
+        public_attributes = cls.Meta.schema.get_included_attributes()
+        for eq_filter_key in eq_filters.keys():
+            if eq_filter_key not in public_attributes:
+                return eq_filter_key
+        return None
+
     @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
@@ -107,11 +119,15 @@ class BaseService:
     @classmethod
     def _split_filter_term(cls, filter_term):
         if '==' not in filter_term:
-            raise MalformedParameterStringException(
+            raise BadParameterStringException(
                 "There is no double equals sign in filter "
                 f"term: '{filter_term}'."
             )
         (filter_key, filter_value) = filter_term.split('==', 1)
+        if not cls.Meta.schema.attribute_is_public(filter_key):
+            raise BadParameterStringException(
+                f"The filter key '{filter_key}' is invalid."
+            )
         return filter_key, filter_value
 
     @classmethod
@@ -123,7 +139,7 @@ class BaseService:
             filter_string.startswith('[') and
             filter_string.endswith(']')
         ):
-            raise MalformedParameterStringException(
+            raise BadParameterStringException(
                 'The entire filter query parameter must '
                 'be enclosed in square brackets.'
             )

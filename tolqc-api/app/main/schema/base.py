@@ -140,17 +140,22 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.model.has_ext_column()
 
     @classmethod
-    def _get_attribute_names(cls):
+    def get_public_attribute_names(cls):
         return [
             column for column in cls.Meta.model.get_column_names()
             if column not in ['id', 'ext'] + cls._get_base_excluded_columns()
         ]
 
     @classmethod
+    def attribute_is_public(cls, attribute_name):
+        #TODO cache this
+        return attribute_name in cls.get_public_attribute_names()
+
+    @classmethod
     def get_included_attributes(cls):
         return [
             (name, cls.Meta.model.get_column_python_type(name))
-            for name in cls._get_attribute_names()
+            for name in cls.get_public_attribute_names()
         ]
 
     @classmethod
