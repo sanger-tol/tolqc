@@ -128,17 +128,19 @@ def _document_post(cls):
     cls.post = _compose_decorators(cls.post, decorators)
 
 
-def _document_relation_list_get(cls):
+def _document_relation_list_get(cls, relation):
     api, self_swagger = _get_api_swagger(cls)
-    type_ = self_swagger.get_type()
-    relation_swagger = BaseSwagger.get_registered_swagger(type_)
+    relation_swagger = BaseSwagger.get_registered_swagger(relation)
+    relation_list_response_model = self_swagger.register_relation_swagger(
+        relation_swagger
+    )
     decorators = (
         api.doc(
             params=PARAMS_DICT,
             responses={
                 '200': (
                     'Success',
-                    relation_swagger.bulk_response_model,
+                    relation_list_response_model,
                 ),
                 '400': 'Bad Request'
             }
@@ -165,7 +167,7 @@ def _document_detail_resource(cls):
 
 def _document_relation_list_resource(cls, relation):
     api, _ = _get_api_swagger(cls)
-    _document_relation_list_get(cls)
+    _document_relation_list_get(cls, relation)
     return api.route(f'/<int:id>/{relation}')(cls)
 
 

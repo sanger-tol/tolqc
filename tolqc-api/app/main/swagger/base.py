@@ -22,6 +22,25 @@ class BaseSwagger:
         return cls.swagger_registry_dict[type_]
 
     @classmethod
+    def register_relation_swagger(cls, relation_swagger):
+        # models have to be registered (with duplicates) per flask-restx's rules
+        self_type = cls.get_type().title()
+        relation_type = relation_swagger.get_type().title()
+        resource_object_copy = cls.api.schema_model(
+            f"{relation_type} Response Resource Object "
+            f"({self_type}'s Copy')",
+            relation_swagger.get_resource_object_schema_model(is_request=False)
+        )
+        return cls.api.model(
+            f"{relation_type} Bulk Response ({self_type}'s Copy)",
+            {
+                'data': fields.List(
+                    fields.Nested(resource_object_copy)
+                )
+            }
+        )
+
+    @classmethod
     def get_type(cls):
         return cls.Meta.schema.get_type()
 
@@ -107,7 +126,7 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_resource_object_schema_model(cls, is_request=True):
+    def get_resource_object_schema_model(cls, is_request=True):
         schema_model = {
             "type": "object",
             'properties': {
@@ -142,7 +161,7 @@ class BaseSwagger:
         return {
             'type': 'object',
             'properties': {
-                "data": cls._get_resource_object_schema_model(
+                "data": cls.get_resource_object_schema_model(
                     is_request=True
                 )
             }
@@ -153,7 +172,7 @@ class BaseSwagger:
         return {
             'type': 'object',
             'properties': {
-                "data": cls._get_resource_object_schema_model(
+                "data": cls.get_resource_object_schema_model(
                     is_request=False
                 )
             }
@@ -166,7 +185,7 @@ class BaseSwagger:
             'properties': {
                 'data': {
                     'type': 'array',
-                    'items': cls._get_resource_object_schema_model(
+                    'items': cls.get_resource_object_schema_model(
                         is_request=False
                     )
                 }
@@ -191,9 +210,9 @@ class BaseSwagger:
             cls._get_request_schema_model()
         )
 
-        response_resource_object = cls.api.schema_model(
+        cls.response_resource_object = cls.api.schema_model(
             f'{type_.title()} Response Resource Object',
-            cls._get_resource_object_schema_model(
+            cls.get_resource_object_schema_model(
                 is_request=False
             )
         )
@@ -201,7 +220,7 @@ class BaseSwagger:
         cls.individual_response_model = cls.api.model(
             f'{type_.title()} Individual Response',
             {
-                'data': fields.Nested(response_resource_object)
+                'data': fields.Nested(cls.response_resource_object)
             }
         )
 
@@ -209,7 +228,7 @@ class BaseSwagger:
             f'{type_.title()} Bulk Response',
             {
                 'data': fields.List(
-                    fields.Nested(response_resource_object)
+                    fields.Nested(cls.response_resource_object)
                 )
             }
         )
