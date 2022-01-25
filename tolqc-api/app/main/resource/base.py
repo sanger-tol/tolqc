@@ -199,7 +199,7 @@ class BaseResource:
             _document_relation_list_resource(type(
                 f'{type_.title()}RelationDetailResource_{r_name}',
                 (BaseRelationListResource,),
-                {'Meta': cls.Meta}
+                {'Meta': cls.Meta, 'relation': r_name}
             ), r_name)
             for r_name in relationship_names
         ]

@@ -158,7 +158,7 @@ class Base(db.Model):
         page = cls._preprocess_page(page)
         if page is not None:
             query = query.offset((page - 1) * PAGE_SIZE)
-        return query.limit(PAGE_SIZE).all()
+        return query.limit(PAGE_SIZE)
 
     @classmethod
     def _postprocess_bulk_find(cls, query, page=None, eq_filters=None, sort_by=None):
@@ -169,16 +169,14 @@ class Base(db.Model):
     @classmethod
     def bulk_find(cls, **kwargs):
         query = db.session.query(cls)
-        return cls._postprocess_bulk_find(query, **kwargs)
+        return cls._postprocess_bulk_find(query, **kwargs).all()
 
     @classmethod
     def bulk_find_on_relation_id(cls, relation_model, relation_id, **kwargs):
         cls._check_related_model_by_id_exists(relation_model, relation_id)
         foreign_key = cls._get_foreign_key_from_relation_model(relation_model)
-        query = db.session.query(cls) \
-                          .join(relation_model, relation_model.id == foreign_key) \
-                          .filter(relation_model.id == relation_id)
-        return cls._postprocess_bulk_find(query, **kwargs)
+        query = db.session.query(cls).filter(foreign_key==relation_id)
+        return cls._postprocess_bulk_find(query, **kwargs).all()
 
     @classmethod
     def _check_related_model_by_id_exists(cls, relation_model, relation_id):
@@ -186,10 +184,7 @@ class Base(db.Model):
                                      .filter_by(id=relation_id) \
                                      .one_or_none()
         if related_instance is None:
-            raise RelatedInstanceDoesNotExistException(
-                related_model=relation_model,
-                id=relation_id
-            )
+            raise RelatedInstanceDoesNotExistException(relation_model)
 
     @staticmethod
     def rollback():
@@ -208,16 +203,22 @@ class Base(db.Model):
         return instance
 
     @classmethod
+    def _get_target_table_from_column(cls, column):
+        return list(column.foreign_keys)[0].target_fullname.split('.')[0]
+
+    @classmethod
     def _get_foreign_key_from_relation_model(cls, relation_model):
-        columns = cls.__table__.columns
-        column_names = columns.keys()
-        foreign_keys = [
-            columns[c_name].foreign_keys[0] for c_name in column_names
+        columns = list(cls.__table__.columns)
+        # this doesn't support compound/composite keys
+        foreign_keys_columns = [
+            c for c in columns
+            if len(c.foreign_keys) == 1
         ]
+        #TODO cache this!!!
         relations = {
-            foreign_key.target_fullname.split('.')[0]: foreign_key
-            for foreign_key
-            in foreign_keys
+            cls._get_target_table_from_column(column): column
+            for column
+            in foreign_keys_columns
         }
         return relations[relation_model.__tablename__]
 
