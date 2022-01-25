@@ -131,7 +131,7 @@ def _document_post(cls):
 def _document_relation_list_get(cls, relation):
     api, self_swagger = _get_api_swagger(cls)
     relation_swagger = BaseSwagger.get_registered_swagger(relation)
-    relation_list_response_model = self_swagger.register_relation_swagger(
+    relation_list_response_model = self_swagger.duplicate_relationship_swagger(
         relation_swagger
     )
     decorators = (

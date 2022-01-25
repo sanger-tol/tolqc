@@ -22,7 +22,7 @@ class BaseSwagger:
         return cls.swagger_registry_dict[type_]
 
     @classmethod
-    def register_relation_swagger(cls, relation_swagger):
+    def duplicate_relationship_swagger(cls, relation_swagger):
         # models have to be registered (with duplicates) per flask-restx's rules
         self_type = cls.get_type().title()
         relation_type = relation_swagger.get_type().title()
