@@ -147,12 +147,10 @@ def setup_resource(cls):
 
 
 class BaseResource(Resource):
-    @classmethod
-    def auth_error(cls, message):
-        return cls.Meta.service.error_401(message)
+    pass
 
 
-class BaseListResource(BaseResource):
+class BaseListResource(Resource):
     @classmethod
     def is_list_resource(cls):
         return True
@@ -165,8 +163,12 @@ class BaseListResource(BaseResource):
     def post(cls, user_id=None):
         return cls.Meta.service.create(user_id=user_id)
 
+    @classmethod
+    def auth_error(cls, message):
+        return cls.Meta.service.error_401(message)
 
-class BaseDetailResource(BaseResource):
+
+class BaseDetailResource(Resource):
     @classmethod
     def is_list_resource(cls):
         return False
@@ -182,3 +184,7 @@ class BaseDetailResource(BaseResource):
     @classmethod
     def delete(cls, id, user_id=None):
         return cls.Meta.service.delete_by_id(id, user_id=user_id)
+
+    @classmethod
+    def auth_error(cls, message):
+        return cls.Meta.service.error_401(message)
