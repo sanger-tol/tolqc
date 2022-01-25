@@ -36,7 +36,6 @@ class InstanceDoesNotExistException(Exception):
         self.id = id
 
 
-
 class RelatedInstanceDoesNotExistException(Exception):
     def __init__(self, related_model):
         self.related_model = related_model
@@ -181,7 +180,7 @@ class Base(db.Model):
     def bulk_find_on_relation_id(cls, relation_model, relation_id, **kwargs):
         cls._check_related_model_by_id_exists(relation_model, relation_id)
         foreign_key = cls._get_foreign_key_from_relation_model(relation_model)
-        query = db.session.query(cls).filter(foreign_key==relation_id)
+        query = db.session.query(cls).filter(foreign_key == relation_id)
         return cls._postprocess_bulk_find(query, **kwargs).all()
 
     @classmethod
