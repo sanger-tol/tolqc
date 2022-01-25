@@ -5,9 +5,10 @@
 from main.model import TolqcData
 from main.schema import DataSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class DataService(BaseService):
     class Meta:
         model = TolqcData

@@ -5,9 +5,10 @@
 from main.model import TolqcUser
 from main.schema import UserSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class UserService(BaseService):
     class Meta:
         model = TolqcUser

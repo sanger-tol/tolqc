@@ -5,9 +5,10 @@
 from main.model import TolqcPlatform
 from main.schema import PlatformSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class PlatformService(BaseService):
     class Meta:
         model = TolqcPlatform

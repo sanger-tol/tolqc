@@ -5,9 +5,10 @@
 from main.model import TolqcProject
 from main.schema import ProjectSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class ProjectService(BaseService):
     class Meta:
         model = TolqcProject

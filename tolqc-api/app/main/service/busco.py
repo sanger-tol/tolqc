@@ -5,9 +5,10 @@
 from main.model import TolqcBusco
 from main.schema import BuscoSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class BuscoService(BaseService):
     class Meta:
         model = TolqcBusco

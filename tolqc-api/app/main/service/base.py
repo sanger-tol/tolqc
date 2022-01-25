@@ -20,6 +20,11 @@ class BadParameterStringException(Exception):
         super().__init__()
 
 
+def setup_service(cls):
+    cls.register_service()
+    return cls
+
+
 def handle_404(function):
     @wraps(function)
     def wrapper(cls, id, *args, **kwargs):
@@ -100,6 +105,14 @@ def provide_parameters(function):
 class BaseService:
     """In meta class, requires a model class, and a schema class,
     neither of which are an instantiated instance"""
+
+    # store a registry of inherited service classes in a dict
+    service_registry_dict = {}
+
+    @classmethod
+    def register_service(cls):
+        type_ = cls._get_type()
+        cls.service_registry_dict[type_] = cls
 
     @classmethod
     def _get_type(cls):

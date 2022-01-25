@@ -5,9 +5,10 @@
 from main.model import TolqcFile
 from main.schema import FileSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class FileService(BaseService):
     class Meta:
         model = TolqcFile

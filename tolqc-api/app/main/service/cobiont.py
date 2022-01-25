@@ -5,9 +5,10 @@
 from main.model import TolqcCobiont
 from main.schema import CobiontSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class CobiontService(BaseService):
     class Meta:
         model = TolqcCobiont

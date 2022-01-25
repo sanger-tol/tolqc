@@ -5,9 +5,10 @@
 from main.model import TolqcRole
 from main.schema import RoleSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class RoleService(BaseService):
     class Meta:
         model = TolqcRole
