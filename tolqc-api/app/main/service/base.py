@@ -285,3 +285,10 @@ class BaseService:
         schema = cls.Meta.schema(many=True)
         model_instances = cls.Meta.model.bulk_find(**kwargs)
         return schema.dump(model_instances), 200
+
+    @classmethod
+    @provide_parameters
+    @handle_400_bad_parameter
+    @handle_404
+    def read_bulk_by_related_id(cls, id, user_id=None, **kwargs):
+        pass
