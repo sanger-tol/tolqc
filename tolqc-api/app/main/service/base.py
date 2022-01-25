@@ -115,6 +115,10 @@ class BaseService:
         cls.service_registry_dict[type_] = cls
 
     @classmethod
+    def get_model(cls):
+        return cls.Meta.model
+
+    @classmethod
     def _get_type(cls):
         return cls.Meta.schema.get_type()
 
