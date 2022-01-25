@@ -26,8 +26,7 @@ class BaseSwagger:
         self_type = cls.get_type().title()
         relation_type = relation_swagger.get_type().title()
         resource_object_copy = cls.api.schema_model(
-            f"{relation_type} Response Resource Object "
-            f"({self_type}'s Copy')",
+            f"{relation_type} Response Resource Object ({self_type}'s Copy')",
             relation_swagger.get_resource_object_schema_model(is_request=False)
         )
         return cls.api.model(
