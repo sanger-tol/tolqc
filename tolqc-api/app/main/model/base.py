@@ -210,6 +210,15 @@ class Base(db.Model):
     @classmethod
     def _get_target_table_from_column(cls, column):
         return list(column.foreign_keys)[0].target_fullname.split('.')[0]
+    
+    @classmethod
+    def _get_all_table_names_many_to_one(cls):
+        columns = cls._get_columns()
+        return [
+            cls._get_target_table_from_column(column)
+            for column in columns
+            if len(list(column.foreign_keys)) != 0
+        ]
 
     @classmethod
     def populate_target_table_dict(cls):
@@ -269,12 +278,17 @@ class Base(db.Model):
         ]
 
     @classmethod
-    def get_relationship_names(cls):
+    def get_one_to_many_relationship_names(cls):
         relationships = inspect(cls).relationships.items()
-        return [r[0] for r in relationships]
+        relationship_names = [r[0] for r in relationships]
+        # exclude relationships for which this model is the many end
+        return [
+            r for r in relationship_names
+            if r not in cls._get_all_table_names_many_to_one()
+        ]
 
     @classmethod
-    def get_relationship_from_foreign_key(cls, column_name):
+    def get_target_table_column_from_foreign_key(cls, column_name):
         """Returns a pair:
         - The target table's name
         - The name of the target column on the target table

@@ -194,7 +194,8 @@ class BaseResource:
     @classmethod
     def add_relation_list_resources(cls):
         type_ = cls.Meta.service.get_type()
-        relationship_names = cls.Meta.service.get_model().get_relationship_names()
+        relationship_names = cls.Meta.service.get_model() \
+                                     .get_one_to_many_relationship_names()
         cls.relation_list_resources = [
             _document_relation_list_resource(type(
                 f'{type_.title()}RelationDetailResource_{r_name}',
