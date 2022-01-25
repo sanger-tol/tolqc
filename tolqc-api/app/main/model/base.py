@@ -210,7 +210,7 @@ class Base(db.Model):
     @classmethod
     def _get_target_table_from_column(cls, column):
         return list(column.foreign_keys)[0].target_fullname.split('.')[0]
-    
+
     @classmethod
     def _get_all_table_names_many_to_one(cls):
         columns = cls._get_columns()
