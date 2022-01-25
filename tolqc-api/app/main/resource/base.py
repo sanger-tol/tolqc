@@ -172,7 +172,36 @@ def _document_relation_list_resource(cls, relation):
 
 
 class BaseResource:
-    pass
+    @classmethod
+    def add_list_resource(cls):
+        type_ = cls.Meta.service.get_type()
+        cls.list_resource = _document_list_resource(type(
+            f'{type_.title()}ListResource',
+            (BaseListResource,),
+            {'Meta': cls.Meta}
+        ))
+
+    @classmethod
+    def add_detail_resource(cls):
+        type_ = cls.Meta.service.get_type()
+        cls.detail_resource = _document_detail_resource(type(
+            f'{type_.title()}DetailResource',
+            (BaseDetailResource,),
+            {'Meta': cls.Meta}
+        ))
+
+    @classmethod
+    def add_relation_list_resources(cls):
+        type_ = cls.Meta.service.get_type()
+        relationship_names = cls.Meta.service.get_model().get_relationship_names()
+        cls.relation_list_resources = [
+            _document_relation_list_resource(type(
+                f'{type_.title()}RelationDetailResource_{r_name}',
+                (BaseRelationListResource,),
+                {'Meta': cls.Meta}
+            ), r_name)
+            for r_name in relationship_names
+        ]
 
 
 class BaseListResource(Resource):
@@ -224,26 +253,7 @@ class BaseRelationListResource(Resource):
 def setup_resource(cls):
     """Dynamically adds detail, list, and related list resources
     to a BaseResource inheritor."""
-    #TODO un-spaghettify this function
-    type_ = cls.Meta.service.get_type()
-    cls.list_resource = _document_list_resource(type(
-        f'{type_.title()}ListResource',
-        (BaseListResource,),
-        {'Meta': cls.Meta}
-    ))
-    cls.detail_resource = _document_detail_resource(type(
-        f'{type_.title()}DetailResource',
-        (BaseDetailResource,),
-        {'Meta': cls.Meta}
-    ))
-    relationship_names = cls.Meta.service.get_model().get_relationship_names()
-    cls.relation_list_resources = [
-        _document_relation_list_resource(type(
-            f'{type_.title()}RelationDetailResource_{r_name}',
-            (BaseRelationListResource,),
-            {'Meta': cls.Meta}
-        ), r_name)
-        for r_name in relationship_names
-    ]
-
+    cls.add_list_resource()
+    cls.add_detail_resource()
+    cls.add_relation_list_resources()
     return cls
