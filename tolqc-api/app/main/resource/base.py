@@ -18,16 +18,16 @@ PARAMS_DICT = {
     'sort_by': {
         'in': 'query',
         'description': 'The field by which to order results. '
-                        'Prepend with a minus sign to sort '
-                        'descending, e.g. -name, otherwise sorting '
-                        'will be ascending. (Sorts by id ascending '
-                        'by default).'
+                       'Prepend with a minus sign to sort '
+                       'descending, e.g. -name, otherwise sorting '
+                       'will be ascending. (Sorts by id ascending '
+                       'by default).'
     },
     'filter': {
         'in': 'query',
         'description': 'Filters by equality. Formatted '
-                        'like [key1==value1,key2==value2]. '
-                        'Delimit strings with " or \', e.g. "string".'
+                       'like [key1==value1,key2==value2]. '
+                       'Delimit strings with " or \', e.g. "string".'
     }
 }
 

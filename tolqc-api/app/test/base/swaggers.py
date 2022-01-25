@@ -14,6 +14,7 @@ class A_Swagger(BaseSwagger):
     class Meta:
         schema = A_Schema
 
+
 @setup_swagger
 class B_Swagger(BaseSwagger):
     class Meta:

@@ -18,6 +18,7 @@ class A_Schema(BaseSchema):
     class Meta(BaseSchema.BaseMeta):
         model = A_ModelRelationship
 
+
 @setup_schema
 class B_Schema(BaseSchema):
     class Meta(BaseSchema.BaseMeta):

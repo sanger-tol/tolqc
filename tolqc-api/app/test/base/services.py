@@ -46,7 +46,6 @@ class E_Service(BaseService):
         schema = E_Schema
 
 
-
 class F_Service(BaseService):
     class Meta:
         model = F_ModelWithExtField

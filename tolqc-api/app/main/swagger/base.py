@@ -18,7 +18,6 @@ class BaseSwagger:
 
     @classmethod
     def get_registered_swagger(cls, type_):
-        #TODO add exception handling
         return cls.swagger_registry_dict[type_]
 
     @classmethod
