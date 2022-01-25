@@ -8,13 +8,22 @@ from flask_restx import Namespace, fields
 
 def setup_swagger(cls):
     cls.populate_default_models()
+    cls.register_swagger()
     return cls
 
 
 class BaseSwagger:
+    # store a registry of inherited swagger classes in a dict
+    swagger_registry_dict = {}
+
     @classmethod
     def get_type(cls):
         return cls.Meta.schema.get_type()
+
+    @classmethod
+    def register_swagger(cls):
+        type_ = cls.get_type()
+        cls.swagger_registry_dict[type_] = cls
 
     @classmethod
     def _get_field_schema_model_type(cls, python_type):
