@@ -195,7 +195,7 @@ def setup_resource(cls):
     ))
     cls.detail_resource = _document_detail_resource(type(
         f'{type_.title()}DetailResource',
-        (BaseListResource,),
+        (BaseDetailResource,),
         {}
     ))
     return cls
