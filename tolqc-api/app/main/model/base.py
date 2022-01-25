@@ -272,10 +272,6 @@ class Base(db.Model):
         return target_table, target_column
 
     @classmethod
-    def get_relationships_dict(cls):
-        return inspect(cls).relationships.items()
-
-    @classmethod
     def _filter_value_is_float(cls, filter_value):
         try:
             float(filter_value)
