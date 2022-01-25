@@ -35,6 +35,7 @@ class InstanceDoesNotExistException(Exception):
     def __init__(self, id):
         self.id = id
 
+
 class RelatedInstanceDoesNotExistException(Exception):
     def __init__(self, related_model):
         self.related_model = related_model
@@ -174,24 +175,21 @@ class Base(db.Model):
     def bulk_find_on_relation_id(cls, relation_model, relation_id, **kwargs):
         cls._check_related_model_by_id_exists(relation_model, relation_id)
         foreign_key = cls._get_foreign_key_from_relation_model(relation_model)
-        query = (db.session.query(cls)
-                   .join(relation_model, relation_model.id == foreign_key)
-                   .filter(relation_model.id == relation_id)
-                )
+        query = db.session.query(cls) \
+                          .join(relation_model, relation_model.id == foreign_key) \
+                          .filter(relation_model.id == relation_id)
         return cls._postprocess_bulk_find(query, **kwargs)
 
     @classmethod
     def _check_related_model_by_id_exists(cls, relation_model, relation_id):
-        related_instance = (db.session.query(relation_model)
-                              .filter_by(id=relation_id)
-                              .one_or_none()
-                           )
+        related_instance = db.session.query(relation_model) \
+                                     .filter_by(id=relation_id) \
+                                     .one_or_none()
         if related_instance is None:
             raise RelatedInstanceDoesNotExistException(
                 related_model=relation_model,
                 id=relation_id
             )
-                            
 
     @staticmethod
     def rollback():
@@ -211,22 +209,16 @@ class Base(db.Model):
 
     @classmethod
     def _get_foreign_key_from_relation_model(cls, relation_model):
-        #TODO cache this in each service somehow
         columns = cls.__table__.columns
         column_names = columns.keys()
         foreign_keys = [
             columns[c_name].foreign_keys[0] for c_name in column_names
         ]
-        #reemove
-        import logging
-        logging.warning(foreign_keys)
-        #rename this
         relations = {
             foreign_key.target_fullname.split('.')[0]: foreign_key
             for foreign_key
             in foreign_keys
         }
-        #this is fragile
         return relations[relation_model.__tablename__]
 
     @classmethod

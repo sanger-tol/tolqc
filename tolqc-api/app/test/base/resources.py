@@ -46,6 +46,6 @@ class F_Resource(BaseResource):
 
 @setup_resource
 class G_Resource(BaseResource):
-    class Meta:    
+    class Meta:
         service = G_Service
         swagger = G_Swagger

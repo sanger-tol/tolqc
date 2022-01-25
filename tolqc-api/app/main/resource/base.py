@@ -139,7 +139,6 @@ def _document_detail_resource(cls):
     return api.route('/<int:id>')(cls)
 
 
-
 class BaseResource(Resource):
     pass
 
