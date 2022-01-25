@@ -135,7 +135,7 @@ class BaseService:
 
     @classmethod
     def register_service(cls):
-        type_ = cls._get_type()
+        type_ = cls.get_type()
         cls.service_registry_dict[type_] = cls
 
     @classmethod
@@ -143,7 +143,7 @@ class BaseService:
         return cls.Meta.model
 
     @classmethod
-    def _get_type(cls):
+    def get_type(cls):
         return cls.Meta.schema.get_type()
 
     @classmethod
@@ -227,7 +227,7 @@ class BaseService:
         return cls._custom_error(
             "Not Found",
             404,
-            f"No {cls._get_type()} found with id {id}."
+            f"No {cls.get_type()} found with id {id}."
         )
 
     @classmethod

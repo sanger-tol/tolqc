@@ -139,12 +139,6 @@ def _document_detail_resource(cls):
     return api.route('/<int:id>')(cls)
 
 
-def setup_resource(cls):
-    if cls.is_list_resource():
-        return _document_list_resource(cls)
-    return _document_detail_resource(cls)
-
-
 
 class BaseResource(Resource):
     pass
@@ -188,3 +182,20 @@ class BaseDetailResource(Resource):
     @classmethod
     def auth_error(cls, message):
         return cls.Meta.service.error_401(message)
+
+
+def setup_resource(cls):
+    """Dynamically adds detail, list, and related list resources
+    to a BaseResource inheritor"""
+    type_ = cls.Meta.service.get_type()
+    cls.list_resource = _document_list_resource(type(
+        f'{type_.title()}ListResource',
+        (BaseListResource,),
+        {}
+    ))
+    cls.detail_resource = _document_detail_resource(type(
+        f'{type_.title()}DetailResource',
+        (BaseListResource,),
+        {}
+    ))
+    return cls
