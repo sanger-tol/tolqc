@@ -62,6 +62,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         cls._public_attribute_names = cls._get_public_attribute_names()
 
     @classmethod
+    def get_model(cls):
+        return cls.Meta.model
+
+    @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
         lookup_map = {
             'created_by': 'creator'

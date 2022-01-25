@@ -266,11 +266,17 @@ class BaseService:
 
     @classmethod
     def get_bulk_results_for_related(cls, id, calling_service, **kwargs):
-        pass
+        relation_model = calling_service.get_model()
+        return cls.get_model().bulk_find_on_relation_id(relation_model, id, **kwargs)
 
     @classmethod
     def get_schema(cls, **kwargs):
         return cls.Meta.schema(**kwargs)
+
+    @classmethod
+    def get_model(cls):
+        schema = cls.Meta.schema
+        return schema.get_model()
 
     @classmethod
     @handle_404
