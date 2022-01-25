@@ -36,6 +36,7 @@ class InstanceDoesNotExistException(Exception):
         self.id = id
 
 
+
 class RelatedInstanceDoesNotExistException(Exception):
     def __init__(self, related_model):
         self.related_model = related_model
@@ -49,6 +50,11 @@ class ExtColumn(db.Column):
             default={},
             **kwargs
         )
+
+
+def setup_model(cls):
+    cls.populate_target_table_dict()
+    return cls
 
 
 class Base(db.Model):
@@ -207,20 +213,22 @@ class Base(db.Model):
         return list(column.foreign_keys)[0].target_fullname.split('.')[0]
 
     @classmethod
-    def _get_foreign_key_from_relation_model(cls, relation_model):
+    def populate_target_table_dict(cls):
         columns = list(cls.__table__.columns)
         # this doesn't support compound/composite keys
         foreign_keys_columns = [
             c for c in columns
             if len(c.foreign_keys) == 1
         ]
-        #TODO cache this!!!
-        relations = {
+        cls.target_table_dict = {
             cls._get_target_table_from_column(column): column
             for column
             in foreign_keys_columns
         }
-        return relations[relation_model.__tablename__]
+
+    @classmethod
+    def _get_foreign_key_from_relation_model(cls, relation_model):
+        return cls.target_table_dict[relation_model.__tablename__]
 
     @classmethod
     def _get_columns(cls):

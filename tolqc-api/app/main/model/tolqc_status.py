@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .base import Base, db, setup_model
 from sqlalchemy import Enum
 
 
@@ -35,6 +35,7 @@ TechEnum = Enum("hifi",
                 name="tech enum", create_type=False)
 
 
+@setup_model
 class TolqcStatus(Base):
     __tablename__ = "statuses"
     id = db.Column(db.Integer(), primary_key=True)

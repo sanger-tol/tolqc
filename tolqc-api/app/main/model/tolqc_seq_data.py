@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 from .creation_log_base import CreationLogBase, db
+from .base import setup_model
 
 
+@setup_model
 class TolqcSeqData(CreationLogBase):
     __tablename__ = "seq_data"
     id = db.Column(db.Integer(), primary_key=True)
