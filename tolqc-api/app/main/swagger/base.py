@@ -17,6 +17,11 @@ class BaseSwagger:
     swagger_registry_dict = {}
 
     @classmethod
+    def get_registered_swagger(cls, type_):
+        #TODO add exception handling
+        return cls.swagger_registry_dict[type_]
+
+    @classmethod
     def get_type(cls):
         return cls.Meta.schema.get_type()
 

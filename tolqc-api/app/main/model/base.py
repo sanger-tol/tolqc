@@ -261,6 +261,11 @@ class Base(db.Model):
         ]
 
     @classmethod
+    def get_relationship_names(cls):
+        relationships = inspect(cls).relationships.items()
+        return [r[0] for r in relationships]
+
+    @classmethod
     def get_relationship_from_foreign_key(cls, column_name):
         """Returns a pair:
         - The target table's name
