@@ -5,22 +5,14 @@
 from main.service import SpeciesService
 from main.swagger import SpeciesSwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_species = SpeciesSwagger.api
 
 
-class SpeciesResourceMeta:
-    service = SpeciesService
-    swagger = SpeciesSwagger
-
-
 @setup_resource
-class SpeciesDetailResource(BaseDetailResource):
-    Meta = SpeciesResourceMeta
-
-
-@setup_resource
-class SpeciesListResource(BaseListResource):
-    Meta = SpeciesResourceMeta
+class SpeciesResource(BaseResource):
+    class Meta:
+        service = SpeciesService
+        swagger = SpeciesSwagger

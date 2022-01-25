@@ -5,22 +5,14 @@
 from main.service import BuscoService
 from main.swagger import BuscoSwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_busco = BuscoSwagger.api
 
 
-class BuscoResourceMeta:
-    service = BuscoService
-    swagger = BuscoSwagger
-
-
 @setup_resource
-class BuscoDetailResource(BaseDetailResource):
-    Meta = BuscoResourceMeta
-
-
-@setup_resource
-class BuscoListResource(BaseListResource):
-    Meta = BuscoResourceMeta
+class BuscoResource(BaseResource):
+    class Meta:
+        service = BuscoService
+        swagger = BuscoSwagger

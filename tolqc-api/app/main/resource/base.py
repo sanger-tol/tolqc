@@ -191,11 +191,11 @@ def setup_resource(cls):
     cls.list_resource = _document_list_resource(type(
         f'{type_.title()}ListResource',
         (BaseListResource,),
-        {}
+        {'Meta': cls.Meta}
     ))
     cls.detail_resource = _document_detail_resource(type(
         f'{type_.title()}DetailResource',
         (BaseDetailResource,),
-        {}
+        {'Meta': cls.Meta}
     ))
     return cls

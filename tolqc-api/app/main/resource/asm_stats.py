@@ -5,22 +5,14 @@
 from main.service import AsmStatsService
 from main.swagger import AsmStatsSwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_asm_stats = AsmStatsSwagger.api
 
 
-class AsmStatsResourceMeta:
-    service = AsmStatsService
-    swagger = AsmStatsSwagger
-
-
 @setup_resource
-class AsmStatsDetailResource(BaseDetailResource):
-    Meta = AsmStatsResourceMeta
-
-
-@setup_resource
-class AsmStatsListResource(BaseListResource):
-    Meta = AsmStatsResourceMeta
+class AsmStatsResource(BaseResource):
+    class Meta:
+        service = AsmStatsService
+        swagger = AsmStatsSwagger
