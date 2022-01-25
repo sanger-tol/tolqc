@@ -166,7 +166,7 @@ def _document_detail_resource(cls):
 def _document_relation_list_resource(cls, relation):
     api, _ = _get_api_swagger(cls)
     _document_relation_list_get(cls)
-    return api.route(f'/<int:id>/{relation}')
+    return api.route(f'/<int:id>/{relation}')(cls)
 
 
 class BaseResource:
@@ -174,10 +174,6 @@ class BaseResource:
 
 
 class BaseListResource(Resource):
-    @classmethod
-    def is_list_resource(cls):
-        return True
-
     @classmethod
     def get(cls, user_id=None):
         return cls.Meta.service.read_bulk(user_id=user_id)
@@ -192,10 +188,6 @@ class BaseListResource(Resource):
 
 
 class BaseDetailResource(Resource):
-    @classmethod
-    def is_list_resource(cls):
-        return False
-
     @classmethod
     def get(cls, id, user_id=None):
         return cls.Meta.service.read_by_id(id, user_id=user_id)
@@ -251,4 +243,5 @@ def setup_resource(cls):
         ), r_name)
         for r_name in relationship_names
     ]
+
     return cls
