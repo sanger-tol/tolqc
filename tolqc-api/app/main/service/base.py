@@ -18,7 +18,13 @@ from main.model import InstanceDoesNotExistException, \
 class BadParameterStringException(Exception):
     def __init__(self, message):
         self.message = message
-        super().__init__()
+        super().__init__(message)
+
+
+class BadTargetServiceException(Exception):
+    def __init__(self, target_service):
+        self.message = f"No endpoint exists with name '{target_service}'."
+        super().__init__(self.message)
 
 
 def setup_service(cls):
@@ -74,6 +80,18 @@ def handle_400_bad_parameter(function):
         try:
             return function(cls, *args, **kwargs)
         except BadParameterException as e:
+            return cls.error_400(
+                e.message
+            )
+    return wrapper
+
+
+def handle_400_nonexistent_service(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            return function(cls, *args, **kwargs)
+        except BadTargetServiceException as e:
             return cls.error_400(
                 e.message
             )
@@ -237,6 +255,24 @@ class BaseService:
         )
 
     @classmethod
+    def _get_target_service_by_name(cls, service_name):
+        target_service = cls.service_registry_dict.get(
+            service_name,
+            None
+        )
+        if target_service is None:
+            raise BadTargetServiceException(service_name)
+        return target_service
+
+    @classmethod
+    def get_bulk_results_for_related(cls, id, calling_service, **kwargs):
+        pass
+
+    @classmethod
+    def get_schema(cls, **kwargs):
+        return cls.Meta.schema(**kwargs)
+
+    @classmethod
     @handle_404
     def read_by_id(cls, id, user_id=None):
         schema = cls.Meta.schema()
@@ -289,6 +325,14 @@ class BaseService:
     @classmethod
     @provide_parameters
     @handle_400_bad_parameter
+    @handle_400_nonexistent_service
     @handle_404
-    def read_bulk_by_related_id(cls, id, user_id=None, **kwargs):
-        pass
+    def read_bulk_by_related_id(cls, id, target_service_name, user_id=None, **kwargs):
+        """
+        Called on the service for the first part of the endpoint
+        e.g. A in /A/{id}/B
+        """
+        target_service = cls._get_target_service_by_name(target_service_name)
+        schema = target_service.get_schema(many=True)
+        model_instances = target_service.get_bulk_results_for_related(id, cls, **kwargs)
+        return schema.dump(model_instances), 200
