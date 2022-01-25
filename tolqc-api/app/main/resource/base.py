@@ -186,7 +186,7 @@ class BaseDetailResource(Resource):
 
 def setup_resource(cls):
     """Dynamically adds detail, list, and related list resources
-    to a BaseResource inheritor"""
+    to a BaseResource inheritor."""
     type_ = cls.Meta.service.get_type()
     cls.list_resource = _document_list_resource(type(
         f'{type_.title()}ListResource',
