@@ -126,9 +126,8 @@ class Base(db.Model):
         return query.order_by(sort_by_column)
 
     @classmethod
-    def _filter_query(cls, eq_filters):
+    def _filter_query(cls, query, eq_filters):
         eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
-        query = db.session.query(cls)
         if eq_filter_terms is not None:
             query = query.filter(and_(*eq_filter_terms))
         return query
@@ -157,10 +156,19 @@ class Base(db.Model):
         return query.limit(PAGE_SIZE).all()
 
     @classmethod
-    def find_bulk(cls, page, eq_filters, sort_by):
-        query = cls._filter_query(eq_filters)
+    def _process_bulk_find(cls, query, page=None, eq_filters=None, sort_by=None):
+        query = cls._filter_query(query, eq_filters)
         query = cls._sort_by_query(query, sort_by)
         return cls._paginate_query(query, page)
+
+    @classmethod
+    def bulk_find(cls, **kwargs):
+        query = db.session.query(cls)
+        return cls._process_bulk_find(query, **kwargs)
+
+    @classmethod
+    def bulk_find_on_relation_id(cls, page, eq_filters, sort_by):
+        pass
 
     @staticmethod
     def rollback():
