@@ -11,6 +11,7 @@ from marshmallow import ValidationError
 from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
 from main.model import InstanceDoesNotExistException, \
+                       RelatedInstanceDoesNotExistException, \
                        BadParameterException
 
 
@@ -32,6 +33,11 @@ def handle_404(function):
             return function(cls, id, *args, **kwargs)
         except InstanceDoesNotExistException:
             return cls.error_404(id)
+        except RelatedInstanceDoesNotExistException as e:
+            return cls.error_404_relation_list(
+                e.related_model,
+                id
+            )
     return wrapper
 
 
@@ -204,6 +210,14 @@ class BaseService:
             "Not Found",
             404,
             f"No {cls._get_type()} found with id {id}."
+        )
+
+    @classmethod
+    def error_404_relation_list(cls, relation_model, id):
+        return cls._custom_error(
+            "Not Found",
+            404,
+            f"No {relation_model.__tablename__} found with id {id}."
         )
 
     @classmethod

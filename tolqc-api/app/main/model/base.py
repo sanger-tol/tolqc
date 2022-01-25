@@ -36,9 +36,8 @@ class InstanceDoesNotExistException(Exception):
         self.id = id
 
 class RelatedInstanceDoesNotExistException(Exception):
-    def __init__(self, related_model, id):
+    def __init__(self, related_model):
         self.related_model = related_model
-        self.id = id
 
 
 class ExtColumn(db.Column):

@@ -4,6 +4,7 @@
 
 from .base import db, Base, \
                   ExtraFieldsNotPermittedException, \
+                  RelatedInstanceDoesNotExistException, \
                   InstanceDoesNotExistException, \
                   BadParameterException # noqa
 from .creation_log_base import CreationLogBase  # noqa
