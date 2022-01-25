@@ -105,7 +105,8 @@ def _document_list_get(cls):
                     'Success',
                     swagger.bulk_response_model,
                 ),
-                '400': 'Bad Request'
+                '400': 'Bad Request',
+                '404': 'Not Found'
             }
         ),
         no_op_decorator
