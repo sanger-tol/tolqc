@@ -105,8 +105,7 @@ def _document_list_get(cls):
                     'Success',
                     swagger.bulk_response_model,
                 ),
-                '400': 'Bad Request',
-                '404': 'Not Found'
+                '400': 'Bad Request'
             }
         ),
         no_op_decorator
@@ -143,7 +142,8 @@ def _document_relation_list_get(cls, relation):
                     'Success',
                     relation_list_response_model,
                 ),
-                '400': 'Bad Request'
+                '400': 'Bad Request',
+                '404': 'Not Found'
             }
         ),
         no_op_decorator
