@@ -7,8 +7,6 @@ from test.base import BaseTestCase
 
 class TestRelationListGet(BaseTestCase):
     def test_relation_list_get_A_B_200(self):
-        #TODO add one to many relationships in both output and swagger models
-        #TODO test all parameters (list get) on relation list get
         # add two A's
         self.add_A(id=20)
         self.add_A(id=29)

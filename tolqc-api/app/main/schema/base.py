@@ -190,8 +190,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def get_many_to_one_relationships(cls):
-        #TODO look into whether it excludes relationships that should be
-        #on responses but not requests!
         return cls.many_to_one_relationship_info
 
     @classmethod
