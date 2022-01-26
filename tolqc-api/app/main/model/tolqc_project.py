@@ -15,4 +15,4 @@ class TolqcProject(CreationLogBase):
     accession_id = db.Column(db.Integer(), db.ForeignKey("accession.id"))
     allocation = db.relationship("TolqcAllocation", back_populates="project")
     accession = db.relationship("TolqcAccession", back_populates="project",
-                                     foreign_keys=[accession_id])
+                                foreign_keys=[accession_id])

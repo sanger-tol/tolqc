@@ -16,5 +16,5 @@ class TolqcSample(CreationLogBase):
     specimen = db.relationship("TolqcSpecimen", back_populates="sample",
                                foreign_keys=[specimen_id])
     accession = db.relationship("TolqcAccession", back_populates="sample",
-                               foreign_keys=[accession_id])
+                                foreign_keys=[accession_id])
     seq = db.relationship("TolqcSeq", back_populates="sample")

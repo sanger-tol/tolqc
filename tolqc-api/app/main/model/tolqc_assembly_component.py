@@ -13,6 +13,6 @@ class TolqcAssemblyComponent(CreationLogBase):
     busco_metrics = db.relationship("TolqcBuscoMetrics",
                                     back_populates="assembly_component")
     merqury_metrics = db.relationship("TolqcMerquryMetrics",
-                                    back_populates="assembly_component")
+                                      back_populates="assembly_component")
     assembly_metrics = db.relationship("TolqcAssemblyMetrics",
                                        back_populates="assembly_component")

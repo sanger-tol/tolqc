@@ -8,10 +8,9 @@ from .creation_log_base import CreationLogBase, db
 class TolqcSpecimen(CreationLogBase):
     __tablename__ = "specimen"
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
-    species_id = db.Column(db.Integer(), db.ForeignKey("species.id"),
-                                    nullable=False)
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
+    species_id = db.Column(db.Integer(), db.ForeignKey("species.id"))
     lims_id = db.Column(db.Integer())
     supplied_name = db.Column(db.String())
     accession_id = db.Column(db.Integer(), db.ForeignKey("accession.id"))
@@ -28,4 +27,4 @@ class TolqcSpecimen(CreationLogBase):
     sex = db.relationship("TolqcSex", back_populates="specimen",
                           foreign_keys=[sex_id])
     accession = db.relationship("TolqcAccession", back_populates="specimen",
-                          foreign_keys=[accession_id])
+                                foreign_keys=[accession_id])

@@ -14,4 +14,4 @@ class TolqcLibrary(CreationLogBase):
     lims_id = db.Column(db.Integer())
     seq = db.relationship("TolqcSeq", back_populates="library")
     library_type = db.relationship("TolqcLibraryType", back_populates="library",
-                                    foreign_keys=[library_type_id])
+                                   foreign_keys=[library_type_id])
