@@ -207,31 +207,6 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_individual_response_schema_model(cls):
-        return {
-            'type': 'object',
-            'properties': {
-                "data": cls.get_resource_object_schema_model(
-                    is_request=False
-                )
-            }
-        }
-
-    @classmethod
-    def _get_bulk_response_schema_model(cls):
-        return {
-            'type': 'object',
-            'properties': {
-                'data': {
-                    'type': 'array',
-                    'items': cls.get_resource_object_schema_model(
-                        is_request=False
-                    )
-                }
-            }
-        }
-
-    @classmethod
     def _set_relationships(cls):
         schema = cls.Meta.schema
         cls.one_to_many_relationship_names = schema.get_one_to_many_relationship_names()
