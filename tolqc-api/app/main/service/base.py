@@ -11,7 +11,7 @@ from marshmallow import ValidationError
 from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
 from main.model import InstanceDoesNotExistException, \
-                       RelatedInstanceDoesNotExistException, \
+                       StemInstanceDoesNotExistException, \
                        BadParameterException
 
 
@@ -39,9 +39,9 @@ def handle_404(function):
             return function(cls, id, *args, **kwargs)
         except InstanceDoesNotExistException:
             return cls.error_404(id)
-        except RelatedInstanceDoesNotExistException as e:
+        except StemInstanceDoesNotExistException as e:
             return cls.error_404_relation_list(
-                e.related_model,
+                e.stem_model,
                 id
             )
     return wrapper

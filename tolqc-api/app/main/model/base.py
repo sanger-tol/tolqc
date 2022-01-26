@@ -36,9 +36,9 @@ class InstanceDoesNotExistException(Exception):
         self.id = id
 
 
-class RelatedInstanceDoesNotExistException(Exception):
-    def __init__(self, related_model):
-        self.related_model = related_model
+class StemInstanceDoesNotExistException(Exception):
+    def __init__(self, stem_model):
+        self.stem_model = stem_model
 
 
 class ExtColumn(db.Column):
@@ -189,7 +189,7 @@ class Base(db.Model):
                                      .filter_by(id=relation_id) \
                                      .one_or_none()
         if related_instance is None:
-            raise RelatedInstanceDoesNotExistException(relation_model)
+            raise StemInstanceDoesNotExistException(relation_model)
 
     @staticmethod
     def rollback():
