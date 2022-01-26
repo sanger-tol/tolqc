@@ -154,3 +154,91 @@ class TestRelationListGet(BaseTestCase):
         )
         # 19 = 59 - 20*2
         self.assertEqual(len(response.json['data']), 19)
+
+    def test_relation_list_get_with_sortby_parameter_200(self):
+        # add an A
+        self.add_A(id=298)
+
+        # add 3 B's in no particular order
+        self.add_B(id=9090, a_id=298)
+        self.add_B(id=348, a_id=298)
+        self.add_B(id=200000, a_id=298)
+
+        # combine parameters on relation list get
+        response = self.client.open(
+            '/api/v1/A/298/B?sort_by=-id',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(len(response.json['data']), 3)
+        # assert they're in the right order (descending id)
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'id': '200000',
+                        'type': 'B',
+                        'relationships': {
+                            'A': {
+                                'data': {
+                                    'id': '298',
+                                    'type': 'A'
+                                },
+                                'links': {
+                                    'related': '/A/298'
+                                }
+                            },
+                            "E": {
+                                'links': {
+                                    'related': '/B/200000/E'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'id': '9090',
+                        'type': 'B',
+                        'relationships': {
+                            'A': {
+                                'data': {
+                                    'id': '298',
+                                    'type': 'A'
+                                },
+                                'links': {
+                                    'related': '/A/298'
+                                }
+                            },
+                            "E": {
+                                'links': {
+                                    'related': '/B/9090/E'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'id': '348',
+                        'type': 'B',
+                        'relationships': {
+                            'A': {
+                                'data': {
+                                    'id': '298',
+                                    'type': 'A'
+                                },
+                                'links': {
+                                    'related': '/A/298'
+                                }
+                            },
+                            "E": {
+                                'links': {
+                                    'related': '/B/348/E'
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        )
