@@ -162,7 +162,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         ]
 
     @classmethod
-    def get_included_relationships(cls):
+    def get_many_to_one_relationships(cls):
         return {
             key: value
             for key, value in cls.relationship_target_info.items()

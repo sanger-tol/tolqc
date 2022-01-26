@@ -116,10 +116,10 @@ class BaseSwagger:
             'type': 'object',
             'properties': {
                 special_name: cls._get_individual_relationship_dict(
-                    cls.relationships[special_name]["target_table"]
+                    cls.many_to_one_relationships[special_name]["target_table"]
                 )
                 for special_name
-                in cls.relationships.keys()
+                in cls.many_to_one_relationships.keys()
             }
         }
 
@@ -195,7 +195,7 @@ class BaseSwagger:
         schema = cls.Meta.schema
         type_ = cls.get_type()
         cls.attributes = schema.get_included_attributes()
-        cls.relationships = schema.get_included_relationships()
+        cls.many_to_one_relationships = schema.get_many_to_one_relationships()
 
         cls.api = Namespace(
             type_,
