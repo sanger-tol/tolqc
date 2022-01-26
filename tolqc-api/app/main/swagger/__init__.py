@@ -22,7 +22,6 @@ from .pacbio_run_stats import PacbioRunStatsSwagger # noqa
 from .data import DataSwagger # noqa
 from .seq_data import SeqDataSwagger # noqa
 from .status import StatusSwagger # noqa
-from .cobiont import CobiontSwagger # noqa
 from .asm_stats import AsmStatsSwagger # noqa
 from .asm import AsmSwagger # noqa
 from .busco import BuscoSwagger # noqa

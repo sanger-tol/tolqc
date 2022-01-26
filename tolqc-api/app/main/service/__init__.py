@@ -22,7 +22,6 @@ from .pacbio_run_stats import PacbioRunStatsService # noqa
 from .data import DataService # noqa
 from .seq_data import SeqDataService # noqa
 from .status import StatusService # noqa
-from .cobiont import CobiontService # noqa
 from .asm_stats import AsmStatsService # noqa
 from .asm import AsmService # noqa
 from .busco import BuscoService # noqa

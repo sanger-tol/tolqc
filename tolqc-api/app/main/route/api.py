@@ -15,8 +15,8 @@ from main.resource import api_centre, api_environment, \
                           api_busco, api_data, \
                           api_file, api_merqury, \
                           api_pacbio_run_stats, api_seq_data, \
-                          api_cobiont, api_sex, \
-                          api_software_version, api_status
+                          api_sex, api_software_version, \
+                          api_status
 
 
 def _get_environment_string(app):
@@ -54,7 +54,6 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_merqury)
     api.add_namespace(api_pacbio_run_stats)
     api.add_namespace(api_seq_data)
-    api.add_namespace(api_cobiont)
     api.add_namespace(api_sex)
     api.add_namespace(api_software_version)
     api.add_namespace(api_status)

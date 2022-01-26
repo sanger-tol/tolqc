@@ -21,7 +21,6 @@ from .pacbio_run_stats import api_pacbio_run_stats # noqa
 from .data import api_data # noqa
 from .seq_data import api_seq_data # noqa
 from .status import api_status # noqa
-from .cobiont import api_cobiont # noqa
 from .asm_stats import api_asm_stats # noqa
 from .asm import api_asm # noqa
 from .busco import api_busco # noqa

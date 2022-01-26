@@ -28,6 +28,5 @@ class TolqcSpecimen(CreationLogBase):
                               foreign_keys=[species_instance_id])
     samples = db.relationship("TolqcSample", back_populates="specimens")
     statuses = db.relationship("TolqcStatus", back_populates="specimens", uselist=False)
-    cobionts = db.relationship("TolqcCobiont", back_populates="specimens")
     sex = db.relationship("TolqcSex", back_populates="specimens",
                           foreign_keys=[sex_id])

@@ -24,7 +24,6 @@ from .tolqc_run import TolqcRun  # noqa
 from .tolqc_asm_stats import TolqcAsmStats  # noqa
 from .tolqc_data import TolqcData  # noqa
 from .tolqc_seq_data import TolqcSeqData  # noqa
-from .tolqc_cobiont import TolqcCobiont  # noqa
 from .tolqc_status import TolqcStatus  # noqa
 from .tolqc_sex import TolqcSex  # noqa
 from .tolqc_file import TolqcFile  # noqa

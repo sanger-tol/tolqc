@@ -8,11 +8,21 @@ from .base import Base, db
 
 
 class CreationLogMixin(object):
-    created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
+    @declared_attr
+    def created_at(cls):
+        return db.Column(db.DateTime, nullable=False, default=db.func.now())
 
     @declared_attr
     def created_by(cls):
         return db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    @declared_attr
+    def history(cls):
+        return db.Column(db.String)
+
+    @declared_attr
+    def ext(cls):
+        return db.Column(db.String)
 
 
 class CreationLogBase(Base, CreationLogMixin):
