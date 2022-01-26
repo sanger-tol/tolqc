@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from main.model import TolqcData
+
 from test.tolqc import TolqcTestCase
 
 
@@ -73,6 +75,17 @@ class TestUserSecurity(TolqcTestCase):
         PATCH request"""
         # N.B. this method needs an endpoint with a model inheriting
         # from creation_log_base
+        expected_response = {
+            'errors': [
+                {
+                    'detail': 'Unknown field.',
+                    'source': {
+                        'pointer': "/data/relationships/creator/data"
+                    }
+                }
+            ]
+        }
+
         response = self.client.open(
             '/api/v1/data',
             method='POST',
@@ -104,16 +117,50 @@ class TestUserSecurity(TolqcTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         # assert 400 code for correct reason
-        self.assertEqual(
-            response.json,
-            {
-                'errors': [
-                    {
-                        'detail': 'Unknown field.',
-                        'source': {
-                            'pointer': "/data/relationships/creator/data"
+        self.assertEqual(response.json, expected_response)
+
+        #TODO created at modifcation check
+
+        # try to modify creation details of existing data instance
+        # add the instance
+        data_instance = TolqcData()
+        data_instance.id = 9090
+        data_instance.reads = 'test'
+        data_instance.bases = 'another test'
+        data_instance.avg_read_len = 4.56
+        data_instance.read_len_n50 = 2387.3
+        data_instance.created_by = 101
+        data_instance.save()
+
+        # try to modify its creator
+        response = self.client.open(
+            '/api/v1/data/9090',
+            method='PATCH',
+            json={
+                'data': {
+                    'type': 'data',
+                    'attributes': {
+                        'reads': 'aquatic reeds'
+                    },
+                    'relationships': {
+                        'creator': {
+                            'data': {
+                                'type': 'users',
+                                'id': '100'
+                            }
                         }
                     }
-                ]
+                }
+            },
+            headers={
+                'Authorization': self.api_key_2
             }
         )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert 400 code for correct reason
+        self.assertEqual(response.json, expected_response)
+
+    

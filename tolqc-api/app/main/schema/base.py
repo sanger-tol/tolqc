@@ -8,7 +8,8 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
-from marshmallow_jsonapi.fields import ResourceMeta, Relationship, Str
+from marshmallow_jsonapi.fields import ResourceMeta, Relationship, Str, \
+                                       DateTime
 
 from main.model import db
 
@@ -48,7 +49,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     OPTIONS_CLASS = CombinedOpts
 
     id = Str(dump_only=True)
+
+    # all three below are excluded at instantiation time if not needed
     created_by = Str(dump_only=True)
+    created_at = DateTime(dump_only=True)
     resource_meta = ResourceMeta(required=False)
 
     def __init__(self, **kwargs):
@@ -168,7 +172,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         if cls.has_ext_field():
             excluded_columns += ['ext']
         if not cls.has_creation_details():
-            excluded_columns += ['created_by']
+            excluded_columns += ['created_by', 'created_at']
         return excluded_columns
 
     @classmethod
