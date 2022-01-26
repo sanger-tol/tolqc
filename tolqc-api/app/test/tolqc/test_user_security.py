@@ -26,7 +26,7 @@ class TestUserSecurity(TolqcTestCase):
 
         # assert no credential disclosure in list get
         response = self.client.open(
-            '/api/v1/users',
+            '/api/v1/users?filter=[name=="test_user_admin"]',
             method='GET'
         )
         self.assert200(
@@ -62,7 +62,58 @@ class TestUserSecurity(TolqcTestCase):
         filtering against api_key value on list get users, is not
         possible."""
         response = self.client.open(
-            f'/api/v1/users?filter=[api_key=="{self.api_key}"]',
+            f'/api/v1/users?filter=[api_key=="{self.api_key_1}"]',
             method='GET'
         )
         self.assert400(response)
+
+    def test_no_overwrite_creator_in_request(self):
+        """Ensures that an authenticated user can not defraud the
+        creation log by specifying another creator in a POST or
+        PATCH request"""
+        # N.B. this method needs an endpoint with a model inheriting
+        # from creation_log_base
+        response = self.client.open(
+            '/api/v1/data',
+            method='POST',
+            json={
+                'data': {
+                    'type': 'data',
+                    'attributes': {
+                        'reads': 'aquatic reeds',
+                        'bases': '0x1337',
+                        'avg_read_len': 1.01,
+                        'read_len_n50': 9.97
+                    },
+                    'relationships': {
+                        'creator': {
+                            'data': {
+                                'type': 'users',
+                                'id': '100'
+                            }
+                        }
+                    }
+                }
+            },
+            headers={
+                'Authorization': self.api_key_2
+            }
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert 400 code for correct reason
+        self.assertEqual(
+            response.json,
+            {
+                'errors': [
+                    {
+                        'detail': 'Unknown field.',
+                        'source': {
+                            'pointer': "/data/relationships/creator/data"
+                        }
+                    }
+                ]
+            }
+        )
