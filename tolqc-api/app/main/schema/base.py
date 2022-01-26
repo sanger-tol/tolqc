@@ -37,7 +37,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         sqla_session = db.session
         load_instance = True
         include_fk = True
-        excluded_relationships = ['creator']
 
         @classmethod
         def setup_meta(cls):
@@ -193,11 +192,13 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def get_many_to_one_relationships(cls):
         #TODO look into whether it excludes relationships that should be
         #on responses but not requests!
-        return {
-            key: value
-            for key, value in cls.many_to_one_relationship_info.items()
-            if key not in cls.Meta.excluded_relationships
-        }
+        return cls.many_to_one_relationship_info
+
+    @classmethod
+    def get_excluded_many_to_one_relationships_on_request(cls):
+        if cls.has_creation_details():
+            return ['creator']
+        return []
 
     @classmethod
     def get_one_to_many_relationship_names(cls):

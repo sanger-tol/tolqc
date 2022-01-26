@@ -128,13 +128,16 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_many_to_one_relationships_dict(cls):
+    def _get_many_to_one_relationships_dict(cls, is_request):
+        relationships = cls.request_many_to_one_relationships \
+                        if is_request \
+                        else cls.response_many_to_one_relationships
         return {
             special_name: cls._get_individual_many_to_one_relationship_dict(
-                cls.many_to_one_relationships[special_name]["target_table"]
+                relationships[special_name]["target_table"]
             )
             for special_name
-            in cls.many_to_one_relationships.keys()
+            in relationships.keys()
         }
 
     @classmethod
@@ -148,7 +151,7 @@ class BaseSwagger:
     def _get_relationships_dict(cls, is_request):
         #TODO only remove certain relationships (such as creator) on request
         #TODO see if you can change creating user by specifying it on post or patch???
-        many_to_one_relationships_dict = cls._get_many_to_one_relationships_dict()
+        many_to_one_relationships_dict = cls._get_many_to_one_relationships_dict(is_request)
 
         if is_request:
             # don't include one-to-many relationships on a request swagger model
@@ -231,13 +234,21 @@ class BaseSwagger:
         }
 
     @classmethod
+    def _set_relationships(cls):
+        schema = cls.Meta.schema
+        cls.one_to_many_relationship_names = schema.get_one_to_many_relationship_names()
+        cls.response_many_to_one_relationships = schema.get_many_to_one_relationships()
+        cls.request_many_to_one_relationships = {
+            key: value for (key, value) in cls.response_many_to_one_relationships.items()
+            if key not in schema.get_excluded_many_to_one_relationships_on_request()
+        }
+
+    @classmethod
     def populate_default_models(cls):
         schema = cls.Meta.schema
         type_ = cls.get_type()
         cls.attributes = schema.get_included_attributes()
-        cls.many_to_one_relationships = schema.get_many_to_one_relationships()
-        cls.one_to_many_relationship_names = schema.get_one_to_many_relationship_names()
-
+        cls._set_relationships()
         cls.api = Namespace(
             type_,
             description=f'Methods relating to {type_}',
