@@ -116,9 +116,22 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
+    def _create_one_to_many_relationship_field_by_name(cls, name):
+        return Relationship(
+            f'/{cls.get_type()}/{{id}}/{name}',
+            related_url_kwargs={'id': '<id>'},
+            many=True,
+            type_=name,
+            dump_deafult=lambda: []
+        )
+
+    @classmethod
     def _create_one_to_many_relationship_fields(cls):
-        #TODO implement
-        return {}
+        cls.one_to_many_relationship_names = cls.Meta.model.get_one_to_many_relationship_names()
+        return {
+            name: cls._create_one_to_many_relationship_field_by_name(name)
+            for name in cls.one_to_many_relationship_names
+        }
 
     @classmethod
     def create_relationship_fields(cls):
