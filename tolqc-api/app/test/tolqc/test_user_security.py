@@ -121,8 +121,6 @@ class TestUserSecurity(TolqcTestCase):
         # assert 400 code for correct reason
         self.assertEqual(response.json, expected_response)
 
-        #TODO created at modifcation check
-
         # try to modify creation details of existing data instance
         # add the instance
         data_instance = TolqcData()
@@ -207,8 +205,6 @@ class TestUserSecurity(TolqcTestCase):
         )
         # assert 400 code for correct reason
         self.assertEqual(response.json, expected_response)
-
-        #TODO created at modifcation check
 
         # try to modify created_at datetime of existing data instance
         # add the instance
