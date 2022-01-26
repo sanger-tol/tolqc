@@ -140,9 +140,9 @@ class TestRelationListGet(BaseTestCase):
         self.add_A(id=789)
 
         # add 59 B's
-        for i in range (1, 60):
+        for i in range(1, 60):
             self.add_B(id=i, a_id=789)
-        
+
         # combine parameters on relation list get
         response = self.client.open(
             '/api/v1/A/789/B?page=3',
