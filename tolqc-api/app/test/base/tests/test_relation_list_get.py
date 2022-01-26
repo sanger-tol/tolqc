@@ -104,3 +104,18 @@ class TestRelationListGet(BaseTestCase):
                 ]
             }
         )
+
+    def test_relation_list_get_no_stem_A_B_404(self):
+        # add an irrelevant A and connected B
+        self.add_A(id=99)
+        self.add_B(id=100, a_id=99)
+
+        # try to get the B's of a non-existent A
+        response = self.client.open(
+            '/api/v1/A/560/B',
+            method='GET'
+        )
+        self.assert404(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
