@@ -84,7 +84,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         )
 
     @classmethod
-    def _create_relationship_field_by_name(cls, foreign_key_name):
+    def _create_many_to_one_relationship_field_by_name(cls, foreign_key_name):
         target_table, target_column = cls.Meta.model.get_target_table_column_from_foreign_key(
             foreign_key_name
         )
@@ -92,7 +92,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             foreign_key_name,
             target_table
         )
-        cls.relationship_target_info[special_name] = {
+        cls.many_to_one_relationship_info[special_name] = {
             "target_table": target_table,
             "foreign_key_name": foreign_key_name
         }
@@ -103,17 +103,32 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         )
 
     @classmethod
-    def create_relationship_fields(cls):
+    def _create_many_to_one_relationship_fields(cls):
         foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
         # maps the relationship name to its target table
-        cls.relationship_target_info = {}
+        cls.many_to_one_relationship_info = {}
         pairs = [
-            cls._create_relationship_field_by_name(foreign_key_name)
+            cls._create_many_to_one_relationship_field_by_name(foreign_key_name)
             for foreign_key_name in foreign_key_names
         ]
         return {
             field_name: field for (field_name, field) in pairs
         }
+
+    @classmethod
+    def _create_one_to_many_relationship_fields(cls):
+        #TODO implement
+        return {}
+
+    @classmethod
+    def create_relationship_fields(cls):
+        many_to_one_relationship_fields = cls._create_many_to_one_relationship_fields()
+        one_to_many_relationship_fields = cls._create_one_to_many_relationship_fields()
+        all_relationship_fields = {
+            **many_to_one_relationship_fields,
+            **one_to_many_relationship_fields
+        }
+        return all_relationship_fields
 
     @classmethod
     def get_type(cls):
@@ -165,7 +180,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def get_many_to_one_relationships(cls):
         return {
             key: value
-            for key, value in cls.relationship_target_info.items()
+            for key, value in cls.many_to_one_relationship_info.items()
             if key not in cls.Meta.excluded_relationships
         }
 
