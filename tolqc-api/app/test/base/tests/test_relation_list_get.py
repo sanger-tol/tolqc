@@ -48,6 +48,11 @@ class TestRelationListGet(BaseTestCase):
                                 'links': {
                                     'related': '/A/20'
                                 }
+                            },
+                            "E": {
+                                'links': {
+                                    'related': '/B/89/E'
+                                }
                             }
                         }
                     },
@@ -62,6 +67,11 @@ class TestRelationListGet(BaseTestCase):
                                 },
                                 'links': {
                                     'related': '/A/20'
+                                }
+                            },
+                            "E": {
+                                'links': {
+                                    'related': '/B/290/E'
                                 }
                             }
                         }
@@ -97,6 +107,11 @@ class TestRelationListGet(BaseTestCase):
                                 },
                                 'links': {
                                     'related': '/A/29'
+                                }
+                            },
+                            "E": {
+                                'links': {
+                                    'related': '/B/8080/E'
                                 }
                             }
                         }

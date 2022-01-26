@@ -14,7 +14,14 @@ class TestUserSecurity(TolqcTestCase):
                 "email": "test_user_admin@sanger.ac.uk",
                 "organisation": "Sanger Institute"
             },
-            "id": "100"
+            "id": "100",
+            'relationships': {
+                'roles': {
+                    'links': {
+                        'related': '/users/100/roles'
+                    }
+                }
+            }
         }
 
         # assert no credential disclosure in list get
