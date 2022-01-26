@@ -85,7 +85,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _many_to_one_relationship_is_dump_only(cls, special_name):
-        dump_only_special_names = ['creator']
+        dump_only_special_names = ['creator'] + list(getattr(cls.Meta, 'dump_only_relationships', []))
         return special_name in dump_only_special_names
 
     @classmethod
