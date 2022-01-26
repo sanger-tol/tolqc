@@ -191,11 +191,17 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def get_many_to_one_relationships(cls):
+        #TODO look into whether it excludes relationships that should be
+        #on responses but not requests!
         return {
             key: value
             for key, value in cls.many_to_one_relationship_info.items()
             if key not in cls.Meta.excluded_relationships
         }
+
+    @classmethod
+    def get_one_to_many_relationship_names(cls):
+        return cls.one_to_many_relationship_names
 
     def _make_instance_without_ext(self, data, **kwargs):
         instance = self.instance

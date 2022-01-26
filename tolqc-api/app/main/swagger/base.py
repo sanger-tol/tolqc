@@ -90,7 +90,7 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_individual_relationship_dict(cls, target_table):
+    def _get_individual_many_to_one_relationship_dict(cls, target_table):
         return {
             'type': 'object',
             'properties': {
@@ -111,15 +111,48 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_relationships_dict(cls):
+    def _get_individual_one_to_many_relationship_dict(cls, relation_name):
         return {
             'type': 'object',
             'properties': {
-                special_name: cls._get_individual_relationship_dict(
-                    cls.many_to_one_relationships[special_name]["target_table"]
-                )
-                for special_name
-                in cls.many_to_one_relationships.keys()
+                'links': {
+                    'type': 'object',
+                    'properties': {
+                        'related': {
+                            'type': 'string',
+                            'default': f'/{cls.get_type()}/1/{relation_name}'
+                        }
+                    }
+                }
+            }
+        }
+
+    @classmethod
+    def _get_many_to_one_relationships_dict(cls):
+        return {
+            special_name: cls._get_individual_many_to_one_relationship_dict(
+                cls.many_to_one_relationships[special_name]["target_table"]
+            )
+            for special_name
+            in cls.many_to_one_relationships.keys()
+        }
+
+    @classmethod
+    def _get_one_to_many_relationships_dict(cls):
+        return {
+            name: cls._get_individual_one_to_many_relationship_dict(name)
+            for name in cls.one_to_many_relationship_names
+        }
+
+    @classmethod
+    def _get_relationships_dict(cls):
+        many_to_one_relationships_dict = cls._get_many_to_one_relationships_dict()
+        one_to_many_relationships_dict = cls._get_one_to_many_relationships_dict()
+        return {
+            'type': 'object',
+            'properties': {
+                **many_to_one_relationships_dict,
+                **one_to_many_relationships_dict
             }
         }
 
@@ -196,6 +229,7 @@ class BaseSwagger:
         type_ = cls.get_type()
         cls.attributes = schema.get_included_attributes()
         cls.many_to_one_relationships = schema.get_many_to_one_relationships()
+        cls.one_to_many_relationship_names = schema.get_one_to_many_relationship_names()
 
         cls.api = Namespace(
             type_,
