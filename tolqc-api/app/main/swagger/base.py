@@ -145,15 +145,24 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_relationships_dict(cls):
+    def _get_relationships_dict(cls, is_request):
+        #TODO only remove certain relationships (such as creator) on request
+        #TODO see if you can change creating user by specifying it on post or patch???
         many_to_one_relationships_dict = cls._get_many_to_one_relationships_dict()
-        one_to_many_relationships_dict = cls._get_one_to_many_relationships_dict()
-        return {
-            'type': 'object',
-            'properties': {
+
+        if is_request:
+            # don't include one-to-many relationships on a request swagger model
+            all_relationships_dict = many_to_one_relationships_dict
+        else:
+            one_to_many_relationships_dict = cls._get_one_to_many_relationships_dict()
+            all_relationships_dict = {
                 **many_to_one_relationships_dict,
                 **one_to_many_relationships_dict
             }
+    
+        return {
+            'type': 'object',
+            'properties': all_relationships_dict
         }
 
     @classmethod
@@ -165,10 +174,8 @@ class BaseSwagger:
                     'type': 'string',
                     'default': cls.get_type()
                 },
-                'attributes': cls._get_attributes_dict(
-                    is_request=is_request
-                ),
-                'relationships': cls._get_relationships_dict()
+                'attributes': cls._get_attributes_dict(is_request),
+                'relationships': cls._get_relationships_dict(is_request)
             }
         }
         if cls.Meta.schema.has_ext_field():
