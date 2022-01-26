@@ -31,6 +31,44 @@ class TestRelationListGet(BaseTestCase):
         )
         # assert that 2 were found
         self.assertEqual(len(response.json['data']), 2)
+        # assert that the correct two were found
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'id': '89',
+                        'type': 'B',
+                        'relationships': {
+                            'A': {
+                                'data': {
+                                    'id': '20',
+                                    'type': 'A'
+                                },
+                                'links': {
+                                    'related': '/A/20'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'id': '290',
+                        'type': 'B',
+                        'relationships': {
+                            'A': {
+                                'data': {
+                                    'id': '20',
+                                    'type': 'A'
+                                },
+                                'links': {
+                                    'related': '/A/20'
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        )
 
         # get the second A's B
         response = self.client.open(
