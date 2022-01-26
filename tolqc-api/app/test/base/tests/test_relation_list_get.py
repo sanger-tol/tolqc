@@ -132,3 +132,25 @@ class TestRelationListGet(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+
+    def test_relation_list_get_with_page_parameter_200(self):
+        """Confirm that the page parameter works with a relation
+        list get endpoint"""
+        # add an A
+        self.add_A(id=789)
+
+        # add 59 B's
+        for i in range (1, 60):
+            self.add_B(id=i, a_id=789)
+        
+        # combine parameters on relation list get
+        response = self.client.open(
+            '/api/v1/A/789/B?page=3',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # 19 = 59 - 20*2
+        self.assertEqual(len(response.json['data']), 19)
