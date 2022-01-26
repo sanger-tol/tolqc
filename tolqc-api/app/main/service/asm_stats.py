@@ -5,9 +5,10 @@
 from main.model import TolqcAsmStats
 from main.schema import AsmStatsSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class AsmStatsService(BaseService):
     class Meta:
         model = TolqcAsmStats

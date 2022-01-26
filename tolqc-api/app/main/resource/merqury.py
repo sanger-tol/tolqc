@@ -5,22 +5,14 @@
 from main.service import MerquryService
 from main.swagger import MerqurySwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_merqury = MerqurySwagger.api
 
 
-class MerquryResourceMeta:
-    service = MerquryService
-    swagger = MerqurySwagger
-
-
 @setup_resource
-class MerquryDetailResource(BaseDetailResource):
-    Meta = MerquryResourceMeta
-
-
-@setup_resource
-class MerquryListResource(BaseListResource):
-    Meta = MerquryResourceMeta
+class MerquryResource(BaseResource):
+    class Meta:
+        service = MerquryService
+        swagger = MerqurySwagger

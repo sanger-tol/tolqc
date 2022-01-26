@@ -5,22 +5,14 @@
 from main.service import FileService
 from main.swagger import FileSwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_file = FileSwagger.api
 
 
-class FileResourceMeta:
-    service = FileService
-    swagger = FileSwagger
-
-
 @setup_resource
-class FileDetailResource(BaseDetailResource):
-    Meta = FileResourceMeta
-
-
-@setup_resource
-class FileListResource(BaseListResource):
-    Meta = FileResourceMeta
+class FileResource(BaseResource):
+    class Meta:
+        service = FileService
+        swagger = FileSwagger

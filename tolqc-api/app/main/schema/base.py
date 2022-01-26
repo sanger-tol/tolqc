@@ -8,7 +8,8 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
                                 SchemaOpts as JsonapiSchemaOpts
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
-from marshmallow_jsonapi.fields import ResourceMeta, Relationship, Str
+from marshmallow_jsonapi.fields import ResourceMeta, Relationship, Str, \
+                                       DateTime
 
 from main.model import db
 
@@ -37,7 +38,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         sqla_session = db.session
         load_instance = True
         include_fk = True
-        excluded_relationships = ['creator']
 
         @classmethod
         def setup_meta(cls):
@@ -49,7 +49,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     OPTIONS_CLASS = CombinedOpts
 
     id = Str(dump_only=True)
+
+    # all three below are excluded at instantiation time if not needed
     created_by = Str(dump_only=True)
+    created_at = DateTime(dump_only=True)
     resource_meta = ResourceMeta(required=False)
 
     def __init__(self, **kwargs):
@@ -62,6 +65,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         cls._public_attribute_names = cls._get_public_attribute_names()
 
     @classmethod
+    def get_model(cls):
+        return cls.Meta.model
+
+    @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
         lookup_map = {
             'created_by': 'creator'
@@ -70,46 +77,83 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return lookup_map.get(foreign_key_name, target_table)
 
     @classmethod
-    def _create_relationship_field(cls, target_table, target_column, foreign_key_name):
+    def _create_many_to_one_relationship_field(cls, table, column, foreign_key_name, dump_only):
         return Relationship(
-            f'/{target_table}/{{{target_column}}}',
-            related_url_kwargs={f'{target_column}': f'<{foreign_key_name}>'},
+            f'/{table}/{{{column}}}',
+            related_url_kwargs={f'{column}': f'<{foreign_key_name}>'},
             include_resource_linkage=True,
-            type_=target_table,
-            attribute=foreign_key_name
+            type_=table,
+            attribute=foreign_key_name,
+            dump_only=dump_only
         )
 
     @classmethod
-    def _create_relationship_field_by_name(cls, foreign_key_name):
-        target_table, target_column = cls.Meta.model.get_relationship_from_foreign_key(
+    def _many_to_one_relationship_is_dump_only(cls, special_name):
+        dump_only_special_names = ['creator'] + list(
+            getattr(cls.Meta, 'dump_only_relationships', [])
+        )
+        return special_name in dump_only_special_names
+
+    @classmethod
+    def _create_many_to_one_relationship_field_by_name(cls, foreign_key_name):
+        target_table, target_column = cls.Meta.model.get_target_table_column_from_foreign_key(
             foreign_key_name
         )
         special_name = cls._lookup_special_relationship_name(
             foreign_key_name,
             target_table
         )
-        cls.relationship_target_info[special_name] = {
+        cls.many_to_one_relationship_info[special_name] = {
             "target_table": target_table,
             "foreign_key_name": foreign_key_name
         }
-        return special_name, cls._create_relationship_field(
+        return special_name, cls._create_many_to_one_relationship_field(
             target_table,
             target_column,
-            foreign_key_name
+            foreign_key_name,
+            cls._many_to_one_relationship_is_dump_only(special_name)
         )
 
     @classmethod
-    def create_relationship_fields(cls):
+    def _create_many_to_one_relationship_fields(cls):
         foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
         # maps the relationship name to its target table
-        cls.relationship_target_info = {}
+        cls.many_to_one_relationship_info = {}
         pairs = [
-            cls._create_relationship_field_by_name(foreign_key_name)
+            cls._create_many_to_one_relationship_field_by_name(foreign_key_name)
             for foreign_key_name in foreign_key_names
         ]
         return {
             field_name: field for (field_name, field) in pairs
         }
+
+    @classmethod
+    def _create_one_to_many_relationship_field_by_name(cls, name):
+        return Relationship(
+            f'/{cls.get_type()}/{{id}}/{name}',
+            related_url_kwargs={'id': '<id>'},
+            many=True,
+            type_=name,
+            dump_default=lambda: []
+        )
+
+    @classmethod
+    def _create_one_to_many_relationship_fields(cls):
+        cls.one_to_many_relationship_names = cls.Meta.model.get_one_to_many_relationship_names()
+        return {
+            name: cls._create_one_to_many_relationship_field_by_name(name)
+            for name in cls.one_to_many_relationship_names
+        }
+
+    @classmethod
+    def create_relationship_fields(cls):
+        many_to_one_relationship_fields = cls._create_many_to_one_relationship_fields()
+        one_to_many_relationship_fields = cls._create_one_to_many_relationship_fields()
+        all_relationship_fields = {
+            **many_to_one_relationship_fields,
+            **one_to_many_relationship_fields
+        }
+        return all_relationship_fields
 
     @classmethod
     def get_type(cls):
@@ -128,7 +172,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         if cls.has_ext_field():
             excluded_columns += ['ext']
         if not cls.has_creation_details():
-            excluded_columns += ['created_by']
+            excluded_columns += ['created_by', 'created_at']
         return excluded_columns
 
     @classmethod
@@ -158,12 +202,18 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         ]
 
     @classmethod
-    def get_included_relationships(cls):
-        return {
-            key: value
-            for key, value in cls.relationship_target_info.items()
-            if key not in cls.Meta.excluded_relationships
-        }
+    def get_many_to_one_relationships(cls):
+        return cls.many_to_one_relationship_info
+
+    @classmethod
+    def get_excluded_many_to_one_relationships_on_request(cls):
+        if cls.has_creation_details():
+            return ['creator']
+        return []
+
+    @classmethod
+    def get_one_to_many_relationship_names(cls):
+        return cls.one_to_many_relationship_names
 
     def _make_instance_without_ext(self, data, **kwargs):
         instance = self.instance

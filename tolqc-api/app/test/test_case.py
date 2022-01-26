@@ -8,7 +8,10 @@ from main.model import db, TolqcUser, TolqcRole, TolqcAllocation, \
                        TolqcCentre, TolqcLibrary, TolqcLibraryType, \
                        TolqcPlatform, TolqcProject, TolqcRun, \
                        TolqcSample, TolqcSeq, TolqcSpecies, \
-                       TolqcSpecimen
+                       TolqcSpecimen, TolqcAsm, TolqcAsmStats, TolqcBusco, \
+                       TolqcCobiont, TolqcData, TolqcFile, TolqcMerqury, \
+                       TolqcPacbioRunStats, TolqcSeqData, TolqcSex, \
+                       TolqcSoftwareVersion, TolqcStatus
 from test.base.models import A_ModelRelationship, B_ModelRelationship, \
                              C_ModelWithNullableColumn, \
                              D_ModelWithNonNullableColumn, \
@@ -18,7 +21,8 @@ from test.base.models import A_ModelRelationship, B_ModelRelationship, \
 
 class TestCase(FlaskTestCase):
 
-    api_key = "AnyThingBecAuseThIsIsATEST567890"
+    api_key_1 = "AnyThingBecAuseThIsIsATEST567890"
+    api_key_2 = "SomethingElse"
 
     def setUp(self):
         # general
@@ -31,11 +35,21 @@ class TestCase(FlaskTestCase):
                           name="test_user_admin",
                           email="test_user_admin@sanger.ac.uk",
                           organisation="Sanger Institute",
-                          api_key=self.api_key)
+                          api_key=self.api_key_1)
         db.session.add(user1)
-        role = TolqcRole(role="admin")
-        role.user = user1
-        db.session.add(role)
+        role_admin = TolqcRole(role="admin")
+        role_admin.user = user1
+        db.session.add(role_admin)
+
+        user2 = TolqcUser(id=101,
+                          name="test_user_other",
+                          email="test_user_other@sanger.ac.uk",
+                          organisation="Sanger Institute",
+                          api_key=self.api_key_2)
+        db.session.add(user2)
+        role_other = TolqcRole(role="other")
+        role_other.user = user2
+        db.session.add(role_other)
 
     def tearDown(self):
         db.session.rollback()
@@ -50,6 +64,7 @@ class TestCase(FlaskTestCase):
         db.session.query(G_ModelWithFilterableFields).delete()
 
         # ToLQC models
+        # TODO delete this all by cascade
         db.session.query(TolqcAllocation).delete()
         db.session.query(TolqcCentre).delete()
         db.session.query(TolqcLibrary).delete()
@@ -62,6 +77,18 @@ class TestCase(FlaskTestCase):
         db.session.query(TolqcSpecies).delete()
         db.session.query(TolqcSpecimen).delete()
         db.session.query(TolqcRole).delete()
+        db.session.query(TolqcAsm).delete()
+        db.session.query(TolqcAsmStats).delete()
+        db.session.query(TolqcBusco).delete()
+        db.session.query(TolqcCobiont).delete()
+        db.session.query(TolqcData).delete()
+        db.session.query(TolqcFile).delete()
+        db.session.query(TolqcMerqury).delete()
+        db.session.query(TolqcPacbioRunStats).delete()
+        db.session.query(TolqcSeqData).delete()
+        db.session.query(TolqcSex).delete()
+        db.session.query(TolqcSoftwareVersion).delete()
+        db.session.query(TolqcStatus).delete()
         db.session.query(TolqcUser).delete()
 
         db.session.commit()

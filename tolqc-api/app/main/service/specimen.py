@@ -5,9 +5,10 @@
 from main.model import TolqcSpecimen
 from main.schema import SpecimenSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class SpecimenService(BaseService):
     class Meta:
         model = TolqcSpecimen

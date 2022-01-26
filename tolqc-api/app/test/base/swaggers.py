@@ -4,9 +4,15 @@
 
 from main.swagger.base import BaseSwagger, setup_swagger
 
-from test.base.schemas import B_Schema, C_Schema, \
-                              D_Schema, F_Schema, \
+from test.base.schemas import A_Schema, B_Schema, C_Schema, \
+                              D_Schema, E_Schema, F_Schema, \
                               G_Schema
+
+
+@setup_swagger
+class A_Swagger(BaseSwagger):
+    class Meta:
+        schema = A_Schema
 
 
 @setup_swagger
@@ -25,6 +31,12 @@ class C_Swagger(BaseSwagger):
 class D_Swagger(BaseSwagger):
     class Meta:
         schema = D_Schema
+
+
+@setup_swagger
+class E_Swagger(BaseSwagger):
+    class Meta:
+        schema = E_Schema
 
 
 @setup_swagger

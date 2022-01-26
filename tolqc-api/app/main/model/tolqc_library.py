@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 from .creation_log_base import CreationLogBase, db
+from .base import setup_model
 
 
+@setup_model
 class TolqcLibrary(CreationLogBase):
     __tablename__ = "libraries"
     id = db.Column(db.Integer(), primary_key=True)

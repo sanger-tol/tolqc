@@ -5,22 +5,14 @@
 from main.service import SampleService
 from main.swagger import SampleSwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_sample = SampleSwagger.api
 
 
-class SampleResourceMeta:
-    service = SampleService
-    swagger = SampleSwagger
-
-
 @setup_resource
-class SampleDetailResource(BaseDetailResource):
-    Meta = SampleResourceMeta
-
-
-@setup_resource
-class SampleListResource(BaseListResource):
-    Meta = SampleResourceMeta
+class SampleResource(BaseResource):
+    class Meta:
+        service = SampleService
+        swagger = SampleSwagger

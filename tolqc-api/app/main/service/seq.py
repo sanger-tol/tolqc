@@ -5,9 +5,10 @@
 from main.model import TolqcSeq
 from main.schema import SeqSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class SeqService(BaseService):
     class Meta:
         model = TolqcSeq

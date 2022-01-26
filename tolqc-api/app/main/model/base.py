@@ -36,6 +36,12 @@ class InstanceDoesNotExistException(Exception):
         self.id = id
 
 
+class StemInstanceDoesNotExistException(Exception):
+    """Used on 'related' endpoints"""
+    def __init__(self, stem_model):
+        self.stem_model = stem_model
+
+
 class ExtColumn(db.Column):
     def __init__(self, **kwargs):
         super().__init__(
@@ -44,6 +50,11 @@ class ExtColumn(db.Column):
             default={},
             **kwargs
         )
+
+
+def setup_model(cls):
+    cls.populate_target_table_dict()
+    return cls
 
 
 class Base(db.Model):
@@ -126,9 +137,8 @@ class Base(db.Model):
         return query.order_by(sort_by_column)
 
     @classmethod
-    def _filter_query(cls, eq_filters):
+    def _filter_query(cls, query, eq_filters):
         eq_filter_terms = cls._get_eq_filter_terms(eq_filters)
-        query = db.session.query(cls)
         if eq_filter_terms is not None:
             query = query.filter(and_(*eq_filter_terms))
         return query
@@ -154,13 +164,33 @@ class Base(db.Model):
         page = cls._preprocess_page(page)
         if page is not None:
             query = query.offset((page - 1) * PAGE_SIZE)
-        return query.limit(PAGE_SIZE).all()
+        return query.limit(PAGE_SIZE)
 
     @classmethod
-    def find_bulk(cls, page, eq_filters, sort_by):
-        query = cls._filter_query(eq_filters)
+    def _postprocess_bulk_find(cls, query, page=None, eq_filters=None, sort_by=None):
+        query = cls._filter_query(query, eq_filters)
         query = cls._sort_by_query(query, sort_by)
         return cls._paginate_query(query, page)
+
+    @classmethod
+    def bulk_find(cls, **kwargs):
+        query = db.session.query(cls)
+        return cls._postprocess_bulk_find(query, **kwargs).all()
+
+    @classmethod
+    def bulk_find_on_relation_id(cls, relation_model, relation_id, **kwargs):
+        cls._check_related_model_by_id_exists(relation_model, relation_id)
+        foreign_key = cls._get_foreign_key_from_relation_model(relation_model)
+        query = db.session.query(cls).filter(foreign_key == relation_id)
+        return cls._postprocess_bulk_find(query, **kwargs).all()
+
+    @classmethod
+    def _check_related_model_by_id_exists(cls, relation_model, relation_id):
+        related_instance = db.session.query(relation_model) \
+                                     .filter_by(id=relation_id) \
+                                     .one_or_none()
+        if related_instance is None:
+            raise StemInstanceDoesNotExistException(relation_model)
 
     @staticmethod
     def rollback():
@@ -177,6 +207,37 @@ class Base(db.Model):
         if instance is None:
             raise InstanceDoesNotExistException(id_)
         return instance
+
+    @classmethod
+    def _get_target_table_from_column(cls, column):
+        return list(column.foreign_keys)[0].target_fullname.split('.')[0]
+
+    @classmethod
+    def _get_all_table_names_many_to_one(cls):
+        columns = cls._get_columns()
+        return [
+            cls._get_target_table_from_column(column)
+            for column in columns
+            if len(list(column.foreign_keys)) != 0
+        ]
+
+    @classmethod
+    def populate_target_table_dict(cls):
+        columns = list(cls.__table__.columns)
+        # this doesn't support compound/composite keys
+        foreign_keys_columns = [
+            c for c in columns
+            if len(c.foreign_keys) == 1
+        ]
+        cls.target_table_dict = {
+            cls._get_target_table_from_column(column): column
+            for column
+            in foreign_keys_columns
+        }
+
+    @classmethod
+    def _get_foreign_key_from_relation_model(cls, relation_model):
+        return cls.target_table_dict[relation_model.__tablename__]
 
     @classmethod
     def _get_columns(cls):
@@ -218,7 +279,17 @@ class Base(db.Model):
         ]
 
     @classmethod
-    def get_relationship_from_foreign_key(cls, column_name):
+    def get_one_to_many_relationship_names(cls):
+        relationships = inspect(cls).relationships.items()
+        relationship_names = [r[0] for r in relationships]
+        # exclude relationships for which this model is the many end
+        return [
+            r for r in relationship_names
+            if r not in cls._get_all_table_names_many_to_one()
+        ]
+
+    @classmethod
+    def get_target_table_column_from_foreign_key(cls, column_name):
         """Returns a pair:
         - The target table's name
         - The name of the target column on the target table
@@ -227,10 +298,6 @@ class Base(db.Model):
         foreign_key = list(cls.__table__.columns[column_name].foreign_keys)[0]
         target_table, target_column = foreign_key.target_fullname.split('.')
         return target_table, target_column
-
-    @classmethod
-    def get_relationships_dict(cls):
-        return inspect(cls).relationships.items()
 
     @classmethod
     def _filter_value_is_float(cls, filter_value):

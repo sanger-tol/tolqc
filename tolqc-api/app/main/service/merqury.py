@@ -5,9 +5,10 @@
 from main.model import TolqcMerqury
 from main.schema import MerqurySchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class MerquryService(BaseService):
     class Meta:
         model = TolqcMerqury

@@ -5,22 +5,14 @@
 from main.service import SoftwareVersionService
 from main.swagger import SoftwareVersionSwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_software_version = SoftwareVersionSwagger.api
 
 
-class SoftwareVersionResourceMeta:
-    service = SoftwareVersionService
-    swagger = SoftwareVersionSwagger
-
-
 @setup_resource
-class SoftwareVersionDetailResource(BaseDetailResource):
-    Meta = SoftwareVersionResourceMeta
-
-
-@setup_resource
-class SoftwareVersionListResource(BaseListResource):
-    Meta = SoftwareVersionResourceMeta
+class SoftwareVersionResource(BaseResource):
+    class Meta:
+        service = SoftwareVersionService
+        swagger = SoftwareVersionSwagger

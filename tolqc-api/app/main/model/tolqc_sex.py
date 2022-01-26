@@ -2,9 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .base import Base, db, setup_model
 
 
+@setup_model
 class TolqcSex(Base):
     __tablename__ = "sex"
     id = db.Column(db.Integer(), primary_key=True)

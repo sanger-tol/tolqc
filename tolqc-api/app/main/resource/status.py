@@ -5,22 +5,14 @@
 from main.service import StatusService
 from main.swagger import StatusSwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_status = StatusSwagger.api
 
 
-class StatusResourceMeta:
-    service = StatusService
-    swagger = StatusSwagger
-
-
 @setup_resource
-class StatusDetailResource(BaseDetailResource):
-    Meta = StatusResourceMeta
-
-
-@setup_resource
-class StatusListResource(BaseListResource):
-    Meta = StatusResourceMeta
+class StatusResource(BaseResource):
+    class Meta:
+        service = StatusService
+        swagger = StatusSwagger

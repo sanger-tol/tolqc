@@ -7,7 +7,7 @@ from test.tolqc import TolqcTestCase
 
 class TestAuthentication(TolqcTestCase):
     def test_api_key_auth(self):
-        good_api_key = {"Authorization": self.api_key}
+        good_api_key = {"Authorization": self.api_key_1}
         false_api_key = {"Authorization": "IamAhacker"}
 
         # no api key
@@ -67,7 +67,14 @@ class TestAuthentication(TolqcTestCase):
                     "hierarchy_name": "Hierarchy Tester",
                     "name": "David",
                 },
-                "id": created_id
+                "id": created_id,
+                'relationships': {
+                    "runs": {
+                        'links': {
+                            'related': f'/centres/{created_id}/runs'
+                        }
+                    }
+                }
             }
         }
         self.assertEqual(expect_data, response.json)

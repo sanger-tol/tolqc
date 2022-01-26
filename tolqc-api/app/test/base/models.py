@@ -2,9 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model.base import Base, db, ExtColumn
+from main.model.base import Base, db, ExtColumn, setup_model
 
 
+@setup_model
 class A_ModelRelationship(Base):
     __tablename__ = 'A'
     # the variable below is necessary on every test model!
@@ -13,6 +14,7 @@ class A_ModelRelationship(Base):
     B = db.relationship('B_ModelRelationship', back_populates='A')
 
 
+@setup_model
 class B_ModelRelationship(Base):
     __tablename__ = 'B'
     __table_args__ = {'extend_existing': True}
@@ -22,6 +24,7 @@ class B_ModelRelationship(Base):
     E = db.relationship('E_ModelRelationship', back_populates='B')
 
 
+@setup_model
 class C_ModelWithNullableColumn(Base):
     __tablename__ = 'C'
     __table_args__ = {'extend_existing': True}
@@ -30,6 +33,7 @@ class C_ModelWithNullableColumn(Base):
     other_column = db.Column(db.String, nullable=True)
 
 
+@setup_model
 class D_ModelWithNonNullableColumn(Base):
     __tablename__ = 'D'
     __table_args__ = {'extend_existing': True}
@@ -38,6 +42,7 @@ class D_ModelWithNonNullableColumn(Base):
     other_column = db.Column(db.String, nullable=True)
 
 
+@setup_model
 class E_ModelRelationship(Base):
     __tablename__ = 'E'
     __table_args__ = {'extend_existing': True}
@@ -46,6 +51,7 @@ class E_ModelRelationship(Base):
     B = db.relationship(B_ModelRelationship, back_populates='E', foreign_keys=[b_id])
 
 
+@setup_model
 class F_ModelWithExtField(Base):
     __tablename__ = 'F'
     __table_args__ = {'extend_existing': True}
@@ -54,6 +60,7 @@ class F_ModelWithExtField(Base):
     other_column = db.Column(db.String, nullable=True)
 
 
+@setup_model
 class G_ModelWithFilterableFields(Base):
     __tablename__ = 'G'
     __table_args__ = {'extend_existing': True}

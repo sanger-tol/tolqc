@@ -23,6 +23,11 @@ class TestGetInsertedData(BaseTestCase):
                         'links': {
                             'related': '/A/90'
                         }
+                    },
+                    'E': {
+                        'links': {
+                            'related': '/B/10/E'
+                        }
                     }
                 }
             }

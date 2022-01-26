@@ -7,14 +7,44 @@ from flask_restx import Namespace, fields
 
 
 def setup_swagger(cls):
-    cls.populate_default_models()
+    cls.setup()
     return cls
 
 
 class BaseSwagger:
+    # store a registry of inherited swagger classes in a dict
+    swagger_registry_dict = {}
+
+    @classmethod
+    def get_registered_swagger(cls, type_):
+        return cls.swagger_registry_dict[type_]
+
+    @classmethod
+    def duplicate_relationship_swagger(cls, relation_swagger):
+        # models have to be registered (with duplicates) per flask-restx's rules
+        self_type = cls.get_type().title()
+        relation_type = relation_swagger.get_type().title()
+        resource_object_copy = cls.api.schema_model(
+            f"{relation_type} Response Resource Object ({self_type}'s Copy')",
+            relation_swagger.get_resource_object_schema_model(is_request=False)
+        )
+        return cls.api.model(
+            f"{relation_type} Bulk Response ({self_type}'s Copy)",
+            {
+                'data': fields.List(
+                    fields.Nested(resource_object_copy)
+                )
+            }
+        )
+
     @classmethod
     def get_type(cls):
         return cls.Meta.schema.get_type()
+
+    @classmethod
+    def _register_swagger(cls):
+        type_ = cls.get_type()
+        cls.swagger_registry_dict[type_] = cls
 
     @classmethod
     def _get_field_schema_model_type(cls, python_type):
@@ -59,7 +89,7 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_individual_relationship_dict(cls, target_table):
+    def _get_individual_many_to_one_relationship_dict(cls, target_table):
         return {
             'type': 'object',
             'properties': {
@@ -80,20 +110,63 @@ class BaseSwagger:
         }
 
     @classmethod
-    def _get_relationships_dict(cls):
+    def _get_individual_one_to_many_relationship_dict(cls, relation_name):
         return {
             'type': 'object',
             'properties': {
-                special_name: cls._get_individual_relationship_dict(
-                    cls.relationships[special_name]["target_table"]
-                )
-                for special_name
-                in cls.relationships.keys()
+                'links': {
+                    'type': 'object',
+                    'properties': {
+                        'related': {
+                            'type': 'string',
+                            'default': f'/{cls.get_type()}/1/{relation_name}'
+                        }
+                    }
+                }
             }
         }
 
     @classmethod
-    def _get_resource_object_schema_model(cls, is_request=True):
+    def _get_many_to_one_relationships_dict(cls, is_request):
+        relationships = cls.request_many_to_one_relationships \
+                        if is_request \
+                        else cls.response_many_to_one_relationships
+        return {
+            special_name: cls._get_individual_many_to_one_relationship_dict(
+                relationships[special_name]["target_table"]
+            )
+            for special_name
+            in relationships.keys()
+        }
+
+    @classmethod
+    def _get_one_to_many_relationships_dict(cls):
+        return {
+            name: cls._get_individual_one_to_many_relationship_dict(name)
+            for name in cls.one_to_many_relationship_names
+        }
+
+    @classmethod
+    def _get_relationships_dict(cls, is_request):
+        many_to_one_relationships_dict = cls._get_many_to_one_relationships_dict(is_request)
+
+        if is_request:
+            # don't include one-to-many relationships on a request swagger model
+            all_relationships_dict = many_to_one_relationships_dict
+        else:
+            one_to_many_relationships_dict = cls._get_one_to_many_relationships_dict()
+            all_relationships_dict = {
+                **many_to_one_relationships_dict,
+                **one_to_many_relationships_dict
+            }
+
+        return {
+            'type': 'object',
+            'properties': all_relationships_dict
+        }
+
+    @classmethod
+    def get_resource_object_schema_model(cls, is_request=True):
         schema_model = {
             "type": "object",
             'properties': {
@@ -101,10 +174,8 @@ class BaseSwagger:
                     'type': 'string',
                     'default': cls.get_type()
                 },
-                'attributes': cls._get_attributes_dict(
-                    is_request=is_request
-                ),
-                'relationships': cls._get_relationships_dict()
+                'attributes': cls._get_attributes_dict(is_request),
+                'relationships': cls._get_relationships_dict(is_request)
             }
         }
         if cls.Meta.schema.has_ext_field():
@@ -128,58 +199,34 @@ class BaseSwagger:
         return {
             'type': 'object',
             'properties': {
-                "data": cls._get_resource_object_schema_model(
+                "data": cls.get_resource_object_schema_model(
                     is_request=True
                 )
             }
         }
 
     @classmethod
-    def _get_individual_response_schema_model(cls):
-        return {
-            'type': 'object',
-            'properties': {
-                "data": cls._get_resource_object_schema_model(
-                    is_request=False
-                )
-            }
-        }
-
-    @classmethod
-    def _get_bulk_response_schema_model(cls):
-        return {
-            'type': 'object',
-            'properties': {
-                'data': {
-                    'type': 'array',
-                    'items': cls._get_resource_object_schema_model(
-                        is_request=False
-                    )
-                }
-            }
-        }
-
-    @classmethod
-    def populate_default_models(cls):
+    def _set_relationships(cls):
         schema = cls.Meta.schema
-        type_ = cls.get_type()
-        cls.attributes = schema.get_included_attributes()
-        cls.relationships = schema.get_included_relationships()
+        cls.one_to_many_relationship_names = schema.get_one_to_many_relationship_names()
+        cls.response_many_to_one_relationships = schema.get_many_to_one_relationships()
+        cls.request_many_to_one_relationships = {
+            key: value for (key, value) in cls.response_many_to_one_relationships.items()
+            if key not in schema.get_excluded_many_to_one_relationships_on_request()
+        }
 
-        cls.api = Namespace(
-            type_,
-            description=f'Methods relating to {type_}',
-            path=f'/{type_}'
-        )
+    @classmethod
+    def _create_models(cls):
+        type_ = cls.get_type()
 
         cls.request_model = cls.api.schema_model(
             f'{type_.title()} Request',
             cls._get_request_schema_model()
         )
 
-        response_resource_object = cls.api.schema_model(
+        cls.response_resource_object = cls.api.schema_model(
             f'{type_.title()} Response Resource Object',
-            cls._get_resource_object_schema_model(
+            cls.get_resource_object_schema_model(
                 is_request=False
             )
         )
@@ -187,7 +234,7 @@ class BaseSwagger:
         cls.individual_response_model = cls.api.model(
             f'{type_.title()} Individual Response',
             {
-                'data': fields.Nested(response_resource_object)
+                'data': fields.Nested(cls.response_resource_object)
             }
         )
 
@@ -195,7 +242,29 @@ class BaseSwagger:
             f'{type_.title()} Bulk Response',
             {
                 'data': fields.List(
-                    fields.Nested(response_resource_object)
+                    fields.Nested(cls.response_resource_object)
                 )
             }
         )
+
+    @classmethod
+    def _set_attributes(cls):
+        schema = cls.Meta.schema
+        cls.attributes = schema.get_included_attributes()
+
+    @classmethod
+    def _create_api(cls):
+        type_ = cls.get_type()
+        cls.api = Namespace(
+            type_,
+            description=f'Methods relating to {type_}',
+            path=f'/{type_}'
+        )
+
+    @classmethod
+    def setup(cls):
+        cls._set_attributes()
+        cls._set_relationships()
+        cls._create_api()
+        cls._create_models()
+        cls._register_swagger()

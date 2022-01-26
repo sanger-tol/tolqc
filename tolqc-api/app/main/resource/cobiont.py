@@ -5,22 +5,14 @@
 from main.service import CobiontService
 from main.swagger import CobiontSwagger
 
-from .base import BaseListResource, BaseDetailResource, setup_resource
+from .base import BaseResource, setup_resource
 
 
 api_cobiont = CobiontSwagger.api
 
 
-class CobiontResourceMeta:
-    service = CobiontService
-    swagger = CobiontSwagger
-
-
 @setup_resource
-class CobiontDetailResource(BaseDetailResource):
-    Meta = CobiontResourceMeta
-
-
-@setup_resource
-class CobiontListResource(BaseListResource):
-    Meta = CobiontResourceMeta
+class CobiontResource(BaseResource):
+    class Meta:
+        service = CobiontService
+        swagger = CobiontSwagger

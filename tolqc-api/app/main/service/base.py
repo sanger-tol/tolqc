@@ -11,13 +11,25 @@ from marshmallow import ValidationError
 from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
 from main.model import InstanceDoesNotExistException, \
+                       StemInstanceDoesNotExistException, \
                        BadParameterException
 
 
 class BadParameterStringException(Exception):
     def __init__(self, message):
         self.message = message
-        super().__init__()
+        super().__init__(message)
+
+
+class BadTargetServiceException(Exception):
+    def __init__(self, target_service):
+        self.message = f"No endpoint exists with name '{target_service}'."
+        super().__init__(self.message)
+
+
+def setup_service(cls):
+    cls.register_service()
+    return cls
 
 
 def handle_404(function):
@@ -27,6 +39,11 @@ def handle_404(function):
             return function(cls, id, *args, **kwargs)
         except InstanceDoesNotExistException:
             return cls.error_404(id)
+        except StemInstanceDoesNotExistException as e:
+            return cls.error_404_relation_list(
+                e.stem_model,
+                id
+            )
     return wrapper
 
 
@@ -69,6 +86,18 @@ def handle_400_bad_parameter(function):
     return wrapper
 
 
+def handle_400_nonexistent_service(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            return function(cls, *args, **kwargs)
+        except BadTargetServiceException as e:
+            return cls.error_400(
+                e.message
+            )
+    return wrapper
+
+
 def provide_body_data(function):
     @wraps(function)
     def wrapper(cls, *args, **kwargs):
@@ -101,8 +130,16 @@ class BaseService:
     """In meta class, requires a model class, and a schema class,
     neither of which are an instantiated instance"""
 
+    # store a registry of inherited service classes in a dict
+    service_registry_dict = {}
+
     @classmethod
-    def _get_type(cls):
+    def register_service(cls):
+        type_ = cls.get_type()
+        cls.service_registry_dict[type_] = cls
+
+    @classmethod
+    def get_type(cls):
         return cls.Meta.schema.get_type()
 
     @classmethod
@@ -186,7 +223,15 @@ class BaseService:
         return cls._custom_error(
             "Not Found",
             404,
-            f"No {cls._get_type()} found with id {id}."
+            f"No {cls.get_type()} found with id {id}."
+        )
+
+    @classmethod
+    def error_404_relation_list(cls, relation_model, id):
+        return cls._custom_error(
+            "Not Found",
+            404,
+            f"No {relation_model.__tablename__} found with id {id}."
         )
 
     @classmethod
@@ -204,6 +249,30 @@ class BaseService:
             response=json.dumps(response),
             status=code
         )
+
+    @classmethod
+    def _get_target_service_by_name(cls, service_name):
+        target_service = cls.service_registry_dict.get(
+            service_name,
+            None
+        )
+        if target_service is None:
+            raise BadTargetServiceException(service_name)
+        return target_service
+
+    @classmethod
+    def get_bulk_results_for_related(cls, id, calling_service, **kwargs):
+        relation_model = calling_service.get_model()
+        return cls.get_model().bulk_find_on_relation_id(relation_model, id, **kwargs)
+
+    @classmethod
+    def get_schema(cls, **kwargs):
+        return cls.Meta.schema(**kwargs)
+
+    @classmethod
+    def get_model(cls):
+        schema = cls.Meta.schema
+        return schema.get_model()
 
     @classmethod
     @handle_404
@@ -250,7 +319,22 @@ class BaseService:
     @classmethod
     @provide_parameters
     @handle_400_bad_parameter
-    def read_bulk(cls, page=1, eq_filters=None, sort_by=None, user_id=None):
+    def read_bulk(cls, user_id=None, **kwargs):
         schema = cls.Meta.schema(many=True)
-        model_instances = cls.Meta.model.find_bulk(page, eq_filters, sort_by)
+        model_instances = cls.Meta.model.bulk_find(**kwargs)
+        return schema.dump(model_instances), 200
+
+    @classmethod
+    @provide_parameters
+    @handle_400_bad_parameter
+    @handle_400_nonexistent_service
+    @handle_404
+    def read_bulk_by_related_id(cls, id, target_service_name, user_id=None, **kwargs):
+        """
+        Called on the service for the first part of the endpoint
+        e.g. A in /A/{id}/B
+        """
+        target_service = cls._get_target_service_by_name(target_service_name)
+        schema = target_service.get_schema(many=True)
+        model_instances = target_service.get_bulk_results_for_related(id, cls, **kwargs)
         return schema.dump(model_instances), 200

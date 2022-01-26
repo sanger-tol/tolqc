@@ -5,9 +5,10 @@
 from main.model import TolqcPacbioRunStats
 from main.schema import PacbioRunStatsSchema
 
-from .base import BaseService
+from .base import BaseService, setup_service
 
 
+@setup_service
 class PacbioRunStatsService(BaseService):
     class Meta:
         model = TolqcPacbioRunStats

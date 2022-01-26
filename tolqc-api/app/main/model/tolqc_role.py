@@ -2,9 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
+from .base import Base, db, setup_model
 
 
+@setup_model
 class TolqcRole(Base):
     __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
