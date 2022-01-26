@@ -37,6 +37,7 @@ class InstanceDoesNotExistException(Exception):
 
 
 class StemInstanceDoesNotExistException(Exception):
+    """Used on 'related' endpoints"""
     def __init__(self, stem_model):
         self.stem_model = stem_model
 
