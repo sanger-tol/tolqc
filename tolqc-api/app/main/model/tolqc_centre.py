@@ -6,8 +6,8 @@ from .base import Base, db
 
 
 class TolqcCentre(Base):
-    __tablename__ = "centres"
+    __tablename__ = "centre"
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
-    runs = db.relationship("TolqcRun", back_populates="centres")
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
+    run = db.relationship("TolqcRun", back_populates="centre")
