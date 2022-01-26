@@ -81,3 +81,26 @@ class TestRelationListGet(BaseTestCase):
         )
         # assert that 1 was found
         self.assertEqual(len(response.json['data']), 1)
+        # assert that the correct one was found
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'id': '8080',
+                        'type': 'B',
+                        'relationships': {
+                            'A': {
+                                'data': {
+                                    'id': '29',
+                                    'type': 'A'
+                                },
+                                'links': {
+                                    'related': '/A/29'
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        )
