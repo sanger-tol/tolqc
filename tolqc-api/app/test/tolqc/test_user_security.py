@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
+
 from main.model import TolqcData
 
 from test.tolqc import TolqcTestCase
@@ -71,7 +73,7 @@ class TestUserSecurity(TolqcTestCase):
 
     def test_no_overwrite_creator_in_request(self):
         """Ensures that an authenticated user can not defraud the
-        creation log by specifying another creator in a POST or
+        creator log by specifying another creator in a POST or
         PATCH request"""
         # N.B. this method needs an endpoint with a model inheriting
         # from creation_log_base
@@ -163,4 +165,81 @@ class TestUserSecurity(TolqcTestCase):
         # assert 400 code for correct reason
         self.assertEqual(response.json, expected_response)
 
-    
+    def test_no_overwrite_created_at_in_request(self):
+        """Ensures that an authenticated user can not defraud the
+        creation datetime log by specifying another value in a POST or
+        PATCH request"""
+        # N.B. this method needs an endpoint with a model inheriting
+        # from creation_log_base
+        expected_response = {
+            'errors': [
+                {
+                    'detail': 'Unknown field.',
+                    'source': {
+                        'pointer': "/data/attributes/created_at"
+                    }
+                }
+            ]
+        }
+
+        response = self.client.open(
+            '/api/v1/data',
+            method='POST',
+            json={
+                'data': {
+                    'type': 'data',
+                    'attributes': {
+                        'reads': 'Reed Richaads',
+                        'bases': 'basement',
+                        'avg_read_len': 2389.8,
+                        'read_len_n50': 4598.97,
+                        'created_at': str(datetime.now())
+                    }
+                }
+            },
+            headers={
+                'Authorization': self.api_key_2
+            }
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert 400 code for correct reason
+        self.assertEqual(response.json, expected_response)
+
+        #TODO created at modifcation check
+
+        # try to modify created_at datetime of existing data instance
+        # add the instance
+        data_instance = TolqcData()
+        data_instance.id = 8609
+        data_instance.reads = 'cogito ergo sum'
+        data_instance.bases = 'based on what?'
+        data_instance.avg_read_len = 4.56
+        data_instance.read_len_n50 = 2387.3
+        data_instance.created_by = 101
+        data_instance.save()
+
+        # try to modify its creator
+        response = self.client.open(
+            '/api/v1/data/8609',
+            method='PATCH',
+            json={
+                'data': {
+                    'type': 'data',
+                    'attributes': {
+                        'created_at': str(datetime.now())
+                    }
+                }
+            },
+            headers={
+                'Authorization': self.api_key_2
+            }
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert 400 code for correct reason
+        self.assertEqual(response.json, expected_response)
