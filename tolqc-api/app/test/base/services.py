@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.service.base import BaseService
+from main.service.base import BaseService, setup_service
 
 from test.base.models import A_ModelRelationship, \
                              B_ModelRelationship, \
@@ -16,42 +16,49 @@ from test.base.schemas import A_Schema, B_Schema, C_Schema, \
                               G_Schema
 
 
+@setup_service
 class A_Service(BaseService):
     class Meta:
         model = A_ModelRelationship
         schema = A_Schema
 
 
+@setup_service
 class B_Service(BaseService):
     class Meta:
         model = B_ModelRelationship
         schema = B_Schema
 
 
+@setup_service
 class C_Service(BaseService):
     class Meta:
         model = C_ModelWithNullableColumn
         schema = C_Schema
 
 
+@setup_service
 class D_Service(BaseService):
     class Meta:
         model = D_ModelWithNonNullableColumn
         schema = D_Schema
 
 
+@setup_service
 class E_Service(BaseService):
     class Meta:
         model = E_ModelRelationship
         schema = E_Schema
 
 
+@setup_service
 class F_Service(BaseService):
     class Meta:
         model = F_ModelWithExtField
         schema = F_Schema
 
 
+@setup_service
 class G_Service(BaseService):
     class Meta:
         model = G_ModelWithFilterableFields

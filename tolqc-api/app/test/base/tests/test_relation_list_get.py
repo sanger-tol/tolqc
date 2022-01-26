@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+from test.base import BaseTestCase
+
+
+class TestRelationListGet(BaseTestCase):
+    def test_relation_list_get_A_B_200(self):
+        #TODO add one to many relationships in both output and swagger models
+        #TODO test all parameters (list get) on relation list get
+        # add two A's
+        self.add_A(id=20)
+        self.add_A(id=29)
+
+        # add two B's on the first A
+        self.add_B(id=89, a_id=20)
+        self.add_B(id=290, a_id=20)
+
+        # add one B on the second A
+        self.add_B(id=8080, a_id=29)
+
+        # get the first A's B's
+        response = self.client.open(
+            '/api/v1/A/20/B',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert that 2 were found
+        self.assertEqual(len(response.json['data']), 2)
+
+        # get the second A's B
+        response = self.client.open(
+            '/api/v1/A/29/B',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert that 1 was found
+        self.assertEqual(len(response.json['data']), 1)
