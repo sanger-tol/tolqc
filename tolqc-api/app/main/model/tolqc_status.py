@@ -2,50 +2,24 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db
-from sqlalchemy import Enum
+from .creation_log_base import CreationLogBase, db
 
 
-StatusEnum = Enum("na",
-                  "pending",
-                  "topup",
-                  "complete",
-                  "archived",
-                  name="status enum", create_type=False)
-
-QCEnum = Enum("no_qc",
-              "pending",
-              "pass",
-              "fail",
-              "investigate",
-              name="qc enum", create_type=False)
-
-TechEnum = Enum("hifi",
-                "hic",
-                "10x",
-                "htag",
-                "bionano",
-                "illumina",
-                "ont",
-                "rna-seq",
-                "iso-seq",
-                "contig_asm",
-                "scaffold_asm",
-                "asm2curation",
-                name="tech enum", create_type=False)
-
-
-class TolqcStatus(Base):
-    __tablename__ = "statuses"
+class TolqcStatus(CreationLogBase):
+    __tablename__ = "status"
     id = db.Column(db.Integer(), primary_key=True)
-    specimen_id = db.Column(db.Integer(), db.ForeignKey("specimens.id"),
+    specimen_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"),
                             nullable=False)
     coverage = db.Column(db.String())
     lims_id = db.Column(db.String())
     note_id = db.Column(db.String())
-    changed = db.Column(db.DateTime())
-    current = db.Column(db.String())
-    status = db.Column(StatusEnum)
-    qc = db.Column(QCEnum)
-    technology = db.Column(TechEnum)
-    specimens = db.relationship("TolqcSpecimen", back_populates="statuses")
+    status_dict_id = db.Column(db.Integer(), db.ForeignKey("status_dict.id"))
+    qc_dict_id = db.Column(db.Integer(), db.ForeignKey("qc_dict.id"))
+    milestone_dict_id = db.Column(db.Integer(), db.ForeignKey("milestone_dict.id"))
+    specimen = db.relationship("TolqcSpecimen", back_populates="status")
+    status_dict = db.relationship("TolqcStatusDict", back_populates="status",
+                                  foreign_keys=[status_dict_id])
+    qc_dict = db.relationship("TolqcQcDict", back_populates="status",
+                              foreign_keys=[qc_dict_id])
+    milestone_dict = db.relationship("TolqcMilestoneDict", back_populates="status",
+                                     foreign_keys=[milestone_dict_id])

@@ -4,7 +4,7 @@
 
 from sqlalchemy.ext.declarative import declared_attr
 
-from .base import Base, db
+from .base import Base, ExtColumn, db
 
 
 class CreationLogMixin(object):
@@ -22,7 +22,7 @@ class CreationLogMixin(object):
 
     @declared_attr
     def ext(cls):
-        return db.Column(db.String)
+        return ExtColumn()
 
 
 class CreationLogBase(Base, CreationLogMixin):
