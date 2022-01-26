@@ -128,7 +128,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             related_url_kwargs={'id': '<id>'},
             many=True,
             type_=name,
-            dump_deafult=lambda: []
+            dump_default=lambda: []
         )
 
     @classmethod
