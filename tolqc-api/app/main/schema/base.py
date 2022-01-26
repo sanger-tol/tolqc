@@ -73,19 +73,21 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return lookup_map.get(foreign_key_name, target_table)
 
     @classmethod
-    def _create_many_to_one_relationship_field(cls, target_table, target_column, foreign_key_name, dump_only):
+    def _create_many_to_one_relationship_field(cls, table, column, foreign_key_name, dump_only):
         return Relationship(
-            f'/{target_table}/{{{target_column}}}',
-            related_url_kwargs={f'{target_column}': f'<{foreign_key_name}>'},
+            f'/{table}/{{{column}}}',
+            related_url_kwargs={f'{column}': f'<{foreign_key_name}>'},
             include_resource_linkage=True,
-            type_=target_table,
+            type_=table,
             attribute=foreign_key_name,
             dump_only=dump_only
         )
 
     @classmethod
     def _many_to_one_relationship_is_dump_only(cls, special_name):
-        dump_only_special_names = ['creator'] + list(getattr(cls.Meta, 'dump_only_relationships', []))
+        dump_only_special_names = ['creator'] + list(
+            getattr(cls.Meta, 'dump_only_relationships', [])
+        )
         return special_name in dump_only_special_names
 
     @classmethod

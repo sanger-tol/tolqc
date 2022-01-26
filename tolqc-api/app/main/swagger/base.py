@@ -148,7 +148,6 @@ class BaseSwagger:
 
     @classmethod
     def _get_relationships_dict(cls, is_request):
-        #TODO see if you can change creating user by specifying it on post or patch???
         many_to_one_relationships_dict = cls._get_many_to_one_relationships_dict(is_request)
 
         if is_request:
