@@ -57,6 +57,10 @@ class TestUserSecurity(TolqcTestCase):
         )
 
     def test_no_blind_equal_filter_credential_disclosure(self):
+        """Ensures that a word-list attack, in which a hacker
+        may guess an api_key from a list of likely candidates by
+        filtering against api_key value on list get users, is not
+        possible."""
         response = self.client.open(
             f'/api/v1/users?filter=[api_key=="{self.api_key}"]',
             method='GET'
