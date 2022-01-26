@@ -7,8 +7,7 @@ from flask_restx import Namespace, fields
 
 
 def setup_swagger(cls):
-    cls.populate_default_models()
-    cls.register_swagger()
+    cls.setup()
     return cls
 
 
@@ -43,7 +42,7 @@ class BaseSwagger:
         return cls.Meta.schema.get_type()
 
     @classmethod
-    def register_swagger(cls):
+    def _register_swagger(cls):
         type_ = cls.get_type()
         cls.swagger_registry_dict[type_] = cls
 
@@ -244,16 +243,8 @@ class BaseSwagger:
         }
 
     @classmethod
-    def populate_default_models(cls):
-        schema = cls.Meta.schema
+    def _create_models(cls):
         type_ = cls.get_type()
-        cls.attributes = schema.get_included_attributes()
-        cls._set_relationships()
-        cls.api = Namespace(
-            type_,
-            description=f'Methods relating to {type_}',
-            path=f'/{type_}'
-        )
 
         cls.request_model = cls.api.schema_model(
             f'{type_.title()} Request',
@@ -282,3 +273,25 @@ class BaseSwagger:
                 )
             }
         )
+
+    @classmethod
+    def _set_attributes(cls):
+        schema = cls.Meta.schema
+        cls.attributes = schema.get_included_attributes()
+
+    @classmethod
+    def _create_api(cls):
+        type_ = cls.get_type()
+        cls.api = Namespace(
+            type_,
+            description=f'Methods relating to {type_}',
+            path=f'/{type_}'
+        )
+
+    @classmethod
+    def setup(cls):
+        cls._set_attributes()
+        cls._set_relationships()
+        cls._create_api()
+        cls._create_models()
+        cls._register_swagger()
