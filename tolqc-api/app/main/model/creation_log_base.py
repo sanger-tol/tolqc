@@ -14,7 +14,15 @@ class CreationLogMixin(object):
 
     @declared_attr
     def created_by(cls):
-        return db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+        return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    @declared_attr
+    def last_modified_at(cls):
+        return db.Column(db.DateTime, nullable=False, default=db.func.now())
+
+    @declared_attr
+    def last_modified_by(cls):
+        return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     @declared_attr
     def history(cls):
