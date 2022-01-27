@@ -21,7 +21,7 @@ def setup_schema(OldCls):
     NewCls = type(
         f'_{OldCls.get_type().title()}Schema',
         (OldCls,),
-        OldCls.create_relationship_fields()
+        OldCls.get_dynamically_added_fields()
     )
     return NewCls
 
@@ -49,14 +49,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     OPTIONS_CLASS = CombinedOpts
 
     id = Str(dump_only=True)
-
-    # all 6 below are excluded at instantiation time if not needed
-    created_by = Str(dump_only=True)
-    created_at = DateTime(dump_only=True)
-    last_modified_by = Str(dump_only=True)
-    last_modified_at = DateTime(dump_only=True)
-    history = List(Dict(), dump_only=True)
-    resource_meta = ResourceMeta(required=False)
 
     def __init__(self, **kwargs):
         exclude = self.get_excluded_columns()
@@ -149,7 +141,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
-    def create_relationship_fields(cls):
+    def _create_relationship_fields(cls):
         many_to_one_relationship_fields = cls._create_many_to_one_relationship_fields()
         one_to_many_relationship_fields = cls._create_one_to_many_relationship_fields()
         all_relationship_fields = {
@@ -159,29 +151,48 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return all_relationship_fields
 
     @classmethod
+    def _get_possibly_empty_resource_meta_field(cls):
+        if cls.has_ext_field():
+            return {'resource_meta': ResourceMeta(required=False)}
+        return {}
+
+    @classmethod
+    def _get_possibly_empty_creation_log_fields(cls):
+        if not cls.has_creation_details():
+            return {}
+        return {
+            'created_by': Str(dump_only=True),
+            'created_at': DateTime(dump_only=True),
+            'last_modified_by': Str(dump_only=True),
+            'last_modified_at': DateTime(dump_only=True),
+            'history': List(Dict(), dump_only=True)
+        }
+
+    @classmethod
+    def _get_dynamically_added_non_relationship_fields(cls):
+        return {
+            **cls._get_possibly_empty_resource_meta_field(),
+            **cls._get_possibly_empty_creation_log_fields()
+        }
+
+    @classmethod
+    def get_dynamically_added_fields(cls):
+        relationship_fields = cls._create_relationship_fields()
+        other_fields = cls._get_dynamically_added_non_relationship_fields()
+        return {
+            **relationship_fields,
+            **other_fields
+        }
+
+    @classmethod
     def get_type(cls):
         return cls.Meta.type_
 
     @classmethod
-    def _get_base_excluded_columns(cls):
+    def get_excluded_columns(cls):
         """Gets the excluded columns on both requests and responses"""
         excluded_columns = list(getattr(cls.Meta, 'exclude', []))
         excluded_columns += cls.Meta.model.get_foreign_key_column_names()
-        return excluded_columns
-
-    @classmethod
-    def get_excluded_columns(cls):
-        excluded_columns = cls._get_base_excluded_columns()
-        if cls.has_ext_field():
-            excluded_columns += ['ext']
-        if not cls.has_creation_details():
-            excluded_columns += [
-                'created_by',
-                'created_at',
-                'last_modified_by',
-                'last_modified_at',
-                'history'
-            ]
         return excluded_columns
 
     @classmethod
@@ -196,7 +207,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def _get_public_attribute_names(cls):
         return [
             column for column in cls.Meta.model.get_column_names()
-            if column not in ['id', 'ext'] + cls._get_base_excluded_columns()
+            if column not in ['id', 'ext'] + cls.get_excluded_columns()
         ]
 
     @classmethod
