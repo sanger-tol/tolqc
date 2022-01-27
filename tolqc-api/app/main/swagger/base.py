@@ -85,7 +85,11 @@ class BaseSwagger:
 
     @classmethod
     def _get_attributes_dict(cls, is_request=True):
-        exclude_on_request = ['created_at']
+        exclude_on_request = [
+            'created_at',
+            'last_modified_at',
+            'history'
+        ]
         attributes = {
             field_name: cls._get_field_schema_model_type(python_type)
             for field_name, python_type in cls.attributes

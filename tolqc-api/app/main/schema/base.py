@@ -66,7 +66,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
         lookup_map = {
-            'created_by': 'creator'
+            'created_by': 'creator',
+            'last_modified_by': 'last_modifier'
         }
         # default to the target table if no special name
         return lookup_map.get(foreign_key_name, target_table)
@@ -228,7 +229,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def get_excluded_many_to_one_relationships_on_request(cls):
         if cls.has_creation_details():
-            return ['creator']
+            return ['creator', 'last_modifier']
         return []
 
     @classmethod
