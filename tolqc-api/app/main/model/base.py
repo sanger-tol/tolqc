@@ -64,8 +64,13 @@ class Base(db.Model):
     """
     __abstract__ = True
 
-    def to_dict(cls):
-        return {"override": "this"}
+    def to_dict(self, exclude_column_names=[]):
+        return {
+            column_name: getattr(self, column_name)
+            for column_name
+            in self.get_column_names()
+            if column_name not in exclude_column_names
+        }
 
     @classmethod
     def _get_excluded_columns_in_history(cls):
@@ -74,14 +79,8 @@ class Base(db.Model):
             return []
         return list(getattr(cls.Meta, 'exclude_columns_in_history', []))
 
-    @classmethod
-    def _to_history_dict(cls):
-        return {
-            column_name: getattr(cls, column_name)
-            for column_name
-            in cls.get_column_names()
-            if column_name not in cls._get_excluded_columns_in_history()
-        }
+    def _to_history_dict(self):
+        return self.to_dict(self._get_excluded_columns_in_history())
 
     def add(self):
         db.session.add(self)

@@ -13,6 +13,3 @@ class TolqcRole(Base):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     users = db.relationship("TolqcUser", back_populates="roles",
                             uselist=False, foreign_keys=[user_id])
-
-    def to_dict(cls):
-        return {'role': cls.role}

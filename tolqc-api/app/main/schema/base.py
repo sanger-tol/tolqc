@@ -282,13 +282,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return self._model_instance_to_datum(data)
 
     def _model_instance_to_datum(self, model_instance):
-        data = {
-            f: getattr(model_instance, f)
-            for f in model_instance.get_column_names()
-            if f != 'ext'
-        }
-
-        return data
+        return model_instance.to_dict(exclude_column_names=['ext'])
 
     def _re_insert_ext_datum(self, datum, ext_data):
         datum['meta'] = {
