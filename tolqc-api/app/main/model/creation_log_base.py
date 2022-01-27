@@ -33,10 +33,6 @@ class CreationLogMixin(object):
 class CreationLogBase(Base, CreationLogMixin):
     __abstract__ = True
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._create_history_array()
-
     @classmethod
     def has_creation_details(cls):
         return True
@@ -47,7 +43,9 @@ class CreationLogBase(Base, CreationLogMixin):
         if not hasattr(cls, 'Meta'):
             return []
         #TODO test that id does not appear in history
-        return list(getattr(cls.Meta, 'exclude_columns_in_history', [])) + ['id']
+        return list(
+            getattr(cls.Meta, 'exclude_columns_in_history', [])
+        ) + ['id', 'history']
 
     def post_update(self, user_id):
         #TODO check that datetime's don't break dumping of history
@@ -55,9 +53,14 @@ class CreationLogBase(Base, CreationLogMixin):
         self.last_modified_by = user_id
         self.last_modified_at = datetime.now()
 
-    def post_create(self, user_id):
+    def save_create(self, user_id=None):
         self.created_by = user_id
         self.last_modified_by = user_id
+        now = datetime.now()
+        self.created_at = now
+        self.last_modified_at = now
+        self._create_history_array()
+        super().save_create()
 
     def _get_history_entry(self):
         return self.to_dict(

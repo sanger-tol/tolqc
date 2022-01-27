@@ -131,7 +131,7 @@ class TestUserSecurity(TolqcTestCase):
         data_instance.read_len_n50 = 2387.3
         data_instance.created_by = 101
         data_instance.last_modified_by = 101
-        data_instance.save()
+        data_instance.save_create(user_id=101)
 
         # try to modify its creator
         response = self.client.open(
@@ -217,7 +217,7 @@ class TestUserSecurity(TolqcTestCase):
         data_instance.read_len_n50 = 2387.3
         data_instance.created_by = 101
         data_instance.last_modified_by = 101
-        data_instance.save()
+        data_instance.save_create(user_id=101)
 
         # try to modify its creator
         response = self.client.open(

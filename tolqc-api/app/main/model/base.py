@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import dateutil.parser
+import json
 
 from datetime import datetime
 from sqlalchemy import and_
@@ -14,7 +15,17 @@ from sqlalchemy.inspection import inspect
 PAGE_SIZE = 20
 
 
-db = SQLAlchemy()
+def default_dump(value):
+    if isinstance(value, datetime):
+        return str(value)
+    raise TypeError()
+
+
+db = SQLAlchemy(
+    engine_options={
+        'json_serializer': lambda obj: json.dumps(obj, default=default_dump)
+    }
+)
 
 
 class BadParameterException(Exception):
@@ -101,6 +112,10 @@ class Base(db.Model):
         if ext is not None:
             self._update_ext(ext)
 
+    def post_update(self, user_id):
+        self.commit()
+        
+
     def delete(self):
         db.session.delete(self)
         self.commit()
@@ -116,6 +131,9 @@ class Base(db.Model):
     def save(self):
         self.add()
         self.commit()
+
+    def save_create(self, **kwargs):
+        self.save()
 
     @classmethod
     def _get_eq_filter_terms(cls, eq_filters):

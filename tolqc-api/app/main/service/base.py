@@ -293,7 +293,6 @@ class BaseService:
             partial=True
         )
         new_model_instance.post_update(user_id)
-        new_model_instance.save()
         return schema.dump(new_model_instance), 200
 
     @classmethod
@@ -311,8 +310,7 @@ class BaseService:
     def create(cls, data, user_id=None):
         schema = cls.Meta.schema()
         model_instance = schema.load(data)
-        model_instance.post_create(user_id)
-        model_instance.save()
+        model_instance.save_create(user_id=user_id)
         return schema.dump(model_instance), 201
 
     @classmethod
