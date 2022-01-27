@@ -130,6 +130,7 @@ class TestUserSecurity(TolqcTestCase):
         data_instance.avg_read_len = 4.56
         data_instance.read_len_n50 = 2387.3
         data_instance.created_by = 101
+        data_instance.last_modified_by = 101
         data_instance.save()
 
         # try to modify its creator
@@ -215,6 +216,7 @@ class TestUserSecurity(TolqcTestCase):
         data_instance.avg_read_len = 4.56
         data_instance.read_len_n50 = 2387.3
         data_instance.created_by = 101
+        data_instance.last_modified_by = 101
         data_instance.save()
 
         # try to modify its creator

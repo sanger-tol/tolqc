@@ -292,6 +292,7 @@ class BaseService:
             instance=old_model_instance,
             partial=True
         )
+        new_model_instance.set_last_modified(user_id)
         new_model_instance.save()
         return schema.dump(new_model_instance), 200
 
@@ -310,8 +311,9 @@ class BaseService:
     def create(cls, data, user_id=None):
         schema = cls.Meta.schema()
         model_instance = schema.load(data)
-        model_instance.created_by = user_id
-        cls.Meta.model.save(model_instance)
+        model_instance.set_creation_details(user_id)
+        model_instance.set_last_modified(user_id)
+        model_instance.save()
         return schema.dump(model_instance), 201
 
     @classmethod

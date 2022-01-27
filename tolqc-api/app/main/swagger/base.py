@@ -70,6 +70,14 @@ class BaseSwagger:
                 'type': 'number',
                 'format': 'float'
             }
+        if python_type == dict:
+            return {
+                'type': 'object'
+            }
+        if python_type == list:
+            return {
+                'type': 'array'
+            }
 
         raise NotImplementedError(
             f"Type '{python_type}' has not been implemented yet."

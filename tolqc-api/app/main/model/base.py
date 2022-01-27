@@ -72,16 +72,6 @@ class Base(db.Model):
             if column_name not in exclude_column_names
         }
 
-    @classmethod
-    def _get_excluded_columns_in_history(cls):
-        meta_class = getattr(cls, 'Meta', None)
-        if meta_class is None:
-            return []
-        return list(getattr(cls.Meta, 'exclude_columns_in_history', []))
-
-    def _to_history_dict(self):
-        return self.to_dict(self._get_excluded_columns_in_history())
-
     def add(self):
         db.session.add(self)
 
@@ -99,11 +89,24 @@ class Base(db.Model):
                 ext_data[key] = item
         self.ext = ext_data
 
+    def set_last_modified(self, user_id):
+        if not self.has_creation_details():
+            return
+        self.last_modified_by = user_id
+        self.last_modified_at = datetime.now()
+
+    def set_creation_details(self, user_id):
+        if not self.has_creation_details():
+            return
+        self.created_by = user_id
+        self.created_at = datetime.now()
+
     def update(self, data, ext=None):
         for key, item in data.items():
             setattr(self, key, item)
         if ext is not None:
             self._update_ext(ext)
+        
 
     def delete(self):
         db.session.delete(self)
