@@ -38,6 +38,7 @@ class CreationLogBase(Base, CreationLogMixin):
 
     @classmethod
     def _get_excluded_columns_in_history(cls):
+        #TODO test that this works in a CreationLogBase inherited test model
         if not hasattr(cls, 'Meta'):
             return []
         return list(getattr(cls.Meta, 'exclude_columns_in_history', []))
