@@ -16,16 +16,15 @@ class TolqcBuscoMetrics(CreationLogBase):
     fragmented = db.Column(db.Integer())
     missing = db.Column(db.Integer())
     count = db.Column(db.Integer())
-    busco_lineage_id = db.Column(db.Integer(), db.ForeignKey("busco_linage.id"))
+    busco_lineage_id = db.Column(db.Integer(), db.ForeignKey("busco_lineage.id"))
     summary = db.Column(db.String())
     software_version_id = db.Column(db.Integer(), db.ForeignKey("software_version.id"))
-
     assembly = db.relationship("TolqcAssembly", back_populates="busco_metrics",
                                foreign_keys=[assembly_id])
     assembly_component = db.relationship("TolqcAssemblyComponent",
                                          back_populates="busco_metrics",
                                          foreign_keys=[assembly_component_id])
-    busco_lineage = db.relationship("TolqcBuscoLinage", back_populates="busco_metrics",
+    busco_lineage = db.relationship("TolqcBuscoLineage", back_populates="busco_metrics",
                                     foreign_keys=[busco_lineage_id])
-    software_versions = db.relationship("TolqcSoftwareVersion", back_populates="busco_metrics",
-                                        foreign_keys=[software_version_id])
+    software_version = db.relationship("TolqcSoftwareVersion", back_populates="busco_metrics",
+                                       foreign_keys=[software_version_id])

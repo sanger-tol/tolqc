@@ -35,7 +35,7 @@ class TolqcAssemblyMetrics(CreationLogBase):
     scaffold_aun = db.Column(db.Float())
     gap_n = db.Column(db.Integer())
     gap_n50 = db.Column(db.Integer())
-    assembly = db.relationship("TolqcAsm", back_populates="asm_stats",
+    assembly = db.relationship("TolqcAssembly", back_populates="assembly_metrics",
                                foreign_keys=[assembly_id])
-    assembly_component = db.relationship("TolqcBusco", back_populates="asm_stats",
+    assembly_component = db.relationship("TolqcAssemblyComponent", back_populates="assembly_metrics",
                                          foreign_keys=[assembly_component_id])

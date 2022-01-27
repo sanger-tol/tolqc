@@ -19,7 +19,7 @@ class TolqcMerquryMetrics(CreationLogBase):
     qv_alternate = db.Column(db.Float())
     qv_all = db.Column(db.Float())
     software_version_id = db.Column(db.Integer(), db.ForeignKey("software_version.id"))
-    assembly = db.relationship("TolqcAssemblyMetrics", back_populates="merqury_metrics",
+    assembly = db.relationship("TolqcAssembly", back_populates="merqury_metrics",
                                foreign_keys=[assembly_id])
     data = db.relationship("TolqcData", back_populates="merqury_metrics", foreign_keys=[data_id])
     assembly_component = db.relationship("TolqcAssemblyComponent", back_populates="merqury_metrics",

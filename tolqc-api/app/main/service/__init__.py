@@ -18,12 +18,7 @@ from .specimen import SpecimenService # noqa
 from .run import RunService # noqa
 from .user import UserService # noqa
 from .software_version import SoftwareVersionService # noqa
-from .pacbio_run_stats import PacbioRunStatsService # noqa
 from .data import DataService # noqa
 from .seq_data import SeqDataService # noqa
 from .status import StatusService # noqa
-from .asm_stats import AsmStatsService # noqa
-from .asm import AsmService # noqa
-from .busco import BuscoService # noqa
-from .merqury import MerquryService # noqa
 from .file import FileService # noqa

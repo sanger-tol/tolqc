@@ -13,7 +13,7 @@ class TolqcData(CreationLogBase):
     avg_read_len = db.Column(db.Float())
     read_len_n50 = db.Column(db.Float())
     seq_data = db.relationship("TolqcSeqData", back_populates="data")
-    merqury = db.relationship("TolqcMerquryMetrics", back_populates="data")
+    merqury_metrics = db.relationship("TolqcMerquryMetrics", back_populates="data")
     assembly = db.relationship("TolqcAssembly", back_populates="data")
     genomescope_metrics = db.relationship("TolqcGenomescopeMetrics",
                                           back_populates="data")

@@ -27,9 +27,9 @@ class TolqcSeq(CreationLogBase):
                              foreign_keys=[sample_id])
     library = db.relationship("TolqcLibrary", back_populates="seq",
                               foreign_keys=[library_id])
-    run = db.relationship("TolqcAccession", back_populates="seq",
-                          foreign_keys=[accession_id])
-    accession = db.relationship("TolqcRun", back_populates="seq",
-                                foreign_keys=[run_id])
+    run = db.relationship("TolqcRun", back_populates="seq",
+                          foreign_keys=[run_id])
+    accession = db.relationship("TolqcAccession", back_populates="seq",
+                                foreign_keys=[accession_id])
     seq_data = db.relationship("TolqcSeqData", back_populates="seq")
     file = db.relationship("TolqcFile", back_populates="seq")

@@ -25,8 +25,8 @@ class TolqcGenomescopeMetrics(CreationLogBase):
     software_version_id = db.Column(db.Integer(), db.ForeignKey("software_version.id"))
     data = db.relationship("TolqcData", back_populates="genomescope_metrics",
                            foreign_keys=[data_id])
-    qc = db.relationship("TolqcQcDict", back_populates="genomescope_metrics",
+    qc_dict = db.relationship("TolqcQcDict", back_populates="genomescope_metrics",
                          foreign_keys=[qc_id])
-    software_version_id = db.relationship("TolqcSoftwareVersion",
-                                          back_populates="genomescope_metrics",
-                                          foreign_keys=[software_version_id])
+    software_version = db.relationship("TolqcSoftwareVersion",
+                                       back_populates="genomescope_metrics",
+                                       foreign_keys=[software_version_id])

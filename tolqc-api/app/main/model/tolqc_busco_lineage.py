@@ -12,4 +12,4 @@ class TolqcBuscoLineage(CreationLogBase):
     date_created = db.Column(db.DateTime())
     species_count = db.Column(db.Integer())
     gene_count = db.Column(db.Integer())
-    busco_metrics = db.relationship("TolqcBuscoLineage", back_populates="busco_lineage")
+    busco_metrics = db.relationship("TolqcBuscoMetrics", back_populates="busco_lineage")
