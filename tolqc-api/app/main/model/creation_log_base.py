@@ -39,18 +39,14 @@ class CreationLogBase(Base, CreationLogMixin):
 
     @classmethod
     def _get_excluded_columns_in_history(cls):
-        #TODO test that this works in a CreationLogBase inherited test model
         base_excludes = ['id', 'history', 'created_at', 'created_by']
         if not hasattr(cls, 'Meta'):
             return base_excludes
-        #TODO test that id does not appear in history
         return base_excludes + list(
             getattr(cls.Meta, 'exclude_columns_in_history', [])
         )
 
     def save_update(self, user_id):
-        #TODO check that datetime's don't break dumping of history
-        #maybe set a dump method that converts to string??
         self.last_modified_by = user_id
         self.last_modified_at = datetime.now()
         self.commit()

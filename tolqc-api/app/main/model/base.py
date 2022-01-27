@@ -111,7 +111,6 @@ class Base(db.Model):
 
     def post_update(self, user_id):
         self.commit()
-        
 
     def delete(self):
         db.session.delete(self)
