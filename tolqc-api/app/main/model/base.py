@@ -17,7 +17,7 @@ PAGE_SIZE = 20
 
 def default_dump(value):
     if isinstance(value, datetime):
-        return str(value)
+        return value.strftime('%Y-%m-%dT%H:%M:%S.%f')
     raise TypeError()
 
 
