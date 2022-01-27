@@ -106,7 +106,6 @@ class Base(db.Model):
             setattr(self, key, item)
         if ext is not None:
             self._update_ext(ext)
-        
 
     def delete(self):
         db.session.delete(self)

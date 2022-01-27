@@ -23,7 +23,7 @@ class CreationLogMixin(object):
     @declared_attr
     def last_modified_by(cls):
         return db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    
+
     @declared_attr
     def history(cls):
         return db.Column(db.JSON, nullable=False, default={})
@@ -42,9 +42,3 @@ class CreationLogBase(Base, CreationLogMixin):
         if meta_class is None:
             return []
         return list(getattr(cls.Meta, 'exclude_columns_in_history', []))
-
-    def _to_history_dict(self, user_id):
-        current_state = self.to_dict(self._get_excluded_columns_in_history())
-        additional_info = {
-            ''
-        }
