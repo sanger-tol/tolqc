@@ -9,7 +9,7 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
 from marshmallow_jsonapi.fields import ResourceMeta, Relationship, Str, \
-                                       DateTime
+                                       DateTime, List, Dict
 
 from main.model import db
 
@@ -50,9 +50,12 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     id = Str(dump_only=True)
 
-    # all three below are excluded at instantiation time if not needed
+    # all 6 below are excluded at instantiation time if not needed
     created_by = Str(dump_only=True)
     created_at = DateTime(dump_only=True)
+    last_modified_by = Str(dump_only=True)
+    last_modified_at = DateTime(dump_only=True)
+    history = List(Dict(), dump_only=True)
     resource_meta = ResourceMeta(required=False)
 
     def __init__(self, **kwargs):
@@ -172,7 +175,13 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         if cls.has_ext_field():
             excluded_columns += ['ext']
         if not cls.has_creation_details():
-            excluded_columns += ['created_by', 'created_at']
+            excluded_columns += [
+                'created_by',
+                'created_at',
+                'last_modified_by',
+                'last_modified_at',
+                'history'
+            ]
         return excluded_columns
 
     @classmethod

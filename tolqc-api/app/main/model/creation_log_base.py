@@ -27,14 +27,14 @@ class CreationLogMixin(object):
 
     @declared_attr
     def history(cls):
-        return db.Column(db.JSON, nullable=False, default=[])
+        return db.Column(db.JSON, nullable=False)
 
 
 class CreationLogBase(Base, CreationLogMixin):
     __abstract__ = True
 
     def __init__(self, **kwargs):
-        super(Base).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._create_history_array()
 
     @classmethod
