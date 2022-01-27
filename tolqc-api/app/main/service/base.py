@@ -328,7 +328,7 @@ class BaseService:
     @handle_400_bad_parameter
     @handle_400_nonexistent_service
     @handle_404
-    def read_bulk_by_related_id(cls, id, target_service_name, user_id=None, **kwargs):
+    def read_bulk_related_by_id(cls, id, target_service_name, user_id=None, **kwargs):
         """
         Called on the service for the first part of the endpoint
         e.g. A in /A/{id}/B
