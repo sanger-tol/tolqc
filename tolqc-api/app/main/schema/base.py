@@ -15,7 +15,7 @@ from main.model import db
 
 
 def setup_schema(OldCls):
-    """Dynamically adds relationship fields to a Schema Class inheriting
+    """Dynamically adds fields to a Schema Class inheriting
     from BaseSchema"""
     OldCls.setup()
     NewCls = type(
