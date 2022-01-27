@@ -40,7 +40,7 @@ class CreationLogBase(Base, CreationLogMixin):
     @classmethod
     def _get_excluded_columns_in_history(cls):
         #TODO test that this works in a CreationLogBase inherited test model
-        base_excludes = ['id', 'history']
+        base_excludes = ['id', 'history', 'created_at', 'created_by']
         if not hasattr(cls, 'Meta'):
             return base_excludes
         #TODO test that id does not appear in history
@@ -64,9 +64,6 @@ class CreationLogBase(Base, CreationLogMixin):
         super().save_create()
 
     def _get_history_entry(self):
-        #reeemove
-        import logging
-        logging.warning(self._get_excluded_columns_in_history())
         return self.to_dict(
             exclude_column_names=self._get_excluded_columns_in_history()
         )
@@ -79,4 +76,4 @@ class CreationLogBase(Base, CreationLogMixin):
 
     def update(self, *args, **kwargs):
         self._update_history()
-        super(Base).update(*args, **kwargs)
+        super().update(*args, **kwargs)

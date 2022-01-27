@@ -15,7 +15,7 @@ from sqlalchemy.inspection import inspect
 PAGE_SIZE = 20
 
 
-def default_dump(value):
+def default_datetime_dump(value):
     if isinstance(value, datetime):
         return value.strftime('%Y-%m-%dT%H:%M:%S.%f')
     raise TypeError()
@@ -23,7 +23,7 @@ def default_dump(value):
 
 db = SQLAlchemy(
     engine_options={
-        'json_serializer': lambda obj: json.dumps(obj, default=default_dump)
+        'json_serializer': lambda obj: json.dumps(obj, default=default_datetime_dump)
     }
 )
 
