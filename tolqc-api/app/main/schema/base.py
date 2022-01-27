@@ -244,13 +244,13 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return instance
 
     def _remove_resource_metadata(self, data):
-        self._resource_meta = data.get('data', {}).pop('meta', {})
+        self._resource_meta = data.pop('_resource_meta', {})
         if not self.has_ext_field() and 'ext' in self._resource_meta:
             raise ValidationError(
                 f'Extra fields are not permitted on {self.get_type()}.'
             )
 
-    @pre_load(pass_many=True)
+    @pre_load
     def preprocess_instance(self, data, **kwargs):
         self._remove_resource_metadata(data)
         return data
@@ -264,9 +264,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     def _store_ext_data(self, data, many):
         if many:
-            self._ext_data = [
-                m.ext for m in data
-            ]
+            self._ext_data = [m.ext for m in data]
         else:
             self._ext_data = data.ext
 
