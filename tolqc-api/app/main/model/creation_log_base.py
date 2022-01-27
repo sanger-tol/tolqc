@@ -46,6 +46,7 @@ class CreationLogBase(Base, CreationLogMixin):
         #TODO test that this works in a CreationLogBase inherited test model
         if not hasattr(cls, 'Meta'):
             return []
+        #TODO test that id does not appear in history
         return list(getattr(cls.Meta, 'exclude_columns_in_history', [])) + ['id']
 
     def post_update(self, user_id):
@@ -66,10 +67,6 @@ class CreationLogBase(Base, CreationLogMixin):
 
     def _update_history(self):
         self.history.append(self._get_history_entry())
-
-    def create(self, *args, **kwargs):
-        self._create_history_array()
-        super(Base).save(*args, **kwargs)
 
     def update(self, *args, **kwargs):
         self._update_history()
