@@ -89,17 +89,11 @@ class Base(db.Model):
                 ext_data[key] = item
         self.ext = ext_data
 
-    def update_last_modified(self, user_id):
-        if not self.has_creation_details():
-            return
-        self.last_modified_by = user_id
-        self.last_modified_at = datetime.now()
+    def post_update(self, user_id):
+        pass
 
-    def set_first_log_details(self, user_id):
-        if not self.has_creation_details():
-            return
-        self.created_by = user_id
-        self.last_modified_by = user_id
+    def post_create(self, user_id):
+        pass
 
     def update(self, data, ext=None):
         for key, item in data.items():

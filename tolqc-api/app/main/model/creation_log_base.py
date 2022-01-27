@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 
 from .base import Base, db
@@ -42,3 +43,12 @@ class CreationLogBase(Base, CreationLogMixin):
         if not hasattr(cls, 'Meta'):
             return []
         return list(getattr(cls.Meta, 'exclude_columns_in_history', []))
+
+    def post_update(self, user_id):
+        #TODO check that datetime's don't break dumping of history
+        self.last_modified_by = user_id
+        self.last_modified_at = datetime.now()
+
+    def post_create(self, user_id):
+        self.created_by = user_id
+        self.last_modified_by = user_id
