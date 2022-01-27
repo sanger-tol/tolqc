@@ -60,7 +60,9 @@ class CreationLogBase(Base, CreationLogMixin):
         self.last_modified_by = user_id
 
     def _get_history_entry(self):
-        return {}
+        return self.to_dict(
+            exclude_column_names=self._get_excluded_columns_in_history()
+        )
 
     def _create_history_array(self):
         self.history = [self._get_history_entry()]
