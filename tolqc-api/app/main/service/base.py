@@ -37,13 +37,11 @@ def handle_404(function):
     def wrapper(cls, id, *args, **kwargs):
         try:
             return function(cls, id, *args, **kwargs)
-        except InstanceDoesNotExistException:
+        except (
+            InstanceDoesNotExistException,
+            StemInstanceDoesNotExistException
+        ):
             return cls.error_404(id)
-        except StemInstanceDoesNotExistException as e:
-            return cls.error_404_relation_list(
-                e.stem_model,
-                id
-            )
     return wrapper
 
 

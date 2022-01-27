@@ -219,27 +219,28 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         instance = self.instance
         if instance is None:
             return self.Meta.model(**data)
-        for field, value in data.items():
-            setattr(instance, field, value)
+        instance.update(data)
         return instance
 
-    def _remove_null_ext_entries_on_create(self, ext):
+    def _preprocess_ext_on_create(self, ext):
+        if ext is None:
+            return {}
+        # remove null entries with null values
         return {
-            key: value for key, value in ext.items()
+            key: value for key, value
+            in ext.items()
             if value is not None
         }
 
     def _make_instance_including_ext(self, data, **kwargs):
         instance = self.instance
-        ext = self._none_coalesce_ext(self._resource_meta.pop('ext', {}))
+        ext = self._resource_meta.pop('ext', None)
         if instance is None:
             return self.Meta.model(
                 **data,
-                ext=self._remove_null_ext_entries_on_create(ext)
+                ext=self._preprocess_ext_on_create(ext)
             )
-        for field, value in data.items():
-            setattr(instance, field, value)
-        instance.update_ext(ext)
+        instance.update(data, ext=ext)
         return instance
 
     def _remove_resource_metadata(self, data):
@@ -256,13 +257,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        # self.instance is part of a private API
+        # make_instance overrides part of a private API
         if self.has_ext_field():
             return self._make_instance_including_ext(data, **kwargs)
         return self._make_instance_without_ext(data, **kwargs)
-
-    def _none_coalesce_ext(self, ext):
-        return ext if ext is not None else {}
 
     def _store_ext_data(self, data, many):
         if many:

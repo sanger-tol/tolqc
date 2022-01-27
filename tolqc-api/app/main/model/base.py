@@ -32,14 +32,12 @@ class ExtraFieldsNotPermittedException(Exception):
 
 
 class InstanceDoesNotExistException(Exception):
-    def __init__(self, id):
-        self.id = id
+    pass
 
 
 class StemInstanceDoesNotExistException(Exception):
     """Used on 'related' endpoints"""
-    def __init__(self, stem_model):
-        self.stem_model = stem_model
+    pass
 
 
 class ExtColumn(db.Column):
@@ -69,10 +67,26 @@ class Base(db.Model):
     def to_dict(cls):
         return {"override": "this"}
 
+    @classmethod
+    def _get_excluded_columns_in_history(cls):
+        meta_class = getattr(cls, 'Meta', None)
+        if meta_class is None:
+            return []
+        return list(getattr(cls.Meta, 'exclude_columns_in_history', []))
+
+    @classmethod
+    def _to_history_dict(cls):
+        return {
+            column_name: getattr(cls, column_name)
+            for column_name
+            in cls.get_column_names()
+            if column_name not in cls._get_excluded_columns_in_history()
+        }
+
     def add(self):
         db.session.add(self)
 
-    def update_ext(self, ext_data_changes):
+    def _update_ext(self, ext_data_changes):
         if not self.has_ext_column():
             raise ExtraFieldsNotPermittedException(
                 ext_data_changes
@@ -86,9 +100,11 @@ class Base(db.Model):
                 ext_data[key] = item
         self.ext = ext_data
 
-    def update(self, data):
+    def update(self, data, ext=None):
         for key, item in data.items():
             setattr(self, key, item)
+        if ext is not None:
+            self._update_ext(ext)
 
     def delete(self):
         db.session.delete(self)
@@ -190,7 +206,7 @@ class Base(db.Model):
                                      .filter_by(id=relation_id) \
                                      .one_or_none()
         if related_instance is None:
-            raise StemInstanceDoesNotExistException(relation_model)
+            raise StemInstanceDoesNotExistException()
 
     @staticmethod
     def rollback():
@@ -205,7 +221,7 @@ class Base(db.Model):
     def find_by_id(cls, id_):
         instance = cls.query.filter_by(id=id_).one_or_none()
         if instance is None:
-            raise InstanceDoesNotExistException(id_)
+            raise InstanceDoesNotExistException()
         return instance
 
     @classmethod
