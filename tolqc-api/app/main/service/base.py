@@ -292,7 +292,7 @@ class BaseService:
             instance=old_model_instance,
             partial=True
         )
-        new_model_instance.post_update(user_id)
+        new_model_instance.save_update(user_id=user_id)
         return schema.dump(new_model_instance), 200
 
     @classmethod

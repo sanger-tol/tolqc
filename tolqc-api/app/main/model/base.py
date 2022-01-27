@@ -100,10 +100,7 @@ class Base(db.Model):
                 ext_data[key] = item
         self.ext = ext_data
 
-    def post_update(self, user_id):
-        pass
-
-    def post_create(self, user_id):
+    def save_update(self, **kwargs):
         pass
 
     def update(self, data, ext=None):

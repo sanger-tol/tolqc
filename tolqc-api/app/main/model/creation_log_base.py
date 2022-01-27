@@ -27,7 +27,7 @@ class CreationLogMixin(object):
 
     @declared_attr
     def history(cls):
-        return db.Column(db.JSON, nullable=False)
+        return db.Column(db.JSON, nullable=False, default=[])
 
 
 class CreationLogBase(Base, CreationLogMixin):
@@ -48,11 +48,12 @@ class CreationLogBase(Base, CreationLogMixin):
             getattr(cls.Meta, 'exclude_columns_in_history', [])
         )
 
-    def post_update(self, user_id):
+    def save_update(self, user_id):
         #TODO check that datetime's don't break dumping of history
         #maybe set a dump method that converts to string??
         self.last_modified_by = user_id
         self.last_modified_at = datetime.now()
+        self.commit()
 
     def save_create(self, user_id=None):
         self.created_by = user_id
@@ -60,7 +61,6 @@ class CreationLogBase(Base, CreationLogMixin):
         now = datetime.now()
         self.created_at = now
         self.last_modified_at = now
-        self._create_history_array()
         super().save_create()
 
     def _get_history_entry(self):
@@ -68,11 +68,9 @@ class CreationLogBase(Base, CreationLogMixin):
             exclude_column_names=self._get_excluded_columns_in_history()
         )
 
-    def _create_history_array(self):
-        self.history = [self._get_history_entry()]
-
     def _update_history(self):
-        self.history.append(self._get_history_entry())
+        old_history = [*self.history]
+        self.history = old_history + [self._get_history_entry()]
 
     def update(self, *args, **kwargs):
         self._update_history()
