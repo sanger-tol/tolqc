@@ -34,7 +34,7 @@ class CreationLogBase(Base, CreationLogMixin):
     __abstract__ = True
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(Base).__init__(**kwargs)
         self._create_history_array()
 
     @classmethod
