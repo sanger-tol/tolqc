@@ -30,7 +30,7 @@ class CreationLogMixin(object):
 
     @declared_attr
     def ext(cls):
-        return db.Column(db.String)
+        return ExtColumn
 
 
 class CreationLogBase(Base, CreationLogMixin):
