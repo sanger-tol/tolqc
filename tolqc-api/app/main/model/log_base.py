@@ -19,11 +19,11 @@ class LogMixin(object):
 
     @declared_attr
     def last_modified_at(cls):
-        return db.Column(db.DateTime, nullable=False, default=db.func.now())
+        return db.Column(db.DateTime, default=db.func.now())
 
     @declared_attr
     def last_modified_by(cls):
-        return db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+        return db.Column(db.Integer, db.ForeignKey('users.id'))
 
     @declared_attr
     def history(cls):
@@ -53,10 +53,7 @@ class LogBase(Base, LogMixin):
 
     def save_create(self, user_id=None):
         self.created_by = user_id
-        self.last_modified_by = user_id
-        now = datetime.now()
-        self.created_at = now
-        self.last_modified_at = now
+        self.created_at = datetime.now()
         super().save_create()
 
     def _get_history_entry(self):
