@@ -59,17 +59,26 @@ class LogBase(Base, LogMixin):
     @classmethod
     def _map_history_entry_key(cls, entry_key):
         mapping = {
-            'last_modified_by': 'modified_by',
-            'last_modified_at': 'modified_at'
+            'last_modified_by': 'entered_by',
+            'last_modified_at': 'entered_at'
         }
         return mapping.get(entry_key, entry_key)
+
+    @classmethod
+    def _map_history_entry_value(cls, entry_key, entry_value):
+        if entry_key == 'last_modified_by' and entry_value is not None:
+            return str(entry_value)
+        return entry_value
 
     def _get_history_entry(self):
         state_snapshot = self.to_dict(
             exclude_column_names=self._get_excluded_columns_in_history()
         )
         return {
-            self._map_history_entry_key(entry_key): entry_value
+            self._map_history_entry_key(entry_key): self._map_history_entry_value(
+                entry_key,
+                entry_value
+            )
             for (entry_key, entry_value)
             in state_snapshot.items()
         }

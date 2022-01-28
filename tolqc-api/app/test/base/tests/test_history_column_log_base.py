@@ -90,8 +90,8 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'last_modified_at': last_modified_at_1,
                         'history': [{
                             'string_column': 'hello there',
-                            'modified_at': None,
-                            'modified_by': None
+                            'entered_at': None,
+                            'entered_by': None
                         }]
                     },
                     'relationships': {
@@ -116,4 +116,72 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     }
                 }
             }
-        )        
+        )
+
+        # patch this to another new state
+        response = self.client.open(
+            f'/api/v1/H/{instance_id}',
+            method='PATCH',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': None
+                    }
+                }
+            },
+            headers=self._get_api_key_1()
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # pull out unpredictable elements
+        last_modified_at_2 = response.json['data']['attributes']['last_modified_at']
+        # assert that history has one entry, and is correct
+        self.assertEqual(
+            response.json,
+            {
+                'data': {
+                    'type': 'H',
+                    'id': instance_id,
+                    'attributes': {
+                        'string_column': None,
+                        'created_at': created_at,
+                        'last_modified_at': last_modified_at_2,
+                        'history': [
+                            {
+                                'string_column': 'hello there',
+                                'entered_at': None,
+                                'entered_by': None
+                            },
+                            {
+                                'string_column': 'how are you?',
+                                'entered_at': last_modified_at_1,
+                                'entered_by': '101'
+                            }
+                        ]
+                    },
+                    'relationships': {
+                        'creator': {
+                            'data': {
+                                'id': '100',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/100'
+                            }
+                        },
+                        'last_modifier': {
+                            'data': {
+                                'id': '100',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/100'
+                            }
+                        }
+                    }
+                }
+            }
+        )
