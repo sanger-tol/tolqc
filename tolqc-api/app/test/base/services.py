@@ -10,10 +10,11 @@ from test.base.models import A_ModelRelationship, \
                              D_ModelWithNonNullableColumn, \
                              E_ModelRelationship, \
                              F_ModelWithExtField, \
-                             G_ModelWithFilterableFields
+                             G_ModelWithFilterableFields, \
+                             H_ModelLog
 from test.base.schemas import A_Schema, B_Schema, C_Schema, \
                               D_Schema, E_Schema, F_Schema, \
-                              G_Schema
+                              G_Schema, H_Schema
 
 
 @setup_service
@@ -63,3 +64,10 @@ class G_Service(BaseService):
     class Meta:
         model = G_ModelWithFilterableFields
         schema = G_Schema
+
+
+@setup_service
+class H_Service(BaseService):
+    class Meta:
+        model = H_ModelLog
+        schema = H_Schema
