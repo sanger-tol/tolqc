@@ -2,21 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
-from .base import setup_model
+from .log_base import LogBase, db
 
 
-@setup_model
-class TolqcFile(CreationLogBase):
-    __tablename__ = "files"
+class TolqcFile(LogBase):
+    __tablename__ = "file"
     id = db.Column(db.Integer(), primary_key=True)
-    file_id = db.Column(db.String())
-    seq_instance_id = db.Column(db.Integer(), db.ForeignKey("seq.id"),
-                                nullable=False)
+    seq_id = db.Column(db.Integer(), db.ForeignKey("seq.id"))
     name = db.Column(db.String())
     type = db.Column(db.String())
     md5 = db.Column(db.String())
-    changed = db.Column(db.DateTime())
-    current = db.Column(db.Boolean())
-    seq = db.relationship("TolqcSeq", back_populates="files",
-                          foreign_keys=[seq_instance_id])
+    seq = db.relationship("TolqcSeq", back_populates="file",
+                          foreign_keys=[seq_id])

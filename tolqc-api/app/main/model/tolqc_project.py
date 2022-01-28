@@ -2,17 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
-from .base import setup_model
+from .log_base import LogBase, db
 
 
-@setup_model
-class TolqcProject(CreationLogBase):
-    __tablename__ = "projects"
+class TolqcProject(LogBase):
+    __tablename__ = "project"
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
     description = db.Column(db.String())
     lims_id = db.Column(db.Integer())
-    accession_id = db.Column(db.Integer())
-    allocations = db.relationship("TolqcAllocation", back_populates="projects")
+    accession_id = db.Column(db.Integer(), db.ForeignKey("accession.id"))
+    allocation = db.relationship("TolqcAllocation", back_populates="project")
+    accession = db.relationship("TolqcAccession", back_populates="project",
+                                foreign_keys=[accession_id])

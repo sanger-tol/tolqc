@@ -2,18 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
-from .base import setup_model
+from .log_base import LogBase, db
 
 
-@setup_model
-class TolqcAllocation(CreationLogBase):
-    __tablename__ = "allocations"
+class TolqcAllocation(LogBase):
+    __tablename__ = "allocation"
     id = db.Column(db.Integer(), primary_key=True)
-    project_id = db.Column(db.Integer(), db.ForeignKey("projects.id"))
-    specimen_instance_id = db.Column(db.Integer(), db.ForeignKey("specimens.id"))
+    project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
+    specimen_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"))
     is_primary = db.Column(db.Boolean())
-    projects = db.relationship("TolqcProject", back_populates="allocations",
-                               foreign_keys=[project_id])
-    specimens = db.relationship("TolqcSpecimen", back_populates="allocations",
-                                foreign_keys=[specimen_instance_id])
+    project = db.relationship("TolqcProject", back_populates="allocation",
+                              foreign_keys=[project_id])
+    specimen = db.relationship("TolqcSpecimen", back_populates="allocation",
+                               foreign_keys=[specimen_id])

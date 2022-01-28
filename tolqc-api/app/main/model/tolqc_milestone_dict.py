@@ -5,9 +5,9 @@
 from .base import Base, db
 
 
-class TolqcPlatform(Base):
-    __tablename__ = "platform"
+class TolqcMilestoneDict(Base):
+    __tablename__ = "milestone_dict"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
-    model = db.Column(db.String())
-    run = db.relationship("TolqcRun", back_populates="platform")
+    description = db.Column(db.String())
+    status = db.relationship("TolqcStatus", back_populates="milestone_dict")

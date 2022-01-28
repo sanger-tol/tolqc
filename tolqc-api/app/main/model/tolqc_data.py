@@ -2,18 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
-from .base import setup_model
+from .log_base import LogBase, db
 
 
-@setup_model
-class TolqcData(CreationLogBase):
+class TolqcData(LogBase):
     __tablename__ = "data"
     id = db.Column(db.Integer(), primary_key=True)
-    reads = db.Column(db.String())
-    bases = db.Column(db.String())
+    reads = db.Column(db.Integer())
+    bases = db.Column(db.Integer())
     avg_read_len = db.Column(db.Float())
     read_len_n50 = db.Column(db.Float())
     seq_data = db.relationship("TolqcSeqData", back_populates="data")
-    merqury = db.relationship("TolqcMerqury", back_populates="data")
-    asm = db.relationship("TolqcAsm", back_populates="data")
+    merqury_metrics = db.relationship("TolqcMerquryMetrics", back_populates="data")
+    assembly = db.relationship("TolqcAssembly", back_populates="data")
+    genomescope_metrics = db.relationship("TolqcGenomescopeMetrics",
+                                          back_populates="data")

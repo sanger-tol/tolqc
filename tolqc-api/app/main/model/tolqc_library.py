@@ -2,22 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
-from .base import setup_model
+from .log_base import LogBase, db
 
 
-@setup_model
-class TolqcLibrary(CreationLogBase):
-    __tablename__ = "libraries"
+class TolqcLibrary(LogBase):
+    __tablename__ = "library"
     id = db.Column(db.Integer(), primary_key=True)
-    library_id = db.Column(db.Integer(), nullable=False)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
-    library_type_id = db.Column(db.Integer(), db.ForeignKey("library_types.id"),
-                                nullable=False)
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
+    library_type_id = db.Column(db.Integer(), db.ForeignKey("library_type.id"))
     lims_id = db.Column(db.Integer())
-    changed = db.Column(db.DateTime())
-    current = db.Column(db.Boolean())
-    seq = db.relationship("TolqcSeq", back_populates="libraries")
-    library_types = db.relationship("TolqcLibraryType", back_populates="libraries",
-                                    foreign_keys=[library_type_id])
+    seq = db.relationship("TolqcSeq", back_populates="library")
+    library_type = db.relationship("TolqcLibraryType", back_populates="library",
+                                   foreign_keys=[library_type_id])
