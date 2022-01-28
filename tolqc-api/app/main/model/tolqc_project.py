@@ -8,8 +8,8 @@ from .log_base import LogBase, db
 class TolqcProject(LogBase):
     __tablename__ = "project"
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
     description = db.Column(db.String())
     lims_id = db.Column(db.Integer())
     accession_id = db.Column(db.Integer(), db.ForeignKey("accession.id"))

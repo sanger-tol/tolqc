@@ -8,8 +8,8 @@ from .log_base import LogBase, db
 class TolqcSpecies(LogBase):
     __tablename__ = "species"
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
     strain = db.Column(db.String())
     common_name = db.Column(db.String())
     taxon_id = db.Column(db.Integer())

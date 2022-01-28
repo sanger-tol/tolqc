@@ -8,8 +8,7 @@ from .log_base import LogBase, db
 class TolqcStatus(LogBase):
     __tablename__ = "status"
     id = db.Column(db.Integer(), primary_key=True)
-    specimen_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"),
-                            nullable=False)
+    specimen_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"))
     coverage = db.Column(db.String())
     lims_id = db.Column(db.String())
     note_id = db.Column(db.String())
