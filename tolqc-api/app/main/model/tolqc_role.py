@@ -6,11 +6,11 @@ from .base import Base, db
 
 
 class TolqcRole(Base):
-    __tablename__ = "roles"
+    __tablename__ = "role"
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    users = db.relationship("TolqcUser", back_populates="roles",
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("TolqcUser", back_populates="role",
                             uselist=False, foreign_keys=[user_id])
 
     def to_dict(cls):

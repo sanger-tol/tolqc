@@ -18,11 +18,11 @@ class CreationLogMixin(object):
 
     @declared_attr
     def last_modified_at(cls):
-        return db.Column(db.DateTime, nullable=False, default=db.func.now())
+        return db.Column(db.DateTime, default=db.func.now())
 
     @declared_attr
     def last_modified_by(cls):
-        return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+        return db.Column(db.Integer, db.ForeignKey('user.id'))
 
     @declared_attr
     def history(cls):
@@ -30,7 +30,7 @@ class CreationLogMixin(object):
 
     @declared_attr
     def ext(cls):
-        return ExtColumn()
+        return db.Column(db.String)
 
 
 class CreationLogBase(Base, CreationLogMixin):
