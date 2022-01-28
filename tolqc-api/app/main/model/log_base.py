@@ -19,7 +19,7 @@ class LogMixin(object):
 
     @declared_attr
     def last_modified_at(cls):
-        return db.Column(db.DateTime, default=db.func.now())
+        return db.Column(db.DateTime)
 
     @declared_attr
     def last_modified_by(cls):
@@ -56,10 +56,23 @@ class LogBase(Base, LogMixin):
         self.created_at = datetime.now()
         super().save_create()
 
+    @classmethod
+    def _map_history_entry_key(cls, entry_key):
+        mapping = {
+            'last_modified_by': 'modified_by',
+            'last_modified_at': 'modified_at'
+        }
+        return mapping.get(entry_key, entry_key)
+
     def _get_history_entry(self):
-        return self.to_dict(
+        state_snapshot = self.to_dict(
             exclude_column_names=self._get_excluded_columns_in_history()
         )
+        return {
+            self._map_history_entry_key(entry_key): entry_value
+            for (entry_key, entry_value)
+            in state_snapshot.items()
+        }
 
     def _update_history(self):
         old_history = [*self.history]
