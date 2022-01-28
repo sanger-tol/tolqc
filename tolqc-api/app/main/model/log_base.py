@@ -46,7 +46,7 @@ class LogBase(Base, LogMixin):
             getattr(cls.Meta, 'exclude_columns_in_history', [])
         )
 
-    def save_update(self, user_id):
+    def save_update(self, user_id=None):
         self.last_modified_by = user_id
         self.last_modified_at = datetime.now()
         super().save_update()
