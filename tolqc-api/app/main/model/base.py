@@ -109,9 +109,6 @@ class Base(db.Model):
         if ext is not None:
             self._update_ext(ext)
 
-    def post_update(self, user_id):
-        self.commit()
-
     def delete(self):
         db.session.delete(self)
         self.commit()
