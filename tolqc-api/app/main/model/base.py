@@ -293,7 +293,7 @@ class Base(db.Model):
         return 'ext' in cls.get_column_names()
 
     @classmethod
-    def has_creation_details(cls):
+    def has_log_details(cls):
         return False
 
     @classmethod

@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 from .base import setup_model
 
 
 @setup_model
-class TolqcSpecimen(CreationLogBase):
+class TolqcSpecimen(LogBase):
     __tablename__ = "specimens"
     id = db.Column(db.Integer(), primary_key=True)
     specimen_id = db.Column(db.Integer(), nullable=False)

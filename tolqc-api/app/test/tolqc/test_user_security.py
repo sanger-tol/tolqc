@@ -76,7 +76,7 @@ class TestUserSecurity(TolqcTestCase):
         creator log by specifying another creator in a POST or
         PATCH request"""
         # N.B. this method needs an endpoint with a model inheriting
-        # from creation_log_base
+        # from log_base
         expected_response = {
             'errors': [
                 {
@@ -169,7 +169,7 @@ class TestUserSecurity(TolqcTestCase):
         creation datetime log by specifying another value in a POST or
         PATCH request"""
         # N.B. this method needs an endpoint with a model inheriting
-        # from creation_log_base
+        # from log_base
         expected_response = {
             'errors': [
                 {

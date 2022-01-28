@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 from .base import setup_model
 
 
 @setup_model
-class TolqcAsmStats(CreationLogBase):
+class TolqcAsmStats(LogBase):
     __tablename__ = "asm_stats"
     id = db.Column(db.Integer(), primary_key=True)
     bases = db.Column(db.String())

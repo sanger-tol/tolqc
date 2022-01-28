@@ -159,7 +159,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _get_possibly_empty_creation_log_fields(cls):
-        if not cls.has_creation_details():
+        if not cls.has_log_details():
             return {}
         return {
             'created_by': Str(dump_only=True),
@@ -197,8 +197,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return excluded_columns
 
     @classmethod
-    def has_creation_details(cls):
-        return cls.Meta.model.has_creation_details()
+    def has_log_details(cls):
+        return cls.Meta.model.has_log_details()
 
     @classmethod
     def has_ext_field(cls):
@@ -228,7 +228,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def get_excluded_many_to_one_relationships_on_request(cls):
-        if cls.has_creation_details():
+        if cls.has_log_details():
             return ['creator', 'last_modifier']
         return []
 

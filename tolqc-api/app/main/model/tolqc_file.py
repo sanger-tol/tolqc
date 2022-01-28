@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 from .base import setup_model
 
 
 @setup_model
-class TolqcFile(CreationLogBase):
+class TolqcFile(LogBase):
     __tablename__ = "files"
     id = db.Column(db.Integer(), primary_key=True)
     file_id = db.Column(db.String())
