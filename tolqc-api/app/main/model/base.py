@@ -101,7 +101,7 @@ class Base(db.Model):
         self.ext = ext_data
 
     def save_update(self, **kwargs):
-        pass
+        self.commit()
 
     def update(self, data, ext=None):
         for key, item in data.items():

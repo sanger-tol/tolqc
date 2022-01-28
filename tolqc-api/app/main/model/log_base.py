@@ -49,7 +49,7 @@ class LogBase(Base, LogMixin):
     def save_update(self, user_id):
         self.last_modified_by = user_id
         self.last_modified_at = datetime.now()
-        self.commit()
+        super().save_update()
 
     def save_create(self, user_id=None):
         self.created_by = user_id
