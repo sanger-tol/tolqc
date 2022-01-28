@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 
 
-class TolqcGenomescopeMetrics(CreationLogBase):
+class TolqcGenomescopeMetrics(LogBase):
     __tablename__ = "genomescope_metrics"
     id = db.Column(db.Integer(), primary_key=True)
     data_id = db.Column(db.Integer(), db.ForeignKey("data.id"))

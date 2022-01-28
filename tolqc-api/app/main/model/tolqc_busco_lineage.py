@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 
 
-class TolqcBuscoLineage(CreationLogBase):
+class TolqcBuscoLineage(LogBase):
     __tablename__ = "busco_lineage"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())

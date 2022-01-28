@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 
 
-class TolqcPacbioRunMetrics(CreationLogBase):
+class TolqcPacbioRunMetrics(LogBase):
     __tablename__ = "pacbio_run_metrics"
     id = db.Column(db.Integer(), primary_key=True)
     run_id = db.Column(db.Integer(), db.ForeignKey("run.id"))

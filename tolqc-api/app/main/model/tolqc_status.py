@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 
 
-class TolqcStatus(CreationLogBase):
+class TolqcStatus(LogBase):
     __tablename__ = "status"
     id = db.Column(db.Integer(), primary_key=True)
     specimen_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"),

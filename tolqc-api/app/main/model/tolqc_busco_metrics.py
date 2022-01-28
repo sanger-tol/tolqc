@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 
 
-class TolqcBuscoMetrics(CreationLogBase):
+class TolqcBuscoMetrics(LogBase):
     __tablename__ = "busco_metrics"
     id = db.Column(db.Integer(), primary_key=True)
     assembly_id = db.Column(db.Integer(), db.ForeignKey("assembly.id"))

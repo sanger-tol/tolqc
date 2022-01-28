@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from .base import Base, ExtColumn, db
 
 
-class CreationLogMixin(object):
+class LogMixin(object):
     @declared_attr
     def created_at(cls):
         return db.Column(db.DateTime, nullable=False, default=db.func.now())
@@ -33,7 +33,7 @@ class CreationLogMixin(object):
         return ExtColumn
 
 
-class CreationLogBase(Base, CreationLogMixin):
+class LogBase(Base, LogMixin):
     __abstract__ = True
 
     @classmethod

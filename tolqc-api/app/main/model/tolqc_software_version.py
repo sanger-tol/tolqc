@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 
 
-class TolqcSoftwareVersion(CreationLogBase):
+class TolqcSoftwareVersion(LogBase):
     __tablename__ = "software_version"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())

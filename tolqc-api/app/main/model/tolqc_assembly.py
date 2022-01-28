@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .creation_log_base import CreationLogBase, db
+from .log_base import LogBase, db
 
 
-class TolqcAssembly(CreationLogBase):
+class TolqcAssembly(LogBase):
     __tablename__ = "assembly"
     id = db.Column(db.Integer(), primary_key=True)
     data_id = db.Column(db.Integer(), db.ForeignKey("data.id"))
