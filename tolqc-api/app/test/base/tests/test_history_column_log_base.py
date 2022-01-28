@@ -35,7 +35,7 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     'attributes': {
                         'string_column': 'hello there',
                         'created_at': created_at,
-                        'last_modified_at': None,
+                        'last_modified_at': created_at,
                         'history': []
                     },
                     'relationships': {
@@ -49,7 +49,13 @@ class TestHistoryColumnLogBase(BaseTestCase):
                             }
                         },
                         'last_modifier': {
-                            'data': None
+                            'data': {
+                                'id': '100',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/100'
+                            }
                         }
                     }
                 }
@@ -90,8 +96,8 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'last_modified_at': last_modified_at_1,
                         'history': [{
                             'string_column': 'hello there',
-                            'entered_at': None,
-                            'entered_by': None
+                            'entered_at': created_at,
+                            'entered_by': '100'
                         }]
                     },
                     'relationships': {
@@ -152,8 +158,8 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'history': [
                             {
                                 'string_column': 'hello there',
-                                'entered_at': None,
-                                'entered_by': None
+                                'entered_at': created_at,
+                                'entered_by': '100'
                             },
                             {
                                 'string_column': 'how are you?',
