@@ -47,7 +47,6 @@ class LogBase(Base, LogMixin):
         )
 
     def save_update(self, user_id=None):
-        #TODO need to consider how to retry this if the SERIALIZABLE transcation fails
         self.last_modified_by = user_id
         self.last_modified_at = datetime.now()
         super().save_update()
