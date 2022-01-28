@@ -61,7 +61,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
                 }
             }
         )
-        #TODO test that history and other new features can't be hacked by specifying in request
 
         # patch this to new state
         response = self.client.open(
