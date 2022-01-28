@@ -16,7 +16,8 @@ from test.base.models import A_ModelRelationship, B_ModelRelationship, \
                              C_ModelWithNullableColumn, \
                              D_ModelWithNonNullableColumn, \
                              E_ModelRelationship, F_ModelWithExtField, \
-                             G_ModelWithFilterableFields
+                             G_ModelWithFilterableFields, \
+                             H_ModelLog
 
 
 class TestCase(FlaskTestCase):
@@ -62,6 +63,7 @@ class TestCase(FlaskTestCase):
         db.session.query(D_ModelWithNonNullableColumn).delete()
         db.session.query(F_ModelWithExtField).delete()
         db.session.query(G_ModelWithFilterableFields).delete()
+        db.session.query(H_ModelLog).delete()
 
         # ToLQC models
         # TODO delete this all by cascade

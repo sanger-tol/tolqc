@@ -19,7 +19,7 @@ from test.base.models import A_ModelRelationship, \
                              F_ModelWithExtField, \
                              G_ModelWithFilterableFields
 from test.base.resources import api_A, api_B, api_C, api_D, \
-                                api_E, api_F, api_G
+                                api_E, api_F, api_G, api_H
 
 
 def _setup_api(blueprint):
@@ -35,11 +35,15 @@ def _setup_api(blueprint):
     api.add_namespace(api_E)
     api.add_namespace(api_F)
     api.add_namespace(api_G)
+    api.add_namespace(api_H)
 
 
 class BaseTestCase(TestCase):
-    def _get_api_key(self):
+    def _get_api_key_1(self):
         return {"Authorization": self.api_key_1}
+
+    def _get_api_key_2(self):
+        return {"Authorization": self.api_key_2}
 
     def create_app(self):
         app = Flask(__name__)

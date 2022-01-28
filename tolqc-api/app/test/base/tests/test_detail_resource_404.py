@@ -40,7 +40,7 @@ class TestDetailResource404(BaseTestCase):
         response = self.client.open(
             '/api/v1/B/9999',
             method='DELETE',
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert404(
             response,
@@ -51,7 +51,7 @@ class TestDetailResource404(BaseTestCase):
         response = self.client.open(
             '/api/v1/C/9999',
             method='DELETE',
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert404(
             response,
@@ -62,7 +62,7 @@ class TestDetailResource404(BaseTestCase):
         response = self.client.open(
             '/api/v1/D/9999',
             method='DELETE',
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert404(
             response,
@@ -81,7 +81,7 @@ class TestDetailResource404(BaseTestCase):
                     "type": "B"
                 }
             },
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert404(
             response,
@@ -100,7 +100,7 @@ class TestDetailResource404(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert404(
             response,
@@ -119,7 +119,7 @@ class TestDetailResource404(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert404(
             response,

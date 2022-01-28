@@ -11,7 +11,7 @@ class TestEmptyRequestBody(BaseTestCase):
             '/api/v1/D',
             method='POST',
             json={},
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert400(
             response,
@@ -28,7 +28,7 @@ class TestEmptyRequestBody(BaseTestCase):
                     'attributes': {}
                 }
             },
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert400(
             response,
@@ -41,7 +41,7 @@ class TestEmptyRequestBody(BaseTestCase):
             '/api/v1/C/9099',
             method='PATCH',
             json={},
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert400(
             response,
@@ -59,7 +59,7 @@ class TestEmptyRequestBody(BaseTestCase):
                     'attributes': {}
                 }
             },
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert200(
             response,
