@@ -22,7 +22,7 @@ class TolqcMerquryMetrics(CreationLogBase):
     assembly = db.relationship("TolqcAssembly", back_populates="merqury_metrics",
                                foreign_keys=[assembly_id])
     data = db.relationship("TolqcData", back_populates="merqury_metrics", foreign_keys=[data_id])
-    assembly_component = db.relationship("TolqcAssemblyComponent", 
+    assembly_component = db.relationship("TolqcAssemblyComponent",
                                          back_populates="merqury_metrics",
                                          foreign_keys=[assembly_component_id])
     software_version = db.relationship("TolqcSoftwareVersion", back_populates="merqury_metrics",
