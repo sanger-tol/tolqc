@@ -2,17 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.service import Busco_LineageService
-from main.swagger import Busco_LineageSwagger
+from main.service import BuscoLineageService
+from main.swagger import BuscoLineageSwagger
 
 from .base import BaseResource, setup_resource
 
 
-api_busco_lineage = Busco_LineageSwagger.api
+api_busco_lineage = BuscoLineageSwagger.api
 
 
 @setup_resource
-class Busco_LineageResource(BaseResource):
+class BuscoLineageResource(BaseResource):
     class Meta:
-        service = Busco_LineageService
-        swagger = Busco_LineageSwagger
+        service = BuscoLineageService
+        swagger = BuscoLineageSwagger

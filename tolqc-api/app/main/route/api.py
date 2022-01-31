@@ -12,7 +12,15 @@ from main.resource import api_centre, api_environment, \
                           api_project, api_platform, api_library, \
                           api_library_type, api_allocation, \
                           api_file, api_sex, \
-                          api_software_version, api_status
+                          api_software_version, api_status, \
+                          api_accession_type_dict, api_accession, \
+                          api_assembly_component, api_status_dict, \
+                          api_qc_dict, api_milestone_dict, \
+                          api_pacbio_run_metrics, api_data, \
+                          api_dataset, api_set, api_busco_lineage, \
+                          api_assembly, api_assembly_metrics, \
+                          api_merqury_metrics, api_busco_metrics, \
+                          api_genomescope_metrics
 
 
 def _get_environment_string(app):
@@ -45,7 +53,22 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_sex)
     api.add_namespace(api_software_version)
     api.add_namespace(api_status)
-
+    api.add_namespace(api_accession_type_dict)
+    api.add_namespace(api_accession)
+    api.add_namespace(api_assembly_component)
+    api.add_namespace(api_status_dict)
+    api.add_namespace(api_qc_dict)
+    api.add_namespace(api_milestone_dict)
+    api.add_namespace(api_pacbio_run_metrics)
+    api.add_namespace(api_data)
+    api.add_namespace(api_dataset)
+    api.add_namespace(api_set)
+    api.add_namespace(api_busco_lineage)
+    api.add_namespace(api_assembly)
+    api.add_namespace(api_assembly_metrics)
+    api.add_namespace(api_merqury_metrics)
+    api.add_namespace(api_busco_metrics)
+    api.add_namespace(api_genomescope_metrics)
 
 def init_blueprint(app):
     blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
