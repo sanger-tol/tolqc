@@ -5,9 +5,14 @@
 from .base import Base, db
 
 
+class EnumNameNotFoundException(Exception):
+    def __init__(self, name):
+        self.name = name
+
+
 class EnumBase(Base):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String())
+    name = db.Column(db.String(), unique=True)
     description = db.Column(db.String(), nullable=True)
 
     @classmethod
@@ -18,3 +23,11 @@ class EnumBase(Base):
     def get_enum_values(cls):
         query = db.session.query(cls)
         return [m.name for m in query.all()]
+
+    @classmethod
+    def get_id_by_name(cls, name):
+        query = db.session.query(cls)
+        instance = query.filter_by(name=name).one_or_none()
+        if instance is None:
+            raise EnumNameNotFoundException(name)
+        return instance.id
