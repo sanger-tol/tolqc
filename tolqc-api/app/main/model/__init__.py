@@ -4,6 +4,7 @@
 
 from .base import db, Base, \
                   ExtraFieldsNotPermittedException, \
+                  StemInstanceDoesNotExistException, \
                   InstanceDoesNotExistException, \
                   BadParameterException # noqa
 from .log_base import LogBase  # noqa
