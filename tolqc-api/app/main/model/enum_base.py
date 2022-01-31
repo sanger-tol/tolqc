@@ -13,3 +13,8 @@ class EnumBase(Base):
     @classmethod
     def is_enum_table(cls):
         return True
+
+    @classmethod
+    def get_enum_values(cls):
+        query = db.session.query(cls)
+        return [m.name for m in query.all()]
