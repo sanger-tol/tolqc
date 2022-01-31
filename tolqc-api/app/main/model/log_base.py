@@ -77,7 +77,7 @@ class LogBase(Base, LogMixin):
 
     @classmethod
     def _map_history_entry_value(cls, entry_key, entry_value):
-        if entry_key == 'last_modified_by':
+        if entry_key in cls.get_foreign_key_column_names():
             return str(entry_value)
         return entry_value
 
