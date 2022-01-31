@@ -7,12 +7,12 @@ from .base import setup_model
 
 
 @setup_model
-class TolqcFile(LogBase):
-    __tablename__ = "file"
+class TolqcSet(LogBase):
+    __tablename__ = "set"
     id = db.Column(db.Integer(), primary_key=True)
     data_id = db.Column(db.Integer(), db.ForeignKey("data.id"))
-    name = db.Column(db.String())
-    type = db.Column(db.String())
-    md5 = db.Column(db.String())
-    data = db.relationship("TolqcData", back_populates="file",
+    dataset_id = db.Column(db.Integer(), db.ForeignKey("dataset.id"))
+    data = db.relationship("TolqcData", back_populates="set",
                            foreign_keys=[data_id])
+    dataset = db.relationship("TolqcDataset", back_populates="set",
+                              foreign_keys=[dataset_id])

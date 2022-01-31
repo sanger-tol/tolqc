@@ -12,7 +12,7 @@ from test.tolqc import TolqcTestCase
 class TestUserSecurity(TolqcTestCase):
     def test_no_credential_disclosure_get_users(self):
         expected_user = {
-            "type": "users",
+            "type": "user",
             "attributes": {
                 "name": "test_user_admin",
                 "email": "test_user_admin@sanger.ac.uk",
@@ -22,7 +22,7 @@ class TestUserSecurity(TolqcTestCase):
             'relationships': {
                 'roles': {
                     'links': {
-                        'related': '/users/100/roles'
+                        'related': '/user/100/roles'
                     }
                 }
             }
@@ -30,7 +30,7 @@ class TestUserSecurity(TolqcTestCase):
 
         # assert no credential disclosure in list get
         response = self.client.open(
-            '/api/v1/users?filter=[name=="test_user_admin"]',
+            '/api/v1/user?filter=[name=="test_user_admin"]',
             method='GET'
         )
         self.assert200(
@@ -46,7 +46,7 @@ class TestUserSecurity(TolqcTestCase):
 
         # assert no credential disclosure in detail get
         response = self.client.open(
-            '/api/v1/users/100',
+            '/api/v1/user/100',
             method='GET'
         )
         self.assert200(
@@ -66,7 +66,7 @@ class TestUserSecurity(TolqcTestCase):
         filtering against api_key value on list get users, is not
         possible."""
         response = self.client.open(
-            f'/api/v1/users?filter=[api_key=="{self.api_key_1}"]',
+            f'/api/v1/user?filter=[api_key=="{self.api_key_1}"]',
             method='GET'
         )
         self.assert400(response)
@@ -103,7 +103,7 @@ class TestUserSecurity(TolqcTestCase):
                     'relationships': {
                         'creator': {
                             'data': {
-                                'type': 'users',
+                                'type': 'user',
                                 'id': '100'
                             }
                         }
@@ -146,7 +146,7 @@ class TestUserSecurity(TolqcTestCase):
                     'relationships': {
                         'creator': {
                             'data': {
-                                'type': 'users',
+                                'type': 'user',
                                 'id': '100'
                             }
                         }

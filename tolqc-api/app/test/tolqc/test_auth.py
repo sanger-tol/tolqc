@@ -12,11 +12,11 @@ class TestAuthentication(TolqcTestCase):
 
         # no api key
         response = self.client.open(
-            '/api/v1/centres',
+            '/api/v1/centre',
             method='POST',
             json={
                 "data": {
-                    "type": "centres",
+                    "type": "centre",
                     "attributes": {
                         "name": "David",
                         "hierarchy_name": "Hierarchy Tester"
@@ -28,11 +28,11 @@ class TestAuthentication(TolqcTestCase):
 
         # incorrect api key
         response = self.client.open(
-            '/api/v1/centres',
+            '/api/v1/centre',
             method='POST',
             json={
                 "data": {
-                    "type": "centres",
+                    "type": "centre",
                     "attributes": {
                         "name": "David",
                         "hierarchy_name": "Hierarchy Tester"
@@ -45,11 +45,11 @@ class TestAuthentication(TolqcTestCase):
 
         # correct api key
         response = self.client.open(
-            '/api/v1/centres',
+            '/api/v1/centre',
             method='POST',
             json={
                 "data": {
-                    "type": "centres",
+                    "type": "centre",
                     "attributes": {
                         "name": "David",
                         "hierarchy_name": "Hierarchy Tester"
@@ -62,7 +62,7 @@ class TestAuthentication(TolqcTestCase):
         created_id = response.json['data']['id']
         expect_data = {
             "data": {
-                "type": "centres",
+                "type": "centre",
                 "attributes": {
                     "hierarchy_name": "Hierarchy Tester",
                     "name": "David",
@@ -71,7 +71,7 @@ class TestAuthentication(TolqcTestCase):
                 'relationships': {
                     "runs": {
                         'links': {
-                            'related': f'/centres/{created_id}/runs'
+                            'related': f'/centre/{created_id}/runs'
                         }
                     }
                 }
@@ -81,7 +81,7 @@ class TestAuthentication(TolqcTestCase):
 
         # GET data without api key
         response = self.client.open(
-            f'/api/v1/centres/{created_id}',
+            f'/api/v1/centre/{created_id}',
             method='GET',
         )
         self.assert200(response)
@@ -89,7 +89,7 @@ class TestAuthentication(TolqcTestCase):
 
         # GET data with api key
         response = self.client.open(
-            f'/api/v1/centres/{created_id}',
+            f'/api/v1/centre/{created_id}',
             method='GET',
             headers=good_api_key
         )

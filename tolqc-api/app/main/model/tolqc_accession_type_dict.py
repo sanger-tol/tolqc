@@ -6,8 +6,8 @@ from .base import Base, db, setup_model
 
 
 @setup_model
-class TolqcSex(Base):
-    __tablename__ = "sex"
+class TolqcAccessionTypeDict(Base):
+    __tablename__ = "accession_type_dict"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
-    specimen = db.relationship("TolqcSpecimen", back_populates="sex")
+    accession = db.relationship("TolqcAccession", back_populates="accession_type_dict")

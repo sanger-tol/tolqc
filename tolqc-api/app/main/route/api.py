@@ -8,14 +8,10 @@ from flask_restx import Api
 from main.auth import authorizations
 from main.resource import api_centre, api_environment, \
                           api_user, api_run, api_specimen, \
-                          api_species, api_seq, api_sample, \
+                          api_species, api_sample, \
                           api_project, api_platform, api_library, \
                           api_library_type, api_allocation, \
-                          api_asm_stats, api_asm, \
-                          api_busco, api_data, \
-                          api_file, api_merqury, \
-                          api_pacbio_run_stats, api_seq_data, \
-                          api_cobiont, api_sex, \
+                          api_file, api_sex, \
                           api_software_version, api_status
 
 
@@ -39,22 +35,13 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_environment)
     api.add_namespace(api_specimen)
     api.add_namespace(api_species)
-    api.add_namespace(api_seq)
     api.add_namespace(api_sample)
     api.add_namespace(api_project)
     api.add_namespace(api_platform)
     api.add_namespace(api_library)
     api.add_namespace(api_library_type)
     api.add_namespace(api_allocation)
-    api.add_namespace(api_asm_stats)
-    api.add_namespace(api_asm)
-    api.add_namespace(api_busco)
-    api.add_namespace(api_data)
     api.add_namespace(api_file)
-    api.add_namespace(api_merqury)
-    api.add_namespace(api_pacbio_run_stats)
-    api.add_namespace(api_seq_data)
-    api.add_namespace(api_cobiont)
     api.add_namespace(api_sex)
     api.add_namespace(api_software_version)
     api.add_namespace(api_status)
