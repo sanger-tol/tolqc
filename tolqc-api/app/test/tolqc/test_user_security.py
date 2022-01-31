@@ -20,9 +20,9 @@ class TestUserSecurity(TolqcTestCase):
             },
             "id": "100",
             'relationships': {
-                'roles': {
+                'role': {
                     'links': {
-                        'related': '/user/100/roles'
+                        'related': '/user/100/role'
                     }
                 }
             }

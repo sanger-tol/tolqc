@@ -15,7 +15,7 @@ class LogMixin(object):
 
     @declared_attr
     def created_by(cls):
-        return db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+        return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     @declared_attr
     def last_modified_at(cls):
@@ -23,7 +23,7 @@ class LogMixin(object):
 
     @declared_attr
     def last_modified_by(cls):
-        return db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+        return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     @declared_attr
     def history(cls):

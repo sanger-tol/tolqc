@@ -20,7 +20,7 @@ class TolqcUser(Base):
         return {'name': cls.name,
                 'email': cls.email,
                 'organisation': ("" if cls.organisation is None else cls.organisation),
-                'roles': cls.roles}
+                'role': cls.role}
 
 
 def get_user_id_via_api_key(api_key):
