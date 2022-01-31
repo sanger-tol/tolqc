@@ -29,7 +29,7 @@ class BadTargetServiceException(Exception):
 
 
 def setup_service(cls):
-    cls.register_service()
+    cls.setup()
     return cls
 
 
@@ -135,7 +135,11 @@ class BaseService:
     service_registry_dict = {}
 
     @classmethod
-    def register_service(cls):
+    def setup(cls):
+        cls._register_service()
+
+    @classmethod
+    def _register_service(cls):
         type_ = cls.get_type()
         cls.service_registry_dict[type_] = cls
 
