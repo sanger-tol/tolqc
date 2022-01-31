@@ -62,7 +62,7 @@ class ExtColumn(db.Column):
 
 
 def setup_model(cls):
-    cls.populate_target_table_dict()
+    cls.setup()
     return cls
 
 
@@ -74,6 +74,10 @@ class Base(db.Model):
         - It should be plural, e.g. centres
     """
     __abstract__ = True
+
+    @classmethod
+    def setup(cls):
+        cls._populate_target_table_dict()
 
     def to_dict(self, exclude_column_names=[]):
         return {
@@ -244,7 +248,7 @@ class Base(db.Model):
         ]
 
     @classmethod
-    def populate_target_table_dict(cls):
+    def _populate_target_table_dict(cls):
         columns = list(cls.__table__.columns)
         # this doesn't support compound/composite keys
         foreign_keys_columns = [

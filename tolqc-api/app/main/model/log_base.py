@@ -31,20 +31,31 @@ class LogMixin(object):
 
 
 class LogBase(Base, LogMixin):
+    """Logs all three of:
+    - creation details
+    - last modification details
+    - all previous modifcation detail snapshots (in history)"""
+
     __abstract__ = True
+
+    @classmethod
+    def setup(cls):
+        cls._set_excluded_columns_in_history()
+        super().setup()
 
     @classmethod
     def has_log_details(cls):
         return True
 
     @classmethod
-    def _get_excluded_columns_in_history(cls):
+    def _set_excluded_columns_in_history(cls):
         base_excludes = ['id', 'history', 'created_at', 'created_by']
         if not hasattr(cls, 'Meta'):
-            return base_excludes
-        return base_excludes + list(
-            getattr(cls.Meta, 'exclude_columns_in_history', [])
-        )
+            cls._excluded_columns_in_history = base_excludes
+        else:
+            cls._excluded_columns_in_history = base_excludes + list(
+                getattr(cls.Meta, 'exclude_columns_in_history', [])
+            )
 
     def save_update(self, user_id=None):
         self.last_modified_by = user_id
@@ -72,7 +83,7 @@ class LogBase(Base, LogMixin):
 
     def _get_history_entry(self):
         state_snapshot = self.to_dict(
-            exclude_column_names=self._get_excluded_columns_in_history()
+            exclude_column_names=self._excluded_columns_in_history
         )
         return {
             self._map_history_entry_key(entry_key): self._map_history_entry_value(
