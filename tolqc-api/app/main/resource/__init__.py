@@ -12,12 +12,9 @@ from .platform import api_platform # noqa
 from .project import api_project # noqa
 from .run import api_run # noqa
 from .sample import api_sample # noqa
-from .seq import api_seq # noqa
 from .species import api_species # noqa
 from .specimen import api_specimen # noqa
 from .user import api_user # noqa
 from .software_version import api_software_version # noqa
-from .data import api_data # noqa
-from .seq_data import api_seq_data # noqa
 from .status import api_status # noqa
 from .file import api_file # noqa

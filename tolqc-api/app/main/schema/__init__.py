@@ -12,12 +12,9 @@ from .project import ProjectSchema # noqa
 from .role import RoleSchema # noqa
 from .run import RunSchema # noqa
 from .sample import SampleSchema # noqa
-from .seq import SeqSchema # noqa
 from .species import SpeciesSchema # noqa
 from .specimen import SpecimenSchema # noqa
 from .user import UserSchema # noqa
 from .software_version import SoftwareVersionSchema # noqa
-from .data import DataSchema # noqa
-from .seq_data import SeqDataSchema # noqa
 from .status import StatusSchema # noqa
 from .file import FileSchema # noqa
