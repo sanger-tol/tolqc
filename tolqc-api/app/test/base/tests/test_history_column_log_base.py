@@ -190,3 +190,91 @@ class TestHistoryColumnLogBase(BaseTestCase):
                 }
             }
         )
+
+    def test_no_history_change_on_failed_patch(self):
+        # post in the instance
+        response = self.client.open(
+            '/api/v1/H',
+            method='POST',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'a worthy adversary'
+                    }
+                }
+            },
+            headers=self._get_api_key_1()
+        )
+        self.assert201(response)
+
+        # get the non-predictable data
+        instance_id = response.json['data']['id']
+        created_at = response.json['data']['attributes']['created_at']
+
+        # delibrately fail a patch request by specifying a bad attribute
+        response = self.client.open(
+            f'/api/v1/H/{instance_id}',
+            method='PATCH',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'bad_column': 'this will break'
+                    }
+                }
+            },
+            headers=self._get_api_key_1()
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+
+        # get the instance
+        response = self.client.open(
+            f'/api/v1/H/{instance_id}',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+
+
+        # assert no history has yet been created
+        self.assertEqual(
+            response.json,
+            {
+                'data': {
+                    'type': 'H',
+                    'id': instance_id,
+                    'attributes': {
+                        'string_column': 'a worthy adversary',
+                        'created_at': created_at,
+                        'last_modified_at': created_at,
+                        'history': []
+                    },
+                    'relationships': {
+                        'creator': {
+                            'data': {
+                                'id': '100',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/100'
+                            }
+                        },
+                        'last_modifier': {
+                            'data': {
+                                'id': '100',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/100'
+                            }
+                        }
+                    }
+                }
+            }
+        )
