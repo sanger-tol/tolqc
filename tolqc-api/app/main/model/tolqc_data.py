@@ -31,5 +31,5 @@ class TolqcData(LogBase):
                           foreign_keys=[run_id])
     accession = db.relationship("TolqcAccession", back_populates="data",
                                 foreign_keys=[accession_id])
-    set = db.relationship("TolqcSeqData", back_populates="data")
+    set = db.relationship("TolqcSet", back_populates="data")
     file = db.relationship("TolqcFile", back_populates="data")
