@@ -69,9 +69,9 @@ class TestAuthentication(TolqcTestCase):
                 },
                 "id": created_id,
                 'relationships': {
-                    "runs": {
+                    "run": {
                         'links': {
-                            'related': f'/centre/{created_id}/runs'
+                            'related': f'/centre/{created_id}/run'
                         }
                     }
                 }
