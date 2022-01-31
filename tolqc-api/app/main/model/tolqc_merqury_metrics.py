@@ -10,7 +10,7 @@ class TolqcMerquryMetrics(LogBase):
     id = db.Column(db.Integer(), primary_key=True)
     assembly_id = db.Column(db.Integer(), db.ForeignKey("assembly.id"))
     assembly_component_id = db.Column(db.Integer(), db.ForeignKey("assembly_component.id"))
-    data_id = db.Column(db.Integer(), db.ForeignKey("data.id"))
+    dataset_id = db.Column(db.Integer(), db.ForeignKey("dataset.id"))
     kmer = db.Column(db.String())
     complete_primary = db.Column(db.Integer())
     complete_alternate = db.Column(db.Integer())
@@ -21,7 +21,8 @@ class TolqcMerquryMetrics(LogBase):
     software_version_id = db.Column(db.Integer(), db.ForeignKey("software_version.id"))
     assembly = db.relationship("TolqcAssembly", back_populates="merqury_metrics",
                                foreign_keys=[assembly_id])
-    data = db.relationship("TolqcData", back_populates="merqury_metrics", foreign_keys=[data_id])
+    dataset = db.relationship("TolqcDataset", back_populates="merqury_metrics",
+                              foreign_keys=[dataset_id])
     assembly_component = db.relationship("TolqcAssemblyComponent",
                                          back_populates="merqury_metrics",
                                          foreign_keys=[assembly_component_id])

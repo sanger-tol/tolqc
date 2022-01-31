@@ -8,9 +8,9 @@ from .log_base import LogBase, db
 class TolqcFile(LogBase):
     __tablename__ = "file"
     id = db.Column(db.Integer(), primary_key=True)
-    seq_id = db.Column(db.Integer(), db.ForeignKey("seq.id"))
+    data_id = db.Column(db.Integer(), db.ForeignKey("data.id"))
     name = db.Column(db.String())
     type = db.Column(db.String())
     md5 = db.Column(db.String())
-    seq = db.relationship("TolqcSeq", back_populates="file",
-                          foreign_keys=[seq_id])
+    data = db.relationship("TolqcData", back_populates="file",
+                           foreign_keys=[data_id])

@@ -21,4 +21,4 @@ class TolqcAccession(LogBase):
     project = db.relationship("TolqcProject", back_populates="accession")
     specimen = db.relationship("TolqcSpecimen", back_populates="accession")
     sample = db.relationship("TolqcSample", back_populates="accession")
-    seq = db.relationship("TolqcSeq", back_populates="accession")
+    data = db.relationship("TolqcData", back_populates="accession")

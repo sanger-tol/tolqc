@@ -15,7 +15,7 @@ class TolqcRun(LogBase):
     lims_id = db.Column(db.Integer())
     element = db.Column(db.String())
     instrument_name = db.Column(db.String())
-    seq = db.relationship("TolqcSeq", back_populates="run")
+    data = db.relationship("TolqcData", back_populates="run")
     platform = db.relationship("TolqcPlatform", back_populates="run",
                                foreign_keys=[platform_id])
     centre = db.relationship("TolqcCentre", back_populates="run",

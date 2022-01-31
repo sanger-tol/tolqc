@@ -8,9 +8,8 @@ from main.model import db, TolqcUser, TolqcRole, TolqcAllocation, \
                        TolqcCentre, TolqcLibrary, TolqcLibraryType, \
                        TolqcPlatform, TolqcProject, TolqcRun, \
                        TolqcSample, TolqcSeq, TolqcSpecies, \
-                       TolqcSpecimen, TolqcAsm, TolqcAsmStats, TolqcBusco, \
-                       TolqcCobiont, TolqcData, TolqcFile, TolqcMerqury, \
-                       TolqcPacbioRunStats, TolqcSeqData, TolqcSex, \
+                       TolqcSpecimen, TolqcData, TolqcFile,\
+                       TolqcSeqData, TolqcSex, \
                        TolqcSoftwareVersion, TolqcStatus
 from test.base.models import A_ModelRelationship, B_ModelRelationship, \
                              C_ModelWithNullableColumn, \
@@ -77,14 +76,8 @@ class TestCase(FlaskTestCase):
         db.session.query(TolqcSpecies).delete()
         db.session.query(TolqcSpecimen).delete()
         db.session.query(TolqcRole).delete()
-        db.session.query(TolqcAsm).delete()
-        db.session.query(TolqcAsmStats).delete()
-        db.session.query(TolqcBusco).delete()
-        db.session.query(TolqcCobiont).delete()
         db.session.query(TolqcData).delete()
         db.session.query(TolqcFile).delete()
-        db.session.query(TolqcMerqury).delete()
-        db.session.query(TolqcPacbioRunStats).delete()
         db.session.query(TolqcSeqData).delete()
         db.session.query(TolqcSex).delete()
         db.session.query(TolqcSoftwareVersion).delete()

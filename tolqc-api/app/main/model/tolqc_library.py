@@ -12,6 +12,6 @@ class TolqcLibrary(LogBase):
     hierarchy_name = db.Column(db.String())
     library_type_id = db.Column(db.Integer(), db.ForeignKey("library_type.id"))
     lims_id = db.Column(db.Integer())
-    seq = db.relationship("TolqcSeq", back_populates="library")
+    data = db.relationship("TolqcData", back_populates="library")
     library_type = db.relationship("TolqcLibraryType", back_populates="library",
                                    foreign_keys=[library_type_id])

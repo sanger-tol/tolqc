@@ -31,9 +31,9 @@ from .tolqc_library import TolqcLibrary  # noqa
 from .tolqc_file import TolqcFile  # noqa
 from .tolqc_run import TolqcRun  # noqa
 from .tolqc_pacbio_run_metrics import TolqcPacbioRunMetrics  # noqa
-from .tolqc_seq import TolqcSeq  # noqa
 from .tolqc_data import TolqcData  # noqa
-from .tolqc_seq_data import TolqcSeqData  # noqa
+from .tolqc_dataset import TolqcDataset  # noqa
+from .tolqc_set import TolqcSet  # noqa
 from .tolqc_software_version import TolqcSoftwareVersion  # noqa
 from .tolqc_busco_lineage import TolqcBuscoLineage  # noqa
 from .tolqc_assembly import TolqcAssembly  # noqa
