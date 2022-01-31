@@ -302,10 +302,6 @@ class Base(db.Model):
         return False
 
     @classmethod
-    def is_enum_table(cls):
-        return False
-
-    @classmethod
     def get_foreign_key_column_names(cls):
         return [
             c.name for c in cls._get_columns()
