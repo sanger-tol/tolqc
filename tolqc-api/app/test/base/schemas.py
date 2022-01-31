@@ -10,7 +10,8 @@ from test.base.models import A_ModelRelationship, \
                              D_ModelWithNonNullableColumn, \
                              E_ModelRelationship, \
                              F_ModelWithExtField, \
-                             G_ModelWithFilterableFields
+                             G_ModelWithFilterableFields, \
+                             H_ModelLog
 
 
 @setup_schema
@@ -28,7 +29,6 @@ class B_Schema(BaseSchema):
 @setup_schema
 class C_Schema(BaseSchema):
     class Meta(BaseSchema.BaseMeta):
-        type_ = 'C'
         model = C_ModelWithNullableColumn
 
 
@@ -54,3 +54,9 @@ class F_Schema(BaseSchema):
 class G_Schema(BaseSchema):
     class Meta(BaseSchema.BaseMeta):
         model = G_ModelWithFilterableFields
+
+
+@setup_schema
+class H_Schema(BaseSchema):
+    class Meta(BaseSchema.BaseMeta):
+        model = H_ModelLog

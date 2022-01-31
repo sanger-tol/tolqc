@@ -37,13 +37,11 @@ def handle_404(function):
     def wrapper(cls, id, *args, **kwargs):
         try:
             return function(cls, id, *args, **kwargs)
-        except InstanceDoesNotExistException:
+        except (
+            InstanceDoesNotExistException,
+            StemInstanceDoesNotExistException
+        ):
             return cls.error_404(id)
-        except StemInstanceDoesNotExistException as e:
-            return cls.error_404_relation_list(
-                e.stem_model,
-                id
-            )
     return wrapper
 
 
@@ -294,7 +292,7 @@ class BaseService:
             instance=old_model_instance,
             partial=True
         )
-        new_model_instance.save()
+        new_model_instance.save_update(user_id=user_id)
         return schema.dump(new_model_instance), 200
 
     @classmethod
@@ -312,8 +310,7 @@ class BaseService:
     def create(cls, data, user_id=None):
         schema = cls.Meta.schema()
         model_instance = schema.load(data)
-        model_instance.created_by = user_id
-        cls.Meta.model.save(model_instance)
+        model_instance.save_create(user_id=user_id)
         return schema.dump(model_instance), 201
 
     @classmethod
@@ -329,7 +326,7 @@ class BaseService:
     @handle_400_bad_parameter
     @handle_400_nonexistent_service
     @handle_404
-    def read_bulk_by_related_id(cls, id, target_service_name, user_id=None, **kwargs):
+    def read_bulk_related_by_id(cls, id, target_service_name, user_id=None, **kwargs):
         """
         Called on the service for the first part of the endpoint
         e.g. A in /A/{id}/B

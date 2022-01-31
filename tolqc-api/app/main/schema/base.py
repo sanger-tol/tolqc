@@ -9,19 +9,19 @@ from marshmallow_jsonapi import Schema as JsonapiSchema, \
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, \
                                    SQLAlchemyAutoSchemaOpts
 from marshmallow_jsonapi.fields import ResourceMeta, Relationship, Str, \
-                                       DateTime
+                                       DateTime, List, Dict
 
 from main.model import db
 
 
 def setup_schema(OldCls):
-    """Dynamically adds relationship fields to a Schema Class inheriting
+    """Dynamically adds fields to a Schema Class inheriting
     from BaseSchema"""
     OldCls.setup()
     NewCls = type(
         f'_{OldCls.get_type().title()}Schema',
         (OldCls,),
-        OldCls.create_relationship_fields()
+        OldCls.get_dynamically_added_fields()
     )
     return NewCls
 
@@ -50,11 +50,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     id = Str(dump_only=True)
 
-    # all three below are excluded at instantiation time if not needed
-    created_by = Str(dump_only=True)
-    created_at = DateTime(dump_only=True)
-    resource_meta = ResourceMeta(required=False)
-
     def __init__(self, **kwargs):
         exclude = self.get_excluded_columns()
         return super().__init__(exclude=exclude, **kwargs)
@@ -71,7 +66,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
         lookup_map = {
-            'created_by': 'creator'
+            'created_by': 'creator',
+            'last_modified_by': 'last_modifier'
         }
         # default to the target table if no special name
         return lookup_map.get(foreign_key_name, target_table)
@@ -146,7 +142,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
-    def create_relationship_fields(cls):
+    def _create_relationship_fields(cls):
         many_to_one_relationship_fields = cls._create_many_to_one_relationship_fields()
         one_to_many_relationship_fields = cls._create_one_to_many_relationship_fields()
         all_relationship_fields = {
@@ -156,28 +152,53 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return all_relationship_fields
 
     @classmethod
+    def _get_possibly_empty_resource_meta_field(cls):
+        if cls.has_ext_field():
+            return {'resource_meta': ResourceMeta(required=False)}
+        return {}
+
+    @classmethod
+    def _get_possibly_empty_creation_log_fields(cls):
+        if not cls.has_log_details():
+            return {}
+        return {
+            'created_by': Str(dump_only=True),
+            'created_at': DateTime(dump_only=True),
+            'last_modified_by': Str(dump_only=True),
+            'last_modified_at': DateTime(dump_only=True),
+            'history': List(Dict(), dump_only=True)
+        }
+
+    @classmethod
+    def _get_dynamically_added_non_relationship_fields(cls):
+        return {
+            **cls._get_possibly_empty_resource_meta_field(),
+            **cls._get_possibly_empty_creation_log_fields()
+        }
+
+    @classmethod
+    def get_dynamically_added_fields(cls):
+        relationship_fields = cls._create_relationship_fields()
+        other_fields = cls._get_dynamically_added_non_relationship_fields()
+        return {
+            **relationship_fields,
+            **other_fields
+        }
+
+    @classmethod
     def get_type(cls):
         return cls.Meta.type_
 
     @classmethod
-    def _get_base_excluded_columns(cls):
+    def get_excluded_columns(cls):
         """Gets the excluded columns on both requests and responses"""
         excluded_columns = list(getattr(cls.Meta, 'exclude', []))
         excluded_columns += cls.Meta.model.get_foreign_key_column_names()
         return excluded_columns
 
     @classmethod
-    def get_excluded_columns(cls):
-        excluded_columns = cls._get_base_excluded_columns()
-        if cls.has_ext_field():
-            excluded_columns += ['ext']
-        if not cls.has_creation_details():
-            excluded_columns += ['created_by', 'created_at']
-        return excluded_columns
-
-    @classmethod
-    def has_creation_details(cls):
-        return cls.Meta.model.has_creation_details()
+    def has_log_details(cls):
+        return cls.Meta.model.has_log_details()
 
     @classmethod
     def has_ext_field(cls):
@@ -187,7 +208,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def _get_public_attribute_names(cls):
         return [
             column for column in cls.Meta.model.get_column_names()
-            if column not in ['id', 'ext'] + cls._get_base_excluded_columns()
+            if column not in ['id', 'ext'] + cls.get_excluded_columns()
         ]
 
     @classmethod
@@ -207,8 +228,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def get_excluded_many_to_one_relationships_on_request(cls):
-        if cls.has_creation_details():
-            return ['creator']
+        if cls.has_log_details():
+            return ['creator', 'last_modifier']
         return []
 
     @classmethod
@@ -219,56 +240,52 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         instance = self.instance
         if instance is None:
             return self.Meta.model(**data)
-        for field, value in data.items():
-            setattr(instance, field, value)
+        instance.update(data)
         return instance
 
-    def _remove_null_ext_entries_on_create(self, ext):
+    def _preprocess_ext_on_create(self, ext):
+        if ext is None:
+            return {}
+        # remove null entries with null values
         return {
-            key: value for key, value in ext.items()
+            key: value for key, value
+            in ext.items()
             if value is not None
         }
 
     def _make_instance_including_ext(self, data, **kwargs):
         instance = self.instance
-        ext = self._none_coalesce_ext(self._resource_meta.pop('ext', {}))
+        ext = self._resource_meta.pop('ext', None)
         if instance is None:
             return self.Meta.model(
                 **data,
-                ext=self._remove_null_ext_entries_on_create(ext)
+                ext=self._preprocess_ext_on_create(ext)
             )
-        for field, value in data.items():
-            setattr(instance, field, value)
-        instance.update_ext(ext)
+        instance.update(data, ext=ext)
         return instance
 
     def _remove_resource_metadata(self, data):
-        self._resource_meta = data.get('data', {}).pop('meta', {})
+        self._resource_meta = data.pop('_resource_meta', {})
         if not self.has_ext_field() and 'ext' in self._resource_meta:
             raise ValidationError(
                 f'Extra fields are not permitted on {self.get_type()}.'
             )
 
-    @pre_load(pass_many=True)
+    @pre_load
     def preprocess_instance(self, data, **kwargs):
         self._remove_resource_metadata(data)
         return data
 
     @post_load
     def make_instance(self, data, **kwargs):
-        # self.instance is part of a private API
+        # make_instance overrides part of a private API
         if self.has_ext_field():
             return self._make_instance_including_ext(data, **kwargs)
         return self._make_instance_without_ext(data, **kwargs)
 
-    def _none_coalesce_ext(self, ext):
-        return ext if ext is not None else {}
-
     def _store_ext_data(self, data, many):
         if many:
-            self._ext_data = [
-                m.ext for m in data
-            ]
+            self._ext_data = [m.ext for m in data]
         else:
             self._ext_data = data.ext
 
@@ -286,13 +303,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return self._model_instance_to_datum(data)
 
     def _model_instance_to_datum(self, model_instance):
-        data = {
-            f: getattr(model_instance, f)
-            for f in model_instance.get_column_names()
-            if f != 'ext'
-        }
-
-        return data
+        return model_instance.to_dict(exclude_column_names=['ext'])
 
     def _re_insert_ext_datum(self, datum, ext_data):
         datum['meta'] = {

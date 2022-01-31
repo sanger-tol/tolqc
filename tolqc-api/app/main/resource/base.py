@@ -241,7 +241,7 @@ class BaseDetailResource(Resource):
 class BaseRelationListResource(Resource):
     @classmethod
     def get(cls, id, user_id=None):
-        return cls.Meta.service.read_bulk_by_related_id(
+        return cls.Meta.service.read_bulk_related_by_id(
             id,
             cls.relation,
             user_id=user_id

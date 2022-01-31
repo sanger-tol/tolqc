@@ -76,7 +76,7 @@ class TestUserSecurity(TolqcTestCase):
         creator log by specifying another creator in a POST or
         PATCH request"""
         # N.B. this method needs an endpoint with a model inheriting
-        # from creation_log_base
+        # from log_base
         expected_response = {
             'errors': [
                 {
@@ -130,7 +130,8 @@ class TestUserSecurity(TolqcTestCase):
         data_instance.avg_read_len = 4.56
         data_instance.read_len_n50 = 2387.3
         data_instance.created_by = 101
-        data_instance.save()
+        data_instance.last_modified_by = 101
+        data_instance.save_create(user_id=101)
 
         # try to modify its creator
         response = self.client.open(
@@ -168,7 +169,7 @@ class TestUserSecurity(TolqcTestCase):
         creation datetime log by specifying another value in a POST or
         PATCH request"""
         # N.B. this method needs an endpoint with a model inheriting
-        # from creation_log_base
+        # from log_base
         expected_response = {
             'errors': [
                 {
@@ -215,7 +216,8 @@ class TestUserSecurity(TolqcTestCase):
         data_instance.avg_read_len = 4.56
         data_instance.read_len_n50 = 2387.3
         data_instance.created_by = 101
-        data_instance.save()
+        data_instance.last_modified_by = 101
+        data_instance.save_create(user_id=101)
 
         # try to modify its creator
         response = self.client.open(

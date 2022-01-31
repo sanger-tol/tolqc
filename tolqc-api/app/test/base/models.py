@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from main.model.base import Base, db, ExtColumn, setup_model
+from main.model.log_base import LogBase
 
 
 @setup_model
@@ -68,4 +69,12 @@ class G_ModelWithFilterableFields(Base):
     float_column = db.Column(db.Float, nullable=True)
     bool_column = db.Column(db.Boolean, nullable=True)
     datetime_column = db.Column(db.DateTime, nullable=True)
+    string_column = db.Column(db.String, nullable=True)
+
+
+@setup_model
+class H_ModelLog(LogBase):
+    __tablename__ = 'H'
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
     string_column = db.Column(db.String, nullable=True)

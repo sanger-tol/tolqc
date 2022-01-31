@@ -26,7 +26,7 @@ class TestBadForeignKey400(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert400(
             response,

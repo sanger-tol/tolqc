@@ -18,7 +18,7 @@ class TestColumnNullabilityPost(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert201(
             response,
@@ -50,7 +50,7 @@ class TestColumnNullabilityPost(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key()
+            headers=self._get_api_key_1()
         )
         self.assert400(
             response,

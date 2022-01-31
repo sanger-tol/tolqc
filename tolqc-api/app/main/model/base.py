@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import dateutil.parser
+import json
 
 from datetime import datetime
 from sqlalchemy import and_
@@ -14,7 +15,17 @@ from sqlalchemy.inspection import inspect
 PAGE_SIZE = 20
 
 
-db = SQLAlchemy()
+def default_datetime_dump(value):
+    if isinstance(value, datetime):
+        return value.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    raise TypeError()
+
+
+db = SQLAlchemy(
+    engine_options={
+        'json_serializer': lambda obj: json.dumps(obj, default=default_datetime_dump)
+    }
+)
 
 
 class BadParameterException(Exception):
@@ -32,14 +43,12 @@ class ExtraFieldsNotPermittedException(Exception):
 
 
 class InstanceDoesNotExistException(Exception):
-    def __init__(self, id):
-        self.id = id
+    pass
 
 
 class StemInstanceDoesNotExistException(Exception):
     """Used on 'related' endpoints"""
-    def __init__(self, stem_model):
-        self.stem_model = stem_model
+    pass
 
 
 class ExtColumn(db.Column):
@@ -53,7 +62,7 @@ class ExtColumn(db.Column):
 
 
 def setup_model(cls):
-    cls.populate_target_table_dict()
+    cls.setup()
     return cls
 
 
@@ -66,13 +75,22 @@ class Base(db.Model):
     """
     __abstract__ = True
 
-    def to_dict(cls):
-        return {"override": "this"}
+    @classmethod
+    def setup(cls):
+        cls._populate_target_table_dict()
+
+    def to_dict(self, exclude_column_names=[]):
+        return {
+            column_name: getattr(self, column_name)
+            for column_name
+            in self.get_column_names()
+            if column_name not in exclude_column_names
+        }
 
     def add(self):
         db.session.add(self)
 
-    def update_ext(self, ext_data_changes):
+    def _update_ext(self, ext_data_changes):
         if not self.has_ext_column():
             raise ExtraFieldsNotPermittedException(
                 ext_data_changes
@@ -86,9 +104,14 @@ class Base(db.Model):
                 ext_data[key] = item
         self.ext = ext_data
 
-    def update(self, data):
+    def save_update(self, **kwargs):
+        self.commit()
+
+    def update(self, data, ext=None):
         for key, item in data.items():
             setattr(self, key, item)
+        if ext is not None:
+            self._update_ext(ext)
 
     def delete(self):
         db.session.delete(self)
@@ -105,6 +128,9 @@ class Base(db.Model):
     def save(self):
         self.add()
         self.commit()
+
+    def save_create(self, **kwargs):
+        self.save()
 
     @classmethod
     def _get_eq_filter_terms(cls, eq_filters):
@@ -190,7 +216,7 @@ class Base(db.Model):
                                      .filter_by(id=relation_id) \
                                      .one_or_none()
         if related_instance is None:
-            raise StemInstanceDoesNotExistException(relation_model)
+            raise StemInstanceDoesNotExistException()
 
     @staticmethod
     def rollback():
@@ -205,7 +231,7 @@ class Base(db.Model):
     def find_by_id(cls, id_):
         instance = cls.query.filter_by(id=id_).one_or_none()
         if instance is None:
-            raise InstanceDoesNotExistException(id_)
+            raise InstanceDoesNotExistException()
         return instance
 
     @classmethod
@@ -222,7 +248,7 @@ class Base(db.Model):
         ]
 
     @classmethod
-    def populate_target_table_dict(cls):
+    def _populate_target_table_dict(cls):
         columns = list(cls.__table__.columns)
         # this doesn't support compound/composite keys
         foreign_keys_columns = [
@@ -268,7 +294,7 @@ class Base(db.Model):
         return 'ext' in cls.get_column_names()
 
     @classmethod
-    def has_creation_details(cls):
+    def has_log_details(cls):
         return False
 
     @classmethod
