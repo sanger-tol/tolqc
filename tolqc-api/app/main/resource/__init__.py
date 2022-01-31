@@ -33,4 +33,4 @@ from .assembly import api_assembly # noqa
 from .assembly_metrics import api_assembly_metrics # noqa
 from .merqury_metrics import api_merqury_metrics # noqa
 from .busco_metrics import api_busco_metrics # noqa
-from .genomescope_metrics import api_genomescope_metrics #noqa
+from .genomescope_metrics import api_genomescope_metrics # noqa
