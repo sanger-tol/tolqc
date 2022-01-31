@@ -6,8 +6,7 @@ from .base import Base, db
 
 
 class EnumNameNotFoundException(Exception):
-    def __init__(self, name):
-        self.name = name
+    pass
 
 
 class EnumBase(Base):
@@ -29,5 +28,5 @@ class EnumBase(Base):
         query = db.session.query(cls)
         instance = query.filter_by(name=name).one_or_none()
         if instance is None:
-            raise EnumNameNotFoundException(name)
+            raise EnumNameNotFoundException()
         return instance.id

@@ -7,7 +7,8 @@ from .base import db, Base, \
                   StemInstanceDoesNotExistException, \
                   InstanceDoesNotExistException, \
                   BadParameterException # noqa
-from .log_base import LogBase  # noqa
+from .log_base import LogBase # noqa
+from .enum_base import EnumNameNotFoundException # noqa
 
 from .tolqc_user import TolqcUser  # noqa
 from .tolqc_role import TolqcRole  # noqa

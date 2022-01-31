@@ -12,7 +12,8 @@ from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
 from main.model import InstanceDoesNotExistException, \
                        StemInstanceDoesNotExistException, \
-                       BadParameterException
+                       BadParameterException, \
+                       EnumNameNotFoundException
 
 
 class BadParameterStringException(Exception):
@@ -34,14 +35,16 @@ def setup_service(cls):
 
 def handle_404(function):
     @wraps(function)
-    def wrapper(cls, id, *args, **kwargs):
+    def wrapper(cls, identifier, *args, **kwargs):
         try:
-            return function(cls, id, *args, **kwargs)
+            return function(cls, identifier, *args, **kwargs)
         except (
             InstanceDoesNotExistException,
             StemInstanceDoesNotExistException
         ):
-            return cls.error_404(id)
+            return cls.error_404(identifier)
+        except EnumNameNotFoundException:
+            return cls.error_404_enum(identifier)
     return wrapper
 
 
@@ -225,11 +228,11 @@ class BaseService:
         )
 
     @classmethod
-    def error_404_relation_list(cls, relation_model, id):
+    def error_404_enum(cls, name):
         return cls._custom_error(
             "Not Found",
             404,
-            f"No {relation_model.__tablename__} found with id {id}."
+            f"No name '{name}' exists on enum {cls.get_type()}."
         )
 
     @classmethod
