@@ -70,6 +70,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_busco_metrics)
     api.add_namespace(api_genomescope_metrics)
 
+
 def init_blueprint(app):
     blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
     _setup_api(blueprint, app)
