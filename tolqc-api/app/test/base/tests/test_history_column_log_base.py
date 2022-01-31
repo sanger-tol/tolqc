@@ -241,7 +241,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
 
-
         # assert no history has yet been created
         self.assertEqual(
             response.json,
