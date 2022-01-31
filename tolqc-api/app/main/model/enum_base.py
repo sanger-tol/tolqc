@@ -12,4 +12,4 @@ class EnumBase(Base):
 
     @classmethod
     def is_enum_table(cls):
-        return False
+        return True
