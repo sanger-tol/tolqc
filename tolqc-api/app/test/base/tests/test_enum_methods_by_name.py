@@ -42,3 +42,16 @@ class TestEnumMethodsByName(BaseTestCase):
         )
         # assert that the two are equal
         self.assertEqual(response_by_id.json, response_by_name.json)
+
+    def test_I_get_by_bad_name_404(self):
+        # add an irrelevant I
+        self.add_I(id=348523, name='nice')
+        # get a non-exsistant name
+        response_by_name = self.client.open(
+            '/api/v1/I/name/not_nice',
+            method='GET'
+        )
+        self.assert404(
+            response_by_name,
+            f'Response body is : {response_by_name.data.decode("utf-8")}'
+        )
