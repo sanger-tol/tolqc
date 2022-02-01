@@ -113,4 +113,16 @@ class TestEnumMethodsByName(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         # assert that the name is overriden
-        
+        self.assertEqual(
+            response.json,
+            {
+                'data': {
+                    'type': 'I',
+                    'id': '1480',
+                    'attributes': {
+                        'name': 'new',
+                        'description': None
+                    }
+                }
+            }
+        )
