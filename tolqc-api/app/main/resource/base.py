@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Resource
+from flask_restx import Resource as FlaskRestxResource
 from functools import wraps
 
 from main.auth import auth
@@ -229,6 +229,12 @@ class BaseResource:
         ]
 
 
+class Resource(FlaskRestxResource):
+    @classmethod
+    def auth_error(cls, message):
+        return cls.Meta.service.error_401(message)
+
+
 class BaseListResource(Resource):
     @classmethod
     def get(cls, user_id=None):
@@ -237,10 +243,6 @@ class BaseListResource(Resource):
     @classmethod
     def post(cls, user_id=None):
         return cls.Meta.service.create(user_id=user_id)
-
-    @classmethod
-    def auth_error(cls, message):
-        return cls.Meta.service.error_401(message)
 
 
 class BaseDetailResource(Resource):
@@ -256,10 +258,6 @@ class BaseDetailResource(Resource):
     def delete(cls, id, user_id=None):
         return cls.Meta.service.delete_by_id(id, user_id=user_id)
 
-    @classmethod
-    def auth_error(cls, message):
-        return cls.Meta.service.error_401(message)
-
 
 class BaseEnumNameDetailResource(Resource):
     @classmethod
@@ -274,11 +272,6 @@ class BaseEnumNameDetailResource(Resource):
     def delete(cls, name, user_id=None):
         return cls.Meta.service.delete_by_name(name, user_id=user_id)
 
-    @classmethod
-    def auth_error(cls, message):
-        #TODO move this into a common super class
-        return cls.Meta.service.error_401(message)
-
 
 class BaseRelationListResource(Resource):
     @classmethod
@@ -289,10 +282,6 @@ class BaseRelationListResource(Resource):
             user_id=user_id
         )
 
-    @classmethod
-    def auth_error(cls, message):
-        return cls.Meta.service.error_401(message)
-
 
 def setup_resource(cls):
     """Dynamically adds detail, list, and related list resources
@@ -300,6 +289,6 @@ def setup_resource(cls):
     cls.add_list_resource()
     cls.add_detail_resource()
     cls.add_enum_name_detail_resource_if_enum()
-    #TODO add enum_name_relation_list_resource
+    # TODO add enum_name_relation_list_resource
     cls.add_relation_list_resources()
     return cls
