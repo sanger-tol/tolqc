@@ -241,7 +241,6 @@ class Base(db.Model):
             raise StemEnumInstanceDoesNotExistException()
         return related_instance.id
 
-
     @staticmethod
     def rollback():
         db.session.rollback()
