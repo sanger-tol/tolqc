@@ -266,9 +266,18 @@ class BaseService:
         return target_service
 
     @classmethod
-    def get_bulk_results_for_related(cls, id, calling_service, **kwargs):
+    def get_bulk_results_for_related_by_id(cls, id, calling_service, **kwargs):
         relation_model = calling_service.get_model()
         return cls.get_model().bulk_find_on_relation_id(relation_model, id, **kwargs)
+
+    @classmethod
+    def get_bulk_results_for_related_by_name(cls, name, calling_service, **kwargs):
+        relation_model = calling_service.get_model()
+        return cls.get_model().bulk_find_on_relation_name(
+            relation_model,
+            name,
+            **kwargs
+        )
 
     @classmethod
     def get_schema(cls, **kwargs):
@@ -350,12 +359,30 @@ class BaseService:
         """
         target_service = cls._get_target_service_by_name(target_service_name)
         schema = target_service.get_schema(many=True)
-        model_instances = target_service.get_bulk_results_for_related(id, cls, **kwargs)
+        model_instances = target_service.get_bulk_results_for_related_by_id(id, cls, **kwargs)
+        return schema.dump(model_instances), 200
+
+    @classmethod
+    @provide_parameters
+    @handle_400_bad_parameter
+    @handle_400_nonexistent_service
+    @handle_404
+    def read_bulk_related_by_name(cls, name, target_service_name, user_id=None, **kwargs):
+        """
+        Called on the service for the first part of the endpoint
+        e.g. A in /A/{name}/B
+
+        Used only for enum services
+        """
+        target_service = cls._get_target_service_by_name(target_service_name)
+        schema = target_service.get_schema(many=True)
+        model_instances = target_service.get_bulk_results_for_related_by_name(name, cls, **kwargs)
         return schema.dump(model_instances), 200
 
     @classmethod
     @handle_404
     def read_by_name(cls, name, user_id=None):
+        """Used only for enum services"""
         schema = cls.Meta.schema()
         model_instance = cls.Meta.model.find_by_name(name)
         return schema.dump(model_instance), 200
@@ -366,6 +393,7 @@ class BaseService:
     @handle_400_marshmallow_error
     @handle_404
     def update_by_name(cls, name, data, user_id=None):
+        """Used only for enum services"""
         schema = cls.Meta.schema()
         old_model_instance = cls.Meta.model.find_by_name(name)
         new_model_instance = cls._update_model_instance(
@@ -380,6 +408,7 @@ class BaseService:
     @handle_400_db_integrity_error
     @handle_404
     def delete_by_name(cls, name, user_id=None):
+        """Used only for enum services"""
         model_instance = cls.Meta.model.find_by_name(name)
         model_instance.delete()
         return None, 204
