@@ -17,9 +17,12 @@ from test.base.models import A_ModelRelationship, \
                              D_ModelWithNonNullableColumn, \
                              E_ModelRelationship, \
                              F_ModelWithExtField, \
-                             G_ModelWithFilterableFields
+                             G_ModelWithFilterableFields, \
+                             H_ModelLog, \
+                             I_ModelEnum
 from test.base.resources import api_A, api_B, api_C, api_D, \
-                                api_E, api_F, api_G, api_H
+                                api_E, api_F, api_G, api_H, \
+                                api_I
 
 
 def _setup_api(blueprint):
@@ -36,6 +39,7 @@ def _setup_api(blueprint):
     api.add_namespace(api_F)
     api.add_namespace(api_G)
     api.add_namespace(api_H)
+    api.add_namespace(api_I)
 
 
 class BaseTestCase(TestCase):
@@ -79,3 +83,9 @@ class BaseTestCase(TestCase):
 
     def add_G(self, **kwargs):
         self._add_model_instance(G_ModelWithFilterableFields, **kwargs)
+
+    def add_H(self, **kwargs):
+        self._add_model_instance(H_ModelLog, **kwargs)
+
+    def add_I(self, **kwargs):
+        self._add_model_instance(I_ModelEnum, **kwargs)
