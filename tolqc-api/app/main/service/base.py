@@ -261,10 +261,7 @@ class BaseService:
 
     @classmethod
     def _get_target_service_by_name(cls, service_name):
-        target_service = cls.service_registry_dict.get(
-            service_name,
-            None
-        )
+        target_service = cls.service_registry_dict.get(service_name, None)
         if target_service is None:
             raise BadTargetServiceException(service_name)
         return target_service
