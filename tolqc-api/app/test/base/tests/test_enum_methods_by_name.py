@@ -126,3 +126,32 @@ class TestEnumMethodsByName(BaseTestCase):
                 }
             }
         )
+
+    def test_delete_by_name_I(self):
+        self.add_I(id=34989, name='day', description='quaint')
+
+        # delete the instance by name
+        response_by_name = self.client.open(
+            '/api/v1/I/name/day',
+            method='DELETE',
+            headers=self._get_api_key_1()
+        )
+        self.assert_status(response_by_name, 204)
+
+        # confirm that it is no longer in the db, by name or id
+        response_by_name = self.client.open(
+            '/api/v1/I/name/day',
+            method='GET'
+        )
+        self.assert404(
+            response_by_name,
+            f'Response body is : {response_by_name.data.decode("utf-8")}'
+        )
+        response_by_id = self.client.open(
+            '/api/v1/I/34989',
+            method='GET'
+        )
+        self.assert404(
+            response_by_id,
+            f'Response body is : {response_by_id.data.decode("utf-8")}'
+        )
