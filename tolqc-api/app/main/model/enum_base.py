@@ -5,7 +5,7 @@
 from .base import Base, db
 
 
-class EnumNameNotFoundException(Exception):
+class EnumInstanceNotFoundException(Exception):
     pass
 
 
@@ -28,5 +28,5 @@ class EnumBase(Base):
         query = db.session.query(cls)
         instance = query.filter_by(name=name).one_or_none()
         if instance is None:
-            raise EnumNameNotFoundException()
+            raise EnumInstanceNotFoundException()
         return instance

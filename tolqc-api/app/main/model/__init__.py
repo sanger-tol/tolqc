@@ -6,9 +6,10 @@ from .base import db, Base, \
                   ExtraFieldsNotPermittedException, \
                   StemInstanceDoesNotExistException, \
                   InstanceDoesNotExistException, \
+                  StemEnumInstanceDoesNotExistException, \
                   BadParameterException # noqa
 from .log_base import LogBase # noqa
-from .enum_base import EnumNameNotFoundException # noqa
+from .enum_base import EnumInstanceNotFoundException # noqa
 
 from .tolqc_user import TolqcUser  # noqa
 from .tolqc_role import TolqcRole  # noqa

@@ -13,7 +13,8 @@ from marshmallow_jsonapi.exceptions import IncorrectTypeError
 from main.model import InstanceDoesNotExistException, \
                        StemInstanceDoesNotExistException, \
                        BadParameterException, \
-                       EnumNameNotFoundException
+                       EnumInstanceNotFoundException, \
+                       StemEnumInstanceDoesNotExistException
 
 
 class BadParameterStringException(Exception):
@@ -43,7 +44,10 @@ def handle_404(function):
             StemInstanceDoesNotExistException
         ):
             return cls.error_404(identifier)
-        except EnumNameNotFoundException:
+        except (
+            EnumInstanceNotFoundException,
+            StemEnumInstanceDoesNotExistException
+        ):
             return cls.error_404_enum(identifier)
     return wrapper
 

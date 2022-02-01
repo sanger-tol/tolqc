@@ -51,6 +51,11 @@ class StemInstanceDoesNotExistException(Exception):
     pass
 
 
+class StemEnumInstanceDoesNotExistException(Exception):
+    """Used on 'related' endpoints concerning enum tables"""
+    pass
+
+
 class ExtColumn(db.Column):
     def __init__(self, **kwargs):
         super().__init__(
@@ -211,12 +216,28 @@ class Base(db.Model):
         return cls._postprocess_bulk_find(query, **kwargs).all()
 
     @classmethod
+    def bulk_find_on_relation_name(cls, relation_model, relation_name, **kwargs):
+        cls._check_related_model_by_name_exists(relation_model, relation_name)
+        foreign_key = cls._get_foreign_key_from_relation_model(relation_model)
+        query = db.session.query(cls).filter(foreign_key == relation_name)
+        return cls._postprocess_bulk_find(query, **kwargs).all()
+
+    @classmethod
     def _check_related_model_by_id_exists(cls, relation_model, relation_id):
         related_instance = db.session.query(relation_model) \
                                      .filter_by(id=relation_id) \
                                      .one_or_none()
         if related_instance is None:
             raise StemInstanceDoesNotExistException()
+
+    @classmethod
+    def _check_related_model_by_name_exists(cls, relation_model, relation_name):
+        related_instance = db.session.query(relation_model) \
+                                     .filter_by(name=relation_name) \
+                                     .one_or_none()
+        if related_instance is None:
+            raise StemEnumInstanceDoesNotExistException()
+
 
     @staticmethod
     def rollback():
