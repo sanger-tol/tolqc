@@ -90,3 +90,27 @@ class TestEnumMethodsByName(BaseTestCase):
                 }]
             }
         )
+
+    def test_override_name_by_name_patch_200(self):
+        # add an I
+        self.add_I(id=1480, name='nicely')
+        # attempt to patch to a new id
+        response = self.client.open(
+            '/api/v1/I/name/nicely',
+            method='PATCH',
+            json={
+                'data': {
+                    'type': 'I',
+                    'attributes': {
+                        'name': 'new'
+                    }
+                }
+            },
+            headers=self._get_api_key_1()
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert that the name is overriden
+        
