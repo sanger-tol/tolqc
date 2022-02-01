@@ -24,9 +24,9 @@ class EnumBase(Base):
         return [m.name for m in query.all()]
 
     @classmethod
-    def get_id_by_name(cls, name):
+    def find_by_name(cls, name):
         query = db.session.query(cls)
         instance = query.filter_by(name=name).one_or_none()
         if instance is None:
             raise EnumNameNotFoundException()
-        return instance.id
+        return instance

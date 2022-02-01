@@ -342,3 +342,34 @@ class BaseService:
         schema = target_service.get_schema(many=True)
         model_instances = target_service.get_bulk_results_for_related(id, cls, **kwargs)
         return schema.dump(model_instances), 200
+
+    @classmethod
+    @handle_404
+    def read_by_name(cls, name, user_id=None):
+        schema = cls.Meta.schema()
+        model_instance = cls.Meta.model.find_by_name(name)
+        return schema.dump(model_instance), 200
+
+    @classmethod
+    @provide_body_data
+    @handle_400_db_integrity_error
+    @handle_400_marshmallow_error
+    @handle_404
+    def update_by_name(cls, name, data, user_id=None):
+        schema = cls.Meta.schema()
+        old_model_instance = cls.Meta.model.find_by_name(name)
+        new_model_instance = schema.load(
+            data,
+            instance=old_model_instance,
+            partial=True
+        )
+        new_model_instance.save_update(user_id=user_id)
+        return schema.dump(new_model_instance), 200
+
+    @classmethod
+    @handle_400_db_integrity_error
+    @handle_404
+    def delete_by_id(cls, name, user_id=None):
+        model_instance = cls.Meta.model.find_by_name(name)
+        model_instance.delete()
+        return None, 204
