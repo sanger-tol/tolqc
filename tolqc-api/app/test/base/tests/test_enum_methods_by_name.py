@@ -30,4 +30,15 @@ class TestEnumMethodsByName(BaseTestCase):
                     }
                 }
             }
-        )    
+        )
+        # get by name
+        response_by_name = self.client.open(
+            '/api/v1/I/name/testing',
+            method='GET'
+        )
+        self.assert200(
+            response_by_name,
+            f'Response body is : {response_by_name.data.decode("utf-8")}'
+        )
+        # assert that the two are equal
+        self.assertEqual(response_by_id.json, response_by_name.json)
