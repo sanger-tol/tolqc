@@ -209,18 +209,20 @@ class Base(db.Model):
         return cls._postprocess_bulk_find(query, **kwargs).all()
 
     @classmethod
-    def bulk_find_on_relation_id(cls, relation_model, relation_id, **kwargs):
-        cls._check_related_model_by_id_exists(relation_model, relation_id)
+    def _bulk_find_on_relation(cls, relation_model, relation_id, **kwargs):
         foreign_key = cls._get_foreign_key_from_relation_model(relation_model)
         query = db.session.query(cls).filter(foreign_key == relation_id)
         return cls._postprocess_bulk_find(query, **kwargs).all()
 
     @classmethod
+    def bulk_find_on_relation_id(cls, relation_model, relation_id, **kwargs):
+        cls._check_related_model_by_id_exists(relation_model, relation_id)
+        return cls._bulk_find_on_relation(relation_model, relation_id, **kwargs)
+
+    @classmethod
     def bulk_find_on_relation_name(cls, relation_model, relation_name, **kwargs):
-        cls._check_related_model_by_name_exists(relation_model, relation_name)
-        foreign_key = cls._get_foreign_key_from_relation_model(relation_model)
-        query = db.session.query(cls).filter(foreign_key == relation_name)
-        return cls._postprocess_bulk_find(query, **kwargs).all()
+        relation_id = cls._get_related_model_id_by_name(relation_model, relation_name)
+        return cls._bulk_find_on_relation(relation_model, relation_id, **kwargs)
 
     @classmethod
     def _check_related_model_by_id_exists(cls, relation_model, relation_id):
@@ -231,12 +233,13 @@ class Base(db.Model):
             raise StemInstanceDoesNotExistException()
 
     @classmethod
-    def _check_related_model_by_name_exists(cls, relation_model, relation_name):
+    def _get_related_model_id_by_name(cls, relation_model, relation_name):
         related_instance = db.session.query(relation_model) \
                                      .filter_by(name=relation_name) \
                                      .one_or_none()
         if related_instance is None:
             raise StemEnumInstanceDoesNotExistException()
+        return related_instance.id
 
 
     @staticmethod
