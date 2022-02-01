@@ -247,7 +247,6 @@ class BaseResource:
             (BaseEnumNameRelationListResource,),
             {'Meta': cls.Meta, 'relation': relation_name}
         )
-        #TODO consider moving this into super Resource
         return _document_enum_name_relation_list_resource(declared, relation_name)
 
     @classmethod
