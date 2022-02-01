@@ -280,6 +280,16 @@ class BaseService:
         return schema.get_model()
 
     @classmethod
+    def _update_model_instance(cls, old_model_instance, data, schema, user_id=None):
+        new_model_instance = schema.load(
+            data,
+            instance=old_model_instance,
+            partial=True
+        )
+        new_model_instance.save_update(user_id=user_id)
+        return new_model_instance
+
+    @classmethod
     @handle_404
     def read_by_id(cls, id, user_id=None):
         schema = cls.Meta.schema()
@@ -294,12 +304,12 @@ class BaseService:
     def update_by_id(cls, id, data, user_id=None):
         schema = cls.Meta.schema()
         old_model_instance = cls.Meta.model.find_by_id(id)
-        new_model_instance = schema.load(
+        new_model_instance = cls._update_model_instance(
+            old_model_instance,
             data,
-            instance=old_model_instance,
-            partial=True
+            schema,
+            user_id=user_id
         )
-        new_model_instance.save_update(user_id=user_id)
         return schema.dump(new_model_instance), 200
 
     @classmethod
@@ -358,18 +368,18 @@ class BaseService:
     def update_by_name(cls, name, data, user_id=None):
         schema = cls.Meta.schema()
         old_model_instance = cls.Meta.model.find_by_name(name)
-        new_model_instance = schema.load(
+        new_model_instance = cls._update_model_instance(
+            old_model_instance,
             data,
-            instance=old_model_instance,
-            partial=True
+            schema,
+            user_id=user_id
         )
-        new_model_instance.save_update(user_id=user_id)
         return schema.dump(new_model_instance), 200
 
     @classmethod
     @handle_400_db_integrity_error
     @handle_404
-    def delete_by_id(cls, name, user_id=None):
+    def delete_by_name(cls, name, user_id=None):
         model_instance = cls.Meta.model.find_by_name(name)
         model_instance.delete()
         return None, 204
