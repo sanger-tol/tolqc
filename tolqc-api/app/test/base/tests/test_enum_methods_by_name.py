@@ -55,7 +55,7 @@ class TestEnumMethodsByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-#TODO check if you can overwrite the name by name
+
     def test_no_override_id_by_name_patch_400(self):
         # add an I
         self.add_I(id=4989, name='happy')
