@@ -148,6 +148,10 @@ class BaseService:
         cls.service_registry_dict[type_] = cls
 
     @classmethod
+    def is_enum_service(cls):
+        return cls.Meta.schema.is_enum_schema()
+
+    @classmethod
     def get_type(cls):
         return cls.Meta.schema.get_type()
 

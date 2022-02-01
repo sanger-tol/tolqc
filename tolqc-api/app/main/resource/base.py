@@ -166,6 +166,14 @@ def _document_detail_resource(cls):
     return api.route('/<int:id>')(cls)
 
 
+def _document_enum_name_detail_resource(cls):
+    api, _ = _get_api_swagger(cls)
+    _document_detail_get(cls)
+    _document_patch(cls)
+    _document_delete(cls)
+    return api.route('/name/<name>')(cls)
+
+
 def _document_relation_list_resource(cls, relation):
     api, _ = _get_api_swagger(cls)
     _document_relation_list_get(cls, relation)
@@ -173,6 +181,10 @@ def _document_relation_list_resource(cls, relation):
 
 
 class BaseResource:
+    @classmethod
+    def is_enum_resource(cls):
+        return cls.Meta.service.is_enum_service()
+
     @classmethod
     def add_list_resource(cls):
         type_ = cls.Meta.service.get_type()
@@ -188,6 +200,17 @@ class BaseResource:
         cls.detail_resource = _document_detail_resource(type(
             f'{type_.title()}DetailResource',
             (BaseDetailResource,),
+            {'Meta': cls.Meta}
+        ))
+
+    @classmethod
+    def add_enum_name_detail_resource_if_enum(cls):
+        if not cls.is_enum_resource():
+            return
+        type_ = cls.Meta.service.get_type()
+        cls.detail_resource = _document_enum_name_detail_resource(type(
+            f'{type_.title()}EnumNameDetailResource',
+            (BaseEnumNameDetailResource,),
             {'Meta': cls.Meta}
         ))
 
@@ -238,6 +261,25 @@ class BaseDetailResource(Resource):
         return cls.Meta.service.error_401(message)
 
 
+class BaseEnumNameDetailResource(Resource):
+    @classmethod
+    def get(cls, name, user_id=None):
+        return cls.Meta.service.read_by_name(name, user_id=user_id)
+
+    @classmethod
+    def patch(cls, name, user_id=None):
+        return cls.Meta.service.update_by_name(name, user_id=user_id)
+
+    @classmethod
+    def delete(cls, name, user_id=None):
+        return cls.Meta.service.delete_by_name(name, user_id=user_id)
+
+    @classmethod
+    def auth_error(cls, message):
+        #TODO move this into a common super class
+        return cls.Meta.service.error_401(message)
+
+
 class BaseRelationListResource(Resource):
     @classmethod
     def get(cls, id, user_id=None):
@@ -257,5 +299,7 @@ def setup_resource(cls):
     to a BaseResource inheritor."""
     cls.add_list_resource()
     cls.add_detail_resource()
+    cls.add_enum_name_detail_resource_if_enum()
+    #TODO add enum_name_relation_list_resource
     cls.add_relation_list_resources()
     return cls

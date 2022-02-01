@@ -205,6 +205,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.model.has_ext_column()
 
     @classmethod
+    def is_enum_schema(cls):
+        return cls.Meta.model.is_enum_table()
+
+    @classmethod
     def _get_public_attribute_names(cls):
         return [
             column for column in cls.Meta.model.get_column_names()
