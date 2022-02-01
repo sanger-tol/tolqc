@@ -8,15 +8,11 @@ from .base import setup_model
 
 @setup_model
 class TolqcFile(LogBase):
-    __tablename__ = "files"
+    __tablename__ = "file"
     id = db.Column(db.Integer(), primary_key=True)
-    file_id = db.Column(db.String())
-    seq_instance_id = db.Column(db.Integer(), db.ForeignKey("seq.id"),
-                                nullable=False)
+    data_id = db.Column(db.Integer(), db.ForeignKey("data.id"))
     name = db.Column(db.String())
     type = db.Column(db.String())
     md5 = db.Column(db.String())
-    changed = db.Column(db.DateTime())
-    current = db.Column(db.Boolean())
-    seq = db.relationship("TolqcSeq", back_populates="files",
-                          foreign_keys=[seq_instance_id])
+    data = db.relationship("TolqcData", back_populates="file",
+                           foreign_keys=[data_id])

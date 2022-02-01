@@ -8,17 +8,15 @@ from .base import setup_model
 
 @setup_model
 class TolqcSample(LogBase):
-    __tablename__ = "samples"
+    __tablename__ = "sample"
     id = db.Column(db.Integer(), primary_key=True)
-    sample_id = db.Column(db.Integer(), nullable=False)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
     lims_id = db.Column(db.Integer())
-    specimen_instance_id = db.Column(db.Integer(), db.ForeignKey("specimens.id"),
-                                     nullable=False)
-    accession_id = db.Column(db.Integer())
-    changed = db.Column(db.DateTime())
-    current = db.Column(db.Boolean())
-    specimens = db.relationship("TolqcSpecimen", back_populates="samples",
-                                foreign_keys=[specimen_instance_id])
-    seq = db.relationship("TolqcSeq", back_populates="samples")
+    specimen_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"))
+    accession_id = db.Column(db.Integer(), db.ForeignKey("accession.id"))
+    specimen = db.relationship("TolqcSpecimen", back_populates="sample",
+                               foreign_keys=[specimen_id])
+    accession = db.relationship("TolqcAccession", back_populates="sample",
+                                foreign_keys=[accession_id])
+    data = db.relationship("TolqcData", back_populates="sample")

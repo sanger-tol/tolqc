@@ -7,14 +7,20 @@ from .base import Base, db, setup_model
 
 @setup_model
 class TolqcUser(Base):
-    __tablename__ = "users"
+    __tablename__ = "user"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), nullable=False, unique=True)
     organisation = db.Column(db.String())
     api_key = db.Column(db.String(), unique=True)
     token = db.Column(db.String(), unique=True)
-    roles = db.relationship('TolqcRole', lazy=False, back_populates="users")
+    role = db.relationship('TolqcRole', lazy=False, back_populates="user")
+
+    def to_dict(cls):
+        return {'name': cls.name,
+                'email': cls.email,
+                'organisation': ("" if cls.organisation is None else cls.organisation),
+                'role': cls.role}
 
 
 def get_user_id_via_api_key(api_key):

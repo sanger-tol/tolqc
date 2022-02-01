@@ -10,9 +10,8 @@ from .base import setup_model
 class TolqcSpecies(LogBase):
     __tablename__ = "species"
     id = db.Column(db.Integer(), primary_key=True)
-    species_id = db.Column(db.Integer(), nullable=False)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
     strain = db.Column(db.String())
     common_name = db.Column(db.String())
     taxon_id = db.Column(db.Integer())
@@ -22,6 +21,4 @@ class TolqcSpecies(LogBase):
     taxon_group = db.Column(db.String())
     genome_size = db.Column(db.Integer())
     chromosome_number = db.Column(db.Integer())
-    changed = db.Column(db.DateTime())
-    current = db.Column(db.Boolean())
-    specimens = db.relationship("TolqcSpecimen", back_populates="species")
+    specimen = db.relationship("TolqcSpecimen", back_populates="species")

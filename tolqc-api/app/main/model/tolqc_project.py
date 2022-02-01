@@ -8,11 +8,13 @@ from .base import setup_model
 
 @setup_model
 class TolqcProject(LogBase):
-    __tablename__ = "projects"
+    __tablename__ = "project"
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
-    hierarchy_name = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String())
+    hierarchy_name = db.Column(db.String())
     description = db.Column(db.String())
     lims_id = db.Column(db.Integer())
-    accession_id = db.Column(db.Integer())
-    allocations = db.relationship("TolqcAllocation", back_populates="projects")
+    accession_id = db.Column(db.Integer(), db.ForeignKey("accession.id"))
+    allocation = db.relationship("TolqcAllocation", back_populates="project")
+    accession = db.relationship("TolqcAccession", back_populates="project",
+                                foreign_keys=[accession_id])
