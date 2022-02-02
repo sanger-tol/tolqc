@@ -16,6 +16,7 @@ class TolqcUser(Base):
     token = db.Column(db.String(), unique=True)
     role = db.relationship('TolqcRole', lazy=False, back_populates="user")
 
+
 def get_user_id_via_api_key(api_key):
     user = db.session.query(TolqcUser).filter(TolqcUser.api_key == api_key).one_or_none()
     return user.id if user is not None else None

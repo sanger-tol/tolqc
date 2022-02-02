@@ -104,7 +104,7 @@ class TestUserSecurity(TolqcTestCase):
                             }
                         }
                     }
-                }   
+                }
             },
             headers={
                 'Authorization': self.api_key_2
@@ -135,7 +135,7 @@ class TestUserSecurity(TolqcTestCase):
                 'data': {
                     'type': 'assembly_component',
                     'attributes': {
-                    'description': 'this desc has now changed'
+                        'description': 'this desc has now changed'
                     },
                     'relationships': {
                         'creator': {
@@ -145,7 +145,7 @@ class TestUserSecurity(TolqcTestCase):
                             }
                         }
                     }
-                }   
+                }
             },
             headers={
                 'Authorization': self.api_key_2
@@ -176,7 +176,7 @@ class TestUserSecurity(TolqcTestCase):
         }
 
         response = self.client.open(
-            '/api/v1/data',
+            '/api/v1/assembly_component',
             method='POST',
             json={
                 'data': {
@@ -194,7 +194,7 @@ class TestUserSecurity(TolqcTestCase):
                             }
                         }
                     }
-                }   
+                }
             },
             headers={
                 'Authorization': self.api_key_2
@@ -219,7 +219,7 @@ class TestUserSecurity(TolqcTestCase):
 
         # try to modify its creator
         response = self.client.open(
-            '/api/v1/data/43',
+            '/api/v1/assembly_component/43',
             method='PATCH',
             json={
                 'data': {
@@ -227,7 +227,7 @@ class TestUserSecurity(TolqcTestCase):
                     'attributes': {
                         'created_at': str(datetime.now())
                     }
-                }   
+                }
             },
             headers={
                 'Authorization': self.api_key_2

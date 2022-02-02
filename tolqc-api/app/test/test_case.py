@@ -104,8 +104,6 @@ class TestCase(FlaskTestCase):
         db.session.query(TolqcQcDict).delete()
         db.session.query(TolqcRole).delete()
         db.session.query(TolqcUser).delete()
-
-
         db.session.commit()
 
     def assert201(self, response, *args):
