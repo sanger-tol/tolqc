@@ -20,30 +20,24 @@ class BaseSwagger:
         return cls.swagger_registry_dict[type_]
 
     @classmethod
-    def _get_duplicate_relationship_swagger_name(cls, object_title, relation_swagger, is_enum):
-        relation_type = relation_swagger.get_type().title()
-        return (
-            f"{relation_type} {object_title} ({cls.get_type().title()}'s "
-            "Enum " if is_enum else ""
-            "Copy')"
-        )
+    def _get_duplicate_relationship_swagger_name(cls, object_title, relation_type):
+        return  f"{relation_type} {object_title} ({cls.get_type().title()}'s Copy)"
 
     @classmethod
-    def duplicate_relationship_swagger(cls, relation_swagger, is_enum=False):
+    def _duplicate_relationship_swagger(cls, relation_swagger_name):
         # models have to be registered (with duplicates) per flask-restx's rules
+        relation_swagger = cls.get_registered_swagger(relation_swagger_name)
         resource_object_copy = cls.api.schema_model(
             cls._get_duplicate_relationship_swagger_name(
                 'Response Resource Object',
-                relation_swagger,
-                is_enum
+                relation_swagger_name
             ),
             relation_swagger.get_resource_object_schema_model(is_request=False)
         )
         return cls.api.model(
             cls._get_duplicate_relationship_swagger_name(
                 'Bulk Response',
-                relation_swagger,
-                is_enum
+                relation_swagger_name
             ),
             {
                 'data': fields.List(
@@ -51,6 +45,17 @@ class BaseSwagger:
                 )
             }
         )
+
+    @classmethod
+    def duplicate_relationship_swaggers(cls, relationship_names):
+        cls._relation_list_get_swaggers = {
+            r_name: cls._duplicate_relationship_swagger(r_name)
+            for r_name in relationship_names
+        }
+
+    @classmethod
+    def get_relation_list_get_swagger_model(cls, relationship_name):
+        return cls._relation_list_get_swaggers[relationship_name]
 
     @classmethod
     def get_type(cls):
