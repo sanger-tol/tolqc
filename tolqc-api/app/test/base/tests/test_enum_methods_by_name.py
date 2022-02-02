@@ -224,3 +224,12 @@ class TestEnumMethodsByName(BaseTestCase):
                 ]
             }
         )
+
+        # relation list get by id
+        response_by_id = self.client.open(
+            '/api/v1/I/4989/J',
+            method='GET'
+        )
+        self.assert200(response_by_id)
+        # assert that it's equal to the other response
+        self.assertEqual(response_by_name.json, response_by_id.json)
