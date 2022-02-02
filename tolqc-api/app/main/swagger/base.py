@@ -21,7 +21,7 @@ class BaseSwagger:
 
     @classmethod
     def _get_duplicate_relationship_swagger_name(cls, object_title, relation_type):
-        return  f"{relation_type} {object_title} ({cls.get_type().title()}'s Copy)"
+        return f"{relation_type} {object_title} ({cls.get_type().title()}'s Copy)"
 
     @classmethod
     def _duplicate_relationship_swagger(cls, relation_swagger_name):

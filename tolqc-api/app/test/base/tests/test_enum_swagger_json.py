@@ -34,7 +34,6 @@ class TestEnumSwaggerJson(BaseTestCase):
         assert '/B/name/{name}' not in paths
         assert '/B/name/{name}/E' not in paths
 
-
     def _get_response_model(self, swagger_json, method, path, code):
         method_dict = swagger_json['paths'][path][method]
         response_ref = method_dict['responses'][code]['schema']['$ref']

@@ -6,7 +6,6 @@ from flask_restx import Resource as FlaskRestxResource
 from functools import wraps
 
 from main.auth import auth
-from main.swagger import BaseSwagger
 
 
 LIST_GET_PARAMS_DICT = {
