@@ -169,3 +169,14 @@ class TestEnumMethodsByName(BaseTestCase):
             response_by_id,
             f'Response body is : {response_by_id.data.decode("utf-8")}'
         )
+
+    def test_relation_list_get_matches_by_name_and_id(self):
+        # add two I's
+        self.add_I(id=4989, name='happy')
+        self.add_I(id=304930, name='go_lucky')
+        # add two dependent J's on the first I
+        self.add_J(id=2099, i_id=4989)
+        self.add_J(id=9890, i_id=4989)
+        # add one on the second I
+        self.add_J(id=23989, i_id=304930)
+        

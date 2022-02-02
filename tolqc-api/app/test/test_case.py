@@ -69,8 +69,8 @@ class TestCase(FlaskTestCase):
         db.session.query(F_ModelWithExtField).delete()
         db.session.query(G_ModelWithFilterableFields).delete()
         db.session.query(H_ModelLog).delete()
-        db.session.query(I_ModelEnum).delete()
         db.session.query(J_ModelEnumDependent).delete()
+        db.session.query(I_ModelEnum).delete()
 
         # ToLQC models
         # TODO delete this all by cascade
