@@ -48,14 +48,14 @@ class BaseSwagger:
 
     @classmethod
     def duplicate_relationship_swaggers(cls, relationship_names):
-        cls._relation_list_get_swaggers = {
+        cls._relation_list_get_swagger_models = {
             r_name: cls._duplicate_relationship_swagger(r_name)
             for r_name in relationship_names
         }
 
     @classmethod
     def get_relation_list_get_swagger_model(cls, relationship_name):
-        return cls._relation_list_get_swaggers[relationship_name]
+        return cls._relation_list_get_swagger_models[relationship_name]
 
     @classmethod
     def get_type(cls):
