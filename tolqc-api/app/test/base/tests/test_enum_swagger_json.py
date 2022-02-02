@@ -23,14 +23,14 @@ class TestEnumSwaggerJson(BaseTestCase):
         swagger_json = self._get_swagger_json_file()
         paths = list(swagger_json['paths'].keys())
 
-        # assert that all I paths (including name) are in there
+        # assert that all I (enum) paths (including name) are in there
         assert '/I' in paths
         assert '/I/name/{name}' in paths
         assert '/I/{id}' in paths
         assert '/I/name/{name}/J' in paths
         assert '/I/{id}/J' in paths
 
-        # assert that other endpoints do not have name paths
+        # assert that other (non-enum) endpoints do not have name paths
         assert '/B/name/{name}' not in paths
         assert '/B/name/{name}/E' not in paths
 
