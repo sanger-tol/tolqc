@@ -51,3 +51,21 @@ class TestEnumSwaggerJson(BaseTestCase):
         )
 
         self.assertEqual(response_model_by_id, response_model_by_name)
+
+    def test_enum_by_name_response_models_same_as_by_id_detail_patch(self):
+        swagger_json = self._get_swagger_json_file()
+
+        response_model_by_name = self._get_response_model(
+            swagger_json,
+            'patch',
+            '/I/name/{name}',
+            '200'
+        )
+        response_model_by_id = self._get_response_model(
+            swagger_json,
+            'patch',
+            '/I/{id}',
+            '200'
+        )
+
+        self.assertEqual(response_model_by_id, response_model_by_name)
