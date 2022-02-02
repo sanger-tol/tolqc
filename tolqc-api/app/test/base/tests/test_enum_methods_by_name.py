@@ -179,4 +179,48 @@ class TestEnumMethodsByName(BaseTestCase):
         self.add_J(id=9890, i_id=4989)
         # add one on the second I
         self.add_J(id=23989, i_id=304930)
-        
+
+        # relation list get by name
+        response_by_name = self.client.open(
+            '/api/v1/I/name/happy/J',
+            method='GET'
+        )
+        self.assert200(response_by_name)
+        # assert that the response is correct
+        self.assertEqual(
+            response_by_name.json,
+            {
+                'data': [
+                    {
+                        'type': 'J',
+                        'id': '2099',
+                        'relationships': {
+                            'I': {
+                                'data': {
+                                    'id': '4989',
+                                    'type': 'I'
+                                },
+                                'links': {
+                                    'related': '/I/4989'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '9890',
+                        'relationships': {
+                            'I': {
+                                'data': {
+                                    'id': '4989',
+                                    'type': 'I'
+                                },
+                                'links': {
+                                    'related': '/I/4989'
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        )
