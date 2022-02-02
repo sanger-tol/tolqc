@@ -9,7 +9,14 @@ from main.model import db, TolqcUser, TolqcRole, TolqcAllocation, \
                        TolqcPlatform, TolqcProject, TolqcRun, \
                        TolqcSample, TolqcSpecies, TolqcSpecimen, \
                        TolqcData, TolqcFile, TolqcSex, \
-                       TolqcSoftwareVersion, TolqcStatus
+                       TolqcSoftwareVersion, TolqcStatus, TolqcStatusDict, \
+                       TolqcQcDict, TolqcMilestoneDict, TolqcAccession, \
+                       TolqcAccessionTypeDict, TolqcDataset, TolqcSet, \
+                       TolqcPacbioRunMetrics, TolqcAssembly, \
+                       TolqcAssemblyComponent, TolqcGenomescopeMetrics, \
+                       TolqcAssemblyMetrics, TolqcBuscoLineage, \
+                       TolqcBuscoMetrics, TolqcMerquryMetrics
+
 from test.base.models import A_ModelRelationship, B_ModelRelationship, \
                              C_ModelWithNullableColumn, \
                              D_ModelWithNonNullableColumn, \
@@ -65,23 +72,39 @@ class TestCase(FlaskTestCase):
 
         # ToLQC models
         # TODO delete this all by cascade
-        db.session.query(TolqcAllocation).delete()
-        db.session.query(TolqcCentre).delete()
-        db.session.query(TolqcLibrary).delete()
-        db.session.query(TolqcLibraryType).delete()
-        db.session.query(TolqcPlatform).delete()
-        db.session.query(TolqcProject).delete()
-        db.session.query(TolqcRun).delete()
-        db.session.query(TolqcSample).delete()
-        db.session.query(TolqcSpecies).delete()
-        db.session.query(TolqcSpecimen).delete()
-        db.session.query(TolqcRole).delete()
-        db.session.query(TolqcData).delete()
-        db.session.query(TolqcFile).delete()
-        db.session.query(TolqcSex).delete()
+        db.session.query(TolqcMerquryMetrics).delete()
+        db.session.query(TolqcBuscoMetrics).delete()
+        db.session.query(TolqcBuscoLineage).delete()
+        db.session.query(TolqcAssemblyMetrics).delete()
+        db.session.query(TolqcAssembly).delete()
+        db.session.query(TolqcGenomescopeMetrics).delete()
         db.session.query(TolqcSoftwareVersion).delete()
+        db.session.query(TolqcSet).delete()
+        db.session.query(TolqcDataset).delete()
+        db.session.query(TolqcData).delete()
+        db.session.query(TolqcPacbioRunMetrics).delete()
+        db.session.query(TolqcRun).delete()
+        db.session.query(TolqcFile).delete()
+        db.session.query(TolqcLibrary).delete()
+        db.session.query(TolqcCentre).delete()
+        db.session.query(TolqcPlatform).delete()
+        db.session.query(TolqcLibraryType).delete()
+        db.session.query(TolqcSample).delete()
+        db.session.query(TolqcAllocation).delete()
+        db.session.query(TolqcSpecimen).delete()
+        db.session.query(TolqcSex).delete()
+        db.session.query(TolqcSpecies).delete()
+        db.session.query(TolqcProject).delete()
+        db.session.query(TolqcAccessionTypeDict).delete()
+        db.session.query(TolqcAccession).delete()
+        db.session.query(TolqcAssemblyComponent).delete()
         db.session.query(TolqcStatus).delete()
+        db.session.query(TolqcStatusDict).delete()
+        db.session.query(TolqcMilestoneDict).delete()
+        db.session.query(TolqcQcDict).delete()
+        db.session.query(TolqcRole).delete()
         db.session.query(TolqcUser).delete()
+
 
         db.session.commit()
 
