@@ -9,7 +9,7 @@ from main.auth import auth
 from main.swagger import BaseSwagger
 
 
-PARAMS_DICT = {
+LIST_GET_PARAMS_DICT = {
     'page': {
         'in': 'query',
         'type': 'integer',
@@ -99,7 +99,7 @@ def _document_list_get(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
         api.doc(
-            params=PARAMS_DICT,
+            params=LIST_GET_PARAMS_DICT,
             responses={
                 '200': (
                     'Success',
@@ -128,15 +128,16 @@ def _document_post(cls):
     cls.post = _compose_decorators(cls.post, decorators)
 
 
-def _document_relation_list_get(cls, relation):
+def _document_relation_list_get(cls, relation, is_enum=False):
     api, self_swagger = _get_api_swagger(cls)
     relation_swagger = BaseSwagger.get_registered_swagger(relation)
     relation_list_response_model = self_swagger.duplicate_relationship_swagger(
-        relation_swagger
+        relation_swagger,
+        is_enum=is_enum
     )
     decorators = (
         api.doc(
-            params=PARAMS_DICT,
+            params=LIST_GET_PARAMS_DICT,
             responses={
                 '200': (
                     'Success',
@@ -176,13 +177,13 @@ def _document_enum_name_detail_resource(cls):
 
 def _document_relation_list_resource(cls, relation):
     api, _ = _get_api_swagger(cls)
-    _document_relation_list_get(cls, relation)
+    _document_relation_list_get(cls, relation, is_enum=False)
     return api.route(f'/<int:id>/{relation}')(cls)
 
 
 def _document_enum_name_relation_list_resource(cls, relation):
     api, _ = _get_api_swagger(cls)
-    _document_relation_list_get(cls, relation)
+    _document_relation_list_get(cls, relation, is_enum=True)
     return api.route(f'/name/<name>/{relation}')(cls)
 
 

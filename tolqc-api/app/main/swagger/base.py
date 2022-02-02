@@ -20,12 +20,21 @@ class BaseSwagger:
         return cls.swagger_registry_dict[type_]
 
     @classmethod
-    def duplicate_relationship_swagger(cls, relation_swagger):
+    def _get_duplicate_relationship_swagger_name(cls, relation_swagger, is_enum):
+        relation_type = relation_swagger.get_type().title()
+        return (
+            f"{relation_type} Response Resource Object ({cls.get_type().title()}'s "
+            "Enum " if is_enum else ""
+            "Copy')"
+        )
+
+    @classmethod
+    def duplicate_relationship_swagger(cls, relation_swagger, is_enum=False):
         # models have to be registered (with duplicates) per flask-restx's rules
         self_type = cls.get_type().title()
         relation_type = relation_swagger.get_type().title()
         resource_object_copy = cls.api.schema_model(
-            f"{relation_type} Response Resource Object ({self_type}'s Copy')",
+            cls._get_duplicate_relationship_swagger_name(relation_swagger, is_enum),
             relation_swagger.get_resource_object_schema_model(is_request=False)
         )
         return cls.api.model(
