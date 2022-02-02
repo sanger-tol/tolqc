@@ -19,10 +19,11 @@ from test.base.models import A_ModelRelationship, \
                              F_ModelWithExtField, \
                              G_ModelWithFilterableFields, \
                              H_ModelLog, \
-                             I_ModelEnum
+                             I_ModelEnum, \
+                             J_ModelEnumDependent
 from test.base.resources import api_A, api_B, api_C, api_D, \
                                 api_E, api_F, api_G, api_H, \
-                                api_I
+                                api_I, api_J
 
 
 def _setup_api(blueprint):
@@ -40,6 +41,7 @@ def _setup_api(blueprint):
     api.add_namespace(api_G)
     api.add_namespace(api_H)
     api.add_namespace(api_I)
+    api.add_namespace(api_J)
 
 
 class BaseTestCase(TestCase):
@@ -89,3 +91,6 @@ class BaseTestCase(TestCase):
 
     def add_I(self, **kwargs):
         self._add_model_instance(I_ModelEnum, **kwargs)
+
+    def add_J(self, **kwargs):
+        self._add_model_instance(J_ModelEnumDependent, **kwargs)

@@ -12,10 +12,12 @@ from test.base.models import A_ModelRelationship, \
                              F_ModelWithExtField, \
                              G_ModelWithFilterableFields, \
                              H_ModelLog, \
-                             I_ModelEnum
+                             I_ModelEnum, \
+                             J_ModelEnumDependent
 from test.base.schemas import A_Schema, B_Schema, C_Schema, \
                               D_Schema, E_Schema, F_Schema, \
-                              G_Schema, H_Schema, I_Schema
+                              G_Schema, H_Schema, I_Schema, \
+                              J_Schema
 
 
 @setup_service
@@ -79,3 +81,10 @@ class I_Service(BaseService):
     class Meta:
         model = I_ModelEnum
         schema = I_Schema
+
+
+@setup_service
+class J_Service(BaseService):
+    class Meta:
+        model = J_ModelEnumDependent
+        schema = J_Schema

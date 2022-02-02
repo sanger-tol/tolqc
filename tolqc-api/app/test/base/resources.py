@@ -7,10 +7,10 @@ from main.resource.base import BaseResource, setup_resource
 
 from test.base.services import A_Service, B_Service, C_Service, D_Service, \
                                E_Service, F_Service, G_Service, H_Service, \
-                               I_Service
+                               I_Service, J_Service
 from test.base.swaggers import A_Swagger, B_Swagger, C_Swagger, D_Swagger, \
                                E_Swagger, F_Swagger, G_Swagger, H_Swagger, \
-                               I_Swagger
+                               I_Swagger, J_Swagger
 
 
 api_A = A_Swagger.api
@@ -22,6 +22,7 @@ api_F = F_Swagger.api
 api_G = G_Swagger.api
 api_H = H_Swagger.api
 api_I = I_Swagger.api
+api_J = J_Swagger.api
 
 
 @setup_resource
@@ -85,3 +86,10 @@ class I_Resource(BaseResource):
     class Meta:
         service = I_Service
         swagger = I_Swagger
+
+
+@setup_resource
+class J_Resource(BaseResource):
+    class Meta:
+        service = J_Service
+        swagger = J_Swagger

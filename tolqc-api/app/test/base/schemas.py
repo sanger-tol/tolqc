@@ -12,7 +12,8 @@ from test.base.models import A_ModelRelationship, \
                              F_ModelWithExtField, \
                              G_ModelWithFilterableFields, \
                              H_ModelLog, \
-                             I_ModelEnum
+                             I_ModelEnum, \
+                             J_ModelEnumDependent
 
 
 @setup_schema
@@ -67,3 +68,9 @@ class H_Schema(BaseSchema):
 class I_Schema(BaseSchema):
     class Meta(BaseSchema.BaseMeta):
         model = I_ModelEnum
+
+
+@setup_schema
+class J_Schema(BaseSchema):
+    class Meta(BaseSchema.BaseMeta):
+        model = J_ModelEnumDependent

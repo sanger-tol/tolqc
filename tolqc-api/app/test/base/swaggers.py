@@ -6,7 +6,8 @@ from main.swagger.base import BaseSwagger, setup_swagger
 
 from test.base.schemas import A_Schema, B_Schema, C_Schema, \
                               D_Schema, E_Schema, F_Schema, \
-                              G_Schema, H_Schema, I_Schema
+                              G_Schema, H_Schema, I_Schema, \
+                              J_Schema
 
 
 @setup_swagger
@@ -61,3 +62,9 @@ class H_Swagger(BaseSwagger):
 class I_Swagger(BaseSwagger):
     class Meta:
         schema = I_Schema
+
+
+@setup_swagger
+class J_Swagger(BaseSwagger):
+    class Meta:
+        schema = J_Schema

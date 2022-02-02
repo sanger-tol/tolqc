@@ -85,3 +85,9 @@ class H_ModelLog(LogBase):
 class I_ModelEnum(EnumBase):
     __tablename__ = 'I'
     __table_args__ = {'extend_existing': True}
+
+
+@setup_model
+class J_ModelEnumDependent(EnumBase):
+    __tablename__ = 'J'
+    __table_args__ = {'extend_existing': True}
