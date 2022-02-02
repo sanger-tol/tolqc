@@ -127,7 +127,7 @@ def _document_post(cls):
     cls.post = _compose_decorators(cls.post, decorators)
 
 
-def _document_relation_list_get(cls, relation_name, is_enum=False):
+def _document_relation_list_get(cls, relation_name):
     api, swagger = _get_api_swagger(cls)
     decorators = (
         api.doc(
@@ -173,13 +173,13 @@ def _document_enum_name_detail_resource(cls):
 
 def _document_relation_list_resource(cls, relation):
     api, _ = _get_api_swagger(cls)
-    _document_relation_list_get(cls, relation, is_enum=False)
+    _document_relation_list_get(cls, relation)
     return api.route(f'/<int:id>/{relation}')(cls)
 
 
 def _document_enum_name_relation_list_resource(cls, relation):
     api, _ = _get_api_swagger(cls)
-    _document_relation_list_get(cls, relation, is_enum=True)
+    _document_relation_list_get(cls, relation)
     return api.route(f'/name/<name>/{relation}')(cls)
 
 
