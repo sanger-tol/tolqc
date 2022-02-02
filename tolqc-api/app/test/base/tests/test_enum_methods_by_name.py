@@ -97,6 +97,44 @@ class TestEnumMethodsByName(BaseTestCase):
                 }]
             }
         )
+        # confirm that no state change occured
+        response = self.client.open(
+            '/api/v1/I/name/happy',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(
+            response.json,
+            {
+                'data': {
+                    'id': '4989',
+                    'type': 'I',
+                    'attributes': {
+                        'name': 'happy',
+                        'description': None
+                    },
+                    'relationships': {
+                        'J': {
+                            'links': {
+                                'related': '/I/4989/J'
+                            }
+                        }
+                    }
+                }
+            }
+        )
+        # assert that no new entry has been created
+        response = self.client.open(
+            '/api/v1/I/1337',
+            method='GET'
+        )
+        self.assert404(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
 
     def test_override_name_by_name_patch_200(self):
         # add an I
