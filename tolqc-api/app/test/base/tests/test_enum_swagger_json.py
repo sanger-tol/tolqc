@@ -23,3 +23,5 @@ class TestEnumSwaggerJson(BaseTestCase):
         assert '/I' in paths
         assert '/I/name/{name}' in paths
         assert '/I/{id}' in paths
+        assert '/I/name/{name}/J' in paths
+        assert '/I/{id}/J' in paths

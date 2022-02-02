@@ -85,9 +85,13 @@ class H_ModelLog(LogBase):
 class I_ModelEnum(EnumBase):
     __tablename__ = 'I'
     __table_args__ = {'extend_existing': True}
+    J = db.relationship('J_ModelEnumDependent', back_populates='I')
 
 
 @setup_model
-class J_ModelEnumDependent(EnumBase):
+class J_ModelEnumDependent(Base):
     __tablename__ = 'J'
     __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    i_id = db.Column(db.Integer, db.ForeignKey("I.id"), nullable=False)
+    I = db.relationship(I_ModelEnum, back_populates='J', foreign_keys=[i_id])

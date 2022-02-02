@@ -27,6 +27,13 @@ class TestEnumMethodsByName(BaseTestCase):
                     'attributes': {
                         'name': 'testing',
                         'description': None
+                    },
+                    'relationships': {
+                        'J': {
+                            'links': {
+                                'related': '/I/348598/J'
+                            }
+                        }
                     }
                 }
             }
@@ -122,6 +129,13 @@ class TestEnumMethodsByName(BaseTestCase):
                     'attributes': {
                         'name': 'new',
                         'description': None
+                    },
+                    'relationships': {
+                        'J': {
+                            'links': {
+                                'related': '/I/1480/J'
+                            }
+                        }
                     }
                 }
             }
