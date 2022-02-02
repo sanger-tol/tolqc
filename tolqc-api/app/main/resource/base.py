@@ -189,6 +189,15 @@ class BaseResource:
         return cls.Meta.service.is_enum_service()
 
     @classmethod
+    def setup(cls):
+        cls.add_list_resource()
+        cls.add_detail_resource()
+        cls.add_enum_name_detail_resource_if_enum()
+        cls.populate_relation_list_get_swaggers()
+        cls.add_relation_list_resources()
+        cls.add_enum_name_relation_list_resource_if_enum()
+
+    @classmethod
     def populate_relation_list_get_swaggers(cls):
         relationship_names = cls.Meta.service.get_model() \
                                      .get_one_to_many_relationship_names()
@@ -331,10 +340,5 @@ class BaseEnumNameRelationListResource(Resource):
 def setup_resource(cls):
     """Dynamically adds detail, list, and related list resources
     to a BaseResource inheritor."""
-    cls.add_list_resource()
-    cls.add_detail_resource()
-    cls.add_enum_name_detail_resource_if_enum()
-    cls.populate_relation_list_get_swaggers()
-    cls.add_relation_list_resources()
-    cls.add_enum_name_relation_list_resource_if_enum()
+    cls.setup()
     return cls
