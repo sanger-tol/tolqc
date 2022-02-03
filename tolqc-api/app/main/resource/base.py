@@ -189,13 +189,24 @@ class BaseResource:
         return cls.Meta.service.is_enum_service()
 
     @classmethod
-    def setup(cls):
+    def _setup_non_enum_resource(cls):
         cls.add_list_resource()
         cls.add_detail_resource()
         cls.add_enum_name_detail_resource_if_enum()
         cls.populate_relation_list_get_swaggers()
         cls.add_relation_list_resources()
         cls.add_enum_name_relation_list_resource_if_enum()
+
+    @classmethod
+    def _setup_enum_resource(cls):
+        pass
+
+    @classmethod
+    def setup(cls):
+        if cls.is_enum_resource():
+            cls._setup_enum_resource()
+        else:
+            cls._setup_non_enum_resource()
 
     @classmethod
     def populate_relation_list_get_swaggers(cls):
