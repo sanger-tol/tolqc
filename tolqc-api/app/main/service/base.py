@@ -368,23 +368,6 @@ class BaseService:
         return schema.dump(model_instances), 200
 
     @classmethod
-    @provide_parameters
-    @handle_400_bad_parameter
-    @handle_400_nonexistent_service
-    @handle_404
-    def read_bulk_related_by_name(cls, name, target_service_name, user_id=None, **kwargs):
-        """
-        Called on the service for the first part of the endpoint
-        e.g. A in /A/{name}/B
-
-        Used only for enum services
-        """
-        target_service = cls._get_target_service_by_name(target_service_name)
-        schema = target_service.get_schema(many=True)
-        model_instances = target_service.get_bulk_results_for_related_by_name(name, cls, **kwargs)
-        return schema.dump(model_instances), 200
-
-    @classmethod
     @handle_404
     def read_by_name(cls, name, user_id=None):
         """Used only for enum services"""
@@ -417,3 +400,20 @@ class BaseService:
         model_instance = cls.Meta.model.find_by_name(name)
         model_instance.delete()
         return None, 204
+
+    @classmethod
+    @provide_parameters
+    @handle_400_bad_parameter
+    @handle_400_nonexistent_service
+    @handle_404
+    def read_bulk_related_by_name(cls, name, target_service_name, user_id=None, **kwargs):
+        """
+        Called on the service for the first part of the endpoint
+        e.g. A in /A/{name}/B
+
+        Used only for enum services
+        """
+        target_service = cls._get_target_service_by_name(target_service_name)
+        schema = target_service.get_schema(many=True)
+        model_instances = target_service.get_bulk_results_for_related_by_name(name, cls, **kwargs)
+        return schema.dump(model_instances), 200
