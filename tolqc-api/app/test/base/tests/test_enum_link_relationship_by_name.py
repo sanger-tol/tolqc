@@ -6,6 +6,15 @@ from test.base import BaseTestCase
 
 
 class TestEnumLinkRelationshipByName(BaseTestCase):
+    def assertEnumValidationError(self, response):
+        errors = response.json.get('errors', [])
+        first_error = {} if not errors else errors[0]
+        error_title = first_error.get('title', None)
+        self.assertEqual(
+            error_title,
+            'Validation Error'
+        )
+
     def test_post_J_specify_I_by_name(self):
         self.add_I(id=4857, name='nicely')
         response = self.client.open(
@@ -125,7 +134,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        self.assertValidationError(response)
+        self.assertEnumValidationError(response)
 
     def test_specify_neither_id_nor_name_enum_I_for_J_400(self):
         self.add_I(id=32130, name='based')
@@ -150,7 +159,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        self.assertValidationError(response)
+        self.assertEnumValidationError(response)
 
     def test_specify_bad_name_enum_I_for_J_400(self):
         self.add_I(id=34857, name='epic')
@@ -176,4 +185,42 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        self.assertValidationError(response)
+        self.assertEnumValidationError(response)
+
+    def test_name_specification_on_non_enum_B_400(self):
+        self.add_A(id=39849)
+        response = self.client.open(
+            '/api/v1/B',
+            method='POST',
+            headers=self._get_api_key_1(),
+            json={
+                'data': {
+                    'type': 'B',
+                    'relationships': {
+                        'A': {
+                            'data': {
+                                'type': 'A',
+                                'name': 'name_not_supported'
+                            }
+                        }
+                    }
+                }
+            }
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert that it failed for the intended reason
+        self.assertEqual(
+            response.json,
+            {
+                'errors':
+                [{
+                    'detail': 'Must have an `id` field',
+                    'source': {
+                        'pointer': '/data/relationships/A/data'
+                    }
+                }]
+            }
+        )
