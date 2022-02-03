@@ -51,7 +51,7 @@ class StemInstanceDoesNotExistException(Exception):
     pass
 
 
-class StemEnumInstanceDoesNotExistException(Exception):
+class StemNamedEnumInstanceDoesNotExistException(Exception):
     """Used on 'related' endpoints concerning enum tables"""
     pass
 
@@ -238,7 +238,7 @@ class Base(db.Model):
                                      .filter_by(name=relation_name) \
                                      .one_or_none()
         if related_instance is None:
-            raise StemEnumInstanceDoesNotExistException()
+            raise StemNamedEnumInstanceDoesNotExistException()
         return related_instance.id
 
     @staticmethod
