@@ -15,6 +15,7 @@ from main.model import InstanceDoesNotExistException, \
                        BadParameterException, \
                        NamedEnumInstanceDoesNotExistException, \
                        NamedEnumStemInstanceDoesNotExistException
+from main.schema import BadEnumRelationshipException
 
 
 class BadParameterStringException(Exception):
@@ -75,6 +76,18 @@ def handle_400_marshmallow_error(function):
         except (ValidationError, IncorrectTypeError) as e:
             return cls.error_400_marshmallow(
                 e.messages
+            )
+    return wrapper
+
+
+def handle_400_bad_enum_error(function):
+    @wraps(function)
+    def wrapper(cls, *args, **kwargs):
+        try:
+            return function(cls, *args, **kwargs)
+        except BadEnumRelationshipException as e:
+            return cls.error_400_validation(
+                e.message
             )
     return wrapper
 
@@ -220,6 +233,14 @@ class BaseService:
         )
 
     @classmethod
+    def error_400_validation(cls, message):
+        return cls._custom_error(
+            'Validation Error',
+            400,
+            message
+        )
+
+    @classmethod
     def error_400_marshmallow(cls, messages):
         return messages, 400
 
@@ -313,6 +334,7 @@ class BaseService:
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
+    @handle_400_bad_enum_error
     @handle_400_marshmallow_error
     @handle_404
     def update_by_id(cls, id, data, user_id=None):
@@ -337,6 +359,7 @@ class BaseService:
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
+    @handle_400_bad_enum_error
     @handle_400_marshmallow_error
     def create(cls, data, user_id=None):
         schema = cls.Meta.schema()
@@ -378,6 +401,7 @@ class BaseService:
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
+    @handle_400_bad_enum_error
     @handle_400_marshmallow_error
     @handle_404
     def update_by_name(cls, name, data, user_id=None):

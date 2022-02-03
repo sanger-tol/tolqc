@@ -127,6 +127,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        self.assertValidationError(response)
 
     def test_specify_neither_id_nor_name_enum_I_for_J_400(self):
         self.add_I(id=32130, name='based')
@@ -151,6 +152,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        self.assertValidationError(response)
 
     def test_specify_bad_name_enum_I_for_J_400(self):
         self.add_I(id=34857, name='epic')
@@ -176,3 +178,4 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        self.assertValidationError(response)

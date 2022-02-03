@@ -30,6 +30,12 @@ class CombinedOpts(JsonapiSchemaOpts, SQLAlchemyAutoSchemaOpts):
     pass
 
 
+class BadEnumRelationshipException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
+
+
 class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     class BaseMeta(SQLAlchemyAutoSchema.Meta):
         strict = True
@@ -281,9 +287,11 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         specified_id = entry.get('id', None)
         specified_name = entry.get('name', None)
         if specified_id is None and specified_name is None:
-            raise ValidationError('On an enum relationship, an id or name must be specified.')
+            raise BadEnumRelationshipException(
+                'On an enum relationship, an id or name must be specified.'
+            )
         if specified_id is not None and specified_name is not None:
-            raise ValidationError(
+            raise BadEnumRelationshipException(
                 'On an enum relationship, only one of an id or name may be specified'
             )
 
@@ -296,7 +304,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         name = data[relationship_name]['data'].pop('name')
         id = target_model.get_id_from_name(name)
         if id is None:
-            raise ValidationError(f'No {relationship_name} exists with name "{name}".')
+            raise BadEnumRelationshipException(f'No {relationship_name} exists with name "{name}".')
         data[relationship_name]['data']['id'] = str(id)
         return data
 

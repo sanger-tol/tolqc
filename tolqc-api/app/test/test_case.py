@@ -110,3 +110,10 @@ class TestCase(FlaskTestCase):
 
     def assert201(self, response, *args):
         self.assertEqual(response.status_code, 201)
+
+    def assertValidationError(self, response):
+        error_title = response.json.get('errors', [])[0]['title']
+        self.assertEqual(
+            error_title,
+            'Validation Error'
+        )
