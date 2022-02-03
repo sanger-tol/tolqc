@@ -163,24 +163,10 @@ def _document_detail_resource(cls):
     return api.route('/<int:id>')(cls)
 
 
-def _document_enum_name_detail_resource(cls):
-    api, _ = _get_api_swagger(cls)
-    _document_detail_get(cls)
-    _document_patch(cls)
-    _document_delete(cls)
-    return api.route('/name/<name>')(cls)
-
-
 def _document_relation_list_resource(cls, relation):
     api, _ = _get_api_swagger(cls)
     _document_relation_list_get(cls, relation)
     return api.route(f'/<int:id>/{relation}')(cls)
-
-
-def _document_enum_name_relation_list_resource(cls, relation):
-    api, _ = _get_api_swagger(cls)
-    _document_relation_list_get(cls, relation)
-    return api.route(f'/name/<name>/{relation}')(cls)
 
 
 class BaseResource:
@@ -192,10 +178,8 @@ class BaseResource:
     def _setup_non_enum_resource(cls):
         cls.add_list_resource()
         cls.add_detail_resource()
-        cls.add_enum_name_detail_resource_if_enum()
         cls.populate_relation_list_get_swaggers()
         cls.add_relation_list_resources()
-        cls.add_enum_name_relation_list_resource_if_enum()
 
     @classmethod
     def _setup_enum_resource(cls):
@@ -233,17 +217,6 @@ class BaseResource:
         ))
 
     @classmethod
-    def add_enum_name_detail_resource_if_enum(cls):
-        if not cls.is_enum_resource():
-            return
-        type_ = cls.Meta.service.get_type()
-        cls.detail_resource = _document_enum_name_detail_resource(type(
-            f'{type_.title()}EnumNameDetailResource',
-            (BaseEnumNameDetailResource,),
-            {'Meta': cls.Meta}
-        ))
-
-    @classmethod
     def _declare_and_decorate_relation_list_resource(cls, relation_name):
         type_ = cls.Meta.service.get_type()
         declared = type(
@@ -259,27 +232,6 @@ class BaseResource:
                                      .get_one_to_many_relationship_names()
         cls.relation_list_resources = [
             cls._declare_and_decorate_relation_list_resource(r_name)
-            for r_name in relationship_names
-        ]
-
-    @classmethod
-    def _declare_and_decorate_enum_name_relation_list_resource(cls, relation_name):
-        type_ = cls.Meta.service.get_type()
-        declared = type(
-            f'{type_.title()}EnumNameRelationListResource_{relation_name}',
-            (BaseEnumNameRelationListResource,),
-            {'Meta': cls.Meta, 'relation': relation_name}
-        )
-        return _document_enum_name_relation_list_resource(declared, relation_name)
-
-    @classmethod
-    def add_enum_name_relation_list_resource_if_enum(cls):
-        if not cls.is_enum_resource():
-            return
-        relationship_names = cls.Meta.service.get_model() \
-                                     .get_one_to_many_relationship_names()
-        cls.enum_name_relation_list_resources = [
-            cls._declare_and_decorate_enum_name_relation_list_resource(r_name)
             for r_name in relationship_names
         ]
 
