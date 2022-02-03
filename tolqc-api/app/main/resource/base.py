@@ -169,6 +169,14 @@ def _document_relation_list_resource(cls, relation):
     return api.route(f'/<int:id>/{relation}')(cls)
 
 
+def _document_enum_detail_resource(cls):
+    api, _ = _get_api_swagger(cls)
+    _document_detail_get(cls)
+    _document_patch(cls)
+    _document_delete(cls)
+    return api.route('/<name>')(cls)
+
+
 class BaseResource:
     @classmethod
     def is_enum_resource(cls):
@@ -178,12 +186,14 @@ class BaseResource:
     def _setup_non_enum_resource(cls):
         cls.add_list_resource()
         cls.add_detail_resource()
+        #TODO remove relationships in schema/swagger to and from enums
         cls.populate_relation_list_get_swaggers()
         cls.add_relation_list_resources()
 
     @classmethod
     def _setup_enum_resource(cls):
-        pass
+        cls.add_list_resource()
+        cls.add_enum_detail_resource()
 
     @classmethod
     def setup(cls):
@@ -234,6 +244,15 @@ class BaseResource:
             cls._declare_and_decorate_relation_list_resource(r_name)
             for r_name in relationship_names
         ]
+
+    @classmethod
+    def add_enum_detail_resource(cls):
+        type_ = cls.Meta.service.get_type()
+        cls.detail_resource = _document_enum_detail_resource(type(
+            f'{type_.title()}DetailResource',
+            (BaseEnumNameDetailResource,),
+            {'Meta': cls.Meta}
+        ))
 
 
 class Resource(FlaskRestxResource):
