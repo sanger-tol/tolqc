@@ -18,7 +18,7 @@ from .user import api_user # noqa
 from .software_version import api_software_version # noqa
 from .status import api_status # noqa
 from .file import api_file # noqa
-from .accession_type_dict import api_accession_type_dict # noqa
+from .accession_type import api_accession_type # noqa
 from .accession import api_accession # noqa
 from .assembly_component import api_assembly_component # noqa
 from .status_dict import api_status_dict # noqa

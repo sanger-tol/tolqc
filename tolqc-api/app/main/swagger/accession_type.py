@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema import AccessionTypeDictSchema
+from main.schema import AccessionTypeSchema
 
 from .base import BaseSwagger, setup_swagger
 
 
 @setup_swagger
-class AccessionTypeDictSwagger(BaseSwagger):
+class AccessionTypeSwagger(BaseSwagger):
     class Meta:
-        schema = AccessionTypeDictSchema
+        schema = AccessionTypeSchema

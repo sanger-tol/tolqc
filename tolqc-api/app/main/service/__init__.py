@@ -19,7 +19,7 @@ from .user import UserService # noqa
 from .software_version import SoftwareVersionService # noqa
 from .status import StatusService # noqa
 from .file import FileService # noqa
-from .accession_type_dict import AccessionTypeDictService # noqa
+from .accession_type import AccessionTypeService # noqa
 from .accession import AccessionService # noqa
 from .assembly_component import AssemblyComponentService # noqa
 from .status_dict import StatusDictService # noqa

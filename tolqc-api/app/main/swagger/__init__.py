@@ -21,7 +21,7 @@ from .user import UserSwagger # noqa
 from .software_version import SoftwareVersionSwagger # noqa
 from .status import StatusSwagger # noqa
 from .file import FileSwagger # noqa
-from .accession_type_dict import AccessionTypeDictSwagger # noqa
+from .accession_type import AccessionTypeSwagger # noqa
 from .accession import AccessionSwagger # noqa
 from .assembly_component import AssemblyComponentSwagger # noqa
 from .status_dict import StatusDictSwagger # noqa
