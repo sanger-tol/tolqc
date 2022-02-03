@@ -32,3 +32,11 @@ class EnumBase(Base):
         if instance is None:
             raise NamedEnumInstanceDoesNotExistException()
         return instance
+
+    @classmethod
+    def get_id_from_name(cls, name):
+        query = db.session.query(cls)
+        instance = query.filter_by(name=name).one_or_none()
+        if instance is None:
+            return None
+        return instance.id

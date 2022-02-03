@@ -92,7 +92,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _create_many_to_one_relationship_field_by_name(cls, foreign_key_name):
-        target_table, target_column = cls.Meta.model.get_target_table_column_from_foreign_key(
+        model = cls.Meta.model
+        target_table, target_column = model.get_target_table_column_from_foreign_key(
             foreign_key_name
         )
         special_name = cls._lookup_special_relationship_name(
@@ -101,7 +102,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         )
         cls.many_to_one_relationship_info[special_name] = {
             "target_table": target_table,
-            "foreign_key_name": foreign_key_name
+            "foreign_key_name": foreign_key_name,
+            'is_enum': model.relation_is_enum(target_table)
         }
         return special_name, cls._create_many_to_one_relationship_field(
             target_table,
@@ -275,9 +277,57 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 f'Extra fields are not permitted on {self.get_type()}.'
             )
 
+    def _validate_relationship_entry(self, entry):
+        specified_id = entry.get('id', None)
+        specified_name = entry.get('name', None)
+        if specified_id is None and specified_name is None:
+            raise ValidationError('On an enum relationship, an id or name must be specified.')
+        if specified_id is not None and specified_name is not None:
+            raise ValidationError(
+                'On an enum relationship, only one of an id or name may be specified'
+            )
+
+    def _id_is_on_enum_relationship_entry(self, entry):
+        specified_id = entry.get('id', None)
+        return specified_id is not None
+
+    def _update_data_name_to_id_on_enum_relationship_entry(self, data, special_name, target_table):
+        target_model = self.Meta.model.get_model_by_type(target_table)
+        name = data[special_name]['data'].pop('name')
+        id = target_model.get_id_from_name(name)
+        data[special_name]['data']['id'] = str(id)
+        return data
+
+    def _preprocess_name_to_id_individual(self, data, special_name, target_table):
+        entry = data.get(special_name, {}).get('data', None)
+        if entry is None:
+            return data
+        self._validate_relationship_entry(entry)
+        if self._id_is_on_enum_relationship_entry(entry):
+            return data
+        return self._update_data_name_to_id_on_enum_relationship_entry(
+            data,
+            special_name,
+            target_table
+        )
+
+    def _preprocess_names_to_id_if_enum(self, data):
+        """Looksup id from name, for all enum relationships"""
+        if not self.many_to_one_relationship_info:
+            return data
+        for special_name, target_info in self.many_to_one_relationship_info.items():
+            if target_info['is_enum']:
+                data = self._preprocess_name_to_id_individual(
+                    data,
+                    special_name,
+                    target_info['target_table']
+                )
+        return data
+
     @pre_load
     def preprocess_instance(self, data, **kwargs):
         self._remove_resource_metadata(data)
+        data = self._preprocess_names_to_id_if_enum(data)
         return data
 
     @post_load

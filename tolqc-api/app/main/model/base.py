@@ -80,9 +80,13 @@ class Base(db.Model):
     """
     __abstract__ = True
 
+    # a dict in which all inhertied classes are registered during setup
+    model_registry_dict = {}
+
     @classmethod
     def setup(cls):
         cls._populate_target_table_dict()
+        cls._register_model()
 
     def to_dict(self, exclude_column_names=[]):
         return {
@@ -91,6 +95,20 @@ class Base(db.Model):
             in self.get_column_names()
             if column_name not in exclude_column_names
         }
+
+    @classmethod
+    def _register_model(cls):
+        type_ = cls.__tablename__
+        cls.model_registry_dict[type_] = cls
+
+    @classmethod
+    def get_model_by_type(cls, type_):
+        return cls.model_registry_dict[type_]
+
+    @classmethod
+    def model_is_enum(cls, type_):
+        model = cls.get_model_by_type(type_)
+        return model.is_enum_table()
 
     def add(self):
         db.session.add(self)
@@ -278,15 +296,20 @@ class Base(db.Model):
             c for c in columns
             if len(c.foreign_keys) == 1
         ]
-        cls.target_table_dict = {
+        cls.target_table_column_dict = {
             cls._get_target_table_from_column(column): column
             for column
             in foreign_keys_columns
         }
 
     @classmethod
+    def relation_is_enum(cls, type_):
+        relation_model = cls.get_model_by_type(type_)
+        return relation_model.is_enum_table()
+
+    @classmethod
     def _get_foreign_key_from_relation_model(cls, relation_model):
-        return cls.target_table_dict[relation_model.__tablename__]
+        return cls.target_table_column_dict[relation_model.__tablename__]
 
     @classmethod
     def _get_columns(cls):
