@@ -15,7 +15,7 @@ from main.model import InstanceDoesNotExistException, \
                        BadParameterException, \
                        NamedEnumInstanceDoesNotExistException, \
                        NamedEnumStemInstanceDoesNotExistException
-from main.schema import BadEnumRelationshipException
+from main.schema import BadEnumNameException
 
 
 class BadParameterStringException(Exception):
@@ -77,7 +77,7 @@ def handle_400_data_validation_error(function):
             return cls.error_400_marshmallow(
                 e.messages
             )
-        except BadEnumRelationshipException as e:
+        except BadEnumNameException as e:
             return cls.error_400_validation(
                 e.message
             )

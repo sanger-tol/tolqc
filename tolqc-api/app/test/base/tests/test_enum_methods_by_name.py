@@ -27,13 +27,6 @@ class TestEnumMethodsByName(BaseTestCase):
                     'attributes': {
                         'name': 'testing',
                         'description': None
-                    },
-                    'relationships': {
-                        'J': {
-                            'links': {
-                                'related': '/I/348598/J'
-                            }
-                        }
                     }
                 }
             }
@@ -55,7 +48,7 @@ class TestEnumMethodsByName(BaseTestCase):
         self.add_I(id=348523, name='nice')
         # get a non-existent name
         response = self.client.open(
-            '/api/v1/I/name/not_nice',
+            '/api/v1/I/not_nice',
             method='GET'
         )
         self.assert404(
@@ -115,13 +108,6 @@ class TestEnumMethodsByName(BaseTestCase):
                     'attributes': {
                         'name': 'happy',
                         'description': None
-                    },
-                    'relationships': {
-                        'J': {
-                            'links': {
-                                'related': '/I/4989/J'
-                            }
-                        }
                     }
                 }
             }
@@ -167,13 +153,6 @@ class TestEnumMethodsByName(BaseTestCase):
                     'attributes': {
                         'name': 'new',
                         'description': None
-                    },
-                    'relationships': {
-                        'J': {
-                            'links': {
-                                'related': '/I/1480/J'
-                            }
-                        }
                     }
                 }
             }

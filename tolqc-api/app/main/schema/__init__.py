@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import BadEnumRelationshipException # noqa
+from .base import BadEnumNameException # noqa
 
 from .sex import SexSchema # noqa
 from .allocation import AllocationSchema # noqa
