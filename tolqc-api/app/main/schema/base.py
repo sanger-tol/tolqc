@@ -299,12 +299,14 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         specified_id = entry.get('id', None)
         return specified_id is not None
 
-    def _update_data_name_to_id_on_enum_relationship_entry(self, data, relationship_name, relation_model_name):
-        target_model = self.Meta.model.get_model_by_type(relation_model_name)
+    def _update_data_name_to_id_on_enum_entry(self, data, relationship_name, target_model_name):
+        target_model = self.Meta.model.get_model_by_type(target_model_name)
         name = data[relationship_name]['data'].pop('name')
         id = target_model.get_id_from_name(name)
         if id is None:
-            raise BadEnumRelationshipException(f'No {relationship_name} exists with name "{name}".')
+            raise BadEnumRelationshipException(
+                f'No {relationship_name} exists with name "{name}".'
+            )
         data[relationship_name]['data']['id'] = str(id)
         return data
 
@@ -315,7 +317,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         self._validate_relationship_entry(entry)
         if self._id_is_on_enum_relationship_entry(entry):
             return data
-        return self._update_data_name_to_id_on_enum_relationship_entry(
+        return self._update_data_name_to_id_on_enum_entry(
             data,
             special_name,
             target_table
