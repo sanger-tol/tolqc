@@ -127,3 +127,27 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+
+    def test_specify_neither_id_nor_name_enum_I_for_J_400(self):
+        self.add_I(id=32130, name='based')
+        response = self.client.open(
+            '/api/v1/J',
+            method='POST',
+            headers=self._get_api_key_1(),
+            json={
+                'data': {
+                    'type': 'J',
+                    'relationships': {
+                        'I': {
+                            'data': {
+                                'type': 'I'
+                            }
+                        }
+                    }
+                }
+            }
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
