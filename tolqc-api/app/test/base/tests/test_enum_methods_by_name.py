@@ -53,7 +53,7 @@ class TestEnumMethodsByName(BaseTestCase):
     def test_I_get_by_bad_name_404(self):
         # add an irrelevant I
         self.add_I(id=348523, name='nice')
-        # get a non-exsistent name
+        # get a non-existent name
         response = self.client.open(
             '/api/v1/I/name/not_nice',
             method='GET'
