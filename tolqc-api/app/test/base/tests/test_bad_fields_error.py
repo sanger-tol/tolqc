@@ -15,15 +15,15 @@ class TestBadFieldsError(BaseTestCase):
                 'data': {
                     'id': 9999,
                     'type': 'B',
-                },
-                "relationships": {
-                    "A": {
-                        "data": {
-                            "type": 'A',
-                            "id": 9090
+                    "relationships": {
+                        "A": {
+                            "data": {
+                                "type": 'A',
+                                "id": 9090
+                            }
                         }
                     }
-                }
+                },
             },
             headers=self._get_api_key_1()
         )

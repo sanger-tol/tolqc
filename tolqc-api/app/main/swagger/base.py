@@ -196,6 +196,9 @@ class BaseSwagger:
                 **one_to_many_relationships_dict
             }
 
+        if not all_relationships_dict:
+            return None
+
         return {
             'type': 'object',
             'properties': all_relationships_dict
@@ -203,32 +206,37 @@ class BaseSwagger:
 
     @classmethod
     def get_resource_object_schema_model(cls, is_request=True):
-        schema_model = {
+        relationships = cls._get_relationships_dict(is_request)
+        id_dict = {
+            'type': 'string',
+            'default': '1'
+        }
+        meta_ext_dict = {
+            'type': 'object',
+            'properties': {
+                'ext': {
+                    'type': 'object'
+                }
+            }
+        }
+        return {
             "type": "object",
             'properties': {
                 'type': {
                     'type': 'string',
                     'default': cls.get_type()
                 },
+                # don't insert into dict if condition isn't met
+                **({'id': id_dict} if not is_request else {}),
                 'attributes': cls._get_attributes_dict(is_request),
-                'relationships': cls._get_relationships_dict(is_request)
+                **({
+                    'relationships': relationships
+                } if relationships is not None else {}),
+                **({
+                    'meta': meta_ext_dict
+                } if cls.Meta.schema.has_ext_field() else {})
             }
         }
-        if cls.Meta.schema.has_ext_field():
-            schema_model['properties']['meta'] = {
-                'type': 'object',
-                'properties': {
-                    'ext': {
-                        'type': 'object'
-                    }
-                }
-            }
-        if not is_request:
-            schema_model['properties']['id'] = {
-                'type': 'string',
-                'default': '1'
-            }
-        return schema_model
 
     @classmethod
     def _get_request_schema_model(cls):
