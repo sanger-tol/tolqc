@@ -16,6 +16,10 @@ class BaseSwagger:
     swagger_registry_dict = {}
 
     @classmethod
+    def is_enum_swagger(cls):
+        return cls.Meta.schema.is_enum_schema()
+
+    @classmethod
     def get_registered_swagger(cls, type_):
         return cls.swagger_registry_dict[type_]
 
@@ -287,10 +291,11 @@ class BaseSwagger:
     @classmethod
     def _create_api(cls):
         type_ = cls.get_type()
+        path = f'/enum/{type_}' if cls.is_enum_swagger() else f'/{type_}'
         cls.api = Namespace(
             type_,
             description=f'Methods relating to {type_}',
-            path=f'/{type_}'
+            path=path
         )
 
     @classmethod
