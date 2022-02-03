@@ -14,7 +14,7 @@ from main.model import InstanceDoesNotExistException, \
                        StemInstanceDoesNotExistException, \
                        BadParameterException, \
                        NamedEnumInstanceDoesNotExistException, \
-                       NamedStemEnumInstanceDoesNotExistException
+                       NamedEnumStemInstanceDoesNotExistException
 
 
 class BadParameterStringException(Exception):
@@ -46,9 +46,9 @@ def handle_404(function):
             return cls.error_404(identifier)
         except (
             NamedEnumInstanceDoesNotExistException,
-            NamedStemEnumInstanceDoesNotExistException
+            NamedEnumStemInstanceDoesNotExistException
         ):
-            return cls.error_404_enum(identifier)
+            return cls.error_404_named_enum(identifier)
     return wrapper
 
 
@@ -240,7 +240,7 @@ class BaseService:
         )
 
     @classmethod
-    def error_404_enum(cls, name):
+    def error_404_named_enum(cls, name):
         return cls._custom_error(
             "Not Found",
             404,

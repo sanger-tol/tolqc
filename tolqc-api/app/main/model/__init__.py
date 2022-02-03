@@ -6,7 +6,7 @@ from .base import db, Base, \
                   ExtraFieldsNotPermittedException, \
                   StemInstanceDoesNotExistException, \
                   InstanceDoesNotExistException, \
-                  NamedStemEnumInstanceDoesNotExistException, \
+                  NamedEnumStemInstanceDoesNotExistException, \
                   BadParameterException # noqa
 from .log_base import LogBase # noqa
 from .enum_base import NamedEnumInstanceDoesNotExistException # noqa
