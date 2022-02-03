@@ -121,11 +121,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def _create_many_to_one_relationship_fields(cls):
         cls.many_to_one_relationship_info = {}
-    
-        # don't populate this on enum schemas
-        if cls.is_enum_schema():
-            return {}
-
         foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
         # maps the relationship name to its target table
         pairs = [
@@ -148,6 +143,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _create_one_to_many_relationship_fields(cls):
+        # don't populate this on enum schemas
+        if cls.is_enum_schema():
+            cls.one_to_many_relationship_names = []
+            return {}
         cls.one_to_many_relationship_names = cls.Meta.model.get_one_to_many_relationship_names()
         return {
             name: cls._create_one_to_many_relationship_field_by_name(name)
