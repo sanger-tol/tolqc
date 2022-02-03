@@ -6,7 +6,7 @@ from test.base import BaseTestCase
 
 
 class TestEnumLinkRelationshipByName(BaseTestCase):
-    def _assertEnumValidationError(self, response):
+    def _assert_enum_validation_error(self, response):
         errors = response.json.get('errors', [])
         first_error = {} if not errors else errors[0]
         error_title = first_error.get('title', None)
@@ -134,7 +134,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        self._assertEnumValidationError(response)
+        self._assert_enum_validation_error(response)
 
     def test_specify_neither_id_nor_name_enum_I_for_J_400(self):
         self.add_I(id=32130, name='based')
@@ -159,7 +159,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        self._assertEnumValidationError(response)
+        self._assert_enum_validation_error(response)
 
     def test_specify_bad_name_enum_I_for_J_400(self):
         self.add_I(id=34857, name='epic')
@@ -185,7 +185,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
-        self._assertEnumValidationError(response)
+        self._assert_enum_validation_error(response)
 
     def test_name_specification_on_non_enum_B_400(self):
         self.add_A(id=39849)
