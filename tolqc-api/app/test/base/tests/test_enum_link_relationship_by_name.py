@@ -6,6 +6,7 @@ from test.base import BaseTestCase
 
 
 class TestEnumLinkRelationshipByName(BaseTestCase):
+    #TODO test the various breakage paths for specifying both name and id, neither name nor id, and name on non enum schema!
     def test_post_J_specify_I_by_name(self):
         self.add_I(id=4857, name='nicely')
         response = self.client.open(

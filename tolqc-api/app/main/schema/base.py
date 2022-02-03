@@ -291,8 +291,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         specified_id = entry.get('id', None)
         return specified_id is not None
 
-    def _update_data_name_to_id_on_enum_relationship_entry(self, data, special_name, target_table):
-        target_model = self.Meta.model.get_model_by_type(target_table)
+    def _update_data_name_to_id_on_enum_relationship_entry(self, data, special_name, relation_model_name):
+        target_model = self.Meta.model.get_model_by_type(relation_model_name)
         name = data[special_name]['data'].pop('name')
         id = target_model.get_id_from_name(name)
         data[special_name]['data']['id'] = str(id)
