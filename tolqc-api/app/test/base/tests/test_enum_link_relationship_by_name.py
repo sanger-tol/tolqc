@@ -27,7 +27,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             }
         )
         self.assert201(response)
-        
+
         # get non predictable id
         created_id = response.json['data']['id']
 
