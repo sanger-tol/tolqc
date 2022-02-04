@@ -119,6 +119,11 @@ class BaseSwagger:
             for field_name, python_type in cls.attributes
             if not (is_request and field_name in exclude_on_request)
         }
+        if 'name' in attributes and cls.is_enum_swagger():
+            attributes['name'] = {
+                'type': 'string',
+                'default': "name"
+            }
         return {
             'type': 'object',
             'properties': attributes
