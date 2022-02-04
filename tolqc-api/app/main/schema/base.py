@@ -156,10 +156,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _create_one_to_many_relationship_fields(cls):
-        # don't populate this on enum schemas
-        if cls.is_enum_schema():
-            cls.one_to_many_relationship_names = []
-            return {}
         cls.one_to_many_relationship_names = cls.Meta.model.get_one_to_many_relationship_names()
         return {
             name: cls._create_one_to_many_relationship_field_by_name(name)

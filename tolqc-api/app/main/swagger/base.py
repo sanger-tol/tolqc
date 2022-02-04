@@ -155,7 +155,7 @@ class BaseSwagger:
                     'properties': {
                         'related': {
                             'type': 'string',
-                            'default': f'/{cls.get_type()}/1/{relation_name}'
+                            'default': f'{cls._get_api_path()}/name/{relation_name}'
                         }
                     }
                 }
