@@ -211,11 +211,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def get_dynamically_added_fields(cls):
-        relationship_fields = cls._create_relationship_fields()
-        other_fields = cls._get_dynamically_added_non_relationship_fields()
         return {
-            **relationship_fields,
-            **other_fields
+            **cls._create_relationship_fields(),
+            **cls._get_dynamically_added_non_relationship_fields()
         }
 
     @classmethod
