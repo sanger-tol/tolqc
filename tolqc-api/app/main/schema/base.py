@@ -278,6 +278,12 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             if value is not None
         }
 
+    def _add_enum_foreign_keys(self, data):
+        return {
+            **data,
+            **self._emum_foreign_key_values
+        }
+
     def _make_instance_including_ext(self, data, **kwargs):
         instance = self.instance
         ext = self._resource_meta.pop('ext', None)
@@ -338,6 +344,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @post_load
     def make_instance(self, data, **kwargs):
         # make_instance overrides part of a private API
+        data = self._add_enum_foreign_keys(data)
         if self.has_ext_field():
             return self._make_instance_including_ext(data, **kwargs)
         return self._make_instance_without_ext(data, **kwargs)

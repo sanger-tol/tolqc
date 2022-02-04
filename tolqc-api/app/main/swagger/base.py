@@ -315,7 +315,7 @@ class BaseSwagger:
     def _create_api(cls):
         cls.api = Namespace(
             cls.get_type(),
-            description=cls._get_api_description(),
+            description=cls._get_api_description(),#TODO fix this, it's not showing
             path=cls._get_api_path()
         )
 
