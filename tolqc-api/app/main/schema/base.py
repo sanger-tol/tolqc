@@ -424,28 +424,40 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
         return datum
 
-    def _insert_enum_names_to_datum(self, datum, enum_datum):
+    def _insert_enum_names_to_datum_attributes(self, datum, enum_datum):
         if not enum_datum:
             return datum
         for target_table, enum_name in enum_datum.items():
             datum[target_table] = enum_name
         return datum
 
+    def _get_datum_with_inserted_enum_names(self, datum, enum_datum):
+        attributes = self._insert_enum_names_to_datum_attributes(
+            datum.get('attributes', {}),
+            enum_datum
+        )
+        if attributes:
+            datum['attributes'] = attributes
+        return datum
+
     def _insert_enum_names(self, data, many):
+        #TODO add enum check here for performance purposes
         if many:
             data['data'] = [
-                self._insert_enum_names_to_datum(
-                    datum,
-                    enum_name_datum
+                self._get_datum_with_inserted_enum_names(
+                    datum, enum_name_datum
                 )
                 for datum, enum_name_datum
                 in zip(data['data'], self._enum_name_data)
             ]
         else:
-            data['data'] = self._insert_enum_names_to_datum(
+            data['data'] = self._get_datum_with_inserted_enum_names(
                 data['data'],
                 self._enum_name_data
             )
+        #reemove
+        import logging
+        logging.warning(data)
         return data
 
     def _reinsert_ext_data(self, data, many):
@@ -470,7 +482,4 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def postprocess_data(self, data, many, **kwargs):
         data = self._insert_enum_names(data, many)
         data = self._reinsert_ext_data(data, many)
-        #reemove
-        import logging
-        logging.warning(data)
         return data
