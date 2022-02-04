@@ -297,13 +297,21 @@ class BaseSwagger:
         cls.attributes = schema.get_included_attributes()
 
     @classmethod
-    def _create_api(cls):
+    def _get_api_path(cls):
         type_ = cls.get_type()
-        path = f'/enum/{type_}' if cls.is_enum_swagger() else f'/{type_}'
+        return f'/enum/{type_}' if cls.is_enum_swagger() else f'/{type_}'
+
+    @classmethod
+    def _get_api_description(cls):
+        type_ = cls.get_type()
+        return f'Methods relating to {type_}',
+
+    @classmethod
+    def _create_api(cls):
         cls.api = Namespace(
-            type_,
-            description=f'Methods relating to {type_}',
-            path=path
+            cls.get_type(),
+            description=cls._get_api_description(),
+            path=cls._get_api_path()
         )
 
     @classmethod
