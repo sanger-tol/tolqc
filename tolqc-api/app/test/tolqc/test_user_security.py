@@ -185,14 +185,6 @@ class TestUserSecurity(TolqcTestCase):
                         'name': 'component_no_1',
                         'description': 'this is a description',
                         'created_at': str(datetime.now())
-                    },
-                    'relationships': {
-                        'creator': {
-                            'data': {
-                                'type': 'user',
-                                'id': '100'
-                            }
-                        }
                     }
                 }
             },
