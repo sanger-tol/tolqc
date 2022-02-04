@@ -331,14 +331,14 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             if key not in enum_keys
         }
 
-    def _preprocess_and_remove_enum_names(self, data):
+    def _remove_enum_names(self, data):
         enum_keys = self._preprocess_enum_names(data)
         return self._remove_enum_keys(data, enum_keys)
 
     @pre_load
     def preprocess_instance(self, data, **kwargs):
         self._remove_resource_metadata(data)
-        self._preprocess_and_remove_enum_names(data)
+        self._remove_enum_names(data)
         return data
 
     @post_load
