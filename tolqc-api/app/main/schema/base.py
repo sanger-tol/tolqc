@@ -296,21 +296,43 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 f'Extra fields are not permitted on {self.get_type()}.'
             )
 
-    def _validate_relationship_entry(self, entry):
-        specified_id = entry.get('id', None)
-        specified_name = entry.get('name', None)
-        if specified_id is None and specified_name is None:
-            raise BadEnumNameException(
-                'On an enum relationship, an id or name must be specified.'
-            )
-        if specified_id is not None and specified_name is not None:
-            raise BadEnumNameException(
-                'On an enum relationship, only one of an id or name may be specified'
-            )
+    @classmethod
+    def _get_id_from_enum_detail(cls, data, target_table):
+        enum_name = data.get(target_table, None)
+        if enum_name is None:
+            return None
+        return cls.Meta.model.get_relation_id_by_enum_name(
+            target_table,
+            enum_name
+        )
+
+
+    def _preprocess_enum_names(self, data):
+        enum_details = self.Meta.model.get_enum_relationship_details()
+        pairs = [
+            (f_key, self._get_id_from_enum_detail(data, t_table))
+            for f_key, t_table in enum_details
+        ]
+        self._emum_foreign_key_values = {
+            key: value for key, value in pairs
+            if value is not None
+        }
+        return [target_table for (_, target_table) in enum_details]
+
+    def _remove_enum_keys(self, data, enum_keys):
+        data = {
+            key: value for key, value in data.items()
+            if key not in enum_keys
+        }
+
+    def _preprocess_and_remove_enum_names(self, data):
+        enum_keys = self._preprocess_enum_names(data)
+        return self._remove_enum_keys(data, enum_keys)
 
     @pre_load
     def preprocess_instance(self, data, **kwargs):
         self._remove_resource_metadata(data)
+        self._preprocess_and_remove_enum_names(data)
         return data
 
     @post_load

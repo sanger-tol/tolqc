@@ -364,13 +364,18 @@ class Base(db.Model):
         return foreign_keys, target_tables
 
     @classmethod
-    def get_enum_foreign_key_names(cls):
+    def get_enum_relationship_details(cls):
         foreign_keys, target_tables = cls._get_foreign_keys_and_target_tables()
         return [
-            column_name for column_name, target_table
+            (column_name, target_table) for column_name, target_table
             in zip(foreign_keys, target_tables)
             if cls.relation_is_enum(target_table)
         ]
+
+    @classmethod
+    def get_relation_id_by_enum_name(cls, relation_type, enum_name):
+        relation_model = cls.get_model_by_type(relation_type)
+        return relation_model.get_id_from_name(enum_name)
 
     @classmethod
     def _get_related_enum_table_names(cls):
