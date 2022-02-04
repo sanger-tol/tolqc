@@ -8,6 +8,8 @@ from .base import setup_model
 
 @setup_model
 class TolqcAccession(LogBase):
+    #TODO check that enum foreign_keys don't appear bare in schemas/swaggers.
+    #make them a pseudo-attribute on schema/swagger called the enum type
     __tablename__ = "accession"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
