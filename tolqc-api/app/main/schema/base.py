@@ -132,7 +132,18 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
-    def _create_one_to_many_relationship_field_by_name(cls, name):
+    def _create_one_to_many_relationship_field_by_name_enum(cls, r_name):
+        #TODO test that the enum stem is present and correct
+        return Relationship(
+            f'/enum/{cls.get_type()}/{{name}}/{r_name}',
+            related_url_kwargs={'name': '<name>'},
+            many=True,
+            type_=r_name,
+            dump_default=lambda: []
+        )
+
+    @classmethod
+    def _create_one_to_many_relationship_field_by_name_non_enum(cls, name):
         return Relationship(
             f'/{cls.get_type()}/{{id}}/{name}',
             related_url_kwargs={'id': '<id>'},
@@ -140,6 +151,12 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             type_=name,
             dump_default=lambda: []
         )
+
+    @classmethod
+    def _create_one_to_many_relationship_field_by_name(cls, name):
+        if cls.is_enum_schema():
+            return cls._create_one_to_many_relationship_field_by_name_enum(name)
+        return cls._create_one_to_many_relationship_field_by_name_non_enum(name)
 
     @classmethod
     def _create_one_to_many_relationship_fields(cls):
