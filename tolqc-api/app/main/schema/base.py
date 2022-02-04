@@ -424,8 +424,31 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
         return datum
 
-    @post_dump(pass_many=True)
-    def re_insert_ext_data(self, data, many, **kwargs):
+    def _insert_enum_names_to_datum(self, datum, enum_datum):
+        if not enum_datum:
+            return datum
+        for target_table, enum_name in enum_datum.items():
+            datum[target_table] = enum_name
+        return datum
+
+    def _insert_enum_names(self, data, many):
+        if many:
+            data['data'] = [
+                self._insert_enum_names_to_datum(
+                    datum,
+                    enum_name_datum
+                )
+                for datum, enum_name_datum
+                in zip(data['data'], self._enum_name_data)
+            ]
+        else:
+            data['data'] = self._insert_enum_names_to_datum(
+                data['data'],
+                self._enum_name_data
+            )
+        return data
+
+    def _reinsert_ext_data(self, data, many):
         if not self.has_ext_field():
             return data
 
@@ -441,4 +464,13 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 self._ext_data
             )
 
+        return data
+
+    @post_dump(pass_many=True)
+    def postprocess_data(self, data, many, **kwargs):
+        data = self._insert_enum_names(data, many)
+        data = self._reinsert_ext_data(data, many)
+        #reemove
+        import logging
+        logging.warning(data)
         return data
