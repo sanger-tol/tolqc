@@ -170,13 +170,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _create_relationship_fields(cls):
-        many_to_one_relationship_fields = cls._create_many_to_one_relationship_fields()
-        one_to_many_relationship_fields = cls._create_one_to_many_relationship_fields()
-        all_relationship_fields = {
-            **many_to_one_relationship_fields,
-            **one_to_many_relationship_fields
+        return {
+            **cls._create_many_to_one_relationship_fields(),
+            **cls._create_one_to_many_relationship_fields()
         }
-        return all_relationship_fields
 
     @classmethod
     def _get_possibly_empty_resource_meta_field(cls):
