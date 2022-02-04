@@ -441,7 +441,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return datum
 
     def _insert_enum_names(self, data, many):
-        #TODO add enum check here for performance purposes
+        if not self.is_enum_schema():
+            return data
+
         if many:
             data['data'] = [
                 self._get_datum_with_inserted_enum_names(
@@ -455,9 +457,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 data['data'],
                 self._enum_name_data
             )
-        #reemove
-        import logging
-        logging.warning(data)
+
         return data
 
     def _reinsert_ext_data(self, data, many):
