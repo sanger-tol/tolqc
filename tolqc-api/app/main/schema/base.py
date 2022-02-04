@@ -46,7 +46,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     id = Str(dump_only=True)
 
     def __init__(self, **kwargs):
-        exclude = kwargs.get('exclude', []) + self.get_excluded_columns()
+        exclude = kwargs.pop('exclude', []) + self.get_excluded_columns()
         return super().__init__(exclude=exclude, **kwargs)
 
     @classmethod
