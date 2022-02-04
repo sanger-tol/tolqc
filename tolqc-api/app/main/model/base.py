@@ -6,6 +6,7 @@ import dateutil.parser
 import json
 
 from datetime import datetime
+from responses import target
 from sqlalchemy import and_
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
@@ -352,6 +353,36 @@ class Base(db.Model):
         return [
             c.name for c in cls._get_columns()
             if c.foreign_keys
+            and c.name not in cls._get_enum_foreign_key_names()
+        ]
+
+    @classmethod
+    def _get_foreign_keys_and_target_tables(cls):
+        foreign_keys = [
+            c.name for c in cls._get_columns()
+            if c.foreign_keys
+        ]
+        target_tables = [
+            cls.get_target_table_column_from_foreign_key(c_name)[0]
+            for c_name in foreign_keys
+        ]
+        return foreign_keys, target_tables
+
+    @classmethod
+    def _get_enum_foreign_key_names(cls):
+        foreign_keys, target_tables = cls._get_foreign_keys_and_target_tables()
+        return [
+            column_name for column_name, target_table
+            in zip(foreign_keys, target_tables)
+            if cls.relation_is_enum(target_table)
+        ]
+
+    @classmethod
+    def _get_related_enum_table_names(cls):
+        _, target_tables = cls._get_foreign_keys_and_target_tables()
+        return [
+            t_table for t_table in target_tables
+            if cls.relation_is_enum(t_table)
         ]
 
     @classmethod

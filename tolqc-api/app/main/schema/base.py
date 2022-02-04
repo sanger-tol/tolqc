@@ -108,8 +108,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         )
         cls.many_to_one_relationship_info[special_name] = {
             "target_table": target_table,
-            "foreign_key_name": foreign_key_name,
-            'is_enum': model.relation_is_enum(target_table)
+            "foreign_key_name": foreign_key_name
         }
         return special_name, cls._create_many_to_one_relationship_field(
             target_table,
@@ -344,23 +343,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             target_table
         )
 
-    def _preprocess_names_to_id_if_enum(self, data):
-        """Looksup id from name, for all enum relationships"""
-        if not self.many_to_one_relationship_info:
-            return data
-        for special_name, target_info in self.many_to_one_relationship_info.items():
-            if target_info['is_enum']:
-                data = self._preprocess_name_to_id_individual(
-                    data,
-                    special_name,
-                    target_info['target_table']
-                )
-        return data
-
     @pre_load
     def preprocess_instance(self, data, **kwargs):
         self._remove_resource_metadata(data)
-        data = self._preprocess_names_to_id_if_enum(data)
         return data
 
     @post_load
