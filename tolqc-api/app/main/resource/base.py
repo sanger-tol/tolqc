@@ -310,6 +310,7 @@ class BaseRelationListResource(Resource):
 
 
 class BaseEnumNameRelationListResource(Resource):
+    #TODO remove this if unused
     @classmethod
     def get(cls, name, user_id=None):
         return cls.Meta.service.read_bulk_related_by_name(
