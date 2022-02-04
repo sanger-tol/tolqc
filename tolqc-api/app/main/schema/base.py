@@ -14,16 +14,8 @@ from marshmallow_jsonapi.fields import ResourceMeta, Relationship, Str, \
 from main.model import db
 
 
-def setup_schema(OldCls):
-    """Dynamically adds fields to a Schema Class inheriting
-    from BaseSchema"""
-    OldCls.setup()
-    NewCls = type(
-        f'_{OldCls.get_type().title()}Schema',
-        (OldCls,),
-        OldCls.get_dynamically_added_fields()
-    )
-    return NewCls
+def setup_schema(cls):
+    return cls.setup()
 
 
 class CombinedOpts(JsonapiSchemaOpts, SQLAlchemyAutoSchemaOpts):
@@ -48,9 +40,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         @classmethod
         def setup_meta(cls):
             cls.type_ = cls.model.__tablename__
-            cls.self_view = cls.type_
-            cls.self_view_kwargs = {cls.type_: "<id>"}
-            cls.self_view_many = cls.type_
 
     OPTIONS_CLASS = CombinedOpts
 
@@ -61,9 +50,17 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return super().__init__(exclude=exclude, **kwargs)
 
     @classmethod
-    def setup(cls):
-        cls.Meta.setup_meta()
-        cls._public_attribute_names = cls._get_public_attribute_names()
+    def setup(old_cls):
+        """Dynamically adds fields to a Schema Class inheriting
+        from BaseSchema"""
+        old_cls.Meta.setup_meta()
+        old_cls._public_attribute_names = old_cls._get_public_attribute_names()
+        new_cls = type(
+            f'_{old_cls.get_type().title()}Schema',
+            (old_cls,),
+            old_cls.get_dynamically_added_fields()
+        )
+        return new_cls
 
     @classmethod
     def get_model(cls):
