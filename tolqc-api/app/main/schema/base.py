@@ -420,9 +420,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return datum
 
     def _insert_enum_names_to_datum_attributes(self, datum, enum_datum):
-        #reeemove
-        import logging
-        logging.warning(enum_datum)
         if not enum_datum:
             return datum
         for target_table, enum_name in enum_datum.items():
