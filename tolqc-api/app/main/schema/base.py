@@ -117,11 +117,17 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def _create_many_to_one_relationship_fields(cls):
         cls.many_to_one_relationship_info = {}
-        foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
+        model = cls.Meta.model
+        foreign_key_names = model.get_foreign_key_column_names()
+        # do not express enums as a true schema relationship
+        enum_foreign_key_names = [
+            f_key for (f_key, _) in model.get_enum_relationship_details()
+        ]
         # maps the relationship name to its target table
         pairs = [
             cls._create_many_to_one_relationship_field_by_name(foreign_key_name)
             for foreign_key_name in foreign_key_names
+            if foreign_key_name not in enum_foreign_key_names
         ]
         return {
             field_name: field for (field_name, field) in pairs
@@ -326,10 +332,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return [target_table for (_, target_table) in enum_details]
 
     def _remove_enum_keys(self, data, enum_keys):
-        data = {
-            key: value for key, value in data.items()
-            if key not in enum_keys
-        }
+        for key in enum_keys:
+            data.pop(key, None)
 
     def _remove_enum_names(self, data):
         enum_keys = self._preprocess_enum_names(data)
@@ -355,21 +359,55 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         else:
             self._ext_data = data.ext
 
+    def _get_enum_name_from_id(self, datum, target_table, foreign_key):
+        id = getattr(datum, foreign_key)
+        if id is None:
+            return None
+        return self.Meta.model.get_relation_enum_name_by_id(target_table, id)
+
+    def _preprocess_enum_foreign_keys_individual(self, enum_details, datum):
+        return {
+            t_table: self._get_enum_name_from_id(datum, t_table, f_key)
+            for f_key, t_table in enum_details
+        }
+
+    def _preprocess_enum_foreign_keys(self, data, many):
+        enum_details = self.Meta.model.get_enum_relationship_details()
+        if many:
+            self._enum_name_data = [
+                self._preprocess_enum_foreign_keys_individual(
+                    enum_details,
+                    datum
+                )
+                for datum in data
+            ]
+        else:
+            self._enum_name_data = self._preprocess_enum_foreign_keys_individual(
+                enum_details,
+                data
+            )
+        return [f_key for (f_key, _) in enum_details]
+
     @pre_dump(pass_many=True)
     def pre_process_dump_data(self, data, many, **kwargs):
         if self.has_ext_field():
             self._store_ext_data(data, many)
 
+        enum_foreign_key_names = self._preprocess_enum_foreign_keys(
+            data,
+            many
+        )
+
         if many:
             return [
-                self._model_instance_to_datum(m)
+                self._model_instance_to_datum(m, enum_foreign_key_names)
                 for m in data
             ]
 
-        return self._model_instance_to_datum(data)
+        return self._model_instance_to_datum(data, enum_foreign_key_names)
 
-    def _model_instance_to_datum(self, model_instance):
-        return model_instance.to_dict(exclude_column_names=['ext'])
+    def _model_instance_to_datum(self, model_instance, exclude):
+        return model_instance.to_dict(exclude_column_names=['ext', *exclude])
 
     def _re_insert_ext_datum(self, datum, ext_data):
         datum['meta'] = {

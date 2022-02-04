@@ -40,3 +40,11 @@ class EnumBase(Base):
         if instance is None:
             return None
         return instance.id
+
+    @classmethod
+    def get_name_from_id(cls, id):
+        query = db.session.query(cls)
+        instance = query.filter_by(id=id).one_or_none()
+        if instance is None:
+            return None
+        return instance.name

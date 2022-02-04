@@ -378,6 +378,11 @@ class Base(db.Model):
         return relation_model.get_id_from_name(enum_name)
 
     @classmethod
+    def get_relation_enum_name_by_id(cls, relation_type, id):
+        relation_model = cls.get_model_by_type(relation_type)
+        return relation_model.get_name_from_id(id)
+
+    @classmethod
     def _get_related_enum_table_names(cls):
         _, target_tables = cls._get_foreign_keys_and_target_tables()
         return [
