@@ -197,10 +197,19 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
+    def _get_possibly_empty_enum_name_fields(cls):
+        enum_names = [
+            t_table for (_, t_table)
+            in cls.Meta.model.get_enum_relationship_details()
+        ]
+        return {enum_name: Str() for enum_name in enum_names}
+
+    @classmethod
     def _get_dynamically_added_non_relationship_fields(cls):
         return {
             **cls._get_possibly_empty_resource_meta_field(),
-            **cls._get_possibly_empty_creation_log_fields()
+            **cls._get_possibly_empty_creation_log_fields(),
+            **cls._get_possibly_empty_enum_name_fields()
         }
 
     @classmethod
