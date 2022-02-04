@@ -352,7 +352,7 @@ class Base(db.Model):
         return [
             c.name for c in cls._get_columns()
             if c.foreign_keys
-            and c.name not in cls._get_enum_foreign_key_names()
+            and c.name not in cls.get_enum_foreign_key_names()
         ]
 
     @classmethod
@@ -368,7 +368,7 @@ class Base(db.Model):
         return foreign_keys, target_tables
 
     @classmethod
-    def _get_enum_foreign_key_names(cls):
+    def get_enum_foreign_key_names(cls):
         foreign_keys, target_tables = cls._get_foreign_keys_and_target_tables()
         return [
             column_name for column_name, target_table
