@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from urllib.parse import unquote_plus
-
 from test.base import BaseTestCase
 
 
