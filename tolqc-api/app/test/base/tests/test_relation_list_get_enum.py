@@ -70,3 +70,56 @@ class TestRelationListGetEnum(BaseTestCase):
                 ]
             }
         )
+    
+        # sort by I descending
+        response = self.client.open(
+            '/api/v1/J?sort_by=-I',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert that they're in the correct order
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'type': 'J',
+                        'id': '29348',
+                        'attributes': {
+                            'I': 'fun'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '587',
+                        'attributes': {
+                            'I': 'fun'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '4857',
+                        'attributes': {
+                            'I': 'also fun'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '23487',
+                        'attributes': {
+                            'I': 'also fun'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '8394789',
+                        'attributes': {
+                            'I': 'also fun'
+                        }
+                    },
+                ]
+            }
+        )
