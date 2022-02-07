@@ -90,29 +90,36 @@ class Base(db.Model):
     def _convert_enum_names_to_foreign_key_ids(self, data):
         """Converts enum_table:name pairs into foreign_key:id pairs,
         in init data"""
-        related_enum_table_names = self._get_related_enum_table_names()
+        enum_relationship_details = self.get_enum_relationship_details()
+        enum_relation_names = [
+            r_model_name for (_, r_model_name) in enum_relationship_details
+        ]
+        foreign_key_names = [
+            fkey_name for (fkey_name, _) in enum_relationship_details
+        ]
         relation_model_name_pairs = [
             (
                 self.get_model_by_type(r_model_name),
                 data.get(r_model_name, None)
             )
-            for r_model_name in related_enum_table_names
+            for r_model_name in enum_relation_names
         ]
         enum_foreign_key_id_dict = {
-            self._get_foreign_key_from_relation_model(r_model).name: \
-                self._get_related_model_id_by_name(
-                    r_model,
-                    name
-                )
-            for r_model, name in relation_model_name_pairs
+            f_key_name: self._get_related_model_id_by_name(
+                r_model,
+                name
+            )
+            for (r_model, name), f_key_name in zip(
+                relation_model_name_pairs,
+                foreign_key_names
+            )
             if name is not None
         }
         data = {**data, **enum_foreign_key_id_dict}
         return {
             key: pair for (key, pair) in data.items()
-            if key not in related_enum_table_names
+            if key not in enum_relation_names
         }
-        #TODO refactor this like its dual
 
     def _convert_foreign_key_ids_to_enum_names(self, data):
         """Converts foreign_key:id pairs into enum_table:name pairs,
