@@ -112,6 +112,7 @@ class Base(db.Model):
             key: pair for (key, pair) in data.items()
             if key not in related_enum_table_names
         }
+        #TODO refactor this like its dual
 
     def _convert_foreign_key_ids_to_enum_names(self, data):
         """Converts foreign_key:id pairs into enum_table:name pairs,
@@ -129,7 +130,7 @@ class Base(db.Model):
         ]
         relation_model_name_dict = {
             r_model_name: \
-                self.get_model_by_type(r_model_name).get_name_by_id(id)
+                self.get_relation_enum_name_by_id(r_model_name, id)
                 if id is not None else None
             for r_model_name, id in zip(
                 enum_relation_names,
