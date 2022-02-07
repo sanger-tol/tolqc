@@ -88,8 +88,7 @@ class Base(db.Model):
         return super().__init__(**converted_data)
 
     def _convert_enum_names_to_foreign_key_ids(self, data):
-        """Converts enum_table:name pairs into foreign_key:id pairs,
-        in init data"""
+        """Converts enum_table:name pairs into foreign_key:id pairs"""
         enum_relationship_details = self.get_enum_relationship_details()
         enum_relation_names = [
             r_model_name for (_, r_model_name) in enum_relationship_details
@@ -122,8 +121,7 @@ class Base(db.Model):
         }
 
     def _convert_foreign_key_ids_to_enum_names(self, data):
-        """Converts foreign_key:id pairs into enum_table:name pairs,
-        in to_dict data"""
+        """Converts foreign_key:id pairs into enum_table:name pairs"""
         enum_relationship_details = self.get_enum_relationship_details()
         enum_relation_names = [
             r_model_name for (_, r_model_name) in enum_relationship_details
