@@ -57,13 +57,14 @@ class TestEnumMethodsByName(BaseTestCase):
         self.add_I(id=4989, name='happy')
         # attempt to patch to a new id
         response = self.client.open(
-            '/api/v1/I/name/happy',
+            '/api/v1/enum/I/happy',
             method='PATCH',
             json={
                 'data': {
                     'type': 'I',
                     'id': '1337',
                     'attributes': {
+                        'name': 'dinosaur',
                         'description': 'This is a hacker.'
                     }
                 }
@@ -88,7 +89,7 @@ class TestEnumMethodsByName(BaseTestCase):
         )
         # confirm that no state change occured
         response = self.client.open(
-            '/api/v1/I/name/happy',
+            '/api/v1/enum/I/happy',
             method='GET'
         )
         self.assert200(
@@ -104,13 +105,20 @@ class TestEnumMethodsByName(BaseTestCase):
                     'attributes': {
                         'name': 'happy',
                         'description': None
+                    },
+                    'relationships': {
+                        'J': {
+                            'links': {
+                                'related': '/enum/I/happy/J'
+                            }
+                        }
                     }
                 }
             }
         )
         # assert that no new entry has been created
         response = self.client.open(
-            '/api/v1/I/1337',
+            '/api/v1/enum/I/dinosaur',
             method='GET'
         )
         self.assert404(
