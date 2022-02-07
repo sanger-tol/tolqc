@@ -52,7 +52,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
     def test_bad_enum_name_link_400(self):
         # add an enum and a dependant
         self.add_I(id=39489, name='biology')
-        self.add_J(id=349992, i_id=39489)
+        self.add_J(id=349992, I='biology')
 
         #TODO move enum determination logic into model class
 

@@ -83,6 +83,36 @@ class Base(db.Model):
     # a dict in which all inhertied classes are registered during setup
     model_registry_dict = {}
 
+    def __init__(self, **data):
+        converted_data = self._convert_enum_names_to_foreign_key_ids(data)
+        return super().__init__(**converted_data)
+
+    def _convert_enum_names_to_foreign_key_ids(self, data):
+        """Converts enum_table:name pairs into foreign_key:id pairs,
+        in init data"""
+        related_enum_table_names = self._get_related_enum_table_names()
+        relation_model_name_pairs = [
+            (
+                self.get_model_by_type(r_model_name),
+                data.get(r_model_name, None)
+            )
+            for r_model_name in related_enum_table_names
+        ]
+        enum_foreign_key_id_pairs = {
+            self._get_foreign_key_from_relation_model(r_model).name: \
+                self._get_related_model_id_by_name(
+                    r_model,
+                    name
+                )
+            for r_model, name in relation_model_name_pairs
+            if name is not None
+        }
+        data = {**data, **enum_foreign_key_id_pairs}
+        return {
+            key: pair for (key, pair) in data.items()
+            if key not in related_enum_table_names
+        }
+
     @classmethod
     def setup(cls):
         cls._populate_target_table_dict()
