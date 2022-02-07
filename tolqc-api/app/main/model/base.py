@@ -87,9 +87,10 @@ class Base(db.Model):
         converted_data = self._convert_enum_names_to_foreign_key_ids(data)
         return super().__init__(**converted_data)
 
-    def _convert_enum_names_to_foreign_key_ids(self, data):
+    @classmethod
+    def _convert_enum_names_to_foreign_key_ids(cls, data):
         """Converts enum_table:name pairs into foreign_key:id pairs"""
-        enum_relationship_details = self.get_enum_relationship_details()
+        enum_relationship_details = cls.get_enum_relationship_details()
         enum_relation_names = [
             r_model_name for (_, r_model_name) in enum_relationship_details
         ]
@@ -98,13 +99,13 @@ class Base(db.Model):
         ]
         relation_model_name_pairs = [
             (
-                self.get_model_by_type(r_model_name),
+                cls.get_model_by_type(r_model_name),
                 data.get(r_model_name, None)
             )
             for r_model_name in enum_relation_names
         ]
         enum_foreign_key_id_dict = {
-            f_key_name: self._get_related_model_id_by_name(
+            f_key_name: cls._get_related_model_id_by_name(
                 r_model,
                 name
             )
@@ -120,9 +121,10 @@ class Base(db.Model):
             if key not in enum_relation_names
         }
 
-    def _convert_foreign_key_ids_to_enum_names(self, data):
+    @classmethod
+    def _convert_foreign_key_ids_to_enum_names(cls, data):
         """Converts foreign_key:id pairs into enum_table:name pairs"""
-        enum_relationship_details = self.get_enum_relationship_details()
+        enum_relationship_details = cls.get_enum_relationship_details()
         enum_relation_names = [
             r_model_name for (_, r_model_name) in enum_relationship_details
         ]
@@ -135,7 +137,7 @@ class Base(db.Model):
         ]
         relation_model_name_dict = {
             r_model_name: \
-                self.get_relation_enum_name_by_id(r_model_name, id)
+                cls.get_relation_enum_name_by_id(r_model_name, id)
                 if id is not None else None
             for r_model_name, id in zip(
                 enum_relation_names,
@@ -559,8 +561,11 @@ class Base(db.Model):
             raise BadParameterException(
                 "This API cannot filter against 'extra' columns."
             )
-        return {
+        preprocessed_eq_filters = {
             filter_key: cls._preprocess_filter_value(filter_key, filter_value)
             for (filter_key, filter_value)
             in eq_filters.items()
         }
+        return cls._convert_enum_names_to_foreign_key_ids(
+            preprocessed_eq_filters
+        )
