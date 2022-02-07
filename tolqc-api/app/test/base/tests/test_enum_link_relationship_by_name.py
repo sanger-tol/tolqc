@@ -48,3 +48,40 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
                 }
             }
         )
+
+    def test_bad_enum_name_link_400(self):
+        # add an enum and a dependant
+        self.add_I(id=39489, name='biology')
+        self.add_J(id=349992, i_id=39489)
+
+        #TODO move enum determination logic into model class
+
+        # attempt to patch the enum ref to non-existent name
+        #TODO find out why this isn't overwriting
+        response = self.client.open(
+            '/api/v1/J/349992',
+            method='PATCH',
+            json={
+                'data': {
+                    'type': 'J',
+                    'attributes': {
+                        'I': 'physics'
+                    }
+                }
+            },
+            headers=self._get_api_key_1()
+        )
+        # assert that this failed
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert that it failed for the right reason
+        self.assertEqual(
+            response.json,
+            {
+                'errors': [{
+                    'title': 'Validation Error'
+                }]
+            }
+        )
