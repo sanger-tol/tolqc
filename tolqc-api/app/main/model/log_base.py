@@ -83,7 +83,8 @@ class LogBase(Base, LogMixin):
 
     def _get_history_entry(self):
         state_snapshot = self.to_dict(
-            exclude_column_names=self._excluded_columns_in_history
+            exclude_column_names=self._excluded_columns_in_history,
+            convert_enums=False
         )
         return {
             self._map_history_entry_key(entry_key): self._map_history_entry_value(

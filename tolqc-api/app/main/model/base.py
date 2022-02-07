@@ -98,7 +98,7 @@ class Base(db.Model):
             )
             for r_model_name in related_enum_table_names
         ]
-        enum_foreign_key_id_pairs = {
+        enum_foreign_key_id_dict = {
             self._get_foreign_key_from_relation_model(r_model).name: \
                 self._get_related_model_id_by_name(
                     r_model,
@@ -107,10 +107,39 @@ class Base(db.Model):
             for r_model, name in relation_model_name_pairs
             if name is not None
         }
-        data = {**data, **enum_foreign_key_id_pairs}
+        data = {**data, **enum_foreign_key_id_dict}
         return {
             key: pair for (key, pair) in data.items()
             if key not in related_enum_table_names
+        }
+
+    def _convert_foreign_key_ids_to_enum_names(self, data):
+        """Converts foreign_key:id pairs into enum_table:name pairs,
+        in to_dict data"""
+        enum_relationship_details = self.get_enum_relationship_details()
+        enum_relation_names = [
+            r_model_name for (_, r_model_name) in enum_relationship_details
+        ]
+        foreign_key_names = [
+            fkey_name for (fkey_name, _) in enum_relationship_details
+        ]
+        foreign_key_ids = [
+            data.get(foreign_key_name, None)
+            for foreign_key_name in foreign_key_names
+        ]
+        relation_model_name_dict = {
+            r_model_name: \
+                self.get_model_by_type(r_model_name).get_name_by_id(id)
+                if id is not None else None
+            for r_model_name, id in zip(
+                enum_relation_names,
+                foreign_key_ids
+            )
+        }
+        data = {**data, **relation_model_name_dict}
+        return {
+            key: pair for (key, pair) in data.items()
+            if key not in foreign_key_names
         }
 
     @classmethod
@@ -118,13 +147,16 @@ class Base(db.Model):
         cls._populate_target_table_dict()
         cls._register_model()
 
-    def to_dict(self, exclude_column_names=[]):
-        return {
+    def to_dict(self, exclude_column_names=[], convert_enums=True):
+        dict_data = {
             column_name: getattr(self, column_name)
             for column_name
             in self.get_column_names()
             if column_name not in exclude_column_names
         }
+        if not convert_enums:
+            return dict_data
+        return self._convert_foreign_key_ids_to_enum_names(dict_data)
 
     @classmethod
     def _register_model(cls):
