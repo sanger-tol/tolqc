@@ -6,15 +6,6 @@ from test.base import BaseTestCase
 
 
 class TestEnumLinkRelationshipByName(BaseTestCase):
-    def _assert_enum_validation_error(self, response):
-        errors = response.json.get('errors', [])
-        first_error = {} if not errors else errors[0]
-        error_title = first_error.get('title', None)
-        self.assertEqual(
-            error_title,
-            'Validation Error'
-        )
-
     def test_post_J_specify_I_by_name(self):
         self.add_I(id=4857, name='nicely')
         response = self.client.open(
@@ -55,7 +46,6 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
         self.add_J(id=349992, I='biology')
 
         # attempt to patch the enum ref to non-existent name
-        #TODO find out why this isn't overwriting
         response = self.client.open(
             '/api/v1/J/349992',
             method='PATCH',
