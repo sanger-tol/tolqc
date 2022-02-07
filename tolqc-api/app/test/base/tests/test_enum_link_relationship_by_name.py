@@ -54,8 +54,6 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
         self.add_I(id=39489, name='biology')
         self.add_J(id=349992, I='biology')
 
-        #TODO move enum determination logic into model class
-
         # attempt to patch the enum ref to non-existent name
         #TODO find out why this isn't overwriting
         response = self.client.open(
@@ -77,11 +75,17 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
             f'Response body is : {response.data.decode("utf-8")}'
         )
         # assert that it failed for the right reason
+        # TODO improve this error, if only for enums
         self.assertEqual(
             response.json,
             {
                 'errors': [{
-                    'title': 'Validation Error'
+                    'code': 400,
+                    'detail': 'An integrity error occured in the database. This is '
+                              'most likely due to either a dependency on this '
+                              'instance, if deleting, or a foreign reference to an '
+                              'object that does not exist, if creating/updating.',
+                    'title': 'Bad Request'
                 }]
             }
         )
