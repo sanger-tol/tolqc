@@ -19,7 +19,7 @@ class TolqcAccession(LogBase):
     description = db.Column(db.String())
 
     accession_type_dict = db.relationship("TolqcAccessionTypeDict", back_populates="accession",
-                                     foreign_keys=[accession_type_id])
+                                          foreign_keys=[accession_type_id])
     project = db.relationship("TolqcProject", back_populates="accession")
     specimen = db.relationship("TolqcSpecimen", back_populates="accession")
     sample = db.relationship("TolqcSample", back_populates="accession")
