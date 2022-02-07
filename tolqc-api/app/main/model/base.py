@@ -256,13 +256,13 @@ class Base(db.Model):
     @classmethod
     def _get_sort_by_enum(cls, query, enum_name, ascending):
         #TODO make sure grouping works
-        enum_relation = cls.get_model_by_type(enum_name)
-        foreign_key = cls._get_foreign_key_from_relation_model(
-            enum_relation
-        )
-        sort_by_column = enum_relation.name if ascending \
-                         else enum_relation.name.desc()
-        return query.join(cls, foreign_key==enum_relation.id) \
+        #TODO need a lot of error checking
+        enum_relation_model = cls.get_model_by_type(enum_name)
+        enum_relationship = getattr(cls, enum_name)
+        sort_by_column = enum_relation_model.name if ascending \
+                         else enum_relation_model.name.desc()
+        return query.select_from(enum_relation_model) \
+                    .join(enum_relationship) \
                     .order_by(sort_by_column)
 
     @classmethod
