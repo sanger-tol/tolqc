@@ -309,7 +309,7 @@ class BaseSwagger:
     @classmethod
     def _get_api_description(cls):
         type_ = cls.get_type()
-        return f'Methods relating to {type_}',
+        return f'Methods relating to {type_}'
 
     @classmethod
     def _create_api(cls):

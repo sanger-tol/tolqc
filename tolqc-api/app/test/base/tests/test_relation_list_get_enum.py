@@ -78,7 +78,7 @@ class TestListGetEnum(BaseTestCase):
         )
 
     def test_sort_by_enum_I_on_list_get_J(self):
-        # add two I's 
+        # add two I's
         self.add_I(id=4857, name='fun')
         self.add_I(id=2384, name='also fun')
 
@@ -141,7 +141,7 @@ class TestListGetEnum(BaseTestCase):
                 ]
             }
         )
-    
+
         # sort by I descending
         response = self.client.open(
             '/api/v1/J?sort_by=-I',
