@@ -13,7 +13,7 @@ from main.resource import api_centre, api_environment, \
                           api_library_type, api_allocation, \
                           api_file, api_sex, \
                           api_software_version, api_status, \
-                          api_accession_type, api_accession, \
+                          api_accession_type_dict, api_accession, \
                           api_assembly_component, api_status_dict, \
                           api_qc_dict, api_milestone_dict, \
                           api_pacbio_run_metrics, api_data, \
@@ -53,7 +53,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_sex)
     api.add_namespace(api_software_version)
     api.add_namespace(api_status)
-    api.add_namespace(api_accession_type)
+    api.add_namespace(api_accession_type_dict)
     api.add_namespace(api_accession)
     api.add_namespace(api_assembly_component)
     api.add_namespace(api_status_dict)

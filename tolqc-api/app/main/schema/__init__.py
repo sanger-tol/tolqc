@@ -20,7 +20,7 @@ from .user import UserSchema # noqa
 from .software_version import SoftwareVersionSchema # noqa
 from .status import StatusSchema # noqa
 from .file import FileSchema # noqa
-from .accession_type import AccessionTypeSchema # noqa
+from .accession_type_dict import AccessionTypeDictSchema # noqa
 from .accession import AccessionSchema # noqa
 from .assembly_component import AssemblyComponentSchema # noqa
 from .status_dict import StatusDictSchema # noqa

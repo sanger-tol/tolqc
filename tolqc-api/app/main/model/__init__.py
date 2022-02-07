@@ -13,7 +13,7 @@ from .enum_base import NamedEnumInstanceDoesNotExistException # noqa
 
 from .tolqc_user import TolqcUser  # noqa
 from .tolqc_role import TolqcRole  # noqa
-from .tolqc_accession_type import TolqcAccessionType  # noqa
+from .tolqc_accession_type_dict import TolqcAccessionTypeDict  # noqa
 from .tolqc_accession import TolqcAccession  # noqa
 from .tolqc_assembly_component import TolqcAssemblyComponent  # noqa
 from .tolqc_status_dict import TolqcStatusDict  # noqa
