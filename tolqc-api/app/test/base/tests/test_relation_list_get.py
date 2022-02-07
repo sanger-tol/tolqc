@@ -155,7 +155,7 @@ class TestRelationListGet(BaseTestCase):
         # 19 = 59 - 20*2
         self.assertEqual(len(response.json['data']), 19)
 
-    def test_relation_list_get_with_sortby_parameter_200(self):
+    def test_relation_list_get_with_sort_by_parameter_200(self):
         # add an A
         self.add_A(id=298)
 

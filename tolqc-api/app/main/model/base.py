@@ -99,21 +99,20 @@ class Base(db.Model):
         ]
         relation_model_name_pairs = [
             (
-                cls.get_model_by_type(r_model_name),
+                r_model_name,
                 data.get(r_model_name, None)
             )
             for r_model_name in enum_relation_names
         ]
         enum_foreign_key_id_dict = {
-            f_key_name: cls._get_related_model_id_by_name(
-                r_model,
-                name
-            )
-            for (r_model, name), f_key_name in zip(
+            f_key_name: cls.get_model_by_type(
+                r_model_name
+            ).get_id_from_name(enum_name)
+            for (r_model_name, enum_name), f_key_name in zip(
                 relation_model_name_pairs,
                 foreign_key_names
             )
-            if name is not None
+            if enum_name is not None
         }
         data = {**data, **enum_foreign_key_id_dict}
         return {
@@ -545,20 +544,24 @@ class Base(db.Model):
         return filter_value.lower() in ['true', 'false']
 
     @classmethod
-    def _preprocess_filter_value(cls, filter_key, filter_value):
-        if getattr(cls, filter_key, None) is None:
+    def _get_enum_relation_names(cls):
+        enum_relationship_details = cls.get_enum_relationship_details()
+        return [
+            r_name for (_, r_name) in enum_relationship_details
+        ]
+
+    @classmethod
+    def _preprocess_string_filter_value(cls, filter_value):
+        if not cls._filter_value_is_delimited_string(filter_value):
             raise BadParameterException(
-                f"The filter key '{filter_key}' is invalid."
+                f"The string filter value '{filter_value}' must be surrounded "
+                "by quotation marks (either ' or \")"
             )
-        python_type = cls.get_column_python_type(filter_key)
-        if python_type == str:
-            if not cls._filter_value_is_delimited_string(filter_value):
-                raise BadParameterException(
-                    f"The string filter value '{filter_value}' must be surrounded "
-                    "by quotation marks (either ' or \")"
-                )
-            # strip surrounding quotes
-            return filter_value[1:-1]
+        # strip surrounding quotes
+        return filter_value[1:-1]
+
+    @classmethod
+    def _preprocess_non_string_filter_value(cls, filter_value, python_type):
         if python_type == int and not filter_value.isdigit():
             raise BadParameterException(
                 f"The filter value '{filter_value}' must be an integer."
@@ -582,6 +585,27 @@ class Base(db.Model):
         return filter_value
 
     @classmethod
+    def _preprocess_filter_value(cls, filter_key, filter_value, enum_names):
+        if getattr(cls, filter_key, None) is None:
+            raise BadParameterException(
+                f"The filter key '{filter_key}' is invalid."
+            )
+
+        # pre-remove enum types as string
+        if filter_key in enum_names:
+            return cls._preprocess_string_filter_value(filter_value)
+
+        python_type = cls.get_column_python_type(filter_key)
+
+        if python_type == str:
+            return cls._preprocess_string_filter_value(filter_value)
+
+        return cls._preprocess_non_string_filter_value(
+            filter_value,
+            python_type
+        )
+
+    @classmethod
     def _preprocess_filters(cls, eq_filters):
         if not eq_filters:
             return None
@@ -589,11 +613,16 @@ class Base(db.Model):
             raise BadParameterException(
                 "This API cannot filter against 'extra' columns."
             )
-        converted_eq_filters = cls._convert_enum_names_to_foreign_key_ids(
-            eq_filters
-        )
-        return {
-            filter_key: cls._preprocess_filter_value(filter_key, filter_value)
+        enum_names = cls._get_enum_relation_names()
+        processed_eq_filters = {
+            filter_key: cls._preprocess_filter_value(
+                filter_key,
+                filter_value,
+                enum_names
+            )
             for (filter_key, filter_value)
-            in converted_eq_filters.items()
+            in eq_filters.items()
         }
+        return cls._convert_enum_names_to_foreign_key_ids(
+            processed_eq_filters
+        )

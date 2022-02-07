@@ -6,6 +6,9 @@ from test.base import BaseTestCase
 
 
 class TestListGetEnum(BaseTestCase):
+    def test_filter_bad_enum_name_I_on_list_get_(self):
+        pass #TODO implement!!
+
     def test_filter_enum_I_on_list_get_J(self):
         # add three I's
         self.add_I(id=4857, name='easy')
