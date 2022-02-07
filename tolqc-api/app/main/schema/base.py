@@ -54,7 +54,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         """Dynamically adds fields to a Schema Class inheriting
         from BaseSchema"""
         old_cls.Meta.setup_meta()
-        old_cls._public_attribute_names = old_cls._get_public_attribute_names()
+        old_cls._populate_public_attribute_and_enum_names()
         new_cls = type(
             f'_{old_cls.get_type().title()}Schema',
             (old_cls,),
@@ -65,6 +65,12 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def get_model(cls):
         return cls.Meta.model
+
+    @classmethod
+    def _populate_public_attribute_and_enum_names(cls):
+        cls._public_attribute_names = cls._get_public_attribute_names()
+        cls._public_attribute_and_enum_names = \
+            cls._public_attribute_names + cls._get_enum_attribute_names()
 
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
@@ -194,11 +200,15 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
-    def _get_possibly_empty_enum_name_fields(cls):
-        enum_names = [
+    def _get_enum_attribute_names(cls):
+        return [
             t_table for (_, t_table)
             in cls.Meta.model.get_enum_relationship_details()
         ]
+
+    @classmethod
+    def _get_possibly_empty_enum_name_fields(cls):
+        enum_names = cls._get_enum_attribute_names()
         return {enum_name: Str() for enum_name in enum_names}
 
     @classmethod
@@ -242,13 +252,14 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def _get_public_attribute_names(cls):
         return [
-            column for column in cls.Meta.model.get_column_names()
+            column for column
+            in cls.Meta.model.get_column_names()
             if column not in ['id', 'ext'] + cls.get_excluded_columns()
         ]
 
     @classmethod
     def attribute_is_public(cls, attribute_name):
-        return attribute_name in cls._public_attribute_names
+        return attribute_name in cls._public_attribute_and_enum_names
 
     @classmethod
     def get_included_attributes(cls):

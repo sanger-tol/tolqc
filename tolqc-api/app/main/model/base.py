@@ -589,11 +589,11 @@ class Base(db.Model):
             raise BadParameterException(
                 "This API cannot filter against 'extra' columns."
             )
-        preprocessed_eq_filters = {
+        converted_eq_filters = cls._convert_enum_names_to_foreign_key_ids(
+            eq_filters
+        )
+        return {
             filter_key: cls._preprocess_filter_value(filter_key, filter_value)
             for (filter_key, filter_value)
-            in eq_filters.items()
+            in converted_eq_filters.items()
         }
-        return cls._convert_enum_names_to_foreign_key_ids(
-            preprocessed_eq_filters
-        )

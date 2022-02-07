@@ -5,8 +5,52 @@
 from test.base import BaseTestCase
 
 
-class TestRelationListGetEnum(BaseTestCase):
-    def test_sort_by_J_on_enum_I(self):
+class TestListGetEnum(BaseTestCase):
+    def test_filter_enum_I_on_list_get_J(self):
+        # add three I's
+        self.add_I(id=4857, name='easy')
+        self.add_I(id=2384, name='as')
+        self.add_I(id=93848, name='ABC')
+
+        # add four J's
+        self.add_J(id=3847384, I='ABC')
+        self.add_J(id=2348, I='easy')
+        self.add_J(id=234856, I='ABC')
+        self.add_J(id=33, I='as')
+
+        # get I=ABC
+        response = self.client.open(
+            '/api/v1/J?filter=[I=="ABC"]',
+            method='GET'
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert the correct 2 results were found
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'type': 'J',
+                        'id': '3847384',
+                        'attributes': {
+                            'I': 'ABC'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '2348',
+                        'attributes': {
+                            'I': 'ABC'
+                        }
+                    }
+                ]
+            }
+        )
+
+    def test_sort_by_enum_I_on_list_get_J(self):
         # add two I's 
         self.add_I(id=4857, name='fun')
         self.add_I(id=2384, name='also fun')
