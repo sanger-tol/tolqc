@@ -27,6 +27,7 @@ class TestRelationListGetEnum(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        # assert that they're in the correct order
         self.assertEqual(
             response.json,
             {
