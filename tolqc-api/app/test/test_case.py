@@ -11,7 +11,7 @@ from main.model import db, TolqcUser, TolqcRole, TolqcAllocation, \
                        TolqcData, TolqcFile, TolqcSex, \
                        TolqcSoftwareVersion, TolqcStatus, TolqcStatusDict, \
                        TolqcQcDict, TolqcMilestoneDict, TolqcAccession, \
-                       TolqcAccessionTypeDict, TolqcDataset, TolqcSet, \
+                       TolqcAccessionType, TolqcDataset, TolqcSet, \
                        TolqcPacbioRunMetrics, TolqcAssembly, \
                        TolqcAssemblyComponent, TolqcGenomescopeMetrics, \
                        TolqcAssemblyMetrics, TolqcBuscoLineage, \
@@ -97,7 +97,7 @@ class TestCase(FlaskTestCase):
         db.session.query(TolqcSex).delete()
         db.session.query(TolqcSpecies).delete()
         db.session.query(TolqcProject).delete()
-        db.session.query(TolqcAccessionTypeDict).delete()
+        db.session.query(TolqcAccessionType).delete()
         db.session.query(TolqcAccession).delete()
         db.session.query(TolqcAssemblyComponent).delete()
         db.session.query(TolqcStatus).delete()
