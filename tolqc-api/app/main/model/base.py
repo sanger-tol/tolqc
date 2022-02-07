@@ -247,6 +247,7 @@ class Base(db.Model):
 
     @classmethod
     def _sort_by_query(cls, query, sort_by):
+        #TODO sort by enum string NOT id integer sort
         if sort_by is None:
             return query.order_by(cls.id)
         (sort_by_column_name, ascending) = sort_by
