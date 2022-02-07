@@ -20,6 +20,18 @@ class TestListGetEnum(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        # assert it failed for the right reason
+        self.assertEqual(
+            response.json,
+            {
+                'errors': [{
+                    'title': 'Bad Request',
+                    'detail': "The (filter) name 'WRONG' does not "
+                              'exist on the enum I.',
+                    'code': 400
+                }]
+            }
+        )
 
     def test_filter_enum_I_on_list_get_J(self):
         # add three I's

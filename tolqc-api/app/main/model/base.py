@@ -593,7 +593,7 @@ class Base(db.Model):
         valid_enum_names = enum_relation_model.get_enum_values()
         if filter_enum_name not in valid_enum_names:
             raise BadParameterException(
-                f"The filter value '{filter_value}' is invalid for "
+                f"The (filter) name '{filter_enum_name}' does not exist on "
                 f"the enum {filter_key}."
             )
         return filter_enum_name
