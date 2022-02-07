@@ -13,8 +13,8 @@ class TestRelationListGetEnum(BaseTestCase):
 
         # add two and three J's respectively
         self.add_J(id=29348, I='fun')
-        self.add_J(id=587, I='fun')
         self.add_J(id=4857, I='also fun')
+        self.add_J(id=587, I='fun')
         self.add_J(id=23487, I='also fun')
         self.add_J(id=8394789, I='also fun')
 
