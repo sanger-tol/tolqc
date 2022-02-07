@@ -6,8 +6,20 @@ from test.base import BaseTestCase
 
 
 class TestListGetEnum(BaseTestCase):
-    def test_filter_bad_enum_name_I_on_list_get_J(self):
-        pass #TODO implement!!
+    def test_filter_bad_enum_name_I_on_list_get_J_400(self):
+        # add an I and a connected J
+        self.add_I(id=348989, name='right')
+        self.add_J(id=34789, I='right')
+
+        # try to filter by a bad name
+        response = self.client.open(
+            '/api/v1/J?filter=[I=="WRONG"]',
+            method='GET'
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
 
     def test_filter_enum_I_on_list_get_J(self):
         # add three I's
