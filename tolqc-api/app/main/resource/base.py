@@ -177,6 +177,12 @@ def _document_enum_detail_resource(cls):
     return api.route('/<name>')(cls)
 
 
+def _document_enum_relation_list_resource(cls, relation):
+    api, _ = _get_api_swagger(cls)
+    _document_relation_list_get(cls, relation)
+    return api.route(f'/<name>/{relation}')(cls)
+
+
 class BaseResource:
     @classmethod
     def is_enum_resource(cls):
@@ -186,7 +192,6 @@ class BaseResource:
     def _setup_non_enum_resource(cls):
         cls.add_list_resource()
         cls.add_detail_resource()
-        #TODO remove relationships in schema/swagger to and from enums
         cls.populate_relation_list_get_swaggers()
         cls.add_relation_list_resources()
 
@@ -194,6 +199,8 @@ class BaseResource:
     def _setup_enum_resource(cls):
         cls.add_list_resource()
         cls.add_enum_detail_resource()
+        cls.populate_relation_list_get_swaggers()
+        cls.add_enum_relation_list_resources()
 
     @classmethod
     def setup(cls):
@@ -237,6 +244,16 @@ class BaseResource:
         return _document_relation_list_resource(declared, relation_name)
 
     @classmethod
+    def _declare_and_decorate_enum_relation_list_resource(cls, relation_name):
+        type_ = cls.Meta.service.get_type()
+        declared = type(
+            f'{type_.title()}EnumRelationListResource_{relation_name}',
+            (BaseEnumNameRelationListResource,),
+            {'Meta': cls.Meta, 'relation': relation_name}
+        )
+        return _document_enum_relation_list_resource(declared, relation_name)
+
+    @classmethod
     def add_relation_list_resources(cls):
         relationship_names = cls.Meta.service.get_model() \
                                      .get_one_to_many_relationship_names()
@@ -253,6 +270,15 @@ class BaseResource:
             (BaseEnumNameDetailResource,),
             {'Meta': cls.Meta}
         ))
+
+    @classmethod
+    def add_enum_relation_list_resources(cls):
+        relationship_names = cls.Meta.service.get_model() \
+                                     .get_one_to_many_relationship_names()
+        cls.relation_list_resources = [
+            cls._declare_and_decorate_enum_relation_list_resource(r_name)
+            for r_name in relationship_names
+        ]
 
 
 class Resource(FlaskRestxResource):
@@ -310,7 +336,6 @@ class BaseRelationListResource(Resource):
 
 
 class BaseEnumNameRelationListResource(Resource):
-    #TODO remove this if unused
     @classmethod
     def get(cls, name, user_id=None):
         return cls.Meta.service.read_bulk_related_by_name(
