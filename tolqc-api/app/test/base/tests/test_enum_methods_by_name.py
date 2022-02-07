@@ -6,20 +6,20 @@ from test.base import BaseTestCase
 
 
 class TestEnumMethodsByName(BaseTestCase):
-    def test_I_get_by_name_matches_by_id_200(self):
+    def test_I_get_by_name_200(self):
         self.add_I(id=348598, name='testing')
-        # get by id
-        response_by_id = self.client.open(
-            '/api/v1/I/348598',
+        # get by name
+        response = self.client.open(
+            '/api/v1/enum/I/testing',
             method='GET'
         )
         self.assert200(
-            response_by_id,
-            f'Response body is : {response_by_id.data.decode("utf-8")}'
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
         )
         # assert that the response is correct
         self.assertEqual(
-            response_by_id.json,
+            response.json,
             {
                 'data': {
                     'type': 'I',
@@ -27,28 +27,24 @@ class TestEnumMethodsByName(BaseTestCase):
                     'attributes': {
                         'name': 'testing',
                         'description': None
+                    },
+                    'relationships': {
+                        'J': {
+                            'links': {
+                                'related': '/enum/I/testing/J'
+                            }
+                        }
                     }
                 }
             }
         )
-        # get by name
-        response_by_name = self.client.open(
-            '/api/v1/I/name/testing',
-            method='GET'
-        )
-        self.assert200(
-            response_by_name,
-            f'Response body is : {response_by_name.data.decode("utf-8")}'
-        )
-        # assert that the two are equal
-        self.assertEqual(response_by_id.json, response_by_name.json)
 
     def test_I_get_by_bad_name_404(self):
         # add an irrelevant I
         self.add_I(id=348523, name='nice')
         # get a non-existent name
         response = self.client.open(
-            '/api/v1/I/not_nice',
+            '/api/v1/enum/I/not_nice',
             method='GET'
         )
         self.assert404(
@@ -162,91 +158,19 @@ class TestEnumMethodsByName(BaseTestCase):
         self.add_I(id=34989, name='day', description='quaint')
 
         # delete the instance by name
-        response_by_name = self.client.open(
-            '/api/v1/I/name/day',
+        response = self.client.open(
+            '/api/v1/enum/I/day',
             method='DELETE',
             headers=self._get_api_key_1()
         )
-        self.assert_status(response_by_name, 204)
+        self.assert_status(response, 204)
 
-        # confirm that it is no longer in the db, by name or id
-        response_by_name = self.client.open(
-            '/api/v1/I/name/day',
+        # confirm that it is no longer in the db
+        response = self.client.open(
+            '/api/v1/enum/I/day',
             method='GET'
         )
         self.assert404(
-            response_by_name,
-            f'Response body is : {response_by_name.data.decode("utf-8")}'
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
         )
-        response_by_id = self.client.open(
-            '/api/v1/I/34989',
-            method='GET'
-        )
-        self.assert404(
-            response_by_id,
-            f'Response body is : {response_by_id.data.decode("utf-8")}'
-        )
-
-    def test_relation_list_get_matches_by_name_and_id(self):
-        # add two I's
-        self.add_I(id=4989, name='happy')
-        self.add_I(id=304930, name='go_lucky')
-        # add two dependent J's on the first I
-        self.add_J(id=2099, i_id=4989)
-        self.add_J(id=9890, i_id=4989)
-        # add one on the second I
-        self.add_J(id=23989, i_id=304930)
-
-        # relation list get by name
-        response_by_name = self.client.open(
-            '/api/v1/I/name/happy/J',
-            method='GET'
-        )
-        self.assert200(response_by_name)
-        # assert that the response is correct
-        self.assertEqual(
-            response_by_name.json,
-            {
-                'data': [
-                    {
-                        'type': 'J',
-                        'id': '2099',
-                        'relationships': {
-                            'I': {
-                                'data': {
-                                    'id': '4989',
-                                    'type': 'I'
-                                },
-                                'links': {
-                                    'related': '/I/4989'
-                                }
-                            }
-                        }
-                    },
-                    {
-                        'type': 'J',
-                        'id': '9890',
-                        'relationships': {
-                            'I': {
-                                'data': {
-                                    'id': '4989',
-                                    'type': 'I'
-                                },
-                                'links': {
-                                    'related': '/I/4989'
-                                }
-                            }
-                        }
-                    }
-                ]
-            }
-        )
-
-        # relation list get by id
-        response_by_id = self.client.open(
-            '/api/v1/I/4989/J',
-            method='GET'
-        )
-        self.assert200(response_by_id)
-        # assert that it's equal to the other response
-        self.assertEqual(response_by_name.json, response_by_id.json)
