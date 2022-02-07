@@ -131,7 +131,7 @@ class TestEnumMethodsByName(BaseTestCase):
         self.add_I(id=1480, name='nicely')
         # attempt to patch to a new id
         response = self.client.open(
-            '/api/v1/I/name/nicely',
+            '/api/v1/enum/I/nicely',
             method='PATCH',
             json={
                 'data': {
@@ -157,6 +157,13 @@ class TestEnumMethodsByName(BaseTestCase):
                     'attributes': {
                         'name': 'new',
                         'description': None
+                    },
+                    'relationships': {
+                        'J': {
+                            'links': {
+                                'related': '/enum/I/new/J'
+                            }
+                        }
                     }
                 }
             }
