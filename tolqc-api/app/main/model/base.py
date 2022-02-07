@@ -585,15 +585,29 @@ class Base(db.Model):
         return filter_value
 
     @classmethod
+    def _preprocess_enum_filter(cls, filter_key, filter_value):
+        enum_relation_model = cls.get_model_by_type(filter_key)
+        filter_enum_name = cls._preprocess_string_filter_value(
+            filter_value
+        )
+        valid_enum_names = enum_relation_model.get_enum_values()
+        if filter_enum_name not in valid_enum_names:
+            raise BadParameterException(
+                f"The filter value '{filter_value}' is invalid for "
+                f"the enum {filter_key}."
+            )
+        return filter_enum_name
+
+    @classmethod
     def _preprocess_filter_value(cls, filter_key, filter_value, enum_names):
         if getattr(cls, filter_key, None) is None:
             raise BadParameterException(
                 f"The filter key '{filter_key}' is invalid."
             )
 
-        # pre-remove enum types as string
+        # pre-remove enum types
         if filter_key in enum_names:
-            return cls._preprocess_string_filter_value(filter_value)
+            return cls._preprocess_enum_filter(filter_key, filter_value)
 
         python_type = cls.get_column_python_type(filter_key)
 
