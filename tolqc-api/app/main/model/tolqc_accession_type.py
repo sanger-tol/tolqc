@@ -5,6 +5,7 @@
 from .base import db, setup_model
 from .enum_base import EnumBase
 
+
 @setup_model
 class TolqcAccessionType(EnumBase):
     __tablename__ = "accession_type"

@@ -141,7 +141,6 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _create_one_to_many_relationship_field_by_name_enum(cls, r_name):
-        #TODO test that the enum stem is present and correct, and functional
         return Relationship(
             f'/enum/{cls.get_type()}/{{name}}/{r_name}',
             related_url_kwargs={'name': '<name>'},

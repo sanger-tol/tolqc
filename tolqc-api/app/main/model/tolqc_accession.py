@@ -8,8 +8,6 @@ from .base import setup_model
 
 @setup_model
 class TolqcAccession(LogBase):
-    #TODO check that enum foreign_keys don't appear bare in schemas/swaggers.
-    #make them a pseudo-attribute on schema/swagger called the enum type
     __tablename__ = "accession"
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
@@ -21,7 +19,7 @@ class TolqcAccession(LogBase):
     description = db.Column(db.String())
 
     accession_type = db.relationship("TolqcAccessionType", back_populates="accession",
-                                          foreign_keys=[accession_type_id])
+                                     foreign_keys=[accession_type_id])
     project = db.relationship("TolqcProject", back_populates="accession")
     specimen = db.relationship("TolqcSpecimen", back_populates="accession")
     sample = db.relationship("TolqcSample", back_populates="accession")

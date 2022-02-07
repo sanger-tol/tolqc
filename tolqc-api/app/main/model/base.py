@@ -135,12 +135,13 @@ class Base(db.Model):
             for foreign_key_name in foreign_key_names
         ]
         relation_model_name_dict = {
-            r_model_name: \
-                cls.get_relation_enum_name_by_id(r_model_name, id)
-                if id is not None else None
+            r_model_name: cls.get_relation_enum_name_by_id(
+                r_model_name,
+                id
+                ) if id is not None else None
             for r_model_name, id in zip(
                 enum_relation_names,
-                foreign_key_ids
+                foreign_key_ids,
             )
         }
         data = {**data, **relation_model_name_dict}
@@ -254,20 +255,16 @@ class Base(db.Model):
 
     @classmethod
     def _get_sort_by_enum(cls, query, enum_name, ascending):
-        #TODO make sure grouping works
-        #TODO need a lot of error checking
         enum_relation_model = cls.get_model_by_type(enum_name)
         enum_relationship = getattr(cls, enum_name)
         sort_by_column = enum_relation_model.name if ascending \
-                         else enum_relation_model.name.desc()
+            else enum_relation_model.name.desc()
         return query.select_from(enum_relation_model) \
                     .join(enum_relationship) \
                     .order_by(sort_by_column)
 
     @classmethod
     def _sort_by_query(cls, query, sort_by):
-        #TODO sort by enum string NOT id integer sort
-        #TEST IT WORKS!!! (properly)
         if sort_by is None:
             return query.order_by(cls.id)
         (sort_by_attribute, ascending) = sort_by
