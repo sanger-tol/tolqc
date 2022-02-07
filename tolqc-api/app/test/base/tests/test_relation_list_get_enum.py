@@ -6,7 +6,7 @@ from test.base import BaseTestCase
 
 
 class TestListGetEnum(BaseTestCase):
-    def test_filter_bad_enum_name_I_on_list_get_(self):
+    def test_filter_bad_enum_name_I_on_list_get_J(self):
         pass #TODO implement!!
 
     def test_filter_enum_I_on_list_get_J(self):
@@ -21,9 +21,9 @@ class TestListGetEnum(BaseTestCase):
         self.add_J(id=234856, I='ABC')
         self.add_J(id=33, I='as')
 
-        # get I=ABC
+        # get I=ABC with id descending
         response = self.client.open(
-            '/api/v1/J?filter=[I=="ABC"]',
+            '/api/v1/J?filter=[I=="ABC"]&sort_by=-id',
             method='GET'
         )
         self.assert200(
@@ -44,7 +44,7 @@ class TestListGetEnum(BaseTestCase):
                     },
                     {
                         'type': 'J',
-                        'id': '2348',
+                        'id': '234856',
                         'attributes': {
                             'I': 'ABC'
                         }
