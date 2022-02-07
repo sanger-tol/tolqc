@@ -27,3 +27,45 @@ class TestRelationListGetEnum(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+        self.assertEqual(
+            response.json,
+            {
+                'data': [
+                    {
+                        'type': 'J',
+                        'id': '4857',
+                        'attributes': {
+                            'I': 'also fun'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '23487',
+                        'attributes': {
+                            'I': 'also fun'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '8394789',
+                        'attributes': {
+                            'I': 'also fun'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '29348',
+                        'attributes': {
+                            'I': 'fun'
+                        }
+                    },
+                    {
+                        'type': 'J',
+                        'id': '587',
+                        'attributes': {
+                            'I': 'fun'
+                        }
+                    },
+                ]
+            }
+        )
