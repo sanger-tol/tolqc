@@ -246,16 +246,43 @@ class Base(db.Model):
         return sort_by_column if ascending else sort_by_column.desc()
 
     @classmethod
-    def _sort_by_query(cls, query, sort_by):
-        #TODO sort by enum string NOT id integer sort
-        if sort_by is None:
-            return query.order_by(cls.id)
-        (sort_by_column_name, ascending) = sort_by
+    def _get_sort_by_non_enum(cls, query, sort_by_attribute, ascending):
         sort_by_column = cls._get_sort_by_column(
-            sort_by_column_name,
+            sort_by_attribute,
             ascending
         )
         return query.order_by(sort_by_column)
+
+    @classmethod
+    def _get_sort_by_enum(cls, query, enum_name, ascending):
+        #TODO make sure grouping works
+        enum_relation = cls.get_model_by_type(enum_name)
+        foreign_key = cls._get_foreign_key_from_relation_model(
+            enum_relation
+        )
+        sort_by_column = enum_relation.name if ascending \
+                         else enum_relation.name.desc()
+        return query.join(cls, foreign_key==enum_relation.id) \
+                    .order_by(sort_by_column)
+
+    @classmethod
+    def _sort_by_query(cls, query, sort_by):
+        #TODO sort by enum string NOT id integer sort
+        #TEST IT WORKS!!! (properly)
+        if sort_by is None:
+            return query.order_by(cls.id)
+        (sort_by_attribute, ascending) = sort_by
+        if sort_by_attribute in cls._get_related_enum_table_names():
+            return cls._get_sort_by_enum(
+                query,
+                sort_by_attribute,
+                ascending
+            )
+        return cls._get_sort_by_non_enum(
+            query,
+            sort_by_attribute,
+            ascending
+        )
 
     @classmethod
     def _filter_query(cls, query, eq_filters):
