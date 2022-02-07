@@ -161,7 +161,8 @@ class Base(db.Model):
         self.commit()
 
     def update(self, data, ext=None):
-        for key, item in data.items():
+        converted_data = self._convert_enum_names_to_foreign_key_ids(data)
+        for key, item in converted_data.items():
             setattr(self, key, item)
         if ext is not None:
             self._update_ext(ext)
