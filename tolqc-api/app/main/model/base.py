@@ -490,7 +490,7 @@ class Base(db.Model):
     def _get_foreign_keys_and_target_tables(cls):
         foreign_keys = cls.get_foreign_key_column_names()
         target_tablenames = [
-            cls.get_target_table_column_from_foreign_key(c_name)[0]
+            cls._get_target_tablename_column_from_foreign_key(c_name)[0]
             for c_name in foreign_keys
         ]
         target_table_types = [
@@ -512,6 +512,14 @@ class Base(db.Model):
             in zip(foreign_keys, target_table_types)
             if cls.relation_is_enum(target_model_type)
         ]
+
+    @classmethod
+    def get_target_table_type_column_from_foreign_key(cls, foreign_key_name):
+        target_table, target_column = cls._get_target_tablename_column_from_foreign_key(
+            foreign_key_name
+        )
+        target_table_type = cls._get_type_from_tablename(target_table)
+        return target_table_type, target_column
 
     @classmethod
     def get_related_enum_types(cls):
@@ -549,7 +557,7 @@ class Base(db.Model):
         ]
 
     @classmethod
-    def get_target_table_column_from_foreign_key(cls, column_name):
+    def _get_target_tablename_column_from_foreign_key(cls, column_name):
         """Returns a pair:
         - The target table's name
         - The name of the target column on the target table

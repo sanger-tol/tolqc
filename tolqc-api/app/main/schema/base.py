@@ -102,19 +102,19 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def _create_many_to_one_relationship_field_by_name(cls, foreign_key_name):
         model = cls.Meta.model
-        target_table, target_column = model.get_target_table_column_from_foreign_key(
+        target_table_type, target_column = model.get_target_table_type_column_from_foreign_key(
             foreign_key_name
         )
         special_name = cls._lookup_special_relationship_name(
             foreign_key_name,
-            target_table
+            target_table_type
         )
         cls.many_to_one_relationship_info[special_name] = {
-            "target_table": target_table,
+            "target_table": target_table_type,
             "foreign_key_name": foreign_key_name
         }
         return special_name, cls._create_many_to_one_relationship_field(
-            target_table,
+            target_table_type,
             target_column,
             foreign_key_name,
             cls._many_to_one_relationship_is_dump_only(special_name)
