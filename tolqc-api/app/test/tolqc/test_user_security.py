@@ -8,8 +8,8 @@ from test.tolqc import TolqcTestCase
 
 
 class TestusersSecurity(TolqcTestCase):
-    def test_no_credential_disclosure_get_userss(self):
-        expected_users = {
+    def test_no_credential_disclosure_get_users(self):
+        expected_user = {
             "type": "users",
             "attributes": {
                 "name": "test_users_admin",
@@ -28,7 +28,7 @@ class TestusersSecurity(TolqcTestCase):
 
         # assert no credential disclosure in list get
         response = self.client.open(
-            '/api/v1/users?filter=[name=="test_users_admin"]',
+            '/api/v1/users?filter=[name=="test_user_admin"]',
             method='GET'
         )
         self.assert200(
@@ -38,7 +38,7 @@ class TestusersSecurity(TolqcTestCase):
         self.assertEqual(
             response.json,
             {
-                "data": [expected_users]
+                "data": [expected_user]
             }
         )
 
@@ -54,7 +54,7 @@ class TestusersSecurity(TolqcTestCase):
         self.assertEqual(
             response.json,
             {
-                "data": expected_users
+                "data": expected_user
             }
         )
 
