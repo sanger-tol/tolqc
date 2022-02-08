@@ -12,8 +12,8 @@ class TestusersSecurity(TolqcTestCase):
         expected_user = {
             "type": "users",
             "attributes": {
-                "name": "test_users_admin",
-                "email": "test_users_admin@sanger.ac.uk",
+                "name": "test_user_admin",
+                "email": "test_user_admin@sanger.ac.uk",
                 "organisation": "Sanger Institute"
             },
             "id": "100",
