@@ -223,7 +223,7 @@ class TestEnumMethodsByName(BaseTestCase):
                 },
             ]
         }
-        
+
         # J-relation list get on I
         first_response = self.client.open(
             '/api/v1/enum/I/excellent/J',
