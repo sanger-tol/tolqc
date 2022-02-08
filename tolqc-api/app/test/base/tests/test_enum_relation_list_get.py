@@ -69,3 +69,27 @@ class TestEnumRelationListGet(BaseTestCase):
                 ]
             }
         )
+
+    def test_I_bad_name_relation_on_J_list_get_404(self):
+        # add an I
+        self.add_I(id=98902, name='thing2')
+        # try to get the J's of a non-existent I
+        response = self.client.open(
+            '/api/v1/enum/I/nothing/J',
+            method='GET'
+        )
+        self.assert404(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert that it failed for the right reason
+        self.assertEqual(
+            response.json,
+            {
+                'errors': [{
+                    'title': 'Not Found',
+                    'code': 404,
+                    'detail': "No name 'nothing' exists on enum I."
+                }]
+            }
+        )
