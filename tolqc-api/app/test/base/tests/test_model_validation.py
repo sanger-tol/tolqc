@@ -19,6 +19,7 @@ class TestModelValidation(BaseTestCase):
                 type_ = 'good'
 
             __tablename__ = 'good name'
+            __table_args__ = {'extend_existing': True}
 
             id = db.Column(db.Integer, primary_key=True)
         
@@ -28,6 +29,7 @@ class TestModelValidation(BaseTestCase):
         class BadModel(Base):
 
             __tablename__ = 'bad name'
+            __table_args__ = {'extend_existing': True}
 
             id = db.Column(db.Integer, primary_key=True)
         
@@ -40,6 +42,7 @@ class TestModelValidation(BaseTestCase):
                 pass
 
             __tablename__ = 'bad name'
+            __table_args__ = {'extend_existing': True}
 
             id = db.Column(db.Integer, primary_key=True)
         
