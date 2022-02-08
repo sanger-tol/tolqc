@@ -25,7 +25,7 @@ class TestBadFieldsError(BaseTestCase):
                     }
                 },
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert400(
             response,

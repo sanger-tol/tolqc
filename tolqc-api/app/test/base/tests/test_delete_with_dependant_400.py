@@ -14,7 +14,7 @@ class TestDeleteWithDependant400(BaseTestCase):
         response = self.client.open(
             '/api/v1/B/30',
             method='DELETE',
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert400(
             response,

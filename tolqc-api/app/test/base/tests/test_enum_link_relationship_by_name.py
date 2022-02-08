@@ -11,7 +11,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
         response = self.client.open(
             '/api/v1/J',
             method='POST',
-            headers=self._get_api_key_1(),
+            headers=self._get_api_key_1_headers(),
             json={
                 'data': {
                     'type': 'J',
@@ -57,7 +57,7 @@ class TestEnumLinkRelationshipByName(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         # assert that this failed
         self.assert400(

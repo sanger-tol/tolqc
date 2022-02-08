@@ -69,7 +69,7 @@ class TestEnumMethodsByName(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert400(
             response,
@@ -141,7 +141,7 @@ class TestEnumMethodsByName(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert200(
             response,
@@ -176,7 +176,7 @@ class TestEnumMethodsByName(BaseTestCase):
         response = self.client.open(
             '/api/v1/enum/I/day',
             method='DELETE',
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert_status(response, 204)
 

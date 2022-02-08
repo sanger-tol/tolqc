@@ -45,10 +45,10 @@ def _setup_api(blueprint):
 
 
 class BaseTestCase(TestCase):
-    def _get_api_key_1(self):
+    def _get_api_key_1_headers(self):
         return {"Authorization": self.api_key_1}
 
-    def _get_api_key_2(self):
+    def _get_api_key_2_headers(self):
         return {"Authorization": self.api_key_2}
 
     def create_app(self):
