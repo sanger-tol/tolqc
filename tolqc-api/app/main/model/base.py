@@ -28,6 +28,15 @@ db = SQLAlchemy(
 )
 
 
+class ModelValidationError(Exception):
+    def __init__(self, bad_class, reason):
+        class_name = getattr(bad_class, '__tablename__', 'unknown')
+        super().__init__(
+            f'The model class "{class_name}" failed validation due to '
+            f'"{reason}".'
+        )
+
+
 class BadParameterException(Exception):
     def __init__(self, message):
         self.message = message
