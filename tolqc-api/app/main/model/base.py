@@ -293,7 +293,8 @@ class Base(db.Model):
     @classmethod
     def _get_sort_by_enum(cls, query, enum_name, ascending):
         enum_relation_model = cls.get_model_by_type(enum_name)
-        enum_relationship = getattr(cls, enum_name)
+        enum_relation_tablename = enum_relation_model.__tablename__
+        enum_relationship = getattr(cls, enum_relation_tablename)
         sort_by_column = enum_relation_model.name if ascending \
             else enum_relation_model.name.desc()
         return query.select_from(enum_relation_model) \
