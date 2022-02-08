@@ -18,7 +18,7 @@ class TestModelValidation(BaseTestCase):
             class Meta:
                 type_ = 'good'
 
-            __tablename__ = 'good name'
+            __tablename__ = 'TestGG'
             __table_args__ = {'extend_existing': True}
 
             id = db.Column(db.Integer, primary_key=True)
@@ -28,7 +28,7 @@ class TestModelValidation(BaseTestCase):
     def test_model_missing_meta_class_fails(self):
         class BadModel(Base):
 
-            __tablename__ = 'bad name'
+            __tablename__ = 'TestBB'
             __table_args__ = {'extend_existing': True}
 
             id = db.Column(db.Integer, primary_key=True)
@@ -41,7 +41,7 @@ class TestModelValidation(BaseTestCase):
             class Meta:
                 pass
 
-            __tablename__ = 'bad name'
+            __tablename__ = 'TestBB'
             __table_args__ = {'extend_existing': True}
 
             id = db.Column(db.Integer, primary_key=True)
