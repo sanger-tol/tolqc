@@ -151,7 +151,12 @@ class Base(db.Model):
         }
 
     @classmethod
+    def _validate(cls):
+        pass
+
+    @classmethod
     def setup(cls):
+        cls._validate()
         cls._populate_target_table_dict()
         cls._register_model()
 
