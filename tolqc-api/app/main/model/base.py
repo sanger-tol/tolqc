@@ -514,6 +514,13 @@ class Base(db.Model):
         ]
 
     @classmethod
+    def get_related_enum_types(cls):
+        return [
+            target_table_type for (_, target_table_type)
+            in cls.get_enum_relationship_details()
+        ]
+
+    @classmethod
     def get_relation_id_by_enum_name(cls, relation_type, enum_name):
         relation_model = cls.get_model_by_type(relation_type)
         return relation_model.get_id_from_name(enum_name)
@@ -643,7 +650,8 @@ class Base(db.Model):
 
     @classmethod
     def _preprocess_filter_value(cls, filter_key, filter_value, enum_names):
-        if getattr(cls, filter_key, None) is None:
+        if getattr(cls, filter_key, None) is None and \
+            filter_key not in cls.get_related_enum_types():
             raise BadParameterException(
                 f"The filter key '{filter_key}' is invalid."
             )
