@@ -39,7 +39,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
         @classmethod
         def setup_meta(cls):
-            cls.type_ = cls.model.__tablename__
+            cls.type_ = cls.model.get_type()
 
     OPTIONS_CLASS = CombinedOpts
 

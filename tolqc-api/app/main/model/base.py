@@ -91,6 +91,9 @@ class Base(db.Model):
     # a dict in which all inhertied classes are registered during setup
     model_registry_dict = {}
 
+    # maps __tablename__ to type_
+    tablename_type_dict = {}
+
     def __init__(self, **data):
         converted_data = self._convert_enum_names_to_foreign_key_ids(data)
         return super().__init__(**converted_data)
@@ -195,9 +198,15 @@ class Base(db.Model):
         return self._convert_foreign_key_ids_to_enum_names(dict_data)
 
     @classmethod
+    def get_type(cls):
+        return cls.Meta.type_
+
+    @classmethod
     def _register_model(cls):
-        type_ = cls.__tablename__
+        type_ = cls.get_type()
+        tablename = cls.__tablename__
         cls.model_registry_dict[type_] = cls
+        cls.tablename_type_dict[tablename] = type_
 
     @classmethod
     def get_model_by_type(cls, type_):
@@ -403,7 +412,7 @@ class Base(db.Model):
         return list(column.foreign_keys)[0].target_fullname.split('.')[0]
 
     @classmethod
-    def _get_all_table_names_many_to_one(cls):
+    def _get_all_tablenames_many_to_one(cls):
         columns = cls._get_columns()
         return [
             cls._get_target_table_from_column(column)
@@ -480,19 +489,28 @@ class Base(db.Model):
     @classmethod
     def _get_foreign_keys_and_target_tables(cls):
         foreign_keys = cls.get_foreign_key_column_names()
-        target_tables = [
+        target_tablenames = [
             cls.get_target_table_column_from_foreign_key(c_name)[0]
             for c_name in foreign_keys
         ]
-        return foreign_keys, target_tables
+        target_table_types = [
+            cls._get_type_from_tablename(tablename)
+            for tablename in target_tablenames
+        ]
+        return foreign_keys, target_table_types
+
+    @classmethod
+    def _get_type_from_tablename(cls, tablename):
+        return cls.tablename_type_dict[tablename]
 
     @classmethod
     def get_enum_relationship_details(cls):
-        foreign_keys, target_tables = cls._get_foreign_keys_and_target_tables()
+        foreign_keys, target_table_types = cls._get_foreign_keys_and_target_tables()
         return [
-            (column_name, target_table) for column_name, target_table
-            in zip(foreign_keys, target_tables)
-            if cls.relation_is_enum(target_table)
+            (column_name, target_model_type)
+            for column_name, target_model_type
+            in zip(foreign_keys, target_table_types)
+            if cls.relation_is_enum(target_model_type)
         ]
 
     @classmethod
@@ -519,8 +537,8 @@ class Base(db.Model):
         relationship_names = [r[0] for r in relationships]
         # exclude relationships for which this model is the many end
         return [
-            r for r in relationship_names
-            if r not in cls._get_all_table_names_many_to_one()
+            cls._get_type_from_tablename(r) for r in relationship_names
+            if r not in cls._get_all_tablenames_many_to_one()
         ]
 
     @classmethod
