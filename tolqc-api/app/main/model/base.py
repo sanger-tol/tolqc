@@ -594,13 +594,6 @@ class Base(db.Model):
         return filter_value.lower() in ['true', 'false']
 
     @classmethod
-    def _get_enum_relation_names(cls):
-        enum_relationship_details = cls.get_enum_relationship_details()
-        return [
-            r_name for (_, r_name) in enum_relationship_details
-        ]
-
-    @classmethod
     def _preprocess_string_filter_value(cls, filter_value):
         if not cls._filter_value_is_delimited_string(filter_value):
             raise BadParameterException(
@@ -650,8 +643,7 @@ class Base(db.Model):
 
     @classmethod
     def _preprocess_filter_value(cls, filter_key, filter_value, enum_names):
-        if getattr(cls, filter_key, None) is None and \
-            filter_key not in cls.get_related_enum_types():
+        if getattr(cls, filter_key, None) is None and filter_key not in enum_names:
             raise BadParameterException(
                 f"The filter key '{filter_key}' is invalid."
             )
@@ -678,7 +670,7 @@ class Base(db.Model):
             raise BadParameterException(
                 "This API cannot filter against 'extra' columns."
             )
-        enum_names = cls._get_enum_relation_names()
+        enum_names = cls.get_related_enum_types()
         processed_eq_filters = {
             filter_key: cls._preprocess_filter_value(
                 filter_key,
