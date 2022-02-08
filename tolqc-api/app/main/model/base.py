@@ -29,8 +29,7 @@ db = SQLAlchemy(
 
 
 class ModelValidationError(Exception):
-    def __init__(self, bad_class, reason):
-        class_name = getattr(bad_class, '__tablename__', 'unknown')
+    def __init__(self, class_name, reason):
         super().__init__(
             f'The model class "{class_name}" failed validation due to '
             f'"{reason}".'
@@ -160,12 +159,27 @@ class Base(db.Model):
         }
 
     @classmethod
-    def _validate(cls):
-        pass
+    def _validate_model(cls):
+        if not hasattr(cls, '__tablename__'):
+            raise ModelValidationError(
+                'unknown',
+                'No __tablename__ was declared'
+            )
+        tablename = cls.__tablename__
+        if not hasattr(cls, 'Meta'):
+            raise ModelValidationError(
+                tablename,
+                'No Meta class was declared'
+            )
+        if not hasattr(cls.Meta, 'type_'):
+            raise ModelValidationError(
+                tablename,
+                'No (plural) type_ was declared on the Meta class'
+            )
 
     @classmethod
     def setup(cls):
-        cls._validate()
+        cls._validate_model()
         cls._populate_target_table_dict()
         cls._register_model()
 

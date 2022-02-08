@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcSpecies(LogBase):
     __tablename__ = "species"
+
+    class Meta:
+        type_ = 'species'
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())

@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcAssemblyMetrics(LogBase):
     __tablename__ = "assembly_metrics"
+
+    class Meta:
+        type_ = 'assembly_metrics'
+
     id = db.Column(db.Integer(), primary_key=True)
     assembly_id = db.Column(db.Integer, db.ForeignKey("assembly.id"))
     assembly_component_id = db.Column(db.Integer,

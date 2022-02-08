@@ -8,6 +8,10 @@ from .base import Base, db, setup_model
 @setup_model
 class TolqcUser(Base):
     __tablename__ = "user"
+
+    class Meta:
+        type_ = 'users'
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), nullable=False, unique=True)

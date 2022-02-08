@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcFile(LogBase):
     __tablename__ = "file"
+
+    class Meta:
+        type_ = 'files'
+
     id = db.Column(db.Integer(), primary_key=True)
     data_id = db.Column(db.Integer(), db.ForeignKey("data.id"))
     name = db.Column(db.String())

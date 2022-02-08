@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcSoftwareVersion(LogBase):
     __tablename__ = "software_version"
+
+    class Meta:
+        type_ = 'software_versions'
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     version = db.Column(db.String())

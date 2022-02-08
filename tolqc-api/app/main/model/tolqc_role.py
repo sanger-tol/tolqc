@@ -8,6 +8,10 @@ from .base import Base, db, setup_model
 @setup_model
 class TolqcRole(Base):
     __tablename__ = "role"
+
+    class Meta:
+        type_ = 'roles'
+
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcBuscoLineage(LogBase):
     __tablename__ = "busco_lineage"
+
+    class Meta:
+        type_ = 'busco_lineages'
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     date_created = db.Column(db.DateTime())

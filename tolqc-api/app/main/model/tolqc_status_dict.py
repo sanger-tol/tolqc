@@ -9,4 +9,8 @@ from .enum_base import EnumBase
 @setup_model
 class TolqcStatusDict(EnumBase):
     __tablename__ = "status_dict"
+
+    class Meta:
+        type_ = 'status_types'
+
     status = db.relationship("TolqcStatus", back_populates="status_dict")

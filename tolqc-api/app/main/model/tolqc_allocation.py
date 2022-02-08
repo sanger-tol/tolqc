@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcAllocation(LogBase):
     __tablename__ = "allocation"
+
+    class Meta:
+        type_ = 'allocations'
+
     id = db.Column(db.Integer(), primary_key=True)
     project_id = db.Column(db.Integer(), db.ForeignKey("project.id"))
     specimen_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"))

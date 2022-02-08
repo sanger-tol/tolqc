@@ -11,6 +11,9 @@ from .base import setup_model
 class TolqcAssemblyComponent(LogBase, EnumBase):
     __tablename__ = "assembly_component"
 
+    class Meta:
+        type_ = 'assembly_components'
+
     busco_metrics = db.relationship("TolqcBuscoMetrics",
                                     back_populates="assembly_component")
     merqury_metrics = db.relationship("TolqcMerquryMetrics",

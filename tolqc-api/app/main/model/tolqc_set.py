@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcSet(LogBase):
     __tablename__ = "set"
+
+    class Meta:
+        type_ = 'sets'
+
     id = db.Column(db.Integer(), primary_key=True)
     data_id = db.Column(db.Integer(), db.ForeignKey("data.id"))
     dataset_id = db.Column(db.Integer(), db.ForeignKey("dataset.id"))
