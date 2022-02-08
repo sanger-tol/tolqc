@@ -10,7 +10,6 @@ from .base import setup_model
 class TolqcData(LogBase):
     __tablename__ = "data"
 
-
     class Meta:
         type_ = 'data'
 

@@ -21,7 +21,7 @@ class TestModelValidation(BaseTestCase):
             __tablename__ = 'test_GG'
 
             id = db.Column(db.Integer, primary_key=True)
-        
+
         setup_model(GoodModel)
 
     def test_model_missing_meta_class_fails(self):
@@ -30,7 +30,7 @@ class TestModelValidation(BaseTestCase):
             __tablename__ = 'test_BB'
 
             id = db.Column(db.Integer, primary_key=True)
-        
+
         with pytest.raises(ModelValidationError):
             setup_model(BadModel)
 
@@ -42,6 +42,6 @@ class TestModelValidation(BaseTestCase):
             __tablename__ = 'test_BBB'
 
             id = db.Column(db.Integer, primary_key=True)
-        
+
         with pytest.raises(ModelValidationError):
             setup_model(BadModel)
