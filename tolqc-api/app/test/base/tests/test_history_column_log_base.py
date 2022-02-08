@@ -19,7 +19,7 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert201(response)
         # pull out unpredictable elements
@@ -74,7 +74,7 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_2()
+            headers=self._get_api_key_2_headers()
         )
         self.assert200(
             response,
@@ -135,7 +135,7 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert200(
             response,
@@ -204,7 +204,7 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert201(response)
 
@@ -224,7 +224,7 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert400(
             response,
@@ -275,5 +275,40 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         }
                     }
                 }
+            }
+        )
+
+    def test_specifying_history_error_400(self):
+        # specify history on a request
+        response = self.client.open(
+            '/api/v1/H',
+            method='POST',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'hello there',
+                        'history': [{
+                            'fake': 'fradulent'
+                        }]
+                    }
+                }
+            },
+            headers=self._get_api_key_1_headers()
+        )
+        self.assert400(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        # assert it failed for the right reason
+        self.assertEqual(
+            response.json,
+            {
+                'errors': [{
+                    'detail': 'Unknown field.',
+                    'source': {
+                        "pointer": "/data/attributes/history"
+                    }
+                }]
             }
         )

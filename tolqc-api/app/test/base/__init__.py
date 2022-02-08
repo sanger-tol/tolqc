@@ -17,9 +17,13 @@ from test.base.models import A_ModelRelationship, \
                              D_ModelWithNonNullableColumn, \
                              E_ModelRelationship, \
                              F_ModelWithExtField, \
-                             G_ModelWithFilterableFields
+                             G_ModelWithFilterableFields, \
+                             H_ModelLog, \
+                             I_ModelEnum, \
+                             J_ModelEnumDependent
 from test.base.resources import api_A, api_B, api_C, api_D, \
-                                api_E, api_F, api_G, api_H
+                                api_E, api_F, api_G, api_H, \
+                                api_I, api_J
 
 
 def _setup_api(blueprint):
@@ -36,13 +40,15 @@ def _setup_api(blueprint):
     api.add_namespace(api_F)
     api.add_namespace(api_G)
     api.add_namespace(api_H)
+    api.add_namespace(api_I)
+    api.add_namespace(api_J)
 
 
 class BaseTestCase(TestCase):
-    def _get_api_key_1(self):
+    def _get_api_key_1_headers(self):
         return {"Authorization": self.api_key_1}
 
-    def _get_api_key_2(self):
+    def _get_api_key_2_headers(self):
         return {"Authorization": self.api_key_2}
 
     def create_app(self):
@@ -79,3 +85,12 @@ class BaseTestCase(TestCase):
 
     def add_G(self, **kwargs):
         self._add_model_instance(G_ModelWithFilterableFields, **kwargs)
+
+    def add_H(self, **kwargs):
+        self._add_model_instance(H_ModelLog, **kwargs)
+
+    def add_I(self, **kwargs):
+        self._add_model_instance(I_ModelEnum, **kwargs)
+
+    def add_J(self, **kwargs):
+        self._add_model_instance(J_ModelEnumDependent, **kwargs)

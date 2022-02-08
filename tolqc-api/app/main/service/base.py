@@ -12,7 +12,10 @@ from marshmallow_jsonapi.exceptions import IncorrectTypeError
 
 from main.model import InstanceDoesNotExistException, \
                        StemInstanceDoesNotExistException, \
-                       BadParameterException
+                       BadParameterException, \
+                       NamedEnumInstanceDoesNotExistException, \
+                       NamedEnumStemInstanceDoesNotExistException
+from main.schema import BadEnumNameException
 
 
 class BadParameterStringException(Exception):
@@ -28,20 +31,25 @@ class BadTargetServiceException(Exception):
 
 
 def setup_service(cls):
-    cls.register_service()
+    cls.setup()
     return cls
 
 
 def handle_404(function):
     @wraps(function)
-    def wrapper(cls, id, *args, **kwargs):
+    def wrapper(cls, identifier, *args, **kwargs):
         try:
-            return function(cls, id, *args, **kwargs)
+            return function(cls, identifier, *args, **kwargs)
         except (
             InstanceDoesNotExistException,
             StemInstanceDoesNotExistException
         ):
-            return cls.error_404(id)
+            return cls.error_404(identifier)
+        except (
+            NamedEnumInstanceDoesNotExistException,
+            NamedEnumStemInstanceDoesNotExistException
+        ):
+            return cls.error_404_named_enum(identifier)
     return wrapper
 
 
@@ -60,7 +68,7 @@ def handle_400_db_integrity_error(function):
     return wrapper
 
 
-def handle_400_marshmallow_error(function):
+def handle_400_data_validation_error(function):
     @wraps(function)
     def wrapper(cls, *args, **kwargs):
         try:
@@ -68,6 +76,10 @@ def handle_400_marshmallow_error(function):
         except (ValidationError, IncorrectTypeError) as e:
             return cls.error_400_marshmallow(
                 e.messages
+            )
+        except BadEnumNameException as e:
+            return cls.error_400_validation(
+                e.message
             )
     return wrapper
 
@@ -132,9 +144,17 @@ class BaseService:
     service_registry_dict = {}
 
     @classmethod
-    def register_service(cls):
+    def setup(cls):
+        cls._register_service()
+
+    @classmethod
+    def _register_service(cls):
         type_ = cls.get_type()
         cls.service_registry_dict[type_] = cls
+
+    @classmethod
+    def is_enum_service(cls):
+        return cls.Meta.schema.is_enum_schema()
 
     @classmethod
     def get_type(cls):
@@ -205,6 +225,14 @@ class BaseService:
         )
 
     @classmethod
+    def error_400_validation(cls, message):
+        return cls._custom_error(
+            'Validation Error',
+            400,
+            message
+        )
+
+    @classmethod
     def error_400_marshmallow(cls, messages):
         return messages, 400
 
@@ -225,11 +253,11 @@ class BaseService:
         )
 
     @classmethod
-    def error_404_relation_list(cls, relation_model, id):
+    def error_404_named_enum(cls, name):
         return cls._custom_error(
             "Not Found",
             404,
-            f"No {relation_model.__tablename__} found with id {id}."
+            f"No name '{name}' exists on enum {cls.get_type()}."
         )
 
     @classmethod
@@ -250,18 +278,24 @@ class BaseService:
 
     @classmethod
     def _get_target_service_by_name(cls, service_name):
-        target_service = cls.service_registry_dict.get(
-            service_name,
-            None
-        )
+        target_service = cls.service_registry_dict.get(service_name, None)
         if target_service is None:
             raise BadTargetServiceException(service_name)
         return target_service
 
     @classmethod
-    def get_bulk_results_for_related(cls, id, calling_service, **kwargs):
+    def get_bulk_results_for_related_by_id(cls, id, calling_service, **kwargs):
         relation_model = calling_service.get_model()
         return cls.get_model().bulk_find_on_relation_id(relation_model, id, **kwargs)
+
+    @classmethod
+    def get_bulk_results_for_related_by_name(cls, name, calling_service, **kwargs):
+        relation_model = calling_service.get_model()
+        return cls.get_model().bulk_find_on_relation_name(
+            relation_model,
+            name,
+            **kwargs
+        )
 
     @classmethod
     def get_schema(cls, **kwargs):
@@ -273,6 +307,16 @@ class BaseService:
         return schema.get_model()
 
     @classmethod
+    def _update_model_instance(cls, old_model_instance, data, schema, user_id=None):
+        new_model_instance = schema.load(
+            data,
+            instance=old_model_instance,
+            partial=True
+        )
+        new_model_instance.save_update(user_id=user_id)
+        return new_model_instance
+
+    @classmethod
     @handle_404
     def read_by_id(cls, id, user_id=None):
         schema = cls.Meta.schema()
@@ -282,17 +326,17 @@ class BaseService:
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
-    @handle_400_marshmallow_error
+    @handle_400_data_validation_error
     @handle_404
     def update_by_id(cls, id, data, user_id=None):
         schema = cls.Meta.schema()
         old_model_instance = cls.Meta.model.find_by_id(id)
-        new_model_instance = schema.load(
+        new_model_instance = cls._update_model_instance(
+            old_model_instance,
             data,
-            instance=old_model_instance,
-            partial=True
+            schema,
+            user_id=user_id
         )
-        new_model_instance.save_update(user_id=user_id)
         return schema.dump(new_model_instance), 200
 
     @classmethod
@@ -306,7 +350,7 @@ class BaseService:
     @classmethod
     @provide_body_data
     @handle_400_db_integrity_error
-    @handle_400_marshmallow_error
+    @handle_400_data_validation_error
     def create(cls, data, user_id=None):
         schema = cls.Meta.schema()
         model_instance = schema.load(data)
@@ -333,5 +377,56 @@ class BaseService:
         """
         target_service = cls._get_target_service_by_name(target_service_name)
         schema = target_service.get_schema(many=True)
-        model_instances = target_service.get_bulk_results_for_related(id, cls, **kwargs)
+        model_instances = target_service.get_bulk_results_for_related_by_id(id, cls, **kwargs)
+        return schema.dump(model_instances), 200
+
+    @classmethod
+    @handle_404
+    def read_by_name(cls, name, user_id=None):
+        """Used only for enum services"""
+        schema = cls.Meta.schema()
+        model_instance = cls.Meta.model.find_by_name(name)
+        return schema.dump(model_instance), 200
+
+    @classmethod
+    @provide_body_data
+    @handle_400_db_integrity_error
+    @handle_400_data_validation_error
+    @handle_404
+    def update_by_name(cls, name, data, user_id=None):
+        """Used only for enum services"""
+        schema = cls.Meta.schema()
+        old_model_instance = cls.Meta.model.find_by_name(name)
+        new_model_instance = cls._update_model_instance(
+            old_model_instance,
+            data,
+            schema,
+            user_id=user_id
+        )
+        return schema.dump(new_model_instance), 200
+
+    @classmethod
+    @handle_400_db_integrity_error
+    @handle_404
+    def delete_by_name(cls, name, user_id=None):
+        """Used only for enum services"""
+        model_instance = cls.Meta.model.find_by_name(name)
+        model_instance.delete()
+        return None, 204
+
+    @classmethod
+    @provide_parameters
+    @handle_400_bad_parameter
+    @handle_400_nonexistent_service
+    @handle_404
+    def read_bulk_related_by_name(cls, name, target_service_name, user_id=None, **kwargs):
+        """
+        Called on the service for the first part of the endpoint
+        e.g. A in /A/{name}/B
+
+        Used only for enum services
+        """
+        target_service = cls._get_target_service_by_name(target_service_name)
+        schema = target_service.get_schema(many=True)
+        model_instances = target_service.get_bulk_results_for_related_by_name(name, cls, **kwargs)
         return schema.dump(model_instances), 200

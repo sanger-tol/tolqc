@@ -22,7 +22,7 @@ from test.base.models import A_ModelRelationship, B_ModelRelationship, \
                              D_ModelWithNonNullableColumn, \
                              E_ModelRelationship, F_ModelWithExtField, \
                              G_ModelWithFilterableFields, \
-                             H_ModelLog
+                             H_ModelLog, I_ModelEnum, J_ModelEnumDependent
 
 
 class TestCase(FlaskTestCase):
@@ -69,6 +69,8 @@ class TestCase(FlaskTestCase):
         db.session.query(F_ModelWithExtField).delete()
         db.session.query(G_ModelWithFilterableFields).delete()
         db.session.query(H_ModelLog).delete()
+        db.session.query(J_ModelEnumDependent).delete()
+        db.session.query(I_ModelEnum).delete()
 
         # ToLQC models
         # TODO delete this all by cascade

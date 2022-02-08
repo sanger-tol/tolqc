@@ -4,6 +4,7 @@
 
 from main.model.base import Base, db, ExtColumn, setup_model
 from main.model.log_base import LogBase
+from main.model.enum_base import EnumBase
 
 
 @setup_model
@@ -78,3 +79,19 @@ class H_ModelLog(LogBase):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     string_column = db.Column(db.String, nullable=True)
+
+
+@setup_model
+class I_ModelEnum(EnumBase):
+    __tablename__ = 'I'
+    __table_args__ = {'extend_existing': True}
+    J = db.relationship('J_ModelEnumDependent', back_populates='I')
+
+
+@setup_model
+class J_ModelEnumDependent(Base):
+    __tablename__ = 'J'
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    i_id = db.Column(db.Integer, db.ForeignKey("I.id"), nullable=False)
+    I = db.relationship(I_ModelEnum, back_populates='J', foreign_keys=[i_id])

@@ -51,6 +51,11 @@ class StemInstanceDoesNotExistException(Exception):
     pass
 
 
+class NamedEnumStemInstanceDoesNotExistException(Exception):
+    """Used on 'related' endpoints concerning enum tables"""
+    pass
+
+
 class ExtColumn(db.Column):
     def __init__(self, **kwargs):
         super().__init__(
@@ -75,17 +80,105 @@ class Base(db.Model):
     """
     __abstract__ = True
 
+    # a dict in which all inhertied classes are registered during setup
+    model_registry_dict = {}
+
+    def __init__(self, **data):
+        converted_data = self._convert_enum_names_to_foreign_key_ids(data)
+        return super().__init__(**converted_data)
+
+    @classmethod
+    def _convert_enum_names_to_foreign_key_ids(cls, data):
+        """Converts enum_table:name pairs into foreign_key:id pairs"""
+        enum_relationship_details = cls.get_enum_relationship_details()
+        enum_relation_names = [
+            r_model_name for (_, r_model_name) in enum_relationship_details
+        ]
+        foreign_key_names = [
+            fkey_name for (fkey_name, _) in enum_relationship_details
+        ]
+        relation_model_name_pairs = [
+            (
+                r_model_name,
+                data.get(r_model_name, None)
+            )
+            for r_model_name in enum_relation_names
+        ]
+        enum_foreign_key_id_dict = {
+            f_key_name: cls.get_model_by_type(
+                r_model_name
+            ).get_id_from_name(enum_name)
+            for (r_model_name, enum_name), f_key_name in zip(
+                relation_model_name_pairs,
+                foreign_key_names
+            )
+            if enum_name is not None
+        }
+        data = {**data, **enum_foreign_key_id_dict}
+        return {
+            key: pair for (key, pair) in data.items()
+            if key not in enum_relation_names
+        }
+
+    @classmethod
+    def _convert_foreign_key_ids_to_enum_names(cls, data):
+        """Converts foreign_key:id pairs into enum_table:name pairs"""
+        enum_relationship_details = cls.get_enum_relationship_details()
+        enum_relation_names = [
+            r_model_name for (_, r_model_name) in enum_relationship_details
+        ]
+        foreign_key_names = [
+            fkey_name for (fkey_name, _) in enum_relationship_details
+        ]
+        foreign_key_ids = [
+            data.get(foreign_key_name, None)
+            for foreign_key_name in foreign_key_names
+        ]
+        relation_model_name_dict = {
+            r_model_name: cls.get_relation_enum_name_by_id(
+                r_model_name,
+                id
+                ) if id is not None else None
+            for r_model_name, id in zip(
+                enum_relation_names,
+                foreign_key_ids,
+            )
+        }
+        data = {**data, **relation_model_name_dict}
+        return {
+            key: pair for (key, pair) in data.items()
+            if key not in foreign_key_names
+        }
+
     @classmethod
     def setup(cls):
         cls._populate_target_table_dict()
+        cls._register_model()
 
-    def to_dict(self, exclude_column_names=[]):
-        return {
+    def to_dict(self, exclude_column_names=[], convert_enums=True):
+        dict_data = {
             column_name: getattr(self, column_name)
             for column_name
             in self.get_column_names()
             if column_name not in exclude_column_names
         }
+        if not convert_enums:
+            return dict_data
+        return self._convert_foreign_key_ids_to_enum_names(dict_data)
+
+    @classmethod
+    def _register_model(cls):
+        type_ = cls.__tablename__
+        cls.model_registry_dict[type_] = cls
+
+    @classmethod
+    def get_model_by_type(cls, type_):
+        return cls.model_registry_dict[type_]
+
+    @classmethod
+    def model_is_enum(cls, type_):
+        model = cls.get_model_by_type(type_)
+        return model.is_enum_table()
 
     def add(self):
         db.session.add(self)
@@ -108,7 +201,8 @@ class Base(db.Model):
         self.commit()
 
     def update(self, data, ext=None):
-        for key, item in data.items():
+        converted_data = self._convert_enum_names_to_foreign_key_ids(data)
+        for key, item in converted_data.items():
             setattr(self, key, item)
         if ext is not None:
             self._update_ext(ext)
@@ -152,15 +246,39 @@ class Base(db.Model):
         return sort_by_column if ascending else sort_by_column.desc()
 
     @classmethod
-    def _sort_by_query(cls, query, sort_by):
-        if sort_by is None:
-            return query.order_by(cls.id)
-        (sort_by_column_name, ascending) = sort_by
+    def _get_sort_by_non_enum(cls, query, sort_by_attribute, ascending):
         sort_by_column = cls._get_sort_by_column(
-            sort_by_column_name,
+            sort_by_attribute,
             ascending
         )
         return query.order_by(sort_by_column)
+
+    @classmethod
+    def _get_sort_by_enum(cls, query, enum_name, ascending):
+        enum_relation_model = cls.get_model_by_type(enum_name)
+        enum_relationship = getattr(cls, enum_name)
+        sort_by_column = enum_relation_model.name if ascending \
+            else enum_relation_model.name.desc()
+        return query.select_from(enum_relation_model) \
+                    .join(enum_relationship) \
+                    .order_by(sort_by_column)
+
+    @classmethod
+    def _sort_by_query(cls, query, sort_by):
+        if sort_by is None:
+            return query.order_by(cls.id)
+        (sort_by_attribute, ascending) = sort_by
+        if sort_by_attribute in cls._get_related_enum_table_names():
+            return cls._get_sort_by_enum(
+                query,
+                sort_by_attribute,
+                ascending
+            )
+        return cls._get_sort_by_non_enum(
+            query,
+            sort_by_attribute,
+            ascending
+        )
 
     @classmethod
     def _filter_query(cls, query, eq_filters):
@@ -204,11 +322,20 @@ class Base(db.Model):
         return cls._postprocess_bulk_find(query, **kwargs).all()
 
     @classmethod
-    def bulk_find_on_relation_id(cls, relation_model, relation_id, **kwargs):
-        cls._check_related_model_by_id_exists(relation_model, relation_id)
+    def _bulk_find_on_relation(cls, relation_model, relation_id, **kwargs):
         foreign_key = cls._get_foreign_key_from_relation_model(relation_model)
         query = db.session.query(cls).filter(foreign_key == relation_id)
         return cls._postprocess_bulk_find(query, **kwargs).all()
+
+    @classmethod
+    def bulk_find_on_relation_id(cls, relation_model, relation_id, **kwargs):
+        cls._check_related_model_by_id_exists(relation_model, relation_id)
+        return cls._bulk_find_on_relation(relation_model, relation_id, **kwargs)
+
+    @classmethod
+    def bulk_find_on_relation_name(cls, relation_model, relation_name, **kwargs):
+        relation_id = cls._get_related_model_id_by_name(relation_model, relation_name)
+        return cls._bulk_find_on_relation(relation_model, relation_id, **kwargs)
 
     @classmethod
     def _check_related_model_by_id_exists(cls, relation_model, relation_id):
@@ -217,6 +344,15 @@ class Base(db.Model):
                                      .one_or_none()
         if related_instance is None:
             raise StemInstanceDoesNotExistException()
+
+    @classmethod
+    def _get_related_model_id_by_name(cls, relation_model, relation_name):
+        related_instance = db.session.query(relation_model) \
+                                     .filter_by(name=relation_name) \
+                                     .one_or_none()
+        if related_instance is None:
+            raise NamedEnumStemInstanceDoesNotExistException()
+        return related_instance.id
 
     @staticmethod
     def rollback():
@@ -255,15 +391,20 @@ class Base(db.Model):
             c for c in columns
             if len(c.foreign_keys) == 1
         ]
-        cls.target_table_dict = {
+        cls.target_table_column_dict = {
             cls._get_target_table_from_column(column): column
             for column
             in foreign_keys_columns
         }
 
     @classmethod
+    def relation_is_enum(cls, type_):
+        relation_model = cls.get_model_by_type(type_)
+        return relation_model.is_enum_table()
+
+    @classmethod
     def _get_foreign_key_from_relation_model(cls, relation_model):
-        return cls.target_table_dict[relation_model.__tablename__]
+        return cls.target_table_column_dict[relation_model.__tablename__]
 
     @classmethod
     def _get_columns(cls):
@@ -298,10 +439,50 @@ class Base(db.Model):
         return False
 
     @classmethod
+    def is_enum_table(cls):
+        return False
+
+    @classmethod
     def get_foreign_key_column_names(cls):
         return [
             c.name for c in cls._get_columns()
             if c.foreign_keys
+        ]
+
+    @classmethod
+    def _get_foreign_keys_and_target_tables(cls):
+        foreign_keys = cls.get_foreign_key_column_names()
+        target_tables = [
+            cls.get_target_table_column_from_foreign_key(c_name)[0]
+            for c_name in foreign_keys
+        ]
+        return foreign_keys, target_tables
+
+    @classmethod
+    def get_enum_relationship_details(cls):
+        foreign_keys, target_tables = cls._get_foreign_keys_and_target_tables()
+        return [
+            (column_name, target_table) for column_name, target_table
+            in zip(foreign_keys, target_tables)
+            if cls.relation_is_enum(target_table)
+        ]
+
+    @classmethod
+    def get_relation_id_by_enum_name(cls, relation_type, enum_name):
+        relation_model = cls.get_model_by_type(relation_type)
+        return relation_model.get_id_from_name(enum_name)
+
+    @classmethod
+    def get_relation_enum_name_by_id(cls, relation_type, id):
+        relation_model = cls.get_model_by_type(relation_type)
+        return relation_model.get_name_from_id(id)
+
+    @classmethod
+    def _get_related_enum_table_names(cls):
+        _, target_tables = cls._get_foreign_keys_and_target_tables()
+        return [
+            t_table for t_table in target_tables
+            if cls.relation_is_enum(t_table)
         ]
 
     @classmethod
@@ -360,20 +541,24 @@ class Base(db.Model):
         return filter_value.lower() in ['true', 'false']
 
     @classmethod
-    def _preprocess_filter_value(cls, filter_key, filter_value):
-        if getattr(cls, filter_key, None) is None:
+    def _get_enum_relation_names(cls):
+        enum_relationship_details = cls.get_enum_relationship_details()
+        return [
+            r_name for (_, r_name) in enum_relationship_details
+        ]
+
+    @classmethod
+    def _preprocess_string_filter_value(cls, filter_value):
+        if not cls._filter_value_is_delimited_string(filter_value):
             raise BadParameterException(
-                f"The filter key '{filter_key}' is invalid."
+                f"The string filter value '{filter_value}' must be surrounded "
+                "by quotation marks (either ' or \")"
             )
-        python_type = cls.get_column_python_type(filter_key)
-        if python_type == str:
-            if not cls._filter_value_is_delimited_string(filter_value):
-                raise BadParameterException(
-                    f"The string filter value '{filter_value}' must be surrounded "
-                    "by quotation marks (either ' or \")"
-                )
-            # strip surrounding quotes
-            return filter_value[1:-1]
+        # strip surrounding quotes
+        return filter_value[1:-1]
+
+    @classmethod
+    def _preprocess_non_string_filter_value(cls, filter_value, python_type):
         if python_type == int and not filter_value.isdigit():
             raise BadParameterException(
                 f"The filter value '{filter_value}' must be an integer."
@@ -397,6 +582,41 @@ class Base(db.Model):
         return filter_value
 
     @classmethod
+    def _preprocess_enum_filter(cls, filter_key, filter_value):
+        enum_relation_model = cls.get_model_by_type(filter_key)
+        filter_enum_name = cls._preprocess_string_filter_value(
+            filter_value
+        )
+        valid_enum_names = enum_relation_model.get_enum_values()
+        if filter_enum_name not in valid_enum_names:
+            raise BadParameterException(
+                f"The (filter) name '{filter_enum_name}' does not exist on "
+                f"the enum {filter_key}."
+            )
+        return filter_enum_name
+
+    @classmethod
+    def _preprocess_filter_value(cls, filter_key, filter_value, enum_names):
+        if getattr(cls, filter_key, None) is None:
+            raise BadParameterException(
+                f"The filter key '{filter_key}' is invalid."
+            )
+
+        # pre-remove enum types
+        if filter_key in enum_names:
+            return cls._preprocess_enum_filter(filter_key, filter_value)
+
+        python_type = cls.get_column_python_type(filter_key)
+
+        if python_type == str:
+            return cls._preprocess_string_filter_value(filter_value)
+
+        return cls._preprocess_non_string_filter_value(
+            filter_value,
+            python_type
+        )
+
+    @classmethod
     def _preprocess_filters(cls, eq_filters):
         if not eq_filters:
             return None
@@ -404,8 +624,16 @@ class Base(db.Model):
             raise BadParameterException(
                 "This API cannot filter against 'extra' columns."
             )
-        return {
-            filter_key: cls._preprocess_filter_value(filter_key, filter_value)
+        enum_names = cls._get_enum_relation_names()
+        processed_eq_filters = {
+            filter_key: cls._preprocess_filter_value(
+                filter_key,
+                filter_value,
+                enum_names
+            )
             for (filter_key, filter_value)
             in eq_filters.items()
         }
+        return cls._convert_enum_names_to_foreign_key_ids(
+            processed_eq_filters
+        )

@@ -2,14 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Resource
+from flask_restx import Resource as FlaskRestxResource
 from functools import wraps
 
 from main.auth import auth
-from main.swagger import BaseSwagger
 
 
-PARAMS_DICT = {
+LIST_GET_PARAMS_DICT = {
     'page': {
         'in': 'query',
         'type': 'integer',
@@ -99,7 +98,7 @@ def _document_list_get(cls):
     api, swagger = _get_api_swagger(cls)
     decorators = (
         api.doc(
-            params=PARAMS_DICT,
+            params=LIST_GET_PARAMS_DICT,
             responses={
                 '200': (
                     'Success',
@@ -128,19 +127,17 @@ def _document_post(cls):
     cls.post = _compose_decorators(cls.post, decorators)
 
 
-def _document_relation_list_get(cls, relation):
-    api, self_swagger = _get_api_swagger(cls)
-    relation_swagger = BaseSwagger.get_registered_swagger(relation)
-    relation_list_response_model = self_swagger.duplicate_relationship_swagger(
-        relation_swagger
-    )
+def _document_relation_list_get(cls, relation_name):
+    api, swagger = _get_api_swagger(cls)
     decorators = (
         api.doc(
-            params=PARAMS_DICT,
+            params=LIST_GET_PARAMS_DICT,
             responses={
                 '200': (
                     'Success',
-                    relation_list_response_model,
+                    swagger.get_relation_list_get_swagger_model(
+                        relation_name
+                    ),
                 ),
                 '400': 'Bad Request',
                 '404': 'Not Found'
@@ -172,7 +169,52 @@ def _document_relation_list_resource(cls, relation):
     return api.route(f'/<int:id>/{relation}')(cls)
 
 
+def _document_enum_detail_resource(cls):
+    api, _ = _get_api_swagger(cls)
+    _document_detail_get(cls)
+    _document_patch(cls)
+    _document_delete(cls)
+    return api.route('/<name>')(cls)
+
+
+def _document_enum_relation_list_resource(cls, relation):
+    api, _ = _get_api_swagger(cls)
+    _document_relation_list_get(cls, relation)
+    return api.route(f'/<name>/{relation}')(cls)
+
+
 class BaseResource:
+    @classmethod
+    def is_enum_resource(cls):
+        return cls.Meta.service.is_enum_service()
+
+    @classmethod
+    def _setup_non_enum_resource(cls):
+        cls.add_list_resource()
+        cls.add_detail_resource()
+        cls.populate_relation_list_get_swaggers()
+        cls.add_relation_list_resources()
+
+    @classmethod
+    def _setup_enum_resource(cls):
+        cls.add_list_resource()
+        cls.add_enum_detail_resource()
+        cls.populate_relation_list_get_swaggers()
+        cls.add_enum_relation_list_resources()
+
+    @classmethod
+    def setup(cls):
+        if cls.is_enum_resource():
+            cls._setup_enum_resource()
+        else:
+            cls._setup_non_enum_resource()
+
+    @classmethod
+    def populate_relation_list_get_swaggers(cls):
+        relationship_names = cls.Meta.service.get_model() \
+                                     .get_one_to_many_relationship_names()
+        cls.Meta.swagger.duplicate_relationship_swaggers(relationship_names)
+
     @classmethod
     def add_list_resource(cls):
         type_ = cls.Meta.service.get_type()
@@ -192,18 +234,57 @@ class BaseResource:
         ))
 
     @classmethod
-    def add_relation_list_resources(cls):
+    def _declare_and_decorate_relation_list_resource(cls, relation_name):
         type_ = cls.Meta.service.get_type()
+        declared = type(
+            f'{type_.title()}RelationListResource_{relation_name}',
+            (BaseRelationListResource,),
+            {'Meta': cls.Meta, 'relation': relation_name}
+        )
+        return _document_relation_list_resource(declared, relation_name)
+
+    @classmethod
+    def _declare_and_decorate_enum_relation_list_resource(cls, relation_name):
+        type_ = cls.Meta.service.get_type()
+        declared = type(
+            f'{type_.title()}EnumRelationListResource_{relation_name}',
+            (BaseEnumNameRelationListResource,),
+            {'Meta': cls.Meta, 'relation': relation_name}
+        )
+        return _document_enum_relation_list_resource(declared, relation_name)
+
+    @classmethod
+    def add_relation_list_resources(cls):
         relationship_names = cls.Meta.service.get_model() \
                                      .get_one_to_many_relationship_names()
         cls.relation_list_resources = [
-            _document_relation_list_resource(type(
-                f'{type_.title()}RelationDetailResource_{r_name}',
-                (BaseRelationListResource,),
-                {'Meta': cls.Meta, 'relation': r_name}
-            ), r_name)
+            cls._declare_and_decorate_relation_list_resource(r_name)
             for r_name in relationship_names
         ]
+
+    @classmethod
+    def add_enum_detail_resource(cls):
+        type_ = cls.Meta.service.get_type()
+        cls.detail_resource = _document_enum_detail_resource(type(
+            f'{type_.title()}DetailResource',
+            (BaseEnumNameDetailResource,),
+            {'Meta': cls.Meta}
+        ))
+
+    @classmethod
+    def add_enum_relation_list_resources(cls):
+        relationship_names = cls.Meta.service.get_model() \
+                                     .get_one_to_many_relationship_names()
+        cls.relation_list_resources = [
+            cls._declare_and_decorate_enum_relation_list_resource(r_name)
+            for r_name in relationship_names
+        ]
+
+
+class Resource(FlaskRestxResource):
+    @classmethod
+    def auth_error(cls, message):
+        return cls.Meta.service.error_401(message)
 
 
 class BaseListResource(Resource):
@@ -214,10 +295,6 @@ class BaseListResource(Resource):
     @classmethod
     def post(cls, user_id=None):
         return cls.Meta.service.create(user_id=user_id)
-
-    @classmethod
-    def auth_error(cls, message):
-        return cls.Meta.service.error_401(message)
 
 
 class BaseDetailResource(Resource):
@@ -233,9 +310,19 @@ class BaseDetailResource(Resource):
     def delete(cls, id, user_id=None):
         return cls.Meta.service.delete_by_id(id, user_id=user_id)
 
+
+class BaseEnumNameDetailResource(Resource):
     @classmethod
-    def auth_error(cls, message):
-        return cls.Meta.service.error_401(message)
+    def get(cls, name, user_id=None):
+        return cls.Meta.service.read_by_name(name, user_id=user_id)
+
+    @classmethod
+    def patch(cls, name, user_id=None):
+        return cls.Meta.service.update_by_name(name, user_id=user_id)
+
+    @classmethod
+    def delete(cls, name, user_id=None):
+        return cls.Meta.service.delete_by_name(name, user_id=user_id)
 
 
 class BaseRelationListResource(Resource):
@@ -247,15 +334,19 @@ class BaseRelationListResource(Resource):
             user_id=user_id
         )
 
+
+class BaseEnumNameRelationListResource(Resource):
     @classmethod
-    def auth_error(cls, message):
-        return cls.Meta.service.error_401(message)
+    def get(cls, name, user_id=None):
+        return cls.Meta.service.read_bulk_related_by_name(
+            name,
+            cls.relation,
+            user_id=user_id
+        )
 
 
 def setup_resource(cls):
     """Dynamically adds detail, list, and related list resources
     to a BaseResource inheritor."""
-    cls.add_list_resource()
-    cls.add_detail_resource()
-    cls.add_relation_list_resources()
+    cls.setup()
     return cls

@@ -14,20 +14,18 @@ from marshmallow_jsonapi.fields import ResourceMeta, Relationship, Str, \
 from main.model import db
 
 
-def setup_schema(OldCls):
-    """Dynamically adds fields to a Schema Class inheriting
-    from BaseSchema"""
-    OldCls.setup()
-    NewCls = type(
-        f'_{OldCls.get_type().title()}Schema',
-        (OldCls,),
-        OldCls.get_dynamically_added_fields()
-    )
-    return NewCls
+def setup_schema(cls):
+    return cls.setup()
 
 
 class CombinedOpts(JsonapiSchemaOpts, SQLAlchemyAutoSchemaOpts):
     pass
+
+
+class BadEnumNameException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
 
 
 class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
@@ -42,26 +40,37 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         @classmethod
         def setup_meta(cls):
             cls.type_ = cls.model.__tablename__
-            cls.self_view = cls.type_
-            cls.self_view_kwargs = {cls.type_: "<id>"}
-            cls.self_view_many = cls.type_
 
     OPTIONS_CLASS = CombinedOpts
 
     id = Str(dump_only=True)
 
     def __init__(self, **kwargs):
-        exclude = self.get_excluded_columns()
+        exclude = kwargs.pop('exclude', []) + self.get_excluded_columns()
         return super().__init__(exclude=exclude, **kwargs)
 
     @classmethod
-    def setup(cls):
-        cls.Meta.setup_meta()
-        cls._public_attribute_names = cls._get_public_attribute_names()
+    def setup(old_cls):
+        """Dynamically adds fields to a Schema Class inheriting
+        from BaseSchema"""
+        old_cls.Meta.setup_meta()
+        old_cls._populate_public_attribute_and_enum_names()
+        new_cls = type(
+            f'_{old_cls.get_type().title()}Schema',
+            (old_cls,),
+            old_cls.get_dynamically_added_fields()
+        )
+        return new_cls
 
     @classmethod
     def get_model(cls):
         return cls.Meta.model
+
+    @classmethod
+    def _populate_public_attribute_and_enum_names(cls):
+        cls._public_attribute_names = cls._get_public_attribute_names()
+        cls._public_attribute_and_enum_names = \
+            cls._public_attribute_names + cls._get_enum_attribute_names()
 
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
@@ -85,14 +94,15 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _many_to_one_relationship_is_dump_only(cls, special_name):
-        dump_only_special_names = ['creator'] + list(
+        dump_only_special_names = ['creator', 'last_modifier'] + list(
             getattr(cls.Meta, 'dump_only_relationships', [])
         )
         return special_name in dump_only_special_names
 
     @classmethod
     def _create_many_to_one_relationship_field_by_name(cls, foreign_key_name):
-        target_table, target_column = cls.Meta.model.get_target_table_column_from_foreign_key(
+        model = cls.Meta.model
+        target_table, target_column = model.get_target_table_column_from_foreign_key(
             foreign_key_name
         )
         special_name = cls._lookup_special_relationship_name(
@@ -112,19 +122,35 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _create_many_to_one_relationship_fields(cls):
-        foreign_key_names = cls.Meta.model.get_foreign_key_column_names()
-        # maps the relationship name to its target table
         cls.many_to_one_relationship_info = {}
+        model = cls.Meta.model
+        foreign_key_names = model.get_foreign_key_column_names()
+        # do not express enums as a true schema relationship
+        enum_foreign_key_names = [
+            f_key for (f_key, _) in model.get_enum_relationship_details()
+        ]
+        # maps the relationship name to its target table
         pairs = [
             cls._create_many_to_one_relationship_field_by_name(foreign_key_name)
             for foreign_key_name in foreign_key_names
+            if foreign_key_name not in enum_foreign_key_names
         ]
         return {
             field_name: field for (field_name, field) in pairs
         }
 
     @classmethod
-    def _create_one_to_many_relationship_field_by_name(cls, name):
+    def _create_one_to_many_relationship_field_by_name_enum(cls, r_name):
+        return Relationship(
+            f'/enum/{cls.get_type()}/{{name}}/{r_name}',
+            related_url_kwargs={'name': '<name>'},
+            many=True,
+            type_=r_name,
+            dump_default=lambda: []
+        )
+
+    @classmethod
+    def _create_one_to_many_relationship_field_by_name_non_enum(cls, name):
         return Relationship(
             f'/{cls.get_type()}/{{id}}/{name}',
             related_url_kwargs={'id': '<id>'},
@@ -132,6 +158,12 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
             type_=name,
             dump_default=lambda: []
         )
+
+    @classmethod
+    def _create_one_to_many_relationship_field_by_name(cls, name):
+        if cls.is_enum_schema():
+            return cls._create_one_to_many_relationship_field_by_name_enum(name)
+        return cls._create_one_to_many_relationship_field_by_name_non_enum(name)
 
     @classmethod
     def _create_one_to_many_relationship_fields(cls):
@@ -143,13 +175,10 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     @classmethod
     def _create_relationship_fields(cls):
-        many_to_one_relationship_fields = cls._create_many_to_one_relationship_fields()
-        one_to_many_relationship_fields = cls._create_one_to_many_relationship_fields()
-        all_relationship_fields = {
-            **many_to_one_relationship_fields,
-            **one_to_many_relationship_fields
+        return {
+            **cls._create_many_to_one_relationship_fields(),
+            **cls._create_one_to_many_relationship_fields()
         }
-        return all_relationship_fields
 
     @classmethod
     def _get_possibly_empty_resource_meta_field(cls):
@@ -170,19 +199,30 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
+    def _get_enum_attribute_names(cls):
+        return [
+            t_table for (_, t_table)
+            in cls.Meta.model.get_enum_relationship_details()
+        ]
+
+    @classmethod
+    def _get_possibly_empty_enum_name_fields(cls):
+        enum_names = cls._get_enum_attribute_names()
+        return {enum_name: Str() for enum_name in enum_names}
+
+    @classmethod
     def _get_dynamically_added_non_relationship_fields(cls):
         return {
             **cls._get_possibly_empty_resource_meta_field(),
-            **cls._get_possibly_empty_creation_log_fields()
+            **cls._get_possibly_empty_creation_log_fields(),
+            **cls._get_possibly_empty_enum_name_fields()
         }
 
     @classmethod
     def get_dynamically_added_fields(cls):
-        relationship_fields = cls._create_relationship_fields()
-        other_fields = cls._get_dynamically_added_non_relationship_fields()
         return {
-            **relationship_fields,
-            **other_fields
+            **cls._create_relationship_fields(),
+            **cls._get_dynamically_added_non_relationship_fields()
         }
 
     @classmethod
@@ -205,15 +245,20 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.model.has_ext_column()
 
     @classmethod
+    def is_enum_schema(cls):
+        return cls.Meta.model.is_enum_table()
+
+    @classmethod
     def _get_public_attribute_names(cls):
         return [
-            column for column in cls.Meta.model.get_column_names()
+            column for column
+            in cls.Meta.model.get_column_names()
             if column not in ['id', 'ext'] + cls.get_excluded_columns()
         ]
 
     @classmethod
     def attribute_is_public(cls, attribute_name):
-        return attribute_name in cls._public_attribute_names
+        return attribute_name in cls._public_attribute_and_enum_names
 
     @classmethod
     def get_included_attributes(cls):
@@ -311,8 +356,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
         return datum
 
-    @post_dump(pass_many=True)
-    def re_insert_ext_data(self, data, many, **kwargs):
+    def _reinsert_ext_data(self, data, many):
         if not self.has_ext_field():
             return data
 
@@ -328,4 +372,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 self._ext_data
             )
 
+        return data
+
+    @post_dump(pass_many=True)
+    def postprocess_data(self, data, many, **kwargs):
+        data = self._reinsert_ext_data(data, many)
         return data

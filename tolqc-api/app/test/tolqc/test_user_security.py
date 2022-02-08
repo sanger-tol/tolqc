@@ -69,6 +69,18 @@ class TestUserSecurity(TolqcTestCase):
         )
         self.assert400(response)
 
+        # assert that it failed for the correct reason
+        self.assertEqual(
+            response.json,
+            {
+                'errors': [{
+                    'code': 400,
+                    'detail': "The filter key 'api_key' is invalid.",
+                    'title': 'Bad Request'
+                }]
+            }
+        )
+
     def test_no_overwrite_creator_in_request(self):
         """Ensures that an authenticated user can not defraud the
         creator log by specifying another creator in a POST or
@@ -87,7 +99,7 @@ class TestUserSecurity(TolqcTestCase):
         }
 
         response = self.client.open(
-            '/api/v1/assembly_component',
+            '/api/v1/enum/assembly_component',
             method='POST',
             json={
                 'data': {
@@ -129,7 +141,7 @@ class TestUserSecurity(TolqcTestCase):
 
         # try to modify its creator
         response = self.client.open(
-            '/api/v1/assembly_component/4321',
+            '/api/v1/enum/assembly_component/test',
             method='PATCH',
             json={
                 'data': {
@@ -176,7 +188,7 @@ class TestUserSecurity(TolqcTestCase):
         }
 
         response = self.client.open(
-            '/api/v1/assembly_component',
+            '/api/v1/enum/assembly_component',
             method='POST',
             json={
                 'data': {
@@ -211,7 +223,7 @@ class TestUserSecurity(TolqcTestCase):
 
         # try to modify its creator
         response = self.client.open(
-            '/api/v1/assembly_component/43',
+            '/api/v1/enum/assembly_component/test',
             method='PATCH',
             json={
                 'data': {

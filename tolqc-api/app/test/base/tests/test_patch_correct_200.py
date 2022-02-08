@@ -30,7 +30,7 @@ class TestUpdatedCorrectly200(BaseTestCase):
                     }
                 }
             },
-            headers=self._get_api_key_1()
+            headers=self._get_api_key_1_headers()
         )
         self.assert200(
             response,
