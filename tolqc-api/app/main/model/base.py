@@ -160,20 +160,20 @@ class Base(db.Model):
 
     @classmethod
     def _validate_model(cls):
+        name = cls.__name__
         if not hasattr(cls, '__tablename__'):
             raise ModelValidationError(
-                'unknown',
+                name,
                 'No __tablename__ was declared'
             )
-        tablename = cls.__tablename__
         if not hasattr(cls, 'Meta'):
             raise ModelValidationError(
-                tablename,
+                name,
                 'No Meta class was declared'
             )
         if not hasattr(cls.Meta, 'type_'):
             raise ModelValidationError(
-                tablename,
+                name,
                 'No (plural) type_ was declared on the Meta class'
             )
 
