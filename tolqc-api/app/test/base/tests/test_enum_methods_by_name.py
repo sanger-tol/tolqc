@@ -189,3 +189,61 @@ class TestEnumMethodsByName(BaseTestCase):
             response,
             f'Response body is : {response.data.decode("utf-8")}'
         )
+
+    def test_equivalent_methods_list_get_I_and_J(self):
+        # add the data
+        self.add_I(id=878, name='excellent')
+        self.add_J(id=909090, I='excellent')
+        self.add_J(id=8374483, I='excellent')
+        self.add_J(id=987, I='excellent')
+
+        # the expected data (should be identical for both)
+        expected_data = {
+            'data': [
+                {
+                    'type': 'J',
+                    'id': '987',
+                    'attributes': {
+                        'I': 'excellent'
+                    }
+                },
+                {
+                    'type': 'J',
+                    'id': '909090',
+                    'attributes': {
+                        'I': 'excellent'
+                    }
+                },
+                {
+                    'type': 'J',
+                    'id': '8374483',
+                    'attributes': {
+                        'I': 'excellent'
+                    }
+                },
+            ]
+        }
+        
+        # J-relation list get on I
+        first_response = self.client.open(
+            '/api/v1/enum/I/excellent/J',
+            method='GET'
+        )
+        self.assert200(
+            first_response,
+            f'Response body is : {first_response.data.decode("utf-8")}'
+        )
+        # assert that the data is correct
+        self.assertEqual(first_response.json, expected_data)
+
+        # list-get on J, filter by I=excellent
+        second_response = self.client.open(
+            '/api/v1/J?filter=[I=="excellent"]',
+            method='GET'
+        )
+        self.assert200(
+            second_response,
+            f'Response body is : {second_response.data.decode("utf-8")}'
+        )
+        # assert that the data is correct
+        self.assertEqual(second_response.json, expected_data)
