@@ -21,11 +21,9 @@ def default_datetime_dump(value):
     raise TypeError()
 
 
-db = SQLAlchemy(
-    engine_options={
-        'json_serializer': lambda obj: json.dumps(obj, default=default_datetime_dump)
-    }
-)
+db = SQLAlchemy(engine_options={
+    'json_serializer': lambda obj: json.dumps(obj, default=default_datetime_dump)
+})
 
 
 class ModelValidationError(Exception):
