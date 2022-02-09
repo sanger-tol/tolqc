@@ -157,8 +157,8 @@ class BaseSwagger:
     @classmethod
     def _get_default_related_link(cls, relation_name):
         path = cls._get_api_path()
-        identifier = 'name' if cls.is_enum_swagger() else '1'
-        return f'{path}/{identifier}/{relation_name}'
+        default_identifier = 'name' if cls.is_enum_swagger() else '1'
+        return f'{path}/{default_identifier}/{relation_name}'
 
     @classmethod
     def _get_individual_one_to_many_relationship_dict(cls, relation_name):
