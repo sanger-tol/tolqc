@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcGenomescopeMetrics(LogBase):
     __tablename__ = "genomescope_metrics"
+
+    class Meta:
+        type_ = 'genomescope_metrics'
+
     id = db.Column(db.Integer(), primary_key=True)
     dataset_id = db.Column(db.Integer(), db.ForeignKey("dataset.id"))
     kmer = db.Column(db.Integer())

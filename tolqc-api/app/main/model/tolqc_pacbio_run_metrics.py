@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcPacbioRunMetrics(LogBase):
     __tablename__ = "pacbio_run_metrics"
+
+    class Meta:
+        type_ = 'pacbio_run_metrics'
+
     id = db.Column(db.Integer(), primary_key=True)
     run_id = db.Column(db.Integer(), db.ForeignKey("run.id"))
     move_time = db.Column(db.Integer())

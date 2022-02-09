@@ -8,6 +8,10 @@ from .base import Base, db, setup_model
 @setup_model
 class TolqcLibraryType(Base):
     __tablename__ = "library_type"
+
+    class Meta:
+        type_ = 'library_types'
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())

@@ -28,6 +28,14 @@ db = SQLAlchemy(
 )
 
 
+class ModelValidationError(Exception):
+    def __init__(self, class_name, reason):
+        super().__init__(
+            f'The model class "{class_name}" failed validation due to '
+            f'"{reason}".'
+        )
+
+
 class BadParameterException(Exception):
     def __init__(self, message):
         self.message = message
@@ -82,6 +90,9 @@ class Base(db.Model):
 
     # a dict in which all inhertied classes are registered during setup
     model_registry_dict = {}
+
+    # maps __tablename__ to type_
+    tablename_type_dict = {}
 
     def __init__(self, **data):
         converted_data = self._convert_enum_names_to_foreign_key_ids(data)
@@ -151,7 +162,27 @@ class Base(db.Model):
         }
 
     @classmethod
+    def _validate_model(cls):
+        name = cls.__name__
+        if not hasattr(cls, '__tablename__'):
+            raise ModelValidationError(
+                name,
+                'No __tablename__ was declared'
+            )
+        if not hasattr(cls, 'Meta'):
+            raise ModelValidationError(
+                name,
+                'No Meta class was declared'
+            )
+        if not hasattr(cls.Meta, 'type_'):
+            raise ModelValidationError(
+                name,
+                'No (plural) type_ was declared on the Meta class'
+            )
+
+    @classmethod
     def setup(cls):
+        cls._validate_model()
         cls._populate_target_table_dict()
         cls._register_model()
 
@@ -167,9 +198,15 @@ class Base(db.Model):
         return self._convert_foreign_key_ids_to_enum_names(dict_data)
 
     @classmethod
+    def get_type(cls):
+        return cls.Meta.type_
+
+    @classmethod
     def _register_model(cls):
-        type_ = cls.__tablename__
+        type_ = cls.get_type()
+        tablename = cls.__tablename__
         cls.model_registry_dict[type_] = cls
+        cls.tablename_type_dict[tablename] = type_
 
     @classmethod
     def get_model_by_type(cls, type_):
@@ -256,7 +293,8 @@ class Base(db.Model):
     @classmethod
     def _get_sort_by_enum(cls, query, enum_name, ascending):
         enum_relation_model = cls.get_model_by_type(enum_name)
-        enum_relationship = getattr(cls, enum_name)
+        enum_relation_tablename = enum_relation_model.__tablename__
+        enum_relationship = getattr(cls, enum_relation_tablename)
         sort_by_column = enum_relation_model.name if ascending \
             else enum_relation_model.name.desc()
         return query.select_from(enum_relation_model) \
@@ -375,7 +413,7 @@ class Base(db.Model):
         return list(column.foreign_keys)[0].target_fullname.split('.')[0]
 
     @classmethod
-    def _get_all_table_names_many_to_one(cls):
+    def _get_all_tablenames_many_to_one(cls):
         columns = cls._get_columns()
         return [
             cls._get_target_table_from_column(column)
@@ -452,19 +490,43 @@ class Base(db.Model):
     @classmethod
     def _get_foreign_keys_and_target_tables(cls):
         foreign_keys = cls.get_foreign_key_column_names()
-        target_tables = [
-            cls.get_target_table_column_from_foreign_key(c_name)[0]
+        target_tablenames = [
+            cls._get_target_tablename_column_from_foreign_key(c_name)[0]
             for c_name in foreign_keys
         ]
-        return foreign_keys, target_tables
+        target_table_types = [
+            cls._get_type_from_tablename(tablename)
+            for tablename in target_tablenames
+        ]
+        return foreign_keys, target_table_types
+
+    @classmethod
+    def _get_type_from_tablename(cls, tablename):
+        return cls.tablename_type_dict[tablename]
 
     @classmethod
     def get_enum_relationship_details(cls):
-        foreign_keys, target_tables = cls._get_foreign_keys_and_target_tables()
+        foreign_keys, target_table_types = cls._get_foreign_keys_and_target_tables()
         return [
-            (column_name, target_table) for column_name, target_table
-            in zip(foreign_keys, target_tables)
-            if cls.relation_is_enum(target_table)
+            (column_name, target_model_type)
+            for column_name, target_model_type
+            in zip(foreign_keys, target_table_types)
+            if cls.relation_is_enum(target_model_type)
+        ]
+
+    @classmethod
+    def get_target_table_type_column_from_foreign_key(cls, foreign_key_name):
+        target_table, target_column = cls._get_target_tablename_column_from_foreign_key(
+            foreign_key_name
+        )
+        target_table_type = cls._get_type_from_tablename(target_table)
+        return target_table_type, target_column
+
+    @classmethod
+    def get_related_enum_types(cls):
+        return [
+            target_table_type for (_, target_table_type)
+            in cls.get_enum_relationship_details()
         ]
 
     @classmethod
@@ -491,12 +553,12 @@ class Base(db.Model):
         relationship_names = [r[0] for r in relationships]
         # exclude relationships for which this model is the many end
         return [
-            r for r in relationship_names
-            if r not in cls._get_all_table_names_many_to_one()
+            cls._get_type_from_tablename(r) for r in relationship_names
+            if r not in cls._get_all_tablenames_many_to_one()
         ]
 
     @classmethod
-    def get_target_table_column_from_foreign_key(cls, column_name):
+    def _get_target_tablename_column_from_foreign_key(cls, column_name):
         """Returns a pair:
         - The target table's name
         - The name of the target column on the target table
@@ -539,13 +601,6 @@ class Base(db.Model):
     @classmethod
     def _filter_value_is_bool(cls, filter_value):
         return filter_value.lower() in ['true', 'false']
-
-    @classmethod
-    def _get_enum_relation_names(cls):
-        enum_relationship_details = cls.get_enum_relationship_details()
-        return [
-            r_name for (_, r_name) in enum_relationship_details
-        ]
 
     @classmethod
     def _preprocess_string_filter_value(cls, filter_value):
@@ -597,7 +652,7 @@ class Base(db.Model):
 
     @classmethod
     def _preprocess_filter_value(cls, filter_key, filter_value, enum_names):
-        if getattr(cls, filter_key, None) is None:
+        if getattr(cls, filter_key, None) is None and filter_key not in enum_names:
             raise BadParameterException(
                 f"The filter key '{filter_key}' is invalid."
             )
@@ -624,7 +679,7 @@ class Base(db.Model):
             raise BadParameterException(
                 "This API cannot filter against 'extra' columns."
             )
-        enum_names = cls._get_enum_relation_names()
+        enum_names = cls.get_related_enum_types()
         processed_eq_filters = {
             filter_key: cls._preprocess_filter_value(
                 filter_key,

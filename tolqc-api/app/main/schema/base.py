@@ -39,7 +39,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
         @classmethod
         def setup_meta(cls):
-            cls.type_ = cls.model.__tablename__
+            cls.type_ = cls.model.get_type()
 
     OPTIONS_CLASS = CombinedOpts
 
@@ -70,7 +70,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def _populate_public_attribute_and_enum_names(cls):
         cls._public_attribute_names = cls._get_public_attribute_names()
         cls._public_attribute_and_enum_names = \
-            cls._public_attribute_names + cls._get_enum_attribute_names()
+            cls._public_attribute_names + cls.Meta.model.get_related_enum_types()
 
     @classmethod
     def _lookup_special_relationship_name(cls, foreign_key_name, target_table):
@@ -102,19 +102,19 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     @classmethod
     def _create_many_to_one_relationship_field_by_name(cls, foreign_key_name):
         model = cls.Meta.model
-        target_table, target_column = model.get_target_table_column_from_foreign_key(
+        target_table_type, target_column = model.get_target_table_type_column_from_foreign_key(
             foreign_key_name
         )
         special_name = cls._lookup_special_relationship_name(
             foreign_key_name,
-            target_table
+            target_table_type
         )
         cls.many_to_one_relationship_info[special_name] = {
-            "target_table": target_table,
+            "target_table": target_table_type,
             "foreign_key_name": foreign_key_name
         }
         return special_name, cls._create_many_to_one_relationship_field(
-            target_table,
+            target_table_type,
             target_column,
             foreign_key_name,
             cls._many_to_one_relationship_is_dump_only(special_name)
@@ -199,15 +199,8 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         }
 
     @classmethod
-    def _get_enum_attribute_names(cls):
-        return [
-            t_table for (_, t_table)
-            in cls.Meta.model.get_enum_relationship_details()
-        ]
-
-    @classmethod
     def _get_possibly_empty_enum_name_fields(cls):
-        enum_names = cls._get_enum_attribute_names()
+        enum_names = cls.Meta.model.get_related_enum_types()
         return {enum_name: Str() for enum_name in enum_names}
 
     @classmethod

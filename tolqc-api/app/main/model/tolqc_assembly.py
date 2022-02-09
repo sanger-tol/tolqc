@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcAssembly(LogBase):
     __tablename__ = "assembly"
+
+    class Meta:
+        type_ = 'assemblies'
+
     id = db.Column(db.Integer(), primary_key=True)
     dataset_id = db.Column(db.Integer(), db.ForeignKey("dataset.id"))
     name = db.Column(db.String())

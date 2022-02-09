@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcLibrary(LogBase):
     __tablename__ = "library"
+
+    class Meta:
+        type_ = 'libraries'
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())

@@ -42,19 +42,19 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'creator': {
                             'data': {
                                 'id': '100',
-                                'type': 'user'
+                                'type': 'users'
                             },
                             'links': {
-                                'related': '/user/100'
+                                'related': '/users/100'
                             }
                         },
                         'last_modifier': {
                             'data': {
                                 'id': '100',
-                                'type': 'user'
+                                'type': 'users'
                             },
                             'links': {
-                                'related': '/user/100'
+                                'related': '/users/100'
                             }
                         }
                     }
@@ -103,19 +103,19 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'creator': {
                             'data': {
                                 'id': '100',
-                                'type': 'user'
+                                'type': 'users'
                             },
                             'links': {
-                                'related': '/user/100'
+                                'related': '/users/100'
                             }
                         },
                         'last_modifier': {
                             'data': {
                                 'id': '101',
-                                'type': 'user'
+                                'type': 'users'
                             },
                             'links': {
-                                'related': '/user/101'
+                                'related': '/users/101'
                             }
                         }
                     }
@@ -171,19 +171,19 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'creator': {
                             'data': {
                                 'id': '100',
-                                'type': 'user'
+                                'type': 'users'
                             },
                             'links': {
-                                'related': '/user/100'
+                                'related': '/users/100'
                             }
                         },
                         'last_modifier': {
                             'data': {
                                 'id': '100',
-                                'type': 'user'
+                                'type': 'users'
                             },
                             'links': {
-                                'related': '/user/100'
+                                'related': '/users/100'
                             }
                         }
                     }
@@ -258,19 +258,19 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'creator': {
                             'data': {
                                 'id': '100',
-                                'type': 'user'
+                                'type': 'users'
                             },
                             'links': {
-                                'related': '/user/100'
+                                'related': '/users/100'
                             }
                         },
                         'last_modifier': {
                             'data': {
                                 'id': '100',
-                                'type': 'user'
+                                'type': 'users'
                             },
                             'links': {
-                                'related': '/user/100'
+                                'related': '/users/100'
                             }
                         }
                     }

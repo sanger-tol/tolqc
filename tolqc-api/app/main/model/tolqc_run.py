@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcRun(LogBase):
     __tablename__ = "run"
+
+    class Meta:
+        type_ = 'runs'
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())

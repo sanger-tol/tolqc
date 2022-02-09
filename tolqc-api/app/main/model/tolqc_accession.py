@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcAccession(LogBase):
     __tablename__ = "accession"
+
+    class Meta:
+        type_ = 'accessions'
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String())
     accession_type_id = db.Column(db.Integer(), db.ForeignKey("accession_type_dict.id"))

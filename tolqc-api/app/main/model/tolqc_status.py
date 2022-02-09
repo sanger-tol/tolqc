@@ -9,6 +9,10 @@ from .base import setup_model
 @setup_model
 class TolqcStatus(LogBase):
     __tablename__ = "status"
+
+    class Meta:
+        type_ = 'statuses'
+
     id = db.Column(db.Integer(), primary_key=True)
     specimen_id = db.Column(db.Integer(), db.ForeignKey("specimen.id"))
     coverage = db.Column(db.String())
