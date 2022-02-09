@@ -651,14 +651,14 @@ class Base(db.Model):
         return filter_enum_name
 
     @classmethod
-    def _preprocess_filter_value(cls, filter_key, filter_value, enum_names):
-        if getattr(cls, filter_key, None) is None and filter_key not in enum_names:
+    def _preprocess_filter_value(cls, filter_key, filter_value, enum_types):
+        if not hasattr(cls, filter_key) and filter_key not in enum_types:
             raise BadParameterException(
                 f"The filter key '{filter_key}' is invalid."
             )
 
         # pre-remove enum types
-        if filter_key in enum_names:
+        if filter_key in enum_types:
             return cls._preprocess_enum_filter(filter_key, filter_value)
 
         python_type = cls.get_column_python_type(filter_key)
@@ -679,12 +679,12 @@ class Base(db.Model):
             raise BadParameterException(
                 "This API cannot filter against 'extra' columns."
             )
-        enum_names = cls.get_related_enum_types()
+        enum_types = cls.get_related_enum_types()
         processed_eq_filters = {
             filter_key: cls._preprocess_filter_value(
                 filter_key,
                 filter_value,
-                enum_names
+                enum_types
             )
             for (filter_key, filter_value)
             in eq_filters.items()
