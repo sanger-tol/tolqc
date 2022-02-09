@@ -71,7 +71,7 @@ class BaseSwagger:
         cls.swagger_registry_dict[type_] = cls
 
     @classmethod
-    def _get_field_schema_model_type(cls, python_type):
+    def _get_field_schema_model_type(cls, field_name, python_type):
         if python_type == int:
             return {
                 'type': 'integer'
@@ -95,13 +95,17 @@ class BaseSwagger:
                 'format': 'float'
             }
         if python_type == dict:
-            return {
-                'type': 'object'
-            }
-        if python_type == list:
-            return {
-                'type': 'array'
-            }
+            if field_name == 'history':    
+                return {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object'
+                    }
+                }
+            else:
+                return {
+                    'type': 'object'
+                }
 
         raise NotImplementedError(
             f"Type '{python_type}' has not been implemented yet."
@@ -115,7 +119,7 @@ class BaseSwagger:
             'history'
         ]
         attributes = {
-            field_name: cls._get_field_schema_model_type(python_type)
+            field_name: cls._get_field_schema_model_type(field_name, python_type)
             for field_name, python_type in cls.attributes
             if not (is_request and field_name in exclude_on_request)
         }
@@ -151,6 +155,12 @@ class BaseSwagger:
         }
 
     @classmethod
+    def _get_default_related_link(cls, relation_name):
+        path = cls._get_api_path()
+        identifier = 'name' if cls.is_enum_swagger() else '1'
+        return f'{path}/{identifier}/{relation_name}'
+
+    @classmethod
     def _get_individual_one_to_many_relationship_dict(cls, relation_name):
         return {
             'type': 'object',
@@ -160,7 +170,7 @@ class BaseSwagger:
                     'properties': {
                         'related': {
                             'type': 'string',
-                            'default': f'{cls._get_api_path()}/name/{relation_name}'
+                            'default': cls._get_default_related_link(relation_name)
                         }
                     }
                 }
