@@ -27,6 +27,10 @@ Every endpoint has an associated type\_. This should be the plural, lower-case f
 It is defined on the *model* class for that endpoint (see below).
 This is used in several places to identify and fetch the correct classes associated with the endpoint.
 
+### enums
+
+Certain endpoints are enums. This means that they are primarily identified by a string name, and not an integer id, and are directly addressed as such.
+
 ## Overview of Directories
 
 ### model
@@ -57,7 +61,7 @@ They are listed as the **api** class variable under a swagger class.
 
 Resources document HTTP methods on namespaces, such as GET, PATCH, and POST.
 
-There are two kinds:
+There are several kinds:
 
 - **Detail Resources**
     - Operate only on a single **DB model** instance (_via_ services)
@@ -77,46 +81,19 @@ Services contain the main backend logic for fulfilling an HTTP request:
 - They dump and load data using schemas
 - They interact with the database using models
 
-## Additional features
+## Additional Model Mixins
 
 ### Extra fields
 
-Models may support extra fields, that are not defined in the schema, by inheriting adding an ExtColumn to the model (named 'ext'),
-inheriting the schema from BaseExtSchema, and the Meta class in said schema from BaseExtSchemaMeta
+Models may support extra fields, that are not defined in the schema, by inheriting additionally from the **ExtFieldMixin**.
 
 These can be added to, in POST/PATCH requests, by specifying key:value pairs that should be added in the
 resource-level meta (see JSON:API spec), in a field named "ext".
 
-## To add a new endpoint
+### Log
 
-New endpoints can easily be created.
-
-### A default endpoint
-
-For a default endpoint, i.e. one that has all methods, all of which (except GET id/GET bulk) require auth, create:
-
-- A Model
-    - Add an ExtColumn (from .base) if you want optional extra fields
-- A schema, inheriting from BaseSchema with a meta class inheriting from BaseSchema.BaseMeta
-- A swagger, inheriting from BaseSwagger
-- A service, inheriting from BaseService
-- A list and detail resource (or just a choice of one), inheriting from
-BaseListResource and BaseDetailResource respectively
-
-Finally the entire api (from the resource file) should be added to the
-blueprint in route/api.py .
-
-(At the time of writing) Centre is the canonical example of a default endpoint - follow its structure.
-
-### A bespoke endpoint
-
-Bespoke endpoints do not need to (and probably shouldn't) inherit from the base classes.
+Models can log changes to their data by additionally inheriting from the **LogMixin**.
 
 ## Limitations
 
 - Compound/composite keys are not supported
-- Model tablenames must be plural
-    - This is because the endpoint and "JSON:API Resource type" is equal to this
-
-It is worth noting that these limitations can be overcome by hardcoding the various classes for an endpoint,
-instead of inheriting from the base classes and letting them dynamically generate the details.
