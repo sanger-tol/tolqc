@@ -5,7 +5,7 @@
 from test.base import BaseTestCase
 
 
-class TestHistoryColumnLogBase(BaseTestCase):
+class TestHistoryColumnBase(BaseTestCase):
     def test_compose_post_patch_H(self):
         # post in the first instance
         response = self.client.open(

@@ -2,13 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .log_base import LogBase, db
-from .enum_base import EnumBase
-from .base import setup_model
+from .base import db, LogMixin, EnumBase, setup_model
 
 
 @setup_model
-class TolqcAssemblyComponent(LogBase, EnumBase):
+class TolqcAssemblyComponent(LogMixin, EnumBase):
     __tablename__ = "assembly_component"
 
     class Meta:

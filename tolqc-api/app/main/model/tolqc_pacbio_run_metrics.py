@@ -2,12 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .log_base import LogBase, db
-from .base import setup_model
+from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcPacbioRunMetrics(LogBase):
+class TolqcPacbioRunMetrics(Base, LogMixin):
     __tablename__ = "pacbio_run_metrics"
 
     class Meta:

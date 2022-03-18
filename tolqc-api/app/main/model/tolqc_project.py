@@ -2,12 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .log_base import LogBase, db
-from .base import setup_model
+from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcProject(LogBase):
+class TolqcProject(Base, LogMixin):
     __tablename__ = "project"
 
     class Meta:

@@ -5,7 +5,7 @@
 from datetime import datetime
 from flask.json import JSONEncoder as FlaskJSONEncoder
 
-from main.model import Base
+from main.model.base import Base
 
 
 class JSONEncoder(FlaskJSONEncoder):

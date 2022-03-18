@@ -81,19 +81,6 @@ Services contain the main backend logic for fulfilling an HTTP request:
 - They dump and load data using schemas
 - They interact with the database using models
 
-## Additional Model Mixins
-
-### Extra fields
-
-Models may support extra fields, that are not defined in the schema, by inheriting additionally from the **ExtFieldMixin**.
-
-These can be added to, in POST/PATCH requests, by specifying key:value pairs that should be added in the
-resource-level meta (see JSON:API spec), in a field named "ext".
-
-### Log
-
-Models can log changes to their data by additionally inheriting from the **LogMixin**.
-
 ## Limitations
 
 - Compound/composite keys are not supported

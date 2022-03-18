@@ -2,9 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model.base import Base, db, ExtColumn, setup_model
-from main.model.log_base import LogBase
-from main.model.enum_base import EnumBase
+from main.model.base import Base, db, setup_model, LogMixin, EnumBase
+
+#TODO FIX THIS!!!
+ExtColumn = lambda *args: None
 
 
 @setup_model
@@ -102,7 +103,7 @@ class G_ModelWithFilterableFields(Base):
 
 
 @setup_model
-class H_ModelLog(LogBase):
+class H_ModelLog(Base, LogMixin):
     __tablename__ = 'test_H'
 
     class Meta:

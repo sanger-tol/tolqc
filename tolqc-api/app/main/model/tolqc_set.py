@@ -2,12 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .log_base import LogBase, db
-from .base import setup_model
+from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcSet(LogBase):
+class TolqcSet(Base, LogMixin):
     __tablename__ = "set"
 
     class Meta:

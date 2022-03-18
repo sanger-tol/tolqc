@@ -5,10 +5,15 @@
 from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 
-from .base import Base, db
+from .base import db
 
 
 class LogMixin(object):
+    """Logs all three of:
+    - creation details
+    - last modification details
+    - all previous modifcation detail snapshots (in history)"""
+
     @declared_attr
     def created_at(cls):
         return db.Column(db.DateTime, nullable=False, default=db.func.now())
@@ -28,15 +33,6 @@ class LogMixin(object):
     @declared_attr
     def history(cls):
         return db.Column(db.JSON, nullable=False, default=[])
-
-
-class LogBase(Base, LogMixin):
-    """Logs all three of:
-    - creation details
-    - last modification details
-    - all previous modifcation detail snapshots (in history)"""
-
-    __abstract__ = True
 
     @classmethod
     def setup(cls):
@@ -60,12 +56,12 @@ class LogBase(Base, LogMixin):
     def save_update(self, user_id=None):
         self.last_modified_by = user_id
         self.last_modified_at = datetime.now()
-        super().save_update()
+        super(LogMixin, self).save_update()
 
     def save_create(self, user_id=None):
         self.created_by = user_id
         self.last_modified_by = user_id
-        super().save_create()
+        super(LogMixin, self).save_create()
 
     @classmethod
     def _map_history_entry_key(cls, entry_key):

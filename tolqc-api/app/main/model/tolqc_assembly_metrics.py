@@ -2,12 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .log_base import LogBase, db
-from .base import setup_model
+from .base import Base, db, setup_model, LogMixin
 
 
 @setup_model
-class TolqcAssemblyMetrics(LogBase):
+class TolqcAssemblyMetrics(Base, LogMixin):
     __tablename__ = "assembly_metrics"
 
     class Meta:

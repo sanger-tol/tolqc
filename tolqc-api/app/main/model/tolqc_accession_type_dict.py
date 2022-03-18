@@ -2,8 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import db, setup_model
-from .enum_base import EnumBase
+from .base import db, setup_model, EnumBase
 
 
 @setup_model
