@@ -37,7 +37,7 @@ class LogMixin(object):
     @classmethod
     def setup(cls):
         cls._set_excluded_columns_in_history()
-        super().setup()
+        super(LogMixin, cls).setup()
 
     @classmethod
     def has_log_details(cls):
@@ -97,4 +97,4 @@ class LogMixin(object):
 
     def update(self, *args, **kwargs):
         self._update_history()
-        super().update(*args, **kwargs)
+        super(LogMixin, self).update(*args, **kwargs)
