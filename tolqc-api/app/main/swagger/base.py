@@ -95,7 +95,7 @@ class BaseSwagger:
                 'format': 'float'
             }
         if python_type == dict:
-            if field_name == 'history':    
+            if field_name == 'history':
                 return {
                     'type': 'array',
                     'items': {
