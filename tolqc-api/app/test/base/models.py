@@ -2,10 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model.base import Base, db, setup_model, LogMixin, EnumBase
-
-#TODO FIX THIS!!!
-ExtColumn = lambda *args: None
+from main.model.base import Base, db, setup_model, LogMixin, \
+                            EnumBase, ExtFieldsMixin
 
 
 @setup_model
@@ -75,7 +73,7 @@ class E_ModelRelationship(Base):
 
 
 @setup_model
-class F_ModelWithExtField(Base):
+class F_ModelWithExtField(ExtFieldsMixin, Base):
     __tablename__ = 'test_F'
 
     class Meta:
@@ -83,7 +81,6 @@ class F_ModelWithExtField(Base):
 
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    ext = ExtColumn()
     other_column = db.Column(db.String, nullable=True)
 
 
