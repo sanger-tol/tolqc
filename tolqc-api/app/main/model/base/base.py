@@ -40,14 +40,6 @@ class BadParameterException(Exception):
         super().__init__(message)
 
 
-class ExtraFieldsNotPermittedException(Exception):
-    def __init__(self, ext_fields):
-        self._ext_fields = ext_fields
-
-    def get_extra_fields_str(self):
-        return ', '.join(self._ext_fields.keys())
-
-
 class InstanceDoesNotExistException(Exception):
     pass
 
@@ -62,16 +54,6 @@ class NamedEnumStemInstanceDoesNotExistException(Exception):
     pass
 
 
-class ExtColumn(db.Column):
-    def __init__(self, **kwargs):
-        super().__init__(
-            db.JSON,
-            nullable=False,
-            default={},
-            **kwargs
-        )
-
-
 def setup_model(cls):
     cls.setup()
     return cls
@@ -80,7 +62,6 @@ def setup_model(cls):
 class Base(db.Model):
     """The base model class:
     - Its primary key must be called id.
-    - Do not call anything other than an ExtColumn 'ext'.
     - The declared tablename will be the HTTP endpoint stem
         - It should be plural, e.g. centres
     """
@@ -218,29 +199,13 @@ class Base(db.Model):
     def add(self):
         db.session.add(self)
 
-    def _update_ext(self, ext_data_changes):
-        if not self.has_ext_column():
-            raise ExtraFieldsNotPermittedException(
-                ext_data_changes
-            )
-        ext_data = {**self.ext}
-        for key, item in ext_data_changes.items():
-            if item is None:
-                if key in ext_data:
-                    del ext_data[key]
-            else:
-                ext_data[key] = item
-        self.ext = ext_data
-
     def save_update(self, **kwargs):
         self.commit()
 
-    def update(self, data, ext=None):
+    def update(self, data, **kwargs):
         converted_data = self._convert_enum_names_to_foreign_key_ids(data)
         for key, item in converted_data.items():
             setattr(self, key, item)
-        if ext is not None:
-            self._update_ext(ext)
 
     def delete(self):
         db.session.delete(self)
@@ -468,7 +433,7 @@ class Base(db.Model):
 
     @classmethod
     def has_ext_column(cls):
-        return 'ext' in cls.get_column_names()
+        return False
 
     @classmethod
     def has_log_details(cls):

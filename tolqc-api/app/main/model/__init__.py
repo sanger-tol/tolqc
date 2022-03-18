@@ -2,8 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import db, ExtraFieldsNotPermittedException, \
-                  StemInstanceDoesNotExistException, \
+from .base import db, StemInstanceDoesNotExistException, \
                   InstanceDoesNotExistException, \
                   NamedEnumStemInstanceDoesNotExistException, \
                   BadParameterException, ModelValidationError, \

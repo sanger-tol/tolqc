@@ -1,5 +1,4 @@
 from .base import Base, db, BadParameterException, \
-                 ExtraFieldsNotPermittedException, \
                  InstanceDoesNotExistException, \
                  StemInstanceDoesNotExistException, \
                  NamedEnumStemInstanceDoesNotExistException, \
