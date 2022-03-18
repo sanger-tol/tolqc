@@ -6,6 +6,27 @@ SPDX-License-Identifier: MIT
 
 # ToLQC API
 
+## Design Rationale
+
+### Auto _vs_ Manual Endpoints
+
+- Auto endpoints are generated automatically from model classes, with minimal intervention from a developer, other than configuration in individual files.
+- Manual endpoints require most components to be explicitly defined - correct definition is verified at runtime
+
+### setup\_\* Decorators
+
+Every class category, _e.g._ resource or schema, has a mandatory setup\_\* decorator that must be applied to every class.
+These serve to either:
+
+- Populate auto classes _or_
+- Validate manual classes
+
+### type\_
+
+Every endpoint has an associated type\_. This should be the plural, lower-case form, e.g. _users_.
+It is defined on the *model* class for that endpoint (see below).
+This is used in several places to identify and fetch the correct classes associated with the endpoint.
+
 ## Overview of Directories
 
 ### model
