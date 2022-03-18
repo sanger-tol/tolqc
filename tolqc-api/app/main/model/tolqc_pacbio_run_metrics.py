@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcPacbioRunMetrics(Base, LogMixin):
+class TolqcPacbioRunMetrics(LogMixin, Base):
     __tablename__ = "pacbio_run_metrics"
 
     class Meta:

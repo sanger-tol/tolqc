@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcBuscoMetrics(Base, LogMixin):
+class TolqcBuscoMetrics(LogMixin, Base):
     __tablename__ = "busco_metrics"
 
     class Meta:

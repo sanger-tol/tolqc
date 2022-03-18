@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcMerquryMetrics(Base, LogMixin):
+class TolqcMerquryMetrics(LogMixin, Base):
     __tablename__ = "merqury_metrics"
 
     class Meta:

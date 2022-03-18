@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcProject(Base, LogMixin):
+class TolqcProject(LogMixin, Base):
     __tablename__ = "project"
 
     class Meta:

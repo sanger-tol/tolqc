@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcSpecimen(Base, LogMixin):
+class TolqcSpecimen(LogMixin, Base):
     __tablename__ = "specimen"
 
     class Meta:

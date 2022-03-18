@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcAllocation(Base, LogMixin):
+class TolqcAllocation(LogMixin, Base):
     __tablename__ = "allocation"
 
     class Meta:

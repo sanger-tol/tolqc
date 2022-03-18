@@ -6,7 +6,7 @@ from .base import Base, db, setup_model, LogMixin
 
 
 @setup_model
-class TolqcAssemblyMetrics(Base, LogMixin):
+class TolqcAssemblyMetrics(LogMixin, Base):
     __tablename__ = "assembly_metrics"
 
     class Meta:

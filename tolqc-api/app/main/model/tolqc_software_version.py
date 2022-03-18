@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcSoftwareVersion(Base, LogMixin):
+class TolqcSoftwareVersion(LogMixin, Base):
     __tablename__ = "software_version"
 
     class Meta:

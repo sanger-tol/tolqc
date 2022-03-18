@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcDataset(Base, LogMixin):
+class TolqcDataset(LogMixin, Base):
     __tablename__ = "dataset"
 
     class Meta:

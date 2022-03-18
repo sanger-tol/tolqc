@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcRun(Base, LogMixin):
+class TolqcRun(LogMixin, Base):
     __tablename__ = "run"
 
     class Meta:

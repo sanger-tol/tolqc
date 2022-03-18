@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcBuscoLineage(Base, LogMixin):
+class TolqcBuscoLineage(LogMixin, Base):
     __tablename__ = "busco_lineage"
 
     class Meta:

@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcAssembly(Base, LogMixin):
+class TolqcAssembly(LogMixin, Base):
     __tablename__ = "assembly"
 
     class Meta:

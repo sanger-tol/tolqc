@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcFile(Base, LogMixin):
+class TolqcFile(LogMixin, Base):
     __tablename__ = "file"
 
     class Meta:

@@ -103,7 +103,7 @@ class G_ModelWithFilterableFields(Base):
 
 
 @setup_model
-class H_ModelLog(Base, LogMixin):
+class H_ModelLog(LogMixin, Base):
     __tablename__ = 'test_H'
 
     class Meta:

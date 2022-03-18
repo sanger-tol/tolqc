@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcAccession(Base, LogMixin):
+class TolqcAccession(LogMixin, Base):
     __tablename__ = "accession"
 
     class Meta:

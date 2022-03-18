@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcGenomescopeMetrics(Base, LogMixin):
+class TolqcGenomescopeMetrics(LogMixin, Base):
     __tablename__ = "genomescope_metrics"
 
     class Meta:

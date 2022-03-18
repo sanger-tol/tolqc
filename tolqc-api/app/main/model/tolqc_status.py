@@ -6,7 +6,7 @@ from .base import Base, db, LogMixin, setup_model
 
 
 @setup_model
-class TolqcStatus(Base, LogMixin):
+class TolqcStatus(LogMixin, Base):
     __tablename__ = "status"
 
     class Meta:
