@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
 from sqlalchemy.ext.declarative import declared_attr
 
 from .base import db
