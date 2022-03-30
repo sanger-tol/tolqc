@@ -33,7 +33,7 @@ services:
     volumes:
       - schema-html:/var/www/schema
   tolqc-dbutils:
-    image: $CI_REGISTRY/tol/sts/dbutils:1.0.2
+    image: $CI_REGISTRY/tol/tol-core/dbutils:1.0.2
     restart: always
     networks:
       - tolqc
@@ -42,7 +42,7 @@ services:
     env_file:
       - ${ENV_FILE}
   tolqc-schema:
-    image: $CI_REGISTRY/tol/sts/schemaspy:0.2.0
+    image: $CI_REGISTRY/tol/tol-core/schemaspy:0.2.0
     restart: "no"
     networks:
       - tolqc
