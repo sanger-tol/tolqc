@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: gitlab-registry.internal.sanger.ac.uk/tol/tolqc/tolqc-api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "015a0ff217b97671027bca7ac6606e8b56cbc830"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -80,3 +80,26 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+db:
+  user: ""
+  password: ""
+  name: ""
+  host: ""
+  port: ""
+  uri: ""
+api:
+  url: ""
+flask:
+  env: ""
+s3:
+  uri: ""
+  access_key: ""
+  secret_key: ""
+  bucket: ""
+  secure: ""
+backup:
+  schedule: ""
+restore:
+  prefix: ""
+
