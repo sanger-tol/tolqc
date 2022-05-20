@@ -8,12 +8,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV UWSGI_CHEAPER 4
 ENV UWSGI_PROCESSES 64
 
-# Dockerize is needed to sync containers startup
-ENV DOCKERIZE_VERSION v0.6.0
-RUN wget --no-check-certificate https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-
 COPY app/requirements.txt /app
 COPY app/setup.py /app
 
