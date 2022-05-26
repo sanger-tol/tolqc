@@ -5,8 +5,6 @@ metadata:
   labels:
     {{- include "tolqc-app.labels" . | nindent 4 }}
 data:
-  special.how: very
-  special.type: charm
   POSTGRES_USER: {{ .Values.db.user }}
   POSTGRES_PASSWORD: {{ .Values.db.password }}
   POSTGRES_DB: {{ .Values.db.name }}
@@ -15,12 +13,10 @@ data:
   DB_URI: {{ .Values.db.uri }}
   TOLQC_API_LOCATION: {{ .Values.api.url }}
   FLASK_ENV: {{ .Values.flask.env }}
-  # Where the DB backups are stored
   BACKUP_S3_URI: {{ .Values.s3.uri }}
   BACKUP_S3_ACCESS_KEY: {{ .Values.s3.access_key }}
   BACKUP_S3_SECRET_KEY: {{ .Values.s3.secret_key }}
   BACKUP_S3_BUCKET: {{ .Values.s3.bucket }}
   BACKUP_S3_SECURE: {{ .Values.s3.secure }}
   BACKUP_SCHEDULE: {{ .Values.backup.schedule }}
-  # We will restore the prod backups to qa, so this is the name of the prod db
   RESTORE_FILE_PREFIX: {{ .Values.restore.prefix }}

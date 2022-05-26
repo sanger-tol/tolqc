@@ -12,8 +12,10 @@ stages:
   - build
   - unit test
   - push
+  - review
   - deploy
   - integration test
+  - cleanup
 
 build-api:
   extends: .build-template
@@ -151,3 +153,63 @@ test-api:
     - qa
     - staging
     - production
+
+
+variables:
+  AUTO_DEPLOY_IMAGE_VERSION: 'v2.25.0'
+
+.auto-deploy:
+  image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:${AUTO_DEPLOY_IMAGE_VERSION}"
+  dependencies: []
+
+review:
+  extends: .auto-deploy
+  stage: review
+  script:
+    - auto-deploy check_kube_domain
+    - auto-deploy download_chart
+    - auto-deploy use_kube_context || true
+    - auto-deploy ensure_namespace
+    - auto-deploy initialize_tiller
+    - auto-deploy create_secret
+    - auto-deploy deploy
+    - auto-deploy persist_environment_url
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://$CI_PROJECT_ID-$CI_ENVIRONMENT_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+    on_stop: stop_review
+  artifacts:
+    paths: [environment_url.txt, tiller.log]
+    when: always
+  rules:
+    - if: '($CI_KUBERNETES_ACTIVE == null || $CI_KUBERNETES_ACTIVE == "") && ($KUBECONFIG == null || $KUBECONFIG == "")'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: never
+    - if: '$REVIEW_DISABLED'
+      when: never
+    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
+
+stop_review:
+  extends: .auto-deploy
+  stage: cleanup
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - auto-deploy use_kube_context || true
+    - auto-deploy initialize_tiller
+    - auto-deploy delete
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  allow_failure: true
+  rules:
+    - if: '($CI_KUBERNETES_ACTIVE == null || $CI_KUBERNETES_ACTIVE == "") && ($KUBECONFIG == null || $KUBECONFIG == "")'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: never
+    - if: '$REVIEW_DISABLED'
+      when: never
+    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
+      when: manual
+
