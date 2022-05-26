@@ -87,20 +87,6 @@ push-ui-test:
     DOCKER_TLS_CERTDIR: ''
     NAME: tolqc-ui-test
 
-deploy-qa:
-  extends: .swarm-deploy-template
-  environment:
-    name: qa
-    url: http://172.27.27.72:8000
-  variables:
-    DOCKER_HOST: "ssh://ubuntu@172.27.27.72"
-    EXTRA_DEPLOY_FILES: ""
-    STACK_NAME: tolqc
-  script:
-    - echo "Deployed to qa"
-  only:
-    - qa
-
 deploy-staging:
   extends: .swarm-deploy-template
   environment:
@@ -154,7 +140,6 @@ test-api:
     - staging
     - production
 
-
 variables:
   AUTO_DEPLOY_IMAGE_VERSION: 'v2.25.0'
 
@@ -162,9 +147,9 @@ variables:
   image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:${AUTO_DEPLOY_IMAGE_VERSION}"
   dependencies: []
 
-review:
+deploy-qa:
   extends: .auto-deploy
-  stage: review
+  stage: deploy
   script:
     - auto-deploy check_kube_domain
     - auto-deploy download_chart
@@ -173,43 +158,13 @@ review:
     - auto-deploy initialize_tiller
     - auto-deploy create_secret
     - auto-deploy deploy
+    - auto-deploy delete canary
     - auto-deploy persist_environment_url
   environment:
-    name: review/$CI_COMMIT_REF_NAME
-    url: http://$CI_PROJECT_ID-$CI_ENVIRONMENT_SLUG.$KUBE_INGRESS_BASE_DOMAIN
-    on_stop: stop_review
+    name: qa
+    url: http://qc-qa.tol.sanger.ac.uk
   artifacts:
     paths: [environment_url.txt, tiller.log]
     when: always
-  rules:
-    - if: '($CI_KUBERNETES_ACTIVE == null || $CI_KUBERNETES_ACTIVE == "") && ($KUBECONFIG == null || $KUBECONFIG == "")'
-      when: never
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      when: never
-    - if: '$REVIEW_DISABLED'
-      when: never
-    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
-
-stop_review:
-  extends: .auto-deploy
-  stage: cleanup
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - auto-deploy use_kube_context || true
-    - auto-deploy initialize_tiller
-    - auto-deploy delete
-  environment:
-    name: review/$CI_COMMIT_REF_NAME
-    action: stop
-  allow_failure: true
-  rules:
-    - if: '($CI_KUBERNETES_ACTIVE == null || $CI_KUBERNETES_ACTIVE == "") && ($KUBECONFIG == null || $KUBECONFIG == "")'
-      when: never
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      when: never
-    - if: '$REVIEW_DISABLED'
-      when: never
-    - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
-      when: manual
-
+  only:
+    - qa
