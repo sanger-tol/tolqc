@@ -1,7 +1,3 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
-#
-# SPDX-License-Identifier: MIT
-
 apiVersion: v1
 kind: Service
 metadata:
