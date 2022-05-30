@@ -13,4 +13,4 @@ __init__.pyc
 launch.json
 .env.dev
 .env.prod
-values-dev.yaml
+values-*.yaml
