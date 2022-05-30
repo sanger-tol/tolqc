@@ -5,5 +5,5 @@ metadata:
   labels:
     {{- include "tolqc-app.labels" . | nindent 4 }}
 data:
-  DB_URI: {{ .Values.env.db.uri }}
-  FLASK_ENV: {{ .Values.env.flask.env }}
+  DB_URI: {{ .Values.db.uri }}
+  FLASK_ENV: {{ .Values.flask.env }}
