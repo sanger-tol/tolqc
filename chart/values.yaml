@@ -9,14 +9,15 @@
 replicaCount: 1
 
 image:
-  repository: gitlab-registry.internal.sanger.ac.uk/tol/tolqc/tolqc-api
+  repository: gitlab-registry.internal.sanger.ac.uk/tol/platforms/tolqc
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "015a0ff217b97671027bca7ac6606e8b56cbc830"
+  tag: "06e72aef973851b9bef0d057b1cd378c76ba875e" #CHANGE THIS BACK!!!!
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: "tolqc-token"
 nameOverride: ""
-fullnameOverride: ""
+fullnameOverride: "tolqc-service"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -85,25 +86,34 @@ tolerations: []
 
 affinity: {}
 
-db:
-  user: ""
-  password: ""
-  name: ""
-  host: ""
-  port: ""
-  uri: ""
 api:
-  url: ""
-flask:
-  env: ""
-s3:
-  uri: ""
-  access_key: ""
-  secret_key: ""
-  bucket: ""
-  secure: ""
-backup:
-  schedule: ""
-restore:
-  prefix: ""
+  fullname: "tolqc-api"
+  service:
+    port: "80"
 
+ui:
+  fullname: "tolqc-ui"
+  service: {}
+
+env:
+  db:
+    user: ""
+    password: ""
+    name: ""
+    host: ""
+    port: ""
+    uri: ""
+  api:
+    url: ""
+  flask:
+    env: ""
+  s3:
+    uri: ""
+    access_key: ""
+    secret_key: ""
+    bucket: ""
+    secure: ""
+  backup:
+    schedule: ""
+  restore:
+    prefix: ""
