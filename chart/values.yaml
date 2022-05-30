@@ -12,10 +12,10 @@ image:
   repository: gitlab-registry.internal.sanger.ac.uk/tol/platforms/tolqc
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "06e72aef973851b9bef0d057b1cd378c76ba875e" #CHANGE THIS BACK!!!!
+  tag: "831642f746bf965c2a7493c96fc59bb5eeb5babf" #CHANGE THIS BACK!!!!
 
 imagePullSecrets:
-  - name: "tolqc-token"
+  - name: "tolqc-token" # REVERT THIS CHANGE!
 nameOverride: ""
 fullnameOverride: "tolqc-service"
 
