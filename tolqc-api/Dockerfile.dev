@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+FROM python:3.8
+
+WORKDIR /app
+
+ENV FLASK_ENV=development
+ENV PYTHONPATH=/app
+ENV PYTHONDONTWRITEBYTECODE 1
+
+RUN apt-get update -y
+RUN apt-get install -y python3-pip python3-setuptools
+
+RUN pip3 install --upgrade setuptools
+
+# Dockerize is needed to sync containers startup
+ENV DOCKERIZE_VERSION v0.6.0
+RUN wget --no-check-certificate https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
+COPY ./app/setup.py .
+RUN python3 setup.py install
+
+COPY ./app/requirements.txt .
+RUN pip3 --no-cache-dir install -r requirements.txt
+
+COPY ./app /app
+
+CMD [ "python", "run.py" ]

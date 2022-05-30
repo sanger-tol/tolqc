@@ -16,9 +16,12 @@ services:
       - 5435:5432
 
   tolqc-api:
-    build: tolqc-api/.
+    build:
+      context: tolqc-api/.
+      dockerfile: Dockerfile.dev
     image: tolqc-api
-    #command: python3 -m swagger_server
+    # force amd64 on M1 MacOS
+    platform: linux/amd64
     environment:
       - DB_URI
       - TOLQC_URL
@@ -35,13 +38,16 @@ services:
       - ENVIRONMENT
     ports:
       - 8082:80
+    volumes:
+      - './tolqc-api/app/main:/app/main'
 
   tolqc-ui:
     build:
       context: tolqc-ui/.
       dockerfile: Dockerfile.dev
     image: tolqc-ui
-    #command: python3 -m swagger_server
+    # force amd64 on M1 MacOS
+    platform: linux/amd64
     stdin_open: true
     environment:
       - NODE_ENV=development
