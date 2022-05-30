@@ -9,10 +9,10 @@
 replicaCount: 1
 
 image:
-  repository: gitlab-registry.internal.sanger.ac.uk/tol/platforms/tolqc
+  repository: ""
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "831642f746bf965c2a7493c96fc59bb5eeb5babf" #CHANGE THIS BACK!!!!
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""

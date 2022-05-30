@@ -1,0 +1,3 @@
+image:
+  repository: gitlab-registry.internal.sanger.ac.uk/tol/platforms/tolqc
+  tag: $CI_COMMIT_SHA
