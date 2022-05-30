@@ -1,5 +1,6 @@
-env:
-  db:
-    uri: ""
-  flask:
-    env: development
+imagePullSecrets: []
+
+db:
+  uri: ""
+flask:
+  env: development

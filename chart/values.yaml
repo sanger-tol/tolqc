@@ -14,8 +14,7 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "831642f746bf965c2a7493c96fc59bb5eeb5babf" #CHANGE THIS BACK!!!!
 
-imagePullSecrets:
-  - name: "tolqc-token" # REVERT THIS CHANGE!
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: "tolqc-service"
 
@@ -86,34 +85,30 @@ tolerations: []
 
 affinity: {}
 
+db:
+  user: ""
+  password: ""
+  name: ""
+  host: ""
+  port: ""
+  uri: ""
 api:
   fullname: "tolqc-api"
   service:
     port: "80"
-
+  url: ""
+flask:
+  env: ""
 ui:
   fullname: "tolqc-ui"
   service: {}
-
-env:
-  db:
-    user: ""
-    password: ""
-    name: ""
-    host: ""
-    port: ""
-    uri: ""
-  api:
-    url: ""
-  flask:
-    env: ""
-  s3:
-    uri: ""
-    access_key: ""
-    secret_key: ""
-    bucket: ""
-    secure: ""
-  backup:
-    schedule: ""
-  restore:
-    prefix: ""
+s3:
+  uri: ""
+  access_key: ""
+  secret_key: ""
+  bucket: ""
+  secure: ""
+backup:
+  schedule: ""
+restore:
+  prefix: ""
