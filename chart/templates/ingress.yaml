@@ -64,6 +64,4 @@ spec:
                 name: {{ $apiName }}
                 port:
                   number: {{ $apiPort }}
-              serviceName: {{ $apiName }}
-              servicePort: {{ $apiPort }}
 {{- end }}
