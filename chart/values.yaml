@@ -102,7 +102,8 @@ flask:
   env: ""
 ui:
   fullname: "tolqc-ui"
-  service: {}
+  service:
+    port: "80"
 s3:
   uri: ""
   access_key: ""

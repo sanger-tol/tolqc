@@ -1,6 +1,9 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "tolqc-app.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
+{{- $uiName := include "tolqc-app.ui.fullname" . -}}
+{{- $uiPort := .Values.ui.service.port -}}
+{{- $apiName := include "tolqc-app.api.fullname" . -}}
+{{- $apiPort := .Values.api.service.port -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
@@ -41,21 +44,32 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
-            pathType: {{ .pathType }}
-            {{- end }}
+          - path: /
+            pathType: Prefix
             backend:
-              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ $fullName }}
+                name: {{ $uiName }}
                 port:
-                  number: {{ $svcPort }}
-              {{- else }}
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
-              {{- end }}
-          {{- end }}
+                  number: {{ $uiPort }}
+              serviceName: {{ $uiName }}
+              servicePort: {{ $uiPort }}
+          - path: /api/v1
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $apiName }}
+                port:
+                  number: {{ $apiPort }}
+              serviceName: {{ $apiName }}
+              servicePort: {{ $apiPort }}
+          - path: /swaggerui
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $apiName }}
+                port:
+                  number: {{ $apiPort }}
+              serviceName: {{ $apiName }}
+              servicePort: {{ $apiPort }}
     {{- end }}
 {{- end }}
