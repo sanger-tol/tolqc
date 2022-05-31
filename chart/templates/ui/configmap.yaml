@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tolqc-app.ui.fullname" . }}
+  labels:
+    {{- include "tolqc-app.labels" . | nindent 4 }}
+data:
+  TOLQC_API_LOCATION: {{ .Values.api.url }}

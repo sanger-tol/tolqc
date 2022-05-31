@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tolqc-app.ui.fullname" . }}
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
