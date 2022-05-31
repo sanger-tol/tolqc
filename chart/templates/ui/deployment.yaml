@@ -10,7 +10,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "tolqc-app.selectorLabels" . | nindent 6 }}
+      app: ui
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "tolqc-app.selectorLabels" . | nindent 8 }}
+        app: ui
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

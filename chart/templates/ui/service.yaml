@@ -6,7 +6,7 @@ metadata:
     {{- include "tolqc-app.labels" . | nindent 4 }}
 spec:
   selector:
-    {{- include "tolqc-app.selectorLabels" . | nindent 6 }}
+    app: ui
   ports:
     - protocol: TCP
       port: 80
