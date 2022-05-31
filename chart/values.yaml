@@ -16,7 +16,8 @@ image:
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: "tolqc-service"
+fullnameOverride: "qa" #TODO SET THIS IN THE values.yaml of GitLab FOR EACH ENVIRONMENT
+# DO NOT LEAVE THIS HARDCODING IN HERE
 
 serviceAccount:
   # Specifies whether a service account should be created
