@@ -40,7 +40,6 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
@@ -71,5 +70,4 @@ spec:
                   number: {{ $apiPort }}
               serviceName: {{ $apiName }}
               servicePort: {{ $apiPort }}
-    {{- end }}
 {{- end }}
