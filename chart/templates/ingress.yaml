@@ -50,8 +50,6 @@ spec:
                 name: {{ $uiName }}
                 port:
                   number: {{ $uiPort }}
-              serviceName: {{ $uiName }}
-              servicePort: {{ $uiPort }}
           - path: /api/v1
             pathType: Prefix
             backend:
@@ -59,8 +57,6 @@ spec:
                 name: {{ $apiName }}
                 port:
                   number: {{ $apiPort }}
-              serviceName: {{ $apiName }}
-              servicePort: {{ $apiPort }}
           - path: /swaggerui
             pathType: Prefix
             backend:
