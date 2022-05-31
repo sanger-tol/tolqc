@@ -123,6 +123,8 @@ variables:
 deploy-qa:
   extends: .auto-deploy
   stage: deploy
+  variables:
+    CI_APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE
   script:
     - auto-deploy check_kube_domain
     - auto-deploy download_chart
