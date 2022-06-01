@@ -15,9 +15,6 @@ image:
   tag: ""
 
 imagePullSecrets: []
-nameOverride: "qa" # TODO don't hardcode this
-fullnameOverride: "qa" #TODO SET THIS IN THE values.yaml of GitLab FOR EACH ENVIRONMENT
-# DO NOT LEAVE THIS HARDCODING IN HERE
 
 serviceAccount:
   # Specifies whether a service account should be created
