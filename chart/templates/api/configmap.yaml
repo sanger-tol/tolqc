@@ -5,5 +5,5 @@ metadata:
   labels:
     {{- include "tolqc-app.labels" . | nindent 4 }}
 data:
-  DB_URI: {{ .Values.db.uri }}
+  DB_URI: "postgresql://{{ .Values.db.user }}:{{ .Values.db.password }}@{{ .Values.db.host }}:{{ .Values.db.port }}/{{ .Values.db.name }}"
   FLASK_ENV: {{ .Values.flask.env }}

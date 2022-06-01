@@ -87,12 +87,15 @@ tolerations: []
 affinity: {}
 
 db:
+  fullname: "tolqc-db"
+  service:
+    external_port: "5432"
   user: ""
   password: ""
   name: ""
   host: ""
   port: ""
-  uri: ""
+  create_local: ""
 api:
   fullname: "tolqc-api"
   service:
