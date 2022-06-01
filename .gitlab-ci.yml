@@ -125,6 +125,8 @@ deploy-qa:
   stage: deploy
   variables:
     CI_APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE
+    #REMOVE THIS - just for testing
+    CI_COMMIT_SHA: 831642f746bf965c2a7493c96fc59bb5eeb5babf
   script:
     - auto-deploy check_kube_domain
     - auto-deploy download_chart
