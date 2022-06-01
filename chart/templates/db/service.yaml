@@ -1,4 +1,4 @@
-{{- if .Values.db.create_local }}
+{{- if eq .Values.db.create_local "true" }}
 apiVersion: v1
 kind: Service
 metadata:
