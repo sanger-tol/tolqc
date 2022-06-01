@@ -85,8 +85,6 @@ affinity: {}
 
 db:
   fullname: "tolqc-db"
-  service:
-    external_port: "5432"
   user: ""
   password: ""
   name: ""
@@ -95,15 +93,13 @@ db:
   create_local: ""
 api:
   fullname: "tolqc-api"
-  service:
-    port: "80"
+  port: "80"
   url: ""
 flask:
   env: ""
 ui:
   fullname: "tolqc-ui"
-  service:
-    port: "80"
+  port: "80"
 s3:
   uri: ""
   access_key: ""
