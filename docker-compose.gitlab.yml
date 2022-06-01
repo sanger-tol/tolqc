@@ -27,7 +27,6 @@ services:
       replicas: 1
     env_file:
       - ${ENV_FILE}
-#    entrypoint: /bin/sh -c "envsubst "\\$$STS_API_LOCATION" < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && cat /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
     ports: 
       - 8000:80
     volumes:
