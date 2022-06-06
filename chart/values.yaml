@@ -93,13 +93,10 @@ db:
   create_local: ""
 api:
   fullname: "tolqc-api"
-  port: "80"
-  url: ""
 flask:
   env: ""
 ui:
   fullname: "tolqc-ui"
-  port: "80"
 s3:
   uri: ""
   access_key: ""

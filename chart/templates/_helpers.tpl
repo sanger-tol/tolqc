@@ -114,3 +114,25 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Determine the DB port. This is, by default, 5432.
+*/}}
+{{- define "tolqc-app.db.port" -}}
+{{- if eq .Values.db.port "" }}
+{{- "5432" }}
+{{- else }}
+{{- .Values.db.port }}
+{{- end }}
+{{- end }}
+
+{{/*
+Determine the DB host. (always the db fullname for a cluster-local DB)
+*/}}
+{{- define "tolqc-app.db.host" -}}
+{{- if eq .Values.db.create_local "true" }}
+{{- include "tolqc-app.db.fullname" . }}
+{{- else }}
+{{- .Values.db.host }}
+{{- end }}
+{{- end }}
