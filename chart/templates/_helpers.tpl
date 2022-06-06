@@ -120,9 +120,9 @@ Determine the DB port. This is, by default, 5432.
 */}}
 {{- define "tolqc-app.db.port" -}}
 {{- if eq .Values.db.port "" }}
-{{- "5432" }}
+{{- "5432" -}}
 {{- else }}
-{{- .Values.db.port }}
+{{- .Values.db.port -}}
 {{- end }}
 {{- end }}
 
@@ -130,7 +130,7 @@ Determine the DB port. This is, by default, 5432.
 Determine the DB host. (always the db fullname for a cluster-local DB)
 */}}
 {{- define "tolqc-app.db.host" -}}
-{{- if eq .Values.db.create_local "true" }}
+{{- if eq .Values.db.create_local "true" -}}
 {{- include "tolqc-app.db.fullname" . }}
 {{- else }}
 {{- .Values.db.host }}

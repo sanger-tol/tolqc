@@ -10,6 +10,6 @@ spec:
     app: db
   ports:
     - protocol: TCP
-      port: 5432
-      targetPort: 5432
+      port: {{ include "tolqc-app.db.port" . }}
+      targetPort: "5432"
 {{- end }}

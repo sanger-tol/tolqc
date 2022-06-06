@@ -1,7 +1,11 @@
+{{- if .Values.ingress.enabled -}}
+{{- $dbName := include "tolqc-app.db.fullname" . -}}
+{{- $dbPort := include "tolqc-app.db.port" . -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tcp-services
   namespace: ingress-nginx
 data:
-  5432: "{{ .Release.Namespace }}/{{ include "tolqc-app.db.fullname" . }}:5432"
+  {{ $dbPort }}: "{{ .Release.Namespace }}/{{ $dbName }}:{{ $dbPort }}"
+{{- end }}
