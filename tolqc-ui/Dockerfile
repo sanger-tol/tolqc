@@ -22,6 +22,6 @@ FROM nginx:alpine
 RUN rm -rf /var/www/tolqc-ui/*
 
 # Copy from the stage 1
-COPY --from=builder /workspace/build/ /var/www/tolqc-ui/
+COPY --from=builder /workspace/build/ /usr/share/nginx/html/
 
 EXPOSE 80
