@@ -136,3 +136,15 @@ Determine the DB host. (always the db fullname for a cluster-local DB)
 {{- .Values.db.host }}
 {{- end }}
 {{- end }}
+
+{{/*
+Build the DB connection URI from its constituent parts
+*/}}
+{{- define "tolqc-app.db.uri" -}}
+{{- $dbuser := .Values.db.user }}
+{{- $dbpassword := .Values.db.password }}
+{{- $dbname := .Values.db.name }}
+{{- $dbhost := (include "tolqc-app.db.host" .) }}
+{{- $dbport := (include "tolqc-app.db.port" .) }}
+{{- (printf "postgresql://%s:%s@%s:%s/%s" $dbuser $dbpassword $dbhost $dbport $dbname ) }}
+{{- end }}
