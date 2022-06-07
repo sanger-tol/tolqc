@@ -127,7 +127,6 @@ deploy-qa:
   stage: deploy
   variables:
     CI_APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE
-    CI_COMMIT_SHA: "a66998216ac0f0bd18bedfcf85e9d37f3982135c" # remove this hardcoding
   script:
     - auto-deploy check_kube_domain
     - auto-deploy download_chart
@@ -135,8 +134,6 @@ deploy-qa:
     - auto-deploy ensure_namespace
     - auto-deploy initialize_tiller
     - auto-deploy create_secret
-    - echo $HELM_UPGRADE_EXTRA_ARGS
-    - auto-deploy deploy; helm -n tolqc-3067-qa get values qa
     - auto-deploy delete canary
     - auto-deploy persist_environment_url
   environment:
