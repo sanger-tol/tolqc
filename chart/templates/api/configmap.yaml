@@ -7,4 +7,4 @@ metadata:
 data:
   DB_URI: {{ include "tolqc-app.db.uri" . }}
   FLASK_ENV: {{ .Values.flask.env }}
-  ENVIRONMENT: {{ .Values.environment }}
+  ENVIRONMENT: {{ .Values.deployment.environment }}
