@@ -1,6 +1,19 @@
 imagePullSecrets: []
 
+deployment:
+  environment: "dev"
 db:
-  uri: ""
+  user: "tolqc"
+  password: "an-assembly-please"
+  name: "tolqc"
+  create_local: "true"
 flask:
   env: development
+s3:
+  uri: ""
+  access_key: ""
+  secret_key: ""
+  bucket: ""
+  secure: ""
+restore:
+  prefix: ""
