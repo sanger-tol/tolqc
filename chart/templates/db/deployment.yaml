@@ -14,10 +14,8 @@ spec:
       app: db
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/db/configmap.yaml") . | sha256sum }}
       labels:
         app: db
     spec:

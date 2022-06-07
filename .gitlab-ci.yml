@@ -120,7 +120,7 @@ variables:
   image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:${AUTO_DEPLOY_IMAGE_VERSION}"
   dependencies: []
   before_script:
-    - HELM_UPGRADE_EXTRA_ARGS="${HELM_UPGRADE_EXTRA_ARGS} --recreate-pods --set deployment.environment=\"${CI_ENVIRONMENT_NAME}\""
+    - HELM_UPGRADE_EXTRA_ARGS="${HELM_UPGRADE_EXTRA_ARGS} --set deployment.environment=\"${CI_ENVIRONMENT_NAME}\""
 
 deploy-qa:
   extends: .auto-deploy
