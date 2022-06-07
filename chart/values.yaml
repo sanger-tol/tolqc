@@ -83,7 +83,7 @@ tolerations: []
 
 affinity: {}
 
-environment: ""
+environment: "dev"
 db:
   fullname: "tolqc-db"
   user: ""
