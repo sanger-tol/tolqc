@@ -134,6 +134,7 @@ deploy-qa:
     - auto-deploy use_kube_context || true
     - auto-deploy ensure_namespace
     - env
+    - echo "$(deploy_name stable)"
     - auto-deploy initialize_tiller
     - auto-deploy create_secret
     - auto-deploy deploy
