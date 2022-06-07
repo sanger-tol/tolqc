@@ -120,13 +120,14 @@ variables:
   image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:${AUTO_DEPLOY_IMAGE_VERSION}"
   dependencies: []
   before_script:
-    - HELM_UPGRADE_EXTRA_ARGS="${HELM_UPGRADE_EXTRA_ARGS} --set deployment.environment=\"${CI_ENVIRONMENT_NAME}\""
+    - HELM_UPGRADE_EXTRA_ARGS="${HELM_UPGRADE_EXTRA_ARGS} --set gitlab.envName=null --set deployment.environment=\"${CI_ENVIRONMENT_NAME}\""
 
 deploy-qa:
   extends: .auto-deploy
   stage: deploy
   variables:
     CI_APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE
+    CI_COMMIT_SHA: "a66998216ac0f0bd18bedfcf85e9d37f3982135c" # remove this hardcoding
   script:
     - auto-deploy check_kube_domain
     - auto-deploy download_chart
