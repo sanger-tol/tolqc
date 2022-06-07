@@ -125,7 +125,6 @@ deploy-qa:
   stage: deploy
   variables:
     CI_APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE
-    CI_COMMIT_SHA: "0644fac05e54160aca38cfd5bb027a70e5049512" # remove this!
   script:
     - kubectl config set-context $(kubectl config current-context) --namespace="tolqc-3067-qa" # find a way to remove hardcoding
     - auto-deploy check_kube_domain
