@@ -15,13 +15,16 @@ COPY app/ .
 RUN yarn install
 RUN yarn build
 
+
 # Stage 2
 FROM nginx:alpine
+
+COPY nginx.conf /etc/nginx/
 
 ## Remove default nginx index page
 RUN rm -rf /var/www/tolqc-ui/*
 
 # Copy from the stage 1
-COPY --from=builder /workspace/build/ /usr/share/nginx/html/
+COPY --from=builder /workspace/build/ /var/www/tolqc-ui/
 
 EXPOSE 80
