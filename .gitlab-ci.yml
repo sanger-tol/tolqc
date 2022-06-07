@@ -119,7 +119,7 @@ variables:
 .auto-deploy:
   image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:${AUTO_DEPLOY_IMAGE_VERSION}"
   dependencies: []
-  pre_script:
+  before_script:
     - HELM_UPGRADE_EXTRA_ARGS='"$HELM_UPGRADE_EXTRA_ARGS" --set environment="${CI_ENVIRONMENT_NAME}"'
 
 deploy-qa:
