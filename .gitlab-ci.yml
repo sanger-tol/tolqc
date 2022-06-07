@@ -133,6 +133,7 @@ deploy-qa:
     - auto-deploy download_chart
     - auto-deploy use_kube_context || true
     - auto-deploy ensure_namespace
+    - env
     - auto-deploy initialize_tiller
     - auto-deploy create_secret
     - auto-deploy deploy
