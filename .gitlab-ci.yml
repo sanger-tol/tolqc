@@ -135,7 +135,7 @@ deploy-qa:
     - auto-deploy ensure_namespace
     - auto-deploy initialize_tiller
     - auto-deploy create_secret
-    - echo "$HELM_UPGRADE_EXTRA_ARGS"
+    - echo $HELM_UPGRADE_EXTRA_ARGS
     - auto-deploy deploy
     - auto-deploy delete canary
     - auto-deploy persist_environment_url
