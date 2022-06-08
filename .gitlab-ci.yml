@@ -62,16 +62,10 @@ test-ui:
   allow_failure: true
 
 deploy-staging:
-  extends: .swarm-deploy-template
+  extends: .auto-deploy
   environment:
     name: staging
     url: https://qc-staging.tol.sanger.ac.uk
-  variables:
-    DOCKER_HOST: "ssh://ubuntu@172.27.26.124"
-    EXTRA_DEPLOY_FILES: "-c docker-compose.gitlab-logging.yml"
-    STACK_NAME: tolqc
-  script:
-    - echo "Deployed to staging"
   only:
     - staging
 
