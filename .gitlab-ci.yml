@@ -4,8 +4,7 @@
 
 include:
   - project: 'tol/tol-core'
-    #ref: main
-    ref: auto-deploy
+    ref: main
     file: '/gitlab/main.yml'
 
 stages:
