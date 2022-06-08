@@ -114,9 +114,6 @@ test-api:
     - staging
     - production
 
-variables:
-  AUTO_DEPLOY_IMAGE_VERSION: 'v2.25.0'
-
 deploy-qa:
   extends: .auto-deploy
   variables:
