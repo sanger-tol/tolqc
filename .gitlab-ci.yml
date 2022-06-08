@@ -123,4 +123,4 @@ deploy-qa:
     url: http://qc-qa.tol.sanger.ac.uk
   only:
     - qa
-    - helm-test-edward #TODO remove this!  
+    - helm-test-edward #TODO remove this!   
