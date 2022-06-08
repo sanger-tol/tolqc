@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "tolqc-app.ui.fullname" . }}
+  name: {{ include "tolqc-app.api.fullname" . }}
   labels:
     {{- include "tolqc-app.labels" . | nindent 4 }}
 spec:
@@ -10,13 +10,13 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: ui
+      app: api
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/ui/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmaps/api.yaml") . | sha256sum }}
       labels:
-        app: ui
+        app: api
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -28,10 +28,10 @@ spec:
         - name: {{ .Chart.Name }}
           envFrom:
             - configMapRef:
-                name: {{ include "tolqc-app.ui.fullname" . }}
+                name: {{ include "tolqc-app.api.fullname" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}/{{ .Values.ui.fullname }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}/{{ .Values.api.fullname }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -39,11 +39,11 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /api/v1/ui
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /api/v1/ui
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

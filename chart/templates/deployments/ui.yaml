@@ -1,8 +1,7 @@
-{{- if eq .Values.db.create_local "true" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "tolqc-app.db.fullname" . }}
+  name: {{ include "tolqc-app.ui.fullname" . }}
   labels:
     {{- include "tolqc-app.labels" . | nindent 4 }}
 spec:
@@ -11,13 +10,13 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: db
+      app: ui
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/db/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmaps/ui.yaml") . | sha256sum }}
       labels:
-        app: db
+        app: ui
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -29,11 +28,23 @@ spec:
         - name: {{ .Chart.Name }}
           envFrom:
             - configMapRef:
-                name: {{ include "tolqc-app.db.fullname" . }}
+                name: {{ include "tolqc-app.ui.fullname" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "postgres:11"
+          image: "{{ .Values.image.repository }}/{{ .Values.ui.fullname }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -48,4 +59,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-{{- end }}
+
