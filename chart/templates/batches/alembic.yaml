@@ -21,4 +21,6 @@ spec:
         envFrom:
           - configMapRef:
                 name: {{ include "tolqc-app.alembic.fullname" . }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
       restartPolicy: {{ .Values.job.restartPolicy }}
