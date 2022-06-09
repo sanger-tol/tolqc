@@ -78,6 +78,13 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Fullname for alembic
+*/}}
+{{- define "tolqc-app.alembic.fullname" -}}
+{{- printf "%s-%d-alembic" (include "tolqc-app.fullname" . ) .Release.Revision }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "tolqc-app.chart" -}}
@@ -147,4 +154,11 @@ Build the DB connection URI from its constituent parts
 {{- $dbhost := (include "tolqc-app.db.host" .) }}
 {{- $dbport := (include "tolqc-app.db.port" .) }}
 {{- (printf "postgresql://%s:%s@%s:%s/%s" $dbuser $dbpassword $dbhost $dbport $dbname ) }}
+{{- end }}
+
+{{/*
+Build the API image string from its constiuent parts
+*/}}
+{{- define "tolqc-app.api.image" -}}
+{{- .Values.image.repository }}/{{ .Values.api.fullname }}:{{ .Values.image.tag | default .Chart.AppVersion }}
 {{- end }}

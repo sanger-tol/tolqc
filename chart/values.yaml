@@ -83,6 +83,9 @@ tolerations: []
 
 affinity: {}
 
+job:
+  restartPolicy: "OnFailure"
+
 deployment:
   environment: "dev"
 db:

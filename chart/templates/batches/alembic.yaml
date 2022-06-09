@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: alembic # change this back!!!
+  labels:
+    {{- include "tolqc-app.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: alembic
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ include "tolqc-app.api.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["alembic"]
+        args: ["upgrade", "head"]
+      restartPolicy: {{ .Values.job.restartPolicy }}
