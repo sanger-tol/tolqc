@@ -17,7 +17,7 @@ spec:
         image: {{ include "tolqc-app.api.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["alembic"]
-        args: ["upgrade", "head"]
+        args: ["-c", "/migrations/alembic.ini", "upgrade", "head"]
         envFrom:
           - configMapRef:
                 name: {{ include "tolqc-app.alembic.fullname" . }}
