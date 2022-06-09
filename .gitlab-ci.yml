@@ -32,34 +32,6 @@ build-ui:
     DOCKERFILE: 'tolqc-ui/Dockerfile'
     NAME: "tolqc-ui"
 
-build-ui-test:
-  extends: .build-template
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ''
-    PART: "tolqc-ui"
-    DOCKERFILE: 'tolqc-ui/Dockerfile.dev'
-    NAME: "tolqc-ui-test"
-
-test-ui:
-  image: $DOCKER_IMAGE
-  stage: unit test
-  services:
-    - name: $DIND_IMAGE
-      alias: docker
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ''
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker run -e CI=true $CI_REGISTRY_IMAGE/tolqc-ui-test:$CI_COMMIT_SHA yarn test
-  except:
-    - qa
-    - staging
-    - production
-  allow_failure: true
-
 deploy-staging:
   extends: .auto-deploy
   environment:
@@ -82,30 +54,6 @@ deploy-production:
   only:
     - production
   when: manual
-
-test-api:
-  extends: .swarm-deploy-template
-  image: $DOCKER_IMAGE
-  stage: integration test
-  resource_group: testing
-  services:
-    - name: $DIND_IMAGE
-      alias: docker
-  environment:
-    name: testing
-    url: http://172.27.25.82:8000
-  variables:
-    DOCKER_HOST: "ssh://ubuntu@172.27.25.82"
-    EXTRA_DEPLOY_FILES: "-c docker-compose.gitlab-test.yml"
-    STACK_NAME: tolqc
-  script:
-    - sleep 60
-    - docker exec $(docker ps -q -f name="tolqc_tolqc-api") 
-      bash -c "pytest -v"
-  except:
-    - qa
-    - staging
-    - production
 
 deploy-qa:
   extends: .auto-deploy

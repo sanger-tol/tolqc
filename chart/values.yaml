@@ -94,7 +94,7 @@ db:
   password: ""
   name: ""
   host: ""
-  port: ""
+  port: "" # specify as a string
   create_local: ""
 api:
   fullname: "tolqc-api"
