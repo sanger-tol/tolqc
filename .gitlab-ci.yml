@@ -55,37 +55,10 @@ deploy-production:
     - production
   when: manual
 
-
-# put this back in tol-core!!!
-.auto-deploy-copy:
-  image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:v2.25.0"
-  dependencies: []
-  stage: deploy
-  variables:
-    CI_APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE
-  before_script:
-    - HELM_UPGRADE_DEFAULT_SET_ARGS="--set-string deployment.environment=${CI_ENVIRONMENT_NAME} --set image.repository=${CI_REGISTRY_IMAGE} --set-string image.tag=${CI_COMMIT_SHA}"
-  script:
-    - auto-deploy check_kube_domain
-    - auto-deploy download_chart
-    - auto-deploy use_kube_context || true
-    - auto-deploy ensure_namespace
-    - auto-deploy initialize_tiller
-    - auto-deploy create_secret
-    # add to service account the ability to view jobs (used by init containers) if not already given
-    - kubectl create role watch-jobs --verb=get --verb=list --verb=watch --resource=jobs.batch || true
-    - kubectl create rolebinding default-watch-jobs --role=watch-jobs --serviceaccount=$KUBE_NAMESPACE:default --namespace $KUBE_NAMESPACE || true
-    # $(auto-deploy deploy) doesn't like this workflow, so do it manually:
-    - helm upgrade --install -n "$KUBE_NAMESPACE" --values "$HELM_UPGRADE_VALUES_FILE" $HELM_UPGRADE_DEFAULT_SET_ARGS $HELM_UPGRADE_EXTRA_ARGS --atomic "$CI_ENVIRONMENT_NAME" chart/
-    - auto-deploy delete canary
-    - auto-deploy persist_environment_url
-  artifacts:
-    paths: [environment_url.txt, tiller.log]
-    when: always
-
-
 deploy-qa:
-  extends: .auto-deploy-copy
+  extends: .auto-deploy
+  variables:
+    CI_COMMIT_SHA: "7f07f6fe0f9f8dd2a750d83c9afe2a1270088f64"
   environment:
     name: qa
     url: http://qc-qa.tol.sanger.ac.uk
