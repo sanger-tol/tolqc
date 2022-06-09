@@ -3,3 +3,7 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Files: chart/*
 Copyright: 2021 Genome Research Ltd.
 License: MIT
+
+Files: tolqc-api/migrations/*
+Copyright: 2021 Genome Research Ltd.
+License: MIT
