@@ -15,6 +15,7 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps/ui.yaml") . | sha256sum }}
+        image: {{ .Values.image.tag }}
       labels:
         app: ui
     spec:

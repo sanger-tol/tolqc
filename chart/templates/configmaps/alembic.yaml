@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: alembic # change this back!!!
+  name: alembic-{{ .Release.Revision}} # change this back!!!
   labels:
     {{- include "tolqc-app.labels" . | nindent 4 }}
 data:
