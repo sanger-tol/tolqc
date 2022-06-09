@@ -81,7 +81,7 @@ If release name contains chart name it will be used as a full name.
 Fullname for alembic
 */}}
 {{- define "tolqc-app.alembic.fullname" -}}
-{{- printf "%s-%d-alembic" (include "tolqc-app.fullname" . ) .Release.Revision }}
+{{- printf "alembic-%d" .Release.Revision }}
 {{- end }}
 
 {{/*

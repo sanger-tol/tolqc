@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: alembic-{{ .Release.Revision}} # change this back!!!
+  name: {{ include "tolqc-app.alembic.fullname" . }}
   labels:
     {{- include "tolqc-app.labels" . | nindent 4 }}
 spec:
@@ -17,5 +17,5 @@ spec:
         args: ["upgrade", "head"]
         envFrom:
           - configMapRef:
-                name: alembic-{{ .Release.Revision}} # refactor this into a helper var
+                name: {{ include "tolqc-app.alembic.fullname" . }}
       restartPolicy: {{ .Values.job.restartPolicy }}
