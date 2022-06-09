@@ -109,8 +109,6 @@ test-api:
 
 deploy-qa:
   extends: .auto-deploy
-  variables:
-    CI_COMMIT_SHA: "a66998216ac0f0bd18bedfcf85e9d37f3982135c" # remove this hardcoding
   environment:
     name: qa
     url: http://qc-qa.tol.sanger.ac.uk

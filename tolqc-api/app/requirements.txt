@@ -16,6 +16,7 @@ psycopg2-binary == 2.8.6
 markupsafe==2.0.1
 responses
 jwt
+alembic==1.8.0
 
 flask_testing==0.8.0
 coverage>=4.0.3
