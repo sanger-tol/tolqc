@@ -6,7 +6,7 @@ metadata:
     {{- include "tolqc-app.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
-    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-weight": "-10"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
     db_uri: {{ include "tolqc-app.db.uri" . }}
 spec:
