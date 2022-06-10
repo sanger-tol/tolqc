@@ -81,21 +81,28 @@ If release name contains chart name it will be used as a full name.
 Fullname for alembic
 */}}
 {{- define "tolqc-app.alembic.fullname" -}}
-{{- printf "alembic-%d" .Release.Revision }}
+"tolqc-alembic"
 {{- end }}
 
 {{/*
 Fullname for dbutils
 */}}
 {{- define "tolqc-app.dbutils.fullname" -}}
-{{- printf "dbutils-%d" .Release.Revision }}
+"tolqc-dbutils"
 {{- end }}
 
 {{/*
 Fullname for (dbutils) restore job
 */}}
 {{- define "tolqc-app.restore.fullname" -}}
-{{- printf "restore-%d" .Release.Revision }}
+"tolqc-restore"
+{{- end }}
+
+{{/*
+Fullname for (dbutils) backup pod
+*/}}
+{{- define "tolqc-app.backup.fullname" -}}
+"tolqc-backup"
 {{- end }}
 
 {{/*
