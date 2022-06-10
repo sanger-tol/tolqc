@@ -63,7 +63,7 @@ spec:
                 name: {{ $apiName }}
                 port:
                   number: 80
-          - path: /schema
+          - path: /schema/*
             pathType: Prefix
             backend:
               service:
