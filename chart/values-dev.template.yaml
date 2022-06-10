@@ -7,6 +7,10 @@ db:
   password: "an-assembly-please"
   name: "tolqc"
   create_local: "true"
+dbutils:
+  image:
+    repository: ""
+    tag: ""
 flask:
   env: development
 s3:

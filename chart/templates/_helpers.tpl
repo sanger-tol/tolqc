@@ -85,6 +85,20 @@ Fullname for alembic
 {{- end }}
 
 {{/*
+Fullname for dbutils
+*/}}
+{{- define "tolqc-app.dbutils.fullname" -}}
+{{- printf "dbutils-%d" .Release.Revision }}
+{{- end }}
+
+{{/*
+Fullname for (dbutils) restore job
+*/}}
+{{- define "tolqc-app.restore.fullname" -}}
+{{- printf "restore-%d" .Release.Revision }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "tolqc-app.chart" -}}
@@ -161,4 +175,11 @@ Build the API image string from its constiuent parts
 */}}
 {{- define "tolqc-app.api.image" -}}
 {{- .Values.image.repository }}/{{ .Values.api.fullname }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+{{- end }}
+
+{{/*
+Build the dbutils image string from its constiuent parts
+*/}}
+{{- define "tolqc-app.dbutils.image" -}}
+{{- .Values.dbutils.image.repository }}:{{- .Values.dbutils.image.tag }}
 {{- end }}

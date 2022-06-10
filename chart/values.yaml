@@ -96,6 +96,12 @@ db:
   host: ""
   port: "" # specify as a string
   create_local: ""
+  restore: ""
+  backup: ""
+dbutils:
+  image:
+    repository: ""
+    tag: ""
 api:
   fullname: "tolqc-api"
 flask:

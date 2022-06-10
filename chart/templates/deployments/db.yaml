@@ -7,7 +7,7 @@ metadata:
     {{- include "tolqc-app.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
-    "helm.sh/hook-weight": "-30" # run before db service, alembic and restore
+    "helm.sh/hook-weight": "-40"
     "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   replicas: 1
