@@ -97,7 +97,6 @@ db:
   port: "" # specify as a string
   create_local: ""
   restore: ""
-  backup: ""
 dbutils:
   image:
     repository: ""
@@ -116,5 +115,6 @@ s3:
   secure: ""
 backup:
   schedule: ""
+  activated: ""
 restore:
   prefix: ""
