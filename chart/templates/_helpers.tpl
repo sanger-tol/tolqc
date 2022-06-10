@@ -85,6 +85,13 @@ Fullname for alembic
 {{- end }}
 
 {{/*
+Fullname for schemaspy
+*/}}
+{{- define "tolqc-app.schemaspy.fullname" -}}
+"tolqc-schemaspy"
+{{- end }}
+
+{{/*
 Fullname for dbutils
 */}}
 {{- define "tolqc-app.dbutils.fullname" -}}
@@ -189,4 +196,11 @@ Build the dbutils image string from its constiuent parts
 */}}
 {{- define "tolqc-app.dbutils.image" -}}
 {{- .Values.dbutils.image.repository }}:{{- .Values.dbutils.image.tag }}
+{{- end }}
+
+{{/*
+Build the schemaspy image string from its constiuent parts
+*/}}
+{{- define "tolqc-app.schemaspy.image" -}}
+{{- .Values.schemaspy.image.repository }}:{{- .Values.schemaspy.image.tag }}
 {{- end }}

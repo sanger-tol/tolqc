@@ -101,6 +101,10 @@ dbutils:
   image:
     repository: ""
     tag: ""
+schemaspy:
+  image:
+    repository: ""
+    tag: ""
 api:
   fullname: "tolqc-api"
 flask:

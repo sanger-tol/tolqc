@@ -11,6 +11,10 @@ dbutils:
   image:
     repository: ""
     tag: ""
+schemaspy:
+  image:
+    repository: ""
+    tag: ""
 flask:
   env: development
 s3:

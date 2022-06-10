@@ -2,6 +2,7 @@
 {{- $fullName := include "tolqc-app.fullname" . -}}
 {{- $uiName := include "tolqc-app.ui.fullname" . -}}
 {{- $apiName := include "tolqc-app.api.fullname" . -}}
+{{- $schemaspyName := include "tolqc-app.schemaspy.fullname" . -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
@@ -60,6 +61,13 @@ spec:
             backend:
               service:
                 name: {{ $apiName }}
+                port:
+                  number: 80
+          - path: /schema
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $schemaspyName }}
                 port:
                   number: 80
 {{- end }}
