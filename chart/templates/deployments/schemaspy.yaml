@@ -32,6 +32,18 @@ spec:
           volumeMounts:
           - name: schema-html
             mountPath: /usr/share/nginx/html
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
       initContainers:
         - name: schemaspy-generator
           image: {{ include "tolqc-app.schemaspy.image" . }}
