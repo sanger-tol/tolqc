@@ -4,7 +4,7 @@
 
 include:
   - project: 'tol/tol-core'
-    ref: add-view-jobs
+    ref: main
     file: '/gitlab/main.yml'
 
 stages:
