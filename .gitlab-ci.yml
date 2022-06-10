@@ -57,8 +57,6 @@ deploy-production:
 
 deploy-qa:
   extends: .auto-deploy
-  variables:
-    CI_COMMIT_SHA: "7f07f6fe0f9f8dd2a750d83c9afe2a1270088f64"
   environment:
     name: qa
     url: http://qc-qa.tol.sanger.ac.uk
