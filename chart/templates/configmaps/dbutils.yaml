@@ -21,4 +21,4 @@ data:
   BACKUP_S3_SECURE: {{ .Values.s3.secure }}
   RESTORE_FILE_PREFIX: {{ .Values.restore.prefix }}
   FLASK_ENV: {{ .Values.flask.env }}
-  BACKUP_SCHEDULE: {{ .Values.backup.schedule }}
+  BACKUP_SCHEDULE: "{{ .Values.backup.schedule }}"
