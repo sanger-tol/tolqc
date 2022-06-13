@@ -1,4 +1,4 @@
-{{ if or (eq .Values.db.restore "true") (eq .Values.db.create_local "true") }}
+{{- if not (eq .Values.restore.prefix "") }}
 apiVersion: batch/v1
 kind: Job
 metadata:
