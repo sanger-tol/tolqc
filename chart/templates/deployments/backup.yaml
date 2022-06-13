@@ -1,4 +1,4 @@
-{{- if eq .Values.backup.activated "true" }}
+{{- if not (eq .Values.backup.schedule "") }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
