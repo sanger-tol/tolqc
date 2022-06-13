@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tolqc-app.schemaspy.fullname" . }}
+  labels:
+    {{- include "tolqc-app.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schemaspy
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmaps/schemaspy.yaml") . | sha256sum }}
+        image: {{ include "tolqc-app.schemaspy.image" . }}
+      labels:
+        app: schemaspy
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      - name: schema-html
+        emptyDir: {}
+      containers:
+        - name: nginx
+          image: nginx
+          volumeMounts:
+          - name: schema-html
+            mountPath: /usr/share/nginx/html/schema
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /schema/
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /schema/
+              port: http
+      initContainers:
+        - name: schemaspy-generator
+          image: {{ include "tolqc-app.schemaspy.image" . }}
+          volumeMounts:
+          - name: schema-html
+            mountPath: /output
+          envFrom:
+            - configMapRef:
+                name: {{ include "tolqc-app.schemaspy.fullname" . }}

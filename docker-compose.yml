@@ -90,3 +90,20 @@ services:
     volumes:
       - './tolqc-ui/app:/usr/src/app'
       - '/usr/src/app/node_modules'
+  
+  tolqc-dbutils:
+    image: gitlab-registry.internal.sanger.ac.uk/tol/tol-core/dbutils:1.0.3
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - BACKUP_S3_ACCESS_KEY
+      - BACKUP_S3_SECRET_KEY
+      - BACKUP_S3_URI
+      - BACKUP_S3_BUCKET
+      - BACKUP_S3_SECURE
+      - RESTORE_FILE_PREFIX
+      - FLASK_ENV
+      - BACKUP_SCHEDULE

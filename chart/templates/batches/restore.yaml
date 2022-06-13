@@ -1,0 +1,32 @@
+{{ if or (eq .Values.db.restore "true") (eq .Values.db.create_local "true") }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "tolqc-app.restore.fullname" . }}
+  labels:
+    {{- include "tolqc-app.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ include "tolqc-app.dbutils.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["python3"]
+        args: ["run.py", "restore"]
+        envFrom:
+            - configMapRef:
+                name: {{ include "tolqc-app.dbutils.fullname" . }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+      restartPolicy: {{ .Values.job.restartPolicy }}
+{{- end }}

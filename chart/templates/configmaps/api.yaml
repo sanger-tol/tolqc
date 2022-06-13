@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tolqc-app.api.fullname" . }}
+  labels:
+    {{- include "tolqc-app.labels" . | nindent 4 }}
+data:
+  DB_URI: {{ include "tolqc-app.db.uri" . }}
+  FLASK_ENV: {{ .Values.flask.env }}
+  ENVIRONMENT: {{ .Values.deployment.environment }}

@@ -15,10 +15,11 @@ COPY app/ .
 RUN yarn install
 RUN yarn build
 
+
 # Stage 2
 FROM nginx:alpine
 
-COPY nginx/* /etc/nginx/
+COPY nginx.conf /etc/nginx/
 
 ## Remove default nginx index page
 RUN rm -rf /var/www/tolqc-ui/*
@@ -27,5 +28,3 @@ RUN rm -rf /var/www/tolqc-ui/*
 COPY --from=builder /workspace/build/ /var/www/tolqc-ui/
 
 EXPOSE 80
-
-ENTRYPOINT ["/etc/nginx/entrypoint.sh"]
