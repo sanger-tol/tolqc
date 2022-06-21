@@ -64,5 +64,3 @@ deploy-qa:
     url: http://qc-qa.tol.sanger.ac.uk
   only:
     - qa
-    #REEEMOVE
-    - sts-backport
