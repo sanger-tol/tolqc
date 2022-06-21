@@ -1,4 +1,4 @@
-{{- if not (eq .Values.restore.prefix "") }}
+{{- if and (not (eq .Values.restore.prefix "")) (not (eq .Values.deployment.environment "production")) (not (eq .Values.flask.env "production")) }}
 apiVersion: batch/v1
 kind: Job
 metadata:
