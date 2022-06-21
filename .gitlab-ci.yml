@@ -32,15 +32,6 @@ build-ui:
     DOCKERFILE: 'tolqc-ui/Dockerfile'
     NAME: "tolqc-ui"
 
-test-unit:
-  extends: .test-unit
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ''
-    GIT_STRATEGY: none
-    NAME: tolqc-api
-    PART: tolqc-api
-
 test-migrations:
   extends: .test-migrations
   variables:
