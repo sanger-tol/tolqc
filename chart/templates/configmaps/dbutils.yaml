@@ -18,7 +18,7 @@ data:
   BACKUP_S3_SECRET_KEY: "{{ .Values.backup.secret_key }}"
   BACKUP_S3_URI: "{{ .Values.backup.uri }}"
   BACKUP_S3_BUCKET: "{{ .Values.backup.bucket }}"
-  BACKUP_S3_SECURE: "{{ .Values.backupsecure }}"
+  BACKUP_S3_SECURE: "{{ .Values.backup.secure }}"
   RESTORE_FILE_PREFIX: "{{ .Values.restore.prefix }}"
   FLASK_ENV: "{{ .Values.flask.env }}"
   BACKUP_SCHEDULE: "{{ .Values.backup.schedule }}"

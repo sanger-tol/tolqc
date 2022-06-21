@@ -14,7 +14,7 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps/schemaspy.yaml") . | sha256sum }}
         image: {{ include "tolqc-app.schemaspy.image" . }}
-        revision: "{{ include .Release.Revision }}"
+        revision: "{{ .Release.Revision }}"
       labels:
         app: schemaspy
     spec:
