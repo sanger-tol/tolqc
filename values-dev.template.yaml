@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
 imagePullSecrets: []
 
 deployment:
@@ -17,7 +21,7 @@ schemaspy:
     tag: ""
 flask:
   env: development
-s3:
+backup:
   uri: ""
   access_key: ""
   secret_key: ""
