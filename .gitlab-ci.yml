@@ -4,7 +4,9 @@
 
 include:
   - project: 'tol/tol-core'
-    ref: main
+    # TODO PUT BACK!!!
+    #ref: main
+    ref: core-chart # REEEEEMOVE 
     file: '/gitlab/main.yml'
 
 stages:
@@ -64,3 +66,5 @@ deploy-qa:
     url: http://qc-qa.tol.sanger.ac.uk
   only:
     - qa
+    # REEEMOVE
+    - k8s-mkii

@@ -1,0 +1,6 @@
+dependencies:
+- name: tolcore
+  repository: https://gitlab.internal.sanger.ac.uk/api/v4/projects/2930/packages/helm/tol-core
+  version: 0.1.0
+digest: sha256:e9c3388e47d37ecc13964612f01ba8e0a0635139b202550b9392e1f14100479f
+generated: "2022-06-22T16:06:29.996414+01:00"

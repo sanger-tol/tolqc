@@ -2,30 +2,31 @@
 #
 # SPDX-License-Identifier: MIT
 
-imagePullSecrets: []
+tolcore:
+  imagePullSecrets: []
 
-deployment:
-  environment: "dev"
-db:
-  user: "tolqc"
-  password: "an-assembly-please"
-  name: "tolqc"
-  create_local: "true"
-dbutils:
-  image:
-    repository: ""
-    tag: ""
-schemaspy:
-  image:
-    repository: ""
-    tag: ""
-flask:
-  env: development
-backup:
-  uri: ""
-  access_key: ""
-  secret_key: ""
-  bucket: ""
-  secure: ""
-restore:
-  prefix: ""
+  deployment:
+    environment: "dev"
+  db:
+    user: "tolqc"
+    password: "an-assembly-please"
+    name: "tolqc"
+    create_local: "true"
+  dbutils:
+    image:
+      repository: ""
+      tag: ""
+  schemaspy:
+    image:
+      repository: ""
+      tag: ""
+  flask:
+    env: development
+  backup:
+    uri: ""
+    access_key: ""
+    secret_key: ""
+    bucket: ""
+    secure: ""
+  restore:
+    prefix: ""

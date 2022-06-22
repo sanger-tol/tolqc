@@ -14,3 +14,5 @@ launch.json
 .env.dev
 .env.prod
 values-*.yaml
+*.tgz
+chart/charts/
