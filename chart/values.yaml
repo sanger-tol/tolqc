@@ -110,10 +110,12 @@ tolcore:
       tag: ""
   api:
     fullname: "tolqc-api"
+    probe_url: '/api/v1/ui'
   flask:
     env: ""
   ui:
     fullname: "tolqc-ui"
+    probe_url: '/'
   s3:
     uri: ""
     access_key: ""
