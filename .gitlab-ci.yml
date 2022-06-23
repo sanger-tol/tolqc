@@ -63,5 +63,3 @@ deploy-qa:
     url: http://qc-qa.tol.sanger.ac.uk
   only:
     - qa
-    # REEEMOVE
-    - k8s-mkii
