@@ -4,9 +4,7 @@
 
 include:
   - project: 'tol/tol-core'
-    # TODO PUT BACK!!!
-    #ref: main
-    ref: core-chart # REEEEEMOVE 
+    ref: main
     file: '/gitlab/main.yml'
 
 stages:
@@ -14,7 +12,6 @@ stages:
   - build
   - unit test
   - deploy
-  - integration test
 
 build-api:
   extends: .build-template
