@@ -45,9 +45,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     id = Str(dump_only=True)
 
-    def __init__(self, **kwargs):
-        exclude = kwargs.pop('exclude', []) + self.get_excluded_columns()
-        return super().__init__(exclude=exclude, **kwargs)
+    def __init__(self, many=False, **kwargs):
+        exclude = kwargs.pop('exclude', []) + self.get_excluded_columns(many=many)
+        return super().__init__(exclude=exclude, many=many, **kwargs)
 
     @classmethod
     def setup(old_cls):
@@ -223,10 +223,12 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.type_
 
     @classmethod
-    def get_excluded_columns(cls):
+    def get_excluded_columns(cls, many=False):
         """Gets the excluded columns on both requests and responses"""
         excluded_columns = list(getattr(cls.Meta, 'exclude', []))
         excluded_columns += cls.Meta.model.get_foreign_key_column_names()
+        if many and cls.has_log_details():
+            excluded_columns.append('history')
         return excluded_columns
 
     @classmethod
@@ -278,7 +280,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         instance = self.instance
         if instance is None:
             return self.Meta.model(**data)
-        instance.update(data)
+        instance.update(data, schema=self)
         return instance
 
     def _preprocess_ext_on_create(self, ext):
@@ -299,7 +301,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 **data,
                 ext=self._preprocess_ext_on_create(ext)
             )
-        instance.update(data, ext=ext)
+        instance.update(data, ext=ext, schema=self)
         return instance
 
     def _remove_resource_metadata(self, data):

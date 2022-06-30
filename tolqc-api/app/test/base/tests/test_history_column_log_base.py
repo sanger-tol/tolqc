@@ -94,9 +94,34 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'created_at': created_at,
                         'last_modified_at': last_modified_at_1,
                         'history': [{
-                            'string_column': 'hello there',
-                            'entered_at': created_at,
-                            'entered_by': '100'
+                            'data': {
+                                'type': 'H',
+                                'id': instance_id,
+                                'attributes': {
+                                    'last_modified_at': created_at,
+                                    'string_column': 'hello there',
+                                },
+                                'relationships': {
+                                    'creator': {
+                                        'data': {
+                                            'id': '100',
+                                            'type': 'users'
+                                        },
+                                        'links': {
+                                            'related': '/users/100'
+                                        }
+                                    },
+                                    'last_modifier': {
+                                        'data': {
+                                            'id': '100',
+                                            'type': 'users'
+                                        },
+                                        'links': {
+                                            'related': '/users/100'
+                                        }
+                                    }
+                                }
+                            }
                         }]
                     },
                     'relationships': {
@@ -154,19 +179,67 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'string_column': None,
                         'created_at': created_at,
                         'last_modified_at': last_modified_at_2,
-                        'history': [
-                            {
-                                'string_column': 'hello there',
-                                'entered_at': created_at,
-                                'entered_by': '100'
-                            },
-                            {
-                                'string_column': 'how are you?',
-                                'entered_at': last_modified_at_1,
-                                'entered_by': '101'
+                        'history': [{
+                            'data': {
+                                'type': 'H',
+                                'id': instance_id,
+                                'attributes': {
+                                    'last_modified_at': created_at,
+                                    'string_column': 'hello there',
+                                },
+                                'relationships': {
+                                    'creator': {
+                                        'data': {
+                                            'id': '100',
+                                            'type': 'users'
+                                        },
+                                        'links': {
+                                            'related': '/users/100'
+                                        }
+                                    },
+                                    'last_modifier': {
+                                        'data': {
+                                            'id': '100',
+                                            'type': 'users'
+                                        },
+                                        'links': {
+                                            'related': '/users/100'
+                                        }
+                                    }
+                                }
                             }
-                        ]
-                    },
+                        },
+                        {
+                            'data': {
+                                'type': 'H',
+                                'id': instance_id,
+                                'attributes': {
+                                    'last_modified_at': last_modified_at_1,
+                                    'string_column': 'how are you?',
+                                },
+                                'relationships': {
+                                    'creator': {
+                                        'data': {
+                                            'id': '100',
+                                            'type': 'users'
+                                        },
+                                        'links': {
+                                            'related': '/users/100'
+                                        }
+                                    },
+                                    'last_modifier': {
+                                        'data': {
+                                            'id': '101',
+                                            'type': 'users'
+                                        },
+                                        'links': {
+                                            'related': '/users/101'
+                                        }
+                                    }
+                                }
+                            }
+                        }    
+                    ]},
                     'relationships': {
                         'creator': {
                             'data': {
