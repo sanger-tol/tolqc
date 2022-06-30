@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile.dev
     image: tolqc-api
     # force amd64 on M1 MacOS
-    platform: linux/amd64
+    #platform: linux/amd64
     environment:
       - DB_URI
       - TOLQC_URL
