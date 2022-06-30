@@ -102,15 +102,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
                                     'string_column': 'hello there',
                                 },
                                 'relationships': {
-                                    'creator': {
-                                        'data': {
-                                            'id': '100',
-                                            'type': 'users'
-                                        },
-                                        'links': {
-                                            'related': '/users/100'
-                                        }
-                                    },
                                     'last_modifier': {
                                         'data': {
                                             'id': '100',
@@ -188,15 +179,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
                                     'string_column': 'hello there',
                                 },
                                 'relationships': {
-                                    'creator': {
-                                        'data': {
-                                            'id': '100',
-                                            'type': 'users'
-                                        },
-                                        'links': {
-                                            'related': '/users/100'
-                                        }
-                                    },
                                     'last_modifier': {
                                         'data': {
                                             'id': '100',
@@ -218,15 +200,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
                                     'string_column': 'how are you?',
                                 },
                                 'relationships': {
-                                    'creator': {
-                                        'data': {
-                                            'id': '100',
-                                            'type': 'users'
-                                        },
-                                        'links': {
-                                            'related': '/users/100'
-                                        }
-                                    },
                                     'last_modifier': {
                                         'data': {
                                             'id': '101',

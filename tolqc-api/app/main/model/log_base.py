@@ -69,8 +69,11 @@ class LogBase(Base, LogMixin):
 
     def _get_column_excluding_schema(self, schema_instance):
         schema_class = schema_instance.__class__
+        excluded_fields = self._excluded_columns_in_history + [
+            'creator'
+        ]
         return schema_class(
-            exclude=self._excluded_columns_in_history
+            exclude=excluded_fields
         )
 
     def _get_history_entry(self, schema):
