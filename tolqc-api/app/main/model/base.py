@@ -226,21 +226,55 @@ class Base(db.Model):
                 ext_data_changes
             )
         ext_data = {**self.ext}
-        for key, item in ext_data_changes.items():
-            if item is None:
+        for key, value in ext_data_changes.items():
+            if value is None:
                 if key in ext_data:
                     del ext_data[key]
             else:
-                ext_data[key] = item
+                ext_data[key] = value
         self.ext = ext_data
 
     def save_update(self, **kwargs):
-        self.commit()
+        if self._should_update:
+            self.commit()
 
-    def update(self, data, ext=None):
+    def _no_change_on_columns(self, data, **kwargs):
+        for key, value in data.items():
+            if getattr(self, key) != value:
+                return False
+        return True
+
+    def _no_change_on_ext(self, ext, **kwargs):
+        for key, value in ext.items():
+            if value is None and key in self.ext:
+                return False
+            if key not in self.ext:
+                return False
+            if self.ext[key] != value:
+                return False
+        return True
+
+    def _no_change_on_update(self, data, ext=None, **kwargs):
+        if not self._no_change_on_columns(data, **kwargs):
+            return False
+        if self.has_ext_column() and not self._no_change_on_ext(
+            ext,
+            **kwargs
+        ):
+            return False
+        return True
+
+    def _update_data(self, data):
+        for key, value in data.items():
+            setattr(self, key, value)
+
+    def update(self, data, ext=None, **kwargs):
         converted_data = self._convert_enum_names_to_foreign_key_ids(data)
-        for key, item in converted_data.items():
-            setattr(self, key, item)
+        self._should_update = True
+        if self._no_change_on_update(converted_data, ext=ext, **kwargs):
+            self._should_update = False
+            return
+        self._update_data(converted_data)
         if ext is not None:
             self._update_ext(ext)
 

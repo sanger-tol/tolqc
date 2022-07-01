@@ -45,9 +45,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
 
     id = Str(dump_only=True)
 
-    def __init__(self, **kwargs):
-        exclude = kwargs.pop('exclude', []) + self.get_excluded_columns()
-        return super().__init__(exclude=exclude, **kwargs)
+    def __init__(self, many=False, **kwargs):
+        exclude = kwargs.pop('exclude', []) + self.get_excluded_columns(many=many)
+        return super().__init__(exclude=exclude, many=many, **kwargs)
 
     @classmethod
     def setup(old_cls):
@@ -223,10 +223,12 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         return cls.Meta.type_
 
     @classmethod
-    def get_excluded_columns(cls):
+    def get_excluded_columns(cls, many=False):
         """Gets the excluded columns on both requests and responses"""
         excluded_columns = list(getattr(cls.Meta, 'exclude', []))
         excluded_columns += cls.Meta.model.get_foreign_key_column_names()
+        if many and cls.has_log_details():
+            excluded_columns.append('history')
         return excluded_columns
 
     @classmethod
@@ -278,7 +280,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         instance = self.instance
         if instance is None:
             return self.Meta.model(**data)
-        instance.update(data)
+        instance.update(data, schema=self)
         return instance
 
     def _preprocess_ext_on_create(self, ext):
@@ -299,7 +301,7 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
                 **data,
                 ext=self._preprocess_ext_on_create(ext)
             )
-        instance.update(data, ext=ext)
+        instance.update(data, ext=ext, schema=self)
         return instance
 
     def _remove_resource_metadata(self, data):
@@ -371,3 +373,31 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def postprocess_data(self, data, many, **kwargs):
         data = self._reinsert_ext_data(data, many)
         return data
+
+    @staticmethod
+    def _map_history_entry(history_entry):
+        authored_at = history_entry['data']['attributes'].pop('last_modified_at')
+        history_entry['data']['attributes']['authored_at'] = authored_at
+        author = history_entry['data']['relationships'].pop('last_modifier')
+        history_entry['data']['relationships']['author'] = author
+        # remove duplicated entries
+        history_entry['data'].pop('id')
+        history_entry['data'].pop('type')
+        return history_entry
+
+    @classmethod
+    def _get_excluded_fields_on_history(cls):
+        default_exclude = ['history', 'created_at', 'creator']
+        if not hasattr(cls, 'Meta'):
+            return default_exclude
+        dump_exclude = list(getattr(cls.Meta, 'exclude', []))
+        history_exclude = list(getattr(cls.Meta, 'exclude_from_history', []))
+        return default_exclude + dump_exclude + history_exclude
+
+    @classmethod
+    def create_history_entry(cls, model_instance):
+        history_schema_instance = cls(
+            exclude=cls._get_excluded_fields_on_history()
+        )
+        history_entry = history_schema_instance.dump(model_instance)
+        return cls._map_history_entry(history_entry)

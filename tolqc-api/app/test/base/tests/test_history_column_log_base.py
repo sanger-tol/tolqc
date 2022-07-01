@@ -6,6 +6,124 @@ from test.base import BaseTestCase
 
 
 class TestHistoryColumnLogBase(BaseTestCase):
+    def test_no_change_history_unmodified_patch_H(self):
+        # post in the first instance
+        response = self.client.open(
+            '/api/v1/H',
+            method='POST',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'I love testing :)'
+                    }
+                }
+            },
+            headers=self._get_api_key_1_headers()
+        )
+        self.assert201(response)
+        # pull out unpredictable elements
+        instance_id = response.json['data']['id']
+        created_at = response.json['data']['attributes']['created_at']
+        # patch this to new state
+        response = self.client.open(
+            f'/api/v1/H/{instance_id}',
+            method='PATCH',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'how are you?'
+                    }
+                }
+            },
+            headers=self._get_api_key_2_headers()
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        last_modified_at = response.json['data']['attributes']['last_modified_at']
+        final_state = {
+            'data': {
+                'type': 'H',
+                'id': instance_id,
+                'attributes': {
+                    'string_column': 'how are you?',
+                    'created_at': created_at,
+                    'last_modified_at': last_modified_at,
+                    'history': [{
+                        'data': {
+                            'attributes': {
+                                'authored_at': created_at,
+                                'string_column': 'I love testing :)',
+                            },
+                            'relationships': {
+                                'author': {
+                                    'data': {
+                                        'id': '100',
+                                        'type': 'users'
+                                    },
+                                    'links': {
+                                        'related': '/users/100'
+                                    }
+                                }
+                            }
+                        }
+                    }]
+                },
+                'relationships': {
+                    'creator': {
+                        'data': {
+                            'id': '100',
+                            'type': 'users'
+                        },
+                        'links': {
+                            'related': '/users/100'
+                        }
+                    },
+                    'last_modifier': {
+                        'data': {
+                            'id': '101',
+                            'type': 'users'
+                        },
+                        'links': {
+                            'related': '/users/101'
+                        }
+                    }
+                }
+            }
+        }
+        # assert that history has one entry, and is correct
+        self.assertEqual(
+            response.json,
+            final_state
+        )
+        # patch a new update with no change, first user
+        response = self.client.open(
+            f'/api/v1/H/{instance_id}',
+            method='PATCH',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'how are you?'
+                    }
+                }
+            },
+            headers=self._get_api_key_1_headers()
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        print(response.json)
+        # assert that the history has not changed
+        self.assertEqual(
+            response.json,
+            final_state
+        )
+
     def test_compose_post_patch_H(self):
         # post in the first instance
         response = self.client.open(
@@ -94,9 +212,23 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'created_at': created_at,
                         'last_modified_at': last_modified_at_1,
                         'history': [{
-                            'string_column': 'hello there',
-                            'entered_at': created_at,
-                            'entered_by': '100'
+                            'data': {
+                                'attributes': {
+                                    'authored_at': created_at,
+                                    'string_column': 'hello there',
+                                },
+                                'relationships': {
+                                    'author': {
+                                        'data': {
+                                            'id': '100',
+                                            'type': 'users'
+                                        },
+                                        'links': {
+                                            'related': '/users/100'
+                                        }
+                                    }
+                                }
+                            }
                         }]
                     },
                     'relationships': {
@@ -156,14 +288,42 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'last_modified_at': last_modified_at_2,
                         'history': [
                             {
-                                'string_column': 'hello there',
-                                'entered_at': created_at,
-                                'entered_by': '100'
+                                'data': {
+                                    'attributes': {
+                                        'authored_at': created_at,
+                                        'string_column': 'hello there',
+                                    },
+                                    'relationships': {
+                                        'author': {
+                                            'data': {
+                                                'id': '100',
+                                                'type': 'users'
+                                            },
+                                            'links': {
+                                                'related': '/users/100'
+                                            }
+                                        }
+                                    }
+                                }
                             },
                             {
-                                'string_column': 'how are you?',
-                                'entered_at': last_modified_at_1,
-                                'entered_by': '101'
+                                'data': {
+                                    'attributes': {
+                                        'authored_at': last_modified_at_1,
+                                        'string_column': 'how are you?',
+                                    },
+                                    'relationships': {
+                                        'author': {
+                                            'data': {
+                                                'id': '101',
+                                                'type': 'users'
+                                            },
+                                            'links': {
+                                                'related': '/users/101'
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         ]
                     },
@@ -311,4 +471,89 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     }
                 }]
             }
+        )
+
+    def test_no_history_on_list_get_endpoints(self):
+        # post in the first instance
+        response = self.client.open(
+            '/api/v1/H',
+            method='POST',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'this is great fun'
+                    }
+                }
+            },
+            headers=self._get_api_key_1_headers()
+        )
+        self.assert201(response)
+        # pull out unpredictable elements
+        instance_id = response.json['data']['id']
+        created_at = response.json['data']['attributes']['created_at']
+        # patch this to new state
+        response = self.client.open(
+            f'/api/v1/H/{instance_id}',
+            method='PATCH',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'very happy'
+                    }
+                }
+            },
+            headers=self._get_api_key_2_headers()
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        last_modified_at = response.json['data']['attributes']['last_modified_at']
+        # list (many) get, and assert that it doesn't contain the history for each one.
+        expected_response = {
+            'data': [
+                {
+                    'type': 'H',
+                    'id': instance_id,
+                    'attributes': {
+                        'string_column': 'very happy',
+                        'last_modified_at': last_modified_at,
+                        'created_at': created_at,
+                    },
+                    'relationships': {
+                        'creator': {
+                            'data': {
+                                'id': '100',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/100'
+                            }
+                        },
+                        'last_modifier': {
+                            'data': {
+                                'id': '101',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/101'
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+        response = self.client.open(
+            '/api/v1/H',
+            method='GET',
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(
+            response.json,
+            expected_response
         )

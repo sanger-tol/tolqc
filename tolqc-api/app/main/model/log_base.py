@@ -39,27 +39,13 @@ class LogBase(Base, LogMixin):
     __abstract__ = True
 
     @classmethod
-    def setup(cls):
-        cls._set_excluded_columns_in_history()
-        super().setup()
-
-    @classmethod
     def has_log_details(cls):
         return True
 
-    @classmethod
-    def _set_excluded_columns_in_history(cls):
-        base_excludes = ['id', 'history', 'created_at', 'created_by']
-        if not hasattr(cls, 'Meta'):
-            cls._excluded_columns_in_history = base_excludes
-        else:
-            cls._excluded_columns_in_history = base_excludes + list(
-                getattr(cls.Meta, 'exclude_columns_in_history', [])
-            )
-
     def save_update(self, user_id=None):
-        self.last_modified_by = user_id
-        self.last_modified_at = datetime.now()
+        if self._should_update:
+            self.last_modified_by = user_id
+            self.last_modified_at = datetime.now()
         super().save_update()
 
     def save_create(self, user_id=None):
@@ -67,38 +53,14 @@ class LogBase(Base, LogMixin):
         self.last_modified_by = user_id
         super().save_create()
 
-    @classmethod
-    def _map_history_entry_key(cls, entry_key):
-        mapping = {
-            'last_modified_by': 'entered_by',
-            'last_modified_at': 'entered_at'
-        }
-        return mapping.get(entry_key, entry_key)
-
-    @classmethod
-    def _map_history_entry_value(cls, entry_key, entry_value):
-        if entry_key in cls.get_foreign_key_column_names():
-            return str(entry_value)
-        return entry_value
-
-    def _get_history_entry(self):
-        state_snapshot = self.to_dict(
-            exclude_column_names=self._excluded_columns_in_history,
-            convert_enums=False
-        )
-        return {
-            self._map_history_entry_key(entry_key): self._map_history_entry_value(
-                entry_key,
-                entry_value
-            )
-            for (entry_key, entry_value)
-            in state_snapshot.items()
-        }
-
-    def _update_history(self):
+    def _get_updated_history(self, schema):
         old_history = [*self.history]
-        self.history = old_history + [self._get_history_entry()]
+        return old_history + [
+            schema.create_history_entry(self)
+        ]
 
-    def update(self, *args, **kwargs):
-        self._update_history()
+    def update(self, *args, schema=None, **kwargs):
+        updated_history = self._get_updated_history(schema)
         super().update(*args, **kwargs)
+        if self._should_update:
+            self.history = updated_history
