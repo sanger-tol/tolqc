@@ -480,3 +480,88 @@ class TestHistoryColumnLogBase(BaseTestCase):
                 }]
             }
         )
+
+    def test_no_history_on_list_get_endpoints(self):
+        # post in the first instance
+        response = self.client.open(
+            '/api/v1/H',
+            method='POST',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'this is great fun'
+                    }
+                }
+            },
+            headers=self._get_api_key_1_headers()
+        )
+        self.assert201(response)
+        # pull out unpredictable elements
+        instance_id = response.json['data']['id']
+        created_at = response.json['data']['attributes']['created_at']
+        # patch this to new state
+        response = self.client.open(
+            f'/api/v1/H/{instance_id}',
+            method='PATCH',
+            json={
+                "data": {
+                    "type": 'H',
+                    "attributes": {
+                        'string_column': 'very happy'
+                    }
+                }
+            },
+            headers=self._get_api_key_2_headers()
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        last_modified_at = response.json['data']['attributes']['last_modified_at']
+        # list (many) get, and assert that it doesn't contain the history for each one.
+        expected_response = {
+            'data': [
+                {
+                    'type': 'H',
+                    'id': instance_id,
+                    'attributes': {
+                        'string_column': 'very happy',
+                        'last_modified_at': last_modified_at,
+                        'created_at': created_at,
+                    },
+                    'relationships': {
+                        'creator': {
+                            'data': {
+                                'id': '100',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/100'
+                            }
+                        },
+                        'last_modifier': {
+                            'data': {
+                                'id': '101',
+                                'type': 'users'
+                            },
+                            'links': {
+                                'related': '/users/101'
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+        response = self.client.open(
+            '/api/v1/H',
+            method='GET',
+        )
+        self.assert200(
+            response,
+            f'Response body is : {response.data.decode("utf-8")}'
+        )
+        self.assertEqual(
+            response.json,
+            expected_response
+        )
