@@ -49,7 +49,7 @@ class LogBase(Base, LogMixin):
 
     @classmethod
     def _set_excluded_columns_in_history(cls):
-        base_excludes = ['history', 'created_at', 'created_by']
+        base_excludes = ['history', 'created_at', 'creator']
         if not hasattr(cls, 'Meta'):
             cls._excluded_columns_in_history = base_excludes
         else:
@@ -69,11 +69,8 @@ class LogBase(Base, LogMixin):
 
     def _get_column_excluding_schema(self, schema_instance):
         schema_class = schema_instance.__class__
-        excluded_fields = self._excluded_columns_in_history + [
-            'creator'
-        ]
         return schema_class(
-            exclude=excluded_fields
+            exclude=self._excluded_columns_in_history
         )
 
     def _get_history_entry(self, schema):
