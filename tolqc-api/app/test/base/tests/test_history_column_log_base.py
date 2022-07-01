@@ -54,8 +54,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
                     'last_modified_at': last_modified_at,
                     'history': [{
                         'data': {
-                            'type': 'H',
-                            'id': instance_id,
                             'attributes': {
                                 'authored_at': created_at,
                                 'string_column': 'I love testing :)',
@@ -215,8 +213,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'last_modified_at': last_modified_at_1,
                         'history': [{
                             'data': {
-                                'type': 'H',
-                                'id': instance_id,
                                 'attributes': {
                                     'authored_at': created_at,
                                     'string_column': 'hello there',
@@ -293,8 +289,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'history': [
                             {
                                 'data': {
-                                    'type': 'H',
-                                    'id': instance_id,
                                     'attributes': {
                                         'authored_at': created_at,
                                         'string_column': 'hello there',
@@ -314,8 +308,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
                             },
                             {
                                 'data': {
-                                    'type': 'H',
-                                    'id': instance_id,
                                     'attributes': {
                                         'authored_at': last_modified_at_1,
                                         'string_column': 'how are you?',

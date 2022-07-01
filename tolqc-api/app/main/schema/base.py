@@ -380,6 +380,9 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
         history_entry['data']['attributes']['authored_at'] = authored_at
         author = history_entry['data']['relationships'].pop('last_modifier')
         history_entry['data']['relationships']['author'] = author
+        # remove duplicated entries
+        history_entry['data'].pop('id')
+        history_entry['data'].pop('type')
         return history_entry
 
     @classmethod
