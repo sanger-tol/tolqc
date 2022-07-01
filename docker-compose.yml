@@ -107,3 +107,13 @@ services:
       - RESTORE_FILE_PREFIX
       - FLASK_ENV
       - BACKUP_SCHEDULE
+  
+  tolqc-alembic:
+    image: tolqc-api
+    container_name: tolqc-alembic
+    restart: always
+    environment:
+      - DB_URI
+    working_dir: /migrations
+    volumes:
+      - ./tolqc-api/migrations/alembic/versions:/migrations/alembic/versions

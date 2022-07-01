@@ -28,5 +28,6 @@ COPY ./app/requirements.txt .
 RUN pip3 --no-cache-dir install -r requirements.txt
 
 COPY ./app /app
+COPY ./migrations /migrations
 
 CMD [ "python", "run.py" ]
