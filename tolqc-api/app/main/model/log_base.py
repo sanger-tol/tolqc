@@ -58,8 +58,9 @@ class LogBase(Base, LogMixin):
             )
 
     def save_update(self, user_id=None):
-        self.last_modified_by = user_id
-        self.last_modified_at = datetime.now()
+        if self._should_update:
+            self.last_modified_by = user_id
+            self.last_modified_at = datetime.now()
         super().save_update()
 
     def save_create(self, user_id=None):
