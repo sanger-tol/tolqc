@@ -73,16 +73,26 @@ class LogBase(Base, LogMixin):
             exclude=self._excluded_columns_in_history
         )
 
+    def _map_history_dump(self, dump):
+        authored_at = dump['data']['attributes'].pop('last_modified_at')
+        dump['data']['attributes']['authored_at'] = authored_at
+        author = dump['data']['relationships'].pop('last_modifier')
+        dump['data']['relationships']['author'] = author
+        return dump
+
     def _get_history_entry(self, schema):
         column_excluding_schema = self._get_column_excluding_schema(
             schema
         )
-        return column_excluding_schema.dump(self)
+        original_dump = column_excluding_schema.dump(self)
+        return self._map_history_dump(original_dump)
 
-    def _update_history(self, schema):
+    def _get_updated_history(self, schema):
         old_history = [*self.history]
-        self.history = old_history + [self._get_history_entry(schema)]
+        return old_history + [self._get_history_entry(schema)]
 
     def update(self, *args, schema=None, **kwargs):
-        self._update_history(schema)
+        updated_history = self._get_updated_history(schema)
         super().update(*args, **kwargs)
+        if self._should_update:
+            self.history = updated_history

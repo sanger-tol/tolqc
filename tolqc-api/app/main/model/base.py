@@ -237,6 +237,8 @@ class Base(db.Model):
     def save_update(self, **kwargs):
         if self._should_update:
             self.commit()
+        else:
+            db.session.rollback()
 
     def _no_change_on_columns(self, data, **kwargs):
         for key, value in data.items():
