@@ -373,3 +373,28 @@ class BaseSchema(SQLAlchemyAutoSchema, JsonapiSchema):
     def postprocess_data(self, data, many, **kwargs):
         data = self._reinsert_ext_data(data, many)
         return data
+
+    @staticmethod
+    def _map_history_entry(history_entry):
+        authored_at = history_entry['data']['attributes'].pop('last_modified_at')
+        history_entry['data']['attributes']['authored_at'] = authored_at
+        author = history_entry['data']['relationships'].pop('last_modifier')
+        history_entry['data']['relationships']['author'] = author
+        return history_entry
+
+    @classmethod
+    def _get_excluded_fields_on_history(cls):
+        default_exclude = ['history', 'created_at', 'creator']
+        if not hasattr(cls, 'Meta'):
+            return default_exclude
+        dump_exclude = list(getattr(cls.Meta, 'exclude', []))
+        history_exclude = list(getattr(cls.Meta, 'exclude_from_history', []))
+        return default_exclude + dump_exclude + history_exclude
+
+    @classmethod
+    def create_history_entry(cls, model_instance):
+        history_schema_instance = cls(
+            exclude=cls._get_excluded_fields_on_history()
+        )
+        history_entry = history_schema_instance.dump(model_instance)
+        return cls._map_history_entry(history_entry)

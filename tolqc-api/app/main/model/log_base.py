@@ -39,23 +39,8 @@ class LogBase(Base, LogMixin):
     __abstract__ = True
 
     @classmethod
-    def setup(cls):
-        cls._set_excluded_columns_in_history()
-        super().setup()
-
-    @classmethod
     def has_log_details(cls):
         return True
-
-    @classmethod
-    def _set_excluded_columns_in_history(cls):
-        base_excludes = ['history', 'created_at', 'creator']
-        if not hasattr(cls, 'Meta'):
-            cls._excluded_columns_in_history = base_excludes
-        else:
-            cls._excluded_columns_in_history = base_excludes + list(
-                getattr(cls.Meta, 'exclude_columns_in_history', [])
-            )
 
     def save_update(self, user_id=None):
         if self._should_update:
@@ -68,29 +53,11 @@ class LogBase(Base, LogMixin):
         self.last_modified_by = user_id
         super().save_create()
 
-    def _get_column_excluding_schema(self, schema_instance):
-        schema_class = schema_instance.__class__
-        return schema_class(
-            exclude=self._excluded_columns_in_history
-        )
-
-    def _map_history_dump(self, dump):
-        authored_at = dump['data']['attributes'].pop('last_modified_at')
-        dump['data']['attributes']['authored_at'] = authored_at
-        author = dump['data']['relationships'].pop('last_modifier')
-        dump['data']['relationships']['author'] = author
-        return dump
-
-    def _get_history_entry(self, schema):
-        column_excluding_schema = self._get_column_excluding_schema(
-            schema
-        )
-        original_dump = column_excluding_schema.dump(self)
-        return self._map_history_dump(original_dump)
-
     def _get_updated_history(self, schema):
         old_history = [*self.history]
-        return old_history + [self._get_history_entry(schema)]
+        return old_history + [
+            schema.create_history_entry(self)
+        ]
 
     def update(self, *args, schema=None, **kwargs):
         updated_history = self._get_updated_history(schema)
