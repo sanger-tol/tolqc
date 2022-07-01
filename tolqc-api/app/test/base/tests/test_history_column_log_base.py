@@ -126,7 +126,6 @@ class TestHistoryColumnLogBase(BaseTestCase):
             final_state
         )
 
-
     def test_compose_post_patch_H(self):
         # post in the first instance
         response = self.client.open(
@@ -291,49 +290,51 @@ class TestHistoryColumnLogBase(BaseTestCase):
                         'string_column': None,
                         'created_at': created_at,
                         'last_modified_at': last_modified_at_2,
-                        'history': [{
-                            'data': {
-                                'type': 'H',
-                                'id': instance_id,
-                                'attributes': {
-                                    'authored_at': created_at,
-                                    'string_column': 'hello there',
-                                },
-                                'relationships': {
-                                    'author': {
-                                        'data': {
-                                            'id': '100',
-                                            'type': 'users'
-                                        },
-                                        'links': {
-                                            'related': '/users/100'
+                        'history': [
+                            {
+                                'data': {
+                                    'type': 'H',
+                                    'id': instance_id,
+                                    'attributes': {
+                                        'authored_at': created_at,
+                                        'string_column': 'hello there',
+                                    },
+                                    'relationships': {
+                                        'author': {
+                                            'data': {
+                                                'id': '100',
+                                                'type': 'users'
+                                            },
+                                            'links': {
+                                                'related': '/users/100'
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                'data': {
+                                    'type': 'H',
+                                    'id': instance_id,
+                                    'attributes': {
+                                        'authored_at': last_modified_at_1,
+                                        'string_column': 'how are you?',
+                                    },
+                                    'relationships': {
+                                        'author': {
+                                            'data': {
+                                                'id': '101',
+                                                'type': 'users'
+                                            },
+                                            'links': {
+                                                'related': '/users/101'
+                                            }
                                         }
                                     }
                                 }
                             }
-                        },
-                        {
-                            'data': {
-                                'type': 'H',
-                                'id': instance_id,
-                                'attributes': {
-                                    'authored_at': last_modified_at_1,
-                                    'string_column': 'how are you?',
-                                },
-                                'relationships': {
-                                    'author': {
-                                        'data': {
-                                            'id': '101',
-                                            'type': 'users'
-                                        },
-                                        'links': {
-                                            'related': '/users/101'
-                                        }
-                                    }
-                                }
-                            }
-                        }    
-                    ]},
+                        ]
+                    },
                     'relationships': {
                         'creator': {
                             'data': {
