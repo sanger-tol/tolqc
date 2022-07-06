@@ -43,3 +43,4 @@ from .tolqc_assembly_metrics import TolqcAssemblyMetrics  # noqa
 from .tolqc_merqury_metrics import TolqcMerquryMetrics  # noqa
 from .tolqc_busco_metrics import TolqcBuscoMetrics  # noqa
 from .tolqc_genomescope_metrics import TolqcGenomescopeMetrics  # noqa
+from .tolqc_track import TolqcTrackConfig # noqa
