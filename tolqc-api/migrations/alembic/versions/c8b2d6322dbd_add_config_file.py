@@ -9,8 +9,6 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import orm
 
-import main.model as model
-
 
 # revision identifiers, used by Alembic.
 revision = 'c8b2d6322dbd'
