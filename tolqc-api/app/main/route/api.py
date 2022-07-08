@@ -7,7 +7,7 @@ from flask_restx import Api
 
 from main.auth import authorizations
 from main.resource import api_centre, api_environment, \
-                          api_user, api_run, api_specimen, \
+                          api_user, api_track_config, api_specimen, \
                           api_species, api_sample, \
                           api_project, api_platform, api_library, \
                           api_library_type, api_allocation, \
@@ -20,7 +20,7 @@ from main.resource import api_centre, api_environment, \
                           api_dataset, api_set, api_busco_lineage, \
                           api_assembly, api_assembly_metrics, \
                           api_merqury_metrics, api_busco_metrics, \
-                          api_genomescope_metrics
+                          api_genomescope_metrics, api_track_config
 
 
 def _get_environment_string(app):
@@ -39,7 +39,7 @@ def _setup_api(blueprint, app):
     )
     api.add_namespace(api_centre)
     api.add_namespace(api_user)
-    api.add_namespace(api_run)
+    api.add_namespace(api_track_config)
     api.add_namespace(api_environment)
     api.add_namespace(api_specimen)
     api.add_namespace(api_species)
@@ -69,6 +69,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_merqury_metrics)
     api.add_namespace(api_busco_metrics)
     api.add_namespace(api_genomescope_metrics)
+    api.add_namespace(api_track_config)
 
 
 def init_blueprint(app):

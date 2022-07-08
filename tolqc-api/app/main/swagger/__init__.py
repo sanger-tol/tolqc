@@ -37,3 +37,4 @@ from .assembly_metrics import AssemblyMetricsSwagger # noqa
 from .merqury_metrics import MerquryMetricsSwagger # noqa
 from .busco_metrics import BuscoMetricsSwagger # noqa
 from .genomescope_metrics import GenomescopeMetricsSwagger # noqa
+from .track_config import TrackConfigSwagger # noqa
