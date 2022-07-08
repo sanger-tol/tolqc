@@ -18,15 +18,12 @@ depends_on = None
 
 
 def upgrade() -> None:
-    bind = op.get_bind()
-    session = orm.Session(bind=bind)
     op.create_table('track_config',
     sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
     sa.Column('lims_id', sa.INTEGER(), autoincrement=False),
     sa.Column('name', sa.String()),
     sa.Column('hierarchy_name', sa.String()),
     )
-    session.commit()
 
 
 def downgrade() -> None:
