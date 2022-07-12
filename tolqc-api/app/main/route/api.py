@@ -20,7 +20,7 @@ from main.resource import api_centre, api_environment, \
                           api_dataset, api_set, api_busco_lineage, \
                           api_assembly, api_assembly_metrics, \
                           api_merqury_metrics, api_busco_metrics, \
-                          api_genomescope_metrics
+                          api_genomescope_metrics, api_run
 
 
 def _get_environment_string(app):
@@ -69,6 +69,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_merqury_metrics)
     api.add_namespace(api_busco_metrics)
     api.add_namespace(api_genomescope_metrics)
+    api.add_namespace(api_run)
 
 
 def init_blueprint(app):
