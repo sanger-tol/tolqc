@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import Resource as FlaskRestxResource
 from main.auth import auth
 
 from main.resource.base import AutoResourceGroup, BaseResource, setup_resource
@@ -81,7 +80,7 @@ class H_Resource(AutoResourceGroup):
     class Meta:
         service = H_Service
         swagger = H_Swagger
-    
+
     @api_H.route('/42')
     class H_42Resource(BaseResource):
         @classmethod
