@@ -94,6 +94,12 @@ class I_Resource(BaseResource):
         service = I_Service
         swagger = I_Swagger
 
+    @api_I.route('/parrot')
+    class I_ParrotResouce(FlaskRestxResource):
+        @classmethod
+        def post(cls):
+            return I_Service.parrot()
+
 
 @setup_resource
 class J_Resource(BaseResource):

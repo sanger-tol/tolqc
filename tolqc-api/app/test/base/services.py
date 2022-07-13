@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.service.base import BaseService, setup_service
+from main.service.base import BaseService, setup_service, provide_body_data
 
 from test.base.models import A_ModelRelationship, \
                              B_ModelRelationship, \
@@ -75,7 +75,8 @@ class H_Service(BaseService):
         model = H_ModelLog
         schema = H_Schema
 
-    def return_42():
+    @classmethod
+    def return_42(cls):
         return {'data': 42}, 200
 
 
@@ -84,6 +85,11 @@ class I_Service(BaseService):
     class Meta:
         model = I_ModelEnum
         schema = I_Schema
+
+    @classmethod
+    @provide_body_data
+    def parrot(cls, body_data):
+        return body_data, 200
 
 
 @setup_service
