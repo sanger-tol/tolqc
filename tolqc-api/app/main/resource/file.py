@@ -5,14 +5,14 @@
 from main.service import FileService
 from main.swagger import FileSwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_file = FileSwagger.api
 
 
-@setup_resource
-class FileResource(AutoResourceGroup):
+@setup_resource_group
+class FileResourceGroup(AutoResourceGroup):
     class Meta:
         service = FileService
         swagger = FileSwagger

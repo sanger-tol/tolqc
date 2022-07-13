@@ -5,14 +5,14 @@
 from main.service import SpecimenService
 from main.swagger import SpecimenSwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_specimen = SpecimenSwagger.api
 
 
-@setup_resource
-class SpecimenResource(AutoResourceGroup):
+@setup_resource_group
+class SpecimenResourceGroup(AutoResourceGroup):
     class Meta:
         service = SpecimenService
         swagger = SpecimenSwagger

@@ -4,7 +4,7 @@
 
 from main.auth import auth
 
-from main.resource.base import AutoResourceGroup, BaseResource, setup_resource
+from main.resource.base import AutoResourceGroup, BaseResource, setup_resource_group
 
 from test.base.services import A_Service, B_Service, C_Service, D_Service, \
                                E_Service, F_Service, G_Service, H_Service, \
@@ -26,56 +26,56 @@ api_I = I_Swagger.api
 api_J = J_Swagger.api
 
 
-@setup_resource
+@setup_resource_group
 class A_Resource(AutoResourceGroup):
     class Meta:
         service = A_Service
         swagger = A_Swagger
 
 
-@setup_resource
+@setup_resource_group
 class B_Resource(AutoResourceGroup):
     class Meta:
         service = B_Service
         swagger = B_Swagger
 
 
-@setup_resource
+@setup_resource_group
 class C_Resource(AutoResourceGroup):
     class Meta:
         service = C_Service
         swagger = C_Swagger
 
 
-@setup_resource
+@setup_resource_group
 class D_Resource(AutoResourceGroup):
     class Meta:
         service = D_Service
         swagger = D_Swagger
 
 
-@setup_resource
+@setup_resource_group
 class E_Resource(AutoResourceGroup):
     class Meta:
         service = E_Service
         swagger = E_Swagger
 
 
-@setup_resource
+@setup_resource_group
 class F_Resource(AutoResourceGroup):
     class Meta:
         service = F_Service
         swagger = F_Swagger
 
 
-@setup_resource
+@setup_resource_group
 class G_Resource(AutoResourceGroup):
     class Meta:
         service = G_Service
         swagger = G_Swagger
 
 
-@setup_resource
+@setup_resource_group
 class H_Resource(AutoResourceGroup):
     class Meta:
         service = H_Service
@@ -88,7 +88,7 @@ class H_Resource(AutoResourceGroup):
             return H_Service.return_42()
 
 
-@setup_resource
+@setup_resource_group
 class I_Resource(AutoResourceGroup):
     class Meta:
         service = I_Service
@@ -102,7 +102,7 @@ class I_Resource(AutoResourceGroup):
             return I_Service.parrot(user_id=user_id)
 
 
-@setup_resource
+@setup_resource_group
 class J_Resource(AutoResourceGroup):
     class Meta:
         service = J_Service

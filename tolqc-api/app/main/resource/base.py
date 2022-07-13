@@ -347,7 +347,7 @@ class BaseEnumNameRelationListResource(BaseResource):
         )
 
 
-def setup_resource(cls):
+def setup_resource_group(cls):
     """Dynamically adds detail, list, and related list resources
     to a BaseResource inheritor."""
     cls.setup()

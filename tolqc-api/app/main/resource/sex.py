@@ -5,14 +5,14 @@
 from main.service import SexService
 from main.swagger import SexSwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_sex = SexSwagger.api
 
 
-@setup_resource
-class SexResource(AutoResourceGroup):
+@setup_resource_group
+class SexResourceGroup(AutoResourceGroup):
     class Meta:
         service = SexService
         swagger = SexSwagger

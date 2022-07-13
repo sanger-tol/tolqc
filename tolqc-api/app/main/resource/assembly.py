@@ -5,14 +5,14 @@
 from main.service import AssemblyService
 from main.swagger import AssemblySwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_assembly = AssemblySwagger.api
 
 
-@setup_resource
-class AssemblyResource(AutoResourceGroup):
+@setup_resource_group
+class AssemblyResourceGroup(AutoResourceGroup):
     class Meta:
         service = AssemblyService
         swagger = AssemblySwagger

@@ -5,14 +5,14 @@
 from main.service import AccessionService
 from main.swagger import AccessionSwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_accession = AccessionSwagger.api
 
 
-@setup_resource
-class AccessionResource(AutoResourceGroup):
+@setup_resource_group
+class AccessionResourceGroup(AutoResourceGroup):
     class Meta:
         service = AccessionService
         swagger = AccessionSwagger

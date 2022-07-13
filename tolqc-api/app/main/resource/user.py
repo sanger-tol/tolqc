@@ -5,14 +5,14 @@
 from main.service import UserService
 from main.swagger import UserSwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_user = UserSwagger.api
 
 
-@setup_resource
-class UserResource(AutoResourceGroup):
+@setup_resource_group
+class UserResourceGroup(AutoResourceGroup):
     class Meta:
         service = UserService
         swagger = UserSwagger

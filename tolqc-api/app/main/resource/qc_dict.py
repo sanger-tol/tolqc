@@ -5,14 +5,14 @@
 from main.service import QcDictService
 from main.swagger import QcDictSwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_qc_dict = QcDictSwagger.api
 
 
-@setup_resource
-class QcDictResource(AutoResourceGroup):
+@setup_resource_group
+class QcDictResourceGroup(AutoResourceGroup):
     class Meta:
         service = QcDictService
         swagger = QcDictSwagger

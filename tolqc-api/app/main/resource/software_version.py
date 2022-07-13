@@ -5,14 +5,14 @@
 from main.service import SoftwareVersionService
 from main.swagger import SoftwareVersionSwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_software_version = SoftwareVersionSwagger.api
 
 
-@setup_resource
-class SoftwareVersionResource(AutoResourceGroup):
+@setup_resource_group
+class SoftwareVersionResourceGroup(AutoResourceGroup):
     class Meta:
         service = SoftwareVersionService
         swagger = SoftwareVersionSwagger

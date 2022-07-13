@@ -5,14 +5,14 @@
 from main.service import DatasetService
 from main.swagger import DatasetSwagger
 
-from .base import AutoResourceGroup, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_dataset = DatasetSwagger.api
 
 
-@setup_resource
-class DatasetResource(AutoResourceGroup):
+@setup_resource_group
+class DatasetResourceGroup(AutoResourceGroup):
     class Meta:
         service = DatasetService
         swagger = DatasetSwagger
