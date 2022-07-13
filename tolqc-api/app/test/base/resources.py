@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 from flask_restx import Resource as FlaskRestxResource
+from main.auth import auth
 
-from main.resource.base import BaseResource, setup_resource
+from main.resource.base import AutoResourceGroup, BaseResource, setup_resource
 
 from test.base.services import A_Service, B_Service, C_Service, D_Service, \
                                E_Service, F_Service, G_Service, H_Service, \
@@ -27,82 +28,83 @@ api_J = J_Swagger.api
 
 
 @setup_resource
-class A_Resource(BaseResource):
+class A_Resource(AutoResourceGroup):
     class Meta:
         service = A_Service
         swagger = A_Swagger
 
 
 @setup_resource
-class B_Resource(BaseResource):
+class B_Resource(AutoResourceGroup):
     class Meta:
         service = B_Service
         swagger = B_Swagger
 
 
 @setup_resource
-class C_Resource(BaseResource):
+class C_Resource(AutoResourceGroup):
     class Meta:
         service = C_Service
         swagger = C_Swagger
 
 
 @setup_resource
-class D_Resource(BaseResource):
+class D_Resource(AutoResourceGroup):
     class Meta:
         service = D_Service
         swagger = D_Swagger
 
 
 @setup_resource
-class E_Resource(BaseResource):
+class E_Resource(AutoResourceGroup):
     class Meta:
         service = E_Service
         swagger = E_Swagger
 
 
 @setup_resource
-class F_Resource(BaseResource):
+class F_Resource(AutoResourceGroup):
     class Meta:
         service = F_Service
         swagger = F_Swagger
 
 
 @setup_resource
-class G_Resource(BaseResource):
+class G_Resource(AutoResourceGroup):
     class Meta:
         service = G_Service
         swagger = G_Swagger
 
 
 @setup_resource
-class H_Resource(BaseResource):
+class H_Resource(AutoResourceGroup):
     class Meta:
         service = H_Service
         swagger = H_Swagger
     
     @api_H.route('/42')
-    class H_42Resource(FlaskRestxResource):
+    class H_42Resource(BaseResource):
         @classmethod
         def get(cls):
             return H_Service.return_42()
 
 
 @setup_resource
-class I_Resource(BaseResource):
+class I_Resource(AutoResourceGroup):
     class Meta:
         service = I_Service
         swagger = I_Swagger
 
     @api_I.route('/parrot')
-    class I_ParrotResouce(FlaskRestxResource):
+    class I_ParrotResouce(BaseResource):
         @classmethod
-        def post(cls):
-            return I_Service.parrot()
+        @auth(api_I)
+        def post(cls, user_id=None):
+            return I_Service.parrot(user_id=user_id)
 
 
 @setup_resource
-class J_Resource(BaseResource):
+class J_Resource(AutoResourceGroup):
     class Meta:
         service = J_Service
         swagger = J_Swagger

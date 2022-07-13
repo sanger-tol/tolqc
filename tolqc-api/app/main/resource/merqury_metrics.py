@@ -5,14 +5,14 @@
 from main.service import MerquryMetricsService
 from main.swagger import MerquryMetricsSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_merqury_metrics = MerquryMetricsSwagger.api
 
 
 @setup_resource
-class MerquryMetricsResource(BaseResource):
+class MerquryMetricsResource(AutoResourceGroup):
     class Meta:
         service = MerquryMetricsService
         swagger = MerquryMetricsSwagger

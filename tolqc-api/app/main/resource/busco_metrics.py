@@ -5,14 +5,14 @@
 from main.service import BuscoMetricsService
 from main.swagger import BuscoMetricsSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_busco_metrics = BuscoMetricsSwagger.api
 
 
 @setup_resource
-class BuscoMetricsResource(BaseResource):
+class BuscoMetricsResource(AutoResourceGroup):
     class Meta:
         service = BuscoMetricsService
         swagger = BuscoMetricsSwagger

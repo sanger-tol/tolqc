@@ -5,14 +5,14 @@
 from main.service import SampleService
 from main.swagger import SampleSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_sample = SampleSwagger.api
 
 
 @setup_resource
-class SampleResource(BaseResource):
+class SampleResource(AutoResourceGroup):
     class Meta:
         service = SampleService
         swagger = SampleSwagger

@@ -5,14 +5,14 @@
 from main.service import LibraryService
 from main.swagger import LibrarySwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_library = LibrarySwagger.api
 
 
 @setup_resource
-class LibraryResource(BaseResource):
+class LibraryResource(AutoResourceGroup):
     class Meta:
         service = LibraryService
         swagger = LibrarySwagger

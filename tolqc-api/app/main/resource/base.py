@@ -6,6 +6,7 @@ from flask_restx import Resource as FlaskRestxResource
 from functools import wraps
 
 from main.auth import auth
+from main.service.base import BaseService
 
 
 LIST_GET_PARAMS_DICT = {
@@ -183,7 +184,7 @@ def _document_enum_relation_list_resource(cls, relation):
     return api.route(f'/<name>/{relation}')(cls)
 
 
-class BaseResource:
+class AutoResourceGroup:
     @classmethod
     def is_enum_resource(cls):
         return cls.Meta.service.is_enum_service()
@@ -281,13 +282,14 @@ class BaseResource:
         ]
 
 
-class Resource(FlaskRestxResource):
+class BaseResource(FlaskRestxResource):
     @classmethod
     def auth_error(cls, message):
-        return cls.Meta.service.error_401(message)
+        # TODO make this less tightly coupled
+        return BaseService.error_401(message)
 
 
-class BaseListResource(Resource):
+class BaseListResource(BaseResource):
     @classmethod
     def get(cls, user_id=None):
         return cls.Meta.service.read_bulk(user_id=user_id)
@@ -297,7 +299,7 @@ class BaseListResource(Resource):
         return cls.Meta.service.create(user_id=user_id)
 
 
-class BaseDetailResource(Resource):
+class BaseDetailResource(BaseResource):
     @classmethod
     def get(cls, id, user_id=None):
         return cls.Meta.service.read_by_id(id, user_id=user_id)
@@ -311,7 +313,7 @@ class BaseDetailResource(Resource):
         return cls.Meta.service.delete_by_id(id, user_id=user_id)
 
 
-class BaseEnumNameDetailResource(Resource):
+class BaseEnumNameDetailResource(BaseResource):
     @classmethod
     def get(cls, name, user_id=None):
         return cls.Meta.service.read_by_name(name, user_id=user_id)
@@ -325,7 +327,7 @@ class BaseEnumNameDetailResource(Resource):
         return cls.Meta.service.delete_by_name(name, user_id=user_id)
 
 
-class BaseRelationListResource(Resource):
+class BaseRelationListResource(BaseResource):
     @classmethod
     def get(cls, id, user_id=None):
         return cls.Meta.service.read_bulk_related_by_id(
@@ -335,7 +337,7 @@ class BaseRelationListResource(Resource):
         )
 
 
-class BaseEnumNameRelationListResource(Resource):
+class BaseEnumNameRelationListResource(BaseResource):
     @classmethod
     def get(cls, name, user_id=None):
         return cls.Meta.service.read_bulk_related_by_name(

@@ -5,14 +5,14 @@
 from main.service import DataService
 from main.swagger import DataSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_data = DataSwagger.api
 
 
 @setup_resource
-class DataResource(BaseResource):
+class DataResource(AutoResourceGroup):
     class Meta:
         service = DataService
         swagger = DataSwagger

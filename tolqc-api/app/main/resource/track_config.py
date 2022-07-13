@@ -5,14 +5,14 @@
 from main.service import TrackConfigService
 from main.swagger import TrackConfigSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_track_config = TrackConfigSwagger.api
 
 
 @setup_resource
-class TrackConfigResource(BaseResource):
+class TrackConfigResource(AutoResourceGroup):
     class Meta:
         service = TrackConfigService
         swagger = TrackConfigSwagger

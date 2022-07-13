@@ -88,7 +88,7 @@ class I_Service(BaseService):
 
     @classmethod
     @provide_body_data
-    def parrot(cls, body_data):
+    def parrot(cls, body_data, **kwargs):
         return body_data, 200
 
 

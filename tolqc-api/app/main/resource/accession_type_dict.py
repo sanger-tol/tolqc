@@ -5,14 +5,14 @@
 from main.service import AccessionTypeDictService
 from main.swagger import AccessionTypeDictSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_accession_type_dict = AccessionTypeDictSwagger.api
 
 
 @setup_resource
-class AccessionTypeDictResource(BaseResource):
+class AccessionTypeDictResource(AutoResourceGroup):
     class Meta:
         service = AccessionTypeDictService
         swagger = AccessionTypeDictSwagger

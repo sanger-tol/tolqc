@@ -5,14 +5,14 @@
 from main.service import MilestoneDictService
 from main.swagger import MilestoneDictSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_milestone_dict = MilestoneDictSwagger.api
 
 
 @setup_resource
-class MilestoneDictResource(BaseResource):
+class MilestoneDictResource(AutoResourceGroup):
     class Meta:
         service = MilestoneDictService
         swagger = MilestoneDictSwagger

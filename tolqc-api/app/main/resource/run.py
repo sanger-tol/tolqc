@@ -5,14 +5,14 @@
 from main.service import RunService
 from main.swagger import RunSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource
 
 
 api_run = RunSwagger.api
 
 
 @setup_resource
-class RunResource(BaseResource):
+class RunResource(AutoResourceGroup):
     class Meta:
         service = RunService
         swagger = RunSwagger
