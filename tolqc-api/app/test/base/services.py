@@ -75,6 +75,9 @@ class H_Service(BaseService):
         model = H_ModelLog
         schema = H_Schema
 
+    def return_42():
+        return {'data': 42}, 200
+
 
 @setup_service
 class I_Service(BaseService):
