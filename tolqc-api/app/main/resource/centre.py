@@ -5,14 +5,14 @@
 from main.service import CentreService
 from main.swagger import CentreSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_centre = CentreSwagger.api
 
 
-@setup_resource
-class CentreResource(BaseResource):
+@setup_resource_group
+class CentreResourceGroup(AutoResourceGroup):
     class Meta:
         service = CentreService
         swagger = CentreSwagger

@@ -5,14 +5,14 @@
 from main.service import PacbioRunMetricsService
 from main.swagger import PacbioRunMetricsSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_pacbio_run_metrics = PacbioRunMetricsSwagger.api
 
 
-@setup_resource
-class PacbioRunMetricsResource(BaseResource):
+@setup_resource_group
+class PacbioRunMetricsResourceGroup(AutoResourceGroup):
     class Meta:
         service = PacbioRunMetricsService
         swagger = PacbioRunMetricsSwagger

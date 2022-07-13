@@ -5,14 +5,14 @@
 from main.service import GenomescopeMetricsService
 from main.swagger import GenomescopeMetricsSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_genomescope_metrics = GenomescopeMetricsSwagger.api
 
 
-@setup_resource
-class GenomescopeMetricsResource(BaseResource):
+@setup_resource_group
+class GenomescopeMetricsResourceGroup(AutoResourceGroup):
     class Meta:
         service = GenomescopeMetricsService
         swagger = GenomescopeMetricsSwagger

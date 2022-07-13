@@ -5,14 +5,14 @@
 from main.service import BuscoLineageService
 from main.swagger import BuscoLineageSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_busco_lineage = BuscoLineageSwagger.api
 
 
-@setup_resource
-class BuscoLineageResource(BaseResource):
+@setup_resource_group
+class BuscoLineageResourceGroup(AutoResourceGroup):
     class Meta:
         service = BuscoLineageService
         swagger = BuscoLineageSwagger

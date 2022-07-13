@@ -5,14 +5,14 @@
 from main.service import AllocationService
 from main.swagger import AllocationSwagger
 
-from .base import BaseResource, setup_resource
+from .base import AutoResourceGroup, setup_resource_group
 
 
 api_allocation = AllocationSwagger.api
 
 
-@setup_resource
-class AllocationResource(BaseResource):
+@setup_resource_group
+class AllocationResourceGroup(AutoResourceGroup):
     class Meta:
         service = AllocationService
         swagger = AllocationSwagger
