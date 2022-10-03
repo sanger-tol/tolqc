@@ -6,7 +6,7 @@ from functools import wraps
 from flask import request
 from flask_restx import Namespace
 
-from main.model.tolqc_user import get_user_id_via_api_key
+from main.model.user import get_user_id_via_api_key
 
 
 authorizations = {
