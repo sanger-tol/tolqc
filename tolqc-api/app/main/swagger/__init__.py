@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import BaseSwagger # noqa
+from tol.api_base.swagger import BaseSwagger # noqa
 
 from .sex import SexSwagger # noqa
 from .allocation import AllocationSwagger # noqa

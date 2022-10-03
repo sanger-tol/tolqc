@@ -5,7 +5,7 @@
 from main.service import SpeciesService
 from main.swagger import SpeciesSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_species = SpeciesSwagger.api

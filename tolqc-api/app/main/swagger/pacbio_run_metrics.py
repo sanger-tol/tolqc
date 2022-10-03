@@ -4,7 +4,7 @@
 
 from main.schema import PacbioRunMetricsSchema
 
-from .base import BaseSwagger, setup_swagger
+from tol.api_base.swagger import BaseSwagger, setup_swagger
 
 
 @setup_swagger

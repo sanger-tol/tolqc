@@ -5,7 +5,7 @@
 from main.service import SpecimenService
 from main.swagger import SpecimenSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_specimen = SpecimenSwagger.api

@@ -5,7 +5,7 @@
 from main.service import ProjectService
 from main.swagger import ProjectSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_project = ProjectSwagger.api

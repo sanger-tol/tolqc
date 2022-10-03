@@ -5,7 +5,7 @@
 from main.service import AccessionService
 from main.swagger import AccessionSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_accession = AccessionSwagger.api

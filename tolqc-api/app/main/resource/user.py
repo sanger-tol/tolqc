@@ -5,7 +5,7 @@
 from main.service import UserService
 from main.swagger import UserSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_user = UserSwagger.api

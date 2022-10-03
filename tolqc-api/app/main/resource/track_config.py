@@ -5,7 +5,7 @@
 from main.service import TrackConfigService
 from main.swagger import TrackConfigSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_track_config = TrackConfigSwagger.api

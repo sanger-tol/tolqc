@@ -2,14 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import db, Base, \
+from .tol.api_base.model import db, Base, \
                   ExtraFieldsNotPermittedException, \
                   StemInstanceDoesNotExistException, \
                   InstanceDoesNotExistException, \
                   NamedEnumStemInstanceDoesNotExistException, \
                   BadParameterException # noqa
-from .log_base import LogBase # noqa
-from .enum_base import NamedEnumInstanceDoesNotExistException # noqa
+from .tol.api_base.model import LogBase # noqa
+from .tol.api_base.model import NamedEnumInstanceDoesNotExistException # noqa
 
 from .user import TolqcUser  # noqa
 from .role import TolqcRole  # noqa

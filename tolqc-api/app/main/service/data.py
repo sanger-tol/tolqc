@@ -5,7 +5,7 @@
 from main.model import TolqcData
 from main.schema import DataSchema
 
-from .base import BaseService, setup_service
+from tol.api_base.service import BaseService, setup_service
 
 
 @setup_service

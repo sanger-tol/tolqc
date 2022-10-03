@@ -5,7 +5,7 @@
 from main.service import SetService
 from main.swagger import SetSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_set = SetSwagger.api

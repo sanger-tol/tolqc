@@ -5,7 +5,7 @@
 from main.model import TolqcAssembly
 from main.schema import AssemblySchema
 
-from .base import BaseService, setup_service
+from tol.api_base.service import BaseService, setup_service
 
 
 @setup_service

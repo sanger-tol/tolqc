@@ -5,7 +5,7 @@
 from main.service import AssemblyService
 from main.swagger import AssemblySwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_assembly = AssemblySwagger.api

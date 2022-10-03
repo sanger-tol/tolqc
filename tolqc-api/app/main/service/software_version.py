@@ -5,7 +5,7 @@
 from main.model import TolqcSoftwareVersion
 from main.schema import SoftwareVersionSchema
 
-from .base import BaseService, setup_service
+from tol.api_base.service import BaseService, setup_service
 
 
 @setup_service

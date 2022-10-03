@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 from main.model import TolqcStatusDict
 
-from .base import BaseSchema, setup_schema
+from tol.api_base.schema import BaseSchema, setup_schema
 
 
 @setup_schema

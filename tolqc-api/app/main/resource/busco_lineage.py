@@ -5,7 +5,7 @@
 from main.service import BuscoLineageService
 from main.swagger import BuscoLineageSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_busco_lineage = BuscoLineageSwagger.api

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .base import Base, db, setup_model
+from .tol.api_base.model import Base, db, setup_model
 
 
 @setup_model

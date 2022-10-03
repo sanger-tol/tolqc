@@ -5,7 +5,7 @@
 from main.service import SampleService
 from main.swagger import SampleSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_sample = SampleSwagger.api

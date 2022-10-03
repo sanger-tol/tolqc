@@ -5,7 +5,7 @@
 from main.model import TolqcStatus
 from main.schema import StatusSchema
 
-from .base import BaseService, setup_service
+from tol.api_base.service import BaseService, setup_service
 
 
 @setup_service

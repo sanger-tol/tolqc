@@ -5,7 +5,7 @@
 from main.model import TolqcSet
 from main.schema import SetSchema
 
-from .base import BaseService, setup_service
+from tol.api_base.service import BaseService, setup_service
 
 
 @setup_service
