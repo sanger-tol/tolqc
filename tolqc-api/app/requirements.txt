@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+--extra-index-url=https://gitlab.internal.sanger.ac.uk/api/v4/projects/3429/packages/pypi/simple
+
 Cython == 0.29.21
 python_dateutil == 2.8.1
 setuptools == 53.0.0
@@ -17,6 +19,7 @@ markupsafe==2.0.1
 responses
 jwt
 alembic==1.8.0
+tol-sdk
 
 flask_testing==0.8.0
 coverage>=4.0.3
