@@ -5,7 +5,7 @@
 from main.service import MilestoneDictService
 from main.swagger import MilestoneDictSwagger
 
-from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
+from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_milestone_dict = MilestoneDictSwagger.api

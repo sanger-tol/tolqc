@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .tol.api_base.model import LogBase, db
-from .tol.api_base.model import setup_model
+from tol.api_base.model import LogBase, db
+from tol.api_base.model import setup_model
 
 
 @setup_model

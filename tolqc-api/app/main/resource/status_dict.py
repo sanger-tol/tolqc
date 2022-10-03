@@ -5,7 +5,7 @@
 from main.service import StatusDictService
 from main.swagger import StatusDictSwagger
 
-from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
+from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_status_dict = StatusDictSwagger.api

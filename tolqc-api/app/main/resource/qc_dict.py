@@ -5,7 +5,7 @@
 from main.service import QcDictService
 from main.swagger import QcDictSwagger
 
-from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
+from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_qc_dict = QcDictSwagger.api

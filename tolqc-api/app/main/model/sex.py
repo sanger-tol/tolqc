@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .tol.api_base.model import db, setup_model
-from .tol.api_base.model import EnumBase
+from tol.api_base.model import db, setup_model
+from tol.api_base.model import EnumBase
 
 
 @setup_model

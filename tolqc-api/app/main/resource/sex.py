@@ -5,7 +5,7 @@
 from main.service import SexService
 from main.swagger import SexSwagger
 
-from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
+from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_sex = SexSwagger.api

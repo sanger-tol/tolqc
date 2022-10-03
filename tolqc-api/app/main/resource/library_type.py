@@ -5,7 +5,7 @@
 from main.service import LibraryTypeService
 from main.swagger import LibraryTypeSwagger
 
-from .tol.api_base.resource import AutoResourceGroup, setup_resource_group
+from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_library_type = LibraryTypeSwagger.api
