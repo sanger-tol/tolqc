@@ -21,3 +21,4 @@ def set_config(app, encoder):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['RESTX_JSON'] = {'cls': encoder}
+    app.config['PROPAGATE_EXCEPTIONS'] = True
