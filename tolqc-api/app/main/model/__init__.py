@@ -10,10 +10,10 @@ from tol.api_base.model import db, Base, \
                   BadParameterException # noqa
 from tol.api_base.model import LogBase # noqa
 from tol.api_base.model import NamedEnumInstanceDoesNotExistException # noqa
-from tol.api_base.model import (
+from tol.api_base.model import ( # noqa
     User as TolqcUser,
     Role as TolqcRole
-) # noqa
+)
 from .accession_type_dict import TolqcAccessionTypeDict  # noqa
 from .accession import TolqcAccession  # noqa
 from .assembly_component import TolqcAssemblyComponent  # noqa
