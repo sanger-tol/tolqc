@@ -5,7 +5,8 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from main.auth import authorizations
+from tol.api_base.auth import authorizations
+
 from main.resource import api_centre, api_environment, \
                           api_user, api_track_config, api_specimen, \
                           api_species, api_sample, \
