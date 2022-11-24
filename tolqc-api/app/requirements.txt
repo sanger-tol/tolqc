@@ -7,19 +7,11 @@
 Cython == 0.29.21
 python_dateutil == 2.8.1
 setuptools == 53.0.0
-Werkzeug == 1.0.1
-Flask-SQLAlchemy == 2.4.4
-flask-restx == 0.5.1
-marshmallow == 3.14.1
-flask-marshmallow == 0.14.0
-marshmallow-sqlalchemy == 0.27.0
-marshmallow-jsonapi == 0.24.0
-psycopg2-binary == 2.8.6
 markupsafe==2.0.1
 responses
 jwt
 alembic==1.8.0
-tol-sdk
+tol-sdk==0.2.0b0
 
 flask_testing==0.8.0
 coverage>=4.0.3
