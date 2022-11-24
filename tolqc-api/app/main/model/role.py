@@ -15,5 +15,5 @@ class TolqcRole(Base):
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship("TolqcUser", back_populates="role",
+    user = db.relationship("User", back_populates="role",
                            uselist=False, foreign_keys=[user_id])
