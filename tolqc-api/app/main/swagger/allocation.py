@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
 from main.schema import AllocationSchema
 
-from .base import BaseSwagger, setup_swagger
+from tol.api_base.swagger import BaseSwagger, setup_swagger
 
 
 @setup_swagger

@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from .base import BaseSwagger # noqa
+from tol.api_base.swagger import BaseSwagger # noqa
 
 from .sex import SexSwagger # noqa
 from .allocation import AllocationSwagger # noqa

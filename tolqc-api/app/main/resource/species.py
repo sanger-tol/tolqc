@@ -1,11 +1,11 @@
-# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
 from main.service import SpeciesService
 from main.swagger import SpeciesSwagger
 
-from .base import AutoResourceGroup, setup_resource_group
+from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
 api_species = SpeciesSwagger.api

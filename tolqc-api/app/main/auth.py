@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
@@ -6,7 +6,7 @@ from functools import wraps
 from flask import request
 from flask_restx import Namespace
 
-from main.model.tolqc_user import get_user_id_via_api_key
+from main.model.user import get_user_id_via_api_key
 
 
 authorizations = {
