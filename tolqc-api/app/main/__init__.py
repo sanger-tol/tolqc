@@ -6,6 +6,8 @@
 
 from flask import Flask
 
+from tol.api_base.error.handler import blueprint as error_handler
+
 from main.encoder import JSONEncoder
 from main.config import set_config
 from main.model import db
@@ -17,6 +19,7 @@ def application():
     set_config(app, JSONEncoder)
     blueprint = init_blueprint(app)
     app.register_blueprint(blueprint)
+    app.register_blueprint(error_handler)
     app.json_encoder = JSONEncoder
     db.init_app(app)
     return app
