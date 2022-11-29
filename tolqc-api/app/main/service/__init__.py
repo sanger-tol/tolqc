@@ -15,7 +15,6 @@ from .sample import SampleService # noqa
 from .species import SpeciesService # noqa
 from .specimen import SpecimenService # noqa
 from .run import RunService # noqa
-from .user import UserService # noqa
 from .software_version import SoftwareVersionService # noqa
 from .status import StatusService # noqa
 from .file import FileService # noqa

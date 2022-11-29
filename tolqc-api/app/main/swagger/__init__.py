@@ -17,7 +17,6 @@ from .run import RunSwagger # noqa
 from .sample import SampleSwagger # noqa
 from .species import SpeciesSwagger # noqa
 from .specimen import SpecimenSwagger # noqa
-from .user import UserSwagger # noqa
 from .software_version import SoftwareVersionSwagger # noqa
 from .status import StatusSwagger # noqa
 from .file import FileSwagger # noqa

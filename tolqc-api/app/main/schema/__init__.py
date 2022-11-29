@@ -14,7 +14,6 @@ from .run import RunSchema # noqa
 from .sample import SampleSchema # noqa
 from .species import SpeciesSchema # noqa
 from .specimen import SpecimenSchema # noqa
-from .user import UserSchema # noqa
 from .software_version import SoftwareVersionSchema # noqa
 from .status import StatusSchema # noqa
 from .file import FileSchema # noqa

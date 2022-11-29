@@ -11,13 +11,13 @@ from tol.api_base.error.handler import blueprint as error_handler
 from main.encoder import JSONEncoder
 from main.config import set_config
 from main.model import db
-from main.route import init_blueprint
+from main.route import init_blueprints
 
 
 def application():
     app = Flask(__name__)
     set_config(app, JSONEncoder)
-    blueprint = init_blueprint(app)
+    blueprint = init_blueprints(app)
     app.register_blueprint(blueprint)
     app.register_blueprint(error_handler)
     app.json_encoder = JSONEncoder

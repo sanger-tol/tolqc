@@ -6,9 +6,10 @@ from flask import Blueprint
 from flask_restx import Api
 
 from tol.api_base.auth import authorizations
+from tol.api_base.error.handler import blueprint as error_handler
 
 from main.resource import api_centre, api_environment, \
-                          api_user, api_track_config, api_specimen, \
+                          api_track_config, api_specimen, \
                           api_species, api_sample, \
                           api_project, api_platform, api_library, \
                           api_library_type, api_allocation, \
@@ -39,7 +40,6 @@ def _setup_api(blueprint, app):
         authorizations=authorizations
     )
     api.add_namespace(api_centre)
-    api.add_namespace(api_user)
     api.add_namespace(api_track_config)
     api.add_namespace(api_environment)
     api.add_namespace(api_specimen)
@@ -73,7 +73,8 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_run)
 
 
-def init_blueprint(app):
+def init_blueprints(app):
     blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
     _setup_api(blueprint, app)
+    app.register_blueprint(error_handler)
     return blueprint
