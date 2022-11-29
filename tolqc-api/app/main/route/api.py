@@ -6,7 +6,6 @@ from flask import Blueprint
 from flask_restx import Api
 
 from tol.api_base.auth import authorizations
-from tol.api_base.error.handler import blueprint as error_handler
 
 from main.resource import api_centre, api_environment, \
                           api_track_config, api_specimen, \
@@ -76,5 +75,4 @@ def _setup_api(blueprint, app):
 def init_blueprints(app):
     blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
     _setup_api(blueprint, app)
-    app.register_blueprint(error_handler)
     return blueprint
