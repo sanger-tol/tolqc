@@ -4,8 +4,8 @@
 
 include:
   - project: 'tol/tol-core'
-    ref: v1.2.0
-    file: '/gitlab/app.yml'
+    ref: v1.0.0
+    file: '/gitlab/main.yml'
 
 variables:
   APP_NAME: 'tolqc'
