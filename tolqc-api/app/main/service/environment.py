@@ -7,5 +7,5 @@ from flask import current_app as app
 
 class EnvironmentService:
     @classmethod
-    def get_environment(self):
+    def get_environment(cls):
         return {'environment': app.config['DEPLOYMENT_ENVIRONMENT']}

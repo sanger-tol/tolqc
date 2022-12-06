@@ -4,10 +4,10 @@
 
 # coding: utf-8
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-NAME = "app"
-VERSION = "1.1.0"
+NAME = 'app'
+VERSION = '1.1.0'
 # To install the library, run the following
 #
 # python setup.py install
@@ -18,10 +18,10 @@ VERSION = "1.1.0"
 setup(
     name=NAME,
     version=VERSION,
-    description="Tree of Life QC API",
-    author_email="tol-platforms@sanger.ac.uk",
-    url="",
-    keywords=["Swagger", "Tree of Life QC API"],
+    description='Tree of Life QC API',
+    author_email='tol-platforms@sanger.ac.uk',
+    url='',
+    keywords=['Swagger', 'Tree of Life QC API'],
     packages=find_packages(),
     package_data={'': ['swagger/swagger.yaml']},
     include_package_data=True,

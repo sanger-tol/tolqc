@@ -3,39 +3,32 @@
 # SPDX-License-Identifier: MIT
 
 from flask import Blueprint
+
 from flask_restx import Api
 
-from tol.api_base.auth import authorizations
+from main.resource import api_accession, api_accession_type_dict, api_allocation, api_assembly, \
+    api_assembly_component, api_assembly_metrics, api_busco_lineage, api_busco_metrics, \
+    api_centre, api_data, api_dataset, api_environment, api_file, api_genomescope_metrics, \
+    api_library, api_library_type, api_merqury_metrics, api_milestone_dict, \
+    api_pacbio_run_metrics, api_platform, api_project, api_qc_dict, api_run, api_sample, \
+    api_set, api_sex, api_software_version, api_species, api_specimen, api_status, \
+    api_status_dict, api_track_config
 
-from main.resource import api_centre, api_environment, \
-                          api_track_config, api_specimen, \
-                          api_species, api_sample, \
-                          api_project, api_platform, api_library, \
-                          api_library_type, api_allocation, \
-                          api_file, api_sex, \
-                          api_software_version, api_status, \
-                          api_accession_type_dict, api_accession, \
-                          api_assembly_component, api_status_dict, \
-                          api_qc_dict, api_milestone_dict, \
-                          api_pacbio_run_metrics, api_data, \
-                          api_dataset, api_set, api_busco_lineage, \
-                          api_assembly, api_assembly_metrics, \
-                          api_merqury_metrics, api_busco_metrics, \
-                          api_genomescope_metrics, api_run
+from tol.api_base.auth import authorizations
 
 
 def _get_environment_string(app):
     environment = app.config['DEPLOYMENT_ENVIRONMENT']
     if environment == 'production':
-        return ""
-    return f" ({environment})"
+        return ''
+    return f' ({environment})'
 
 
 def _setup_api(blueprint, app):
     api = Api(
         blueprint,
         doc='/ui',
-        title=f"Tree of Life Quality Control{_get_environment_string(app)}",
+        title=f'Tree of Life Quality Control{_get_environment_string(app)}',
         authorizations=authorizations
     )
     api.add_namespace(api_centre)

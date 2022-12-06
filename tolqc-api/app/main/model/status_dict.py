@@ -2,15 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import db, setup_model
-from tol.api_base.model import EnumBase
+from tol.api_base.model import EnumBase, db, setup_model
 
 
 @setup_model
 class TolqcStatusDict(EnumBase):
-    __tablename__ = "status_dict"
+    __tablename__ = 'status_dict'
 
     class Meta:
         type_ = 'status_types'
 
-    status = db.relationship("TolqcStatus", back_populates="status_dict")
+    status = db.relationship('TolqcStatus', back_populates='status_dict')

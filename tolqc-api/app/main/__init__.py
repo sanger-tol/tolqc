@@ -6,12 +6,12 @@
 
 from flask import Flask
 
-from tol.api_base.error.handler import blueprint as error_handler
-
-from main.encoder import JSONEncoder
 from main.config import set_config
+from main.encoder import JSONEncoder
 from main.model import db
 from main.route import init_blueprints
+
+from tol.api_base.error.handler import blueprint as error_handler
 
 
 def application():

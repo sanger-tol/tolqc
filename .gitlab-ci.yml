@@ -4,62 +4,9 @@
 
 include:
   - project: 'tol/tol-core'
-    ref: v1.1.0
-    file: '/gitlab/main.yml'
+    ref: v1.2.0
+    file: '/gitlab/app.yml'
 
-stages:
-  - lint
-  - build
-  - unit test
-  - deploy
-
-build-api:
-  extends: .build-template
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ''
-    PART: "tolqc-api"
-    DOCKERFILE: "tolqc-api/Dockerfile"
-    NAME: "tolqc-api"
-
-build-ui:
-  extends: .build-template
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ''
-    PART: "tolqc-ui"
-    DOCKERFILE: 'tolqc-ui/Dockerfile'
-    NAME: "tolqc-ui"
-
-test-migrations:
-  extends: .test-migrations
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ''
-    GIT_STRATEGY: none
-    NAME: tolqc-api
-
-deploy-staging:
-  extends: .auto-deploy
-  environment:
-    name: staging
-    url: https://qc-staging.tol.sanger.ac.uk
-  only:
-    - staging
-
-deploy-production:
-  extends: .auto-deploy
-  environment:
-    name: production
-    url: https://qc.tol.sanger.ac.uk/
-  only:
-    - production
-  when: manual
-
-deploy-qa:
-  extends: .auto-deploy
-  environment:
-    name: qa
-    url: http://qc-qa.tol.sanger.ac.uk
-  only:
-    - qa
+variables:
+  APP_NAME: 'tolqc'
+  SERVICE_NAME: 'qc'

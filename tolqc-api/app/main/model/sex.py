@@ -2,15 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import db, setup_model
-from tol.api_base.model import EnumBase
+from tol.api_base.model import EnumBase, db, setup_model
 
 
 @setup_model
 class TolqcSex(EnumBase):
-    __tablename__ = "sex"
+    __tablename__ = 'sex'
 
     class Meta:
         type_ = 'sexes'
 
-    specimen = db.relationship("TolqcSpecimen", back_populates="sex")
+    specimen = db.relationship('TolqcSpecimen', back_populates='sex')

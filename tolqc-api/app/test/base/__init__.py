@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main import application
-
 from test.test_case import TestCase
+
+from main import application
 
 
 class TolqcTestCase(TestCase):
