@@ -2,19 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import LogBase, db
-from tol.api_base.model import setup_model
+from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
 class TolqcPacbioRunMetrics(LogBase):
-    __tablename__ = "pacbio_run_metrics"
+    __tablename__ = 'pacbio_run_metrics'
 
     class Meta:
         type_ = 'pacbio_run_metrics'
 
-    id = db.Column(db.Integer(), primary_key=True)
-    run_id = db.Column(db.Integer(), db.ForeignKey("run.id"))
+    id = db.Column(db.Integer(), primary_key=True)  # noqa A003
+    run_id = db.Column(db.Integer(), db.ForeignKey('run.id'))
     move_time = db.Column(db.Integer())
     pre_extension_time = db.Column(db.Integer())
     total_bases = db.Column(db.Integer())
@@ -36,5 +35,5 @@ class TolqcPacbioRunMetrics(LogBase):
     demux_version_id = db.Column(db.String())
     demux_pass = db.Column(db.Integer())
     demux_fail = db.Column(db.Integer())
-    run = db.relationship("TolqcRun", back_populates="pacbio_run_metrics",
+    run = db.relationship('TolqcRun', back_populates='pacbio_run_metrics',
                           foreign_keys=[run_id])

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
+
 from flask.json import JSONEncoder as FlaskJSONEncoder
 
 from main.model import Base

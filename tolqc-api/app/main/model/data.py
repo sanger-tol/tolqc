@@ -2,24 +2,23 @@
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import LogBase, db
-from tol.api_base.model import setup_model
+from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
 class TolqcData(LogBase):
-    __tablename__ = "data"
+    __tablename__ = 'data'
 
     class Meta:
         type_ = 'data'
 
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)  # noqa A003
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
-    sample_id = db.Column(db.Integer(), db.ForeignKey("sample.id"))
-    library_id = db.Column(db.Integer(), db.ForeignKey("library.id"))
-    accession_id = db.Column(db.Integer(), db.ForeignKey("accession.id"))
-    run_id = db.Column(db.Integer(), db.ForeignKey("run.id"))
+    sample_id = db.Column(db.Integer(), db.ForeignKey('sample.id'))
+    library_id = db.Column(db.Integer(), db.ForeignKey('library.id'))
+    accession_id = db.Column(db.Integer(), db.ForeignKey('accession.id'))
+    run_id = db.Column(db.Integer(), db.ForeignKey('run.id'))
     processed = db.Column(db.Integer())
     tag1_id = db.Column(db.String())
     tag2_id = db.Column(db.String())
@@ -29,13 +28,13 @@ class TolqcData(LogBase):
     withdrawn = db.Column(db.Boolean())
     manually_withdrawn = db.Column(db.Boolean())
     date = db.Column(db.DateTime())
-    sample = db.relationship("TolqcSample", back_populates="data",
+    sample = db.relationship('TolqcSample', back_populates='data',
                              foreign_keys=[sample_id])
-    library = db.relationship("TolqcLibrary", back_populates="data",
+    library = db.relationship('TolqcLibrary', back_populates='data',
                               foreign_keys=[library_id])
-    run = db.relationship("TolqcRun", back_populates="data",
+    run = db.relationship('TolqcRun', back_populates='data',
                           foreign_keys=[run_id])
-    accession = db.relationship("TolqcAccession", back_populates="data",
+    accession = db.relationship('TolqcAccession', back_populates='data',
                                 foreign_keys=[accession_id])
-    set = db.relationship("TolqcSet", back_populates="data")
-    file = db.relationship("TolqcFile", back_populates="data")
+    set = db.relationship('TolqcSet', back_populates='data')  # noqa A003
+    file = db.relationship('TolqcFile', back_populates='data')

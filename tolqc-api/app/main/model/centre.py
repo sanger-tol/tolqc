@@ -2,18 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import Base, db
-from tol.api_base.model import setup_model
+from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
 class TolqcCentre(Base):
-    __tablename__ = "centre"
+    __tablename__ = 'centre'
 
     class Meta:
         type_ = 'centres'
 
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)  # noqa A003
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
-    run = db.relationship("TolqcRun", back_populates="centre")
+    run = db.relationship('TolqcRun', back_populates='centre')

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from flask_restx import fields, Namespace
+from flask_restx import Namespace, fields
 
 
 class EnvironmentSwagger:
@@ -12,5 +12,5 @@ class EnvironmentSwagger:
     )
 
     response_model = api.model('Environment', {
-        'environment': fields.String("dev", required=True),
+        'environment': fields.String('dev', required=True),
     })

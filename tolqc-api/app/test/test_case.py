@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from flask_testing import TestCase as FlaskTestCase
+
 from tol.api_base.model import db
 
 
