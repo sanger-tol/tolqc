@@ -6,8 +6,6 @@ from flask import Blueprint
 
 from flask_restx import Api
 
-from tol.api_base.resource import api_auth, api_environment
-
 from main.resource import api_accession, api_accession_type_dict, api_allocation, api_assembly, \
     api_assembly_component, api_assembly_metrics, api_busco_lineage, api_busco_metrics, \
     api_centre, api_data, api_dataset, api_file, api_genomescope_metrics, \
@@ -15,6 +13,8 @@ from main.resource import api_accession, api_accession_type_dict, api_allocation
     api_pacbio_run_metrics, api_platform, api_project, api_qc_dict, api_run, api_sample, \
     api_set, api_sex, api_software_version, api_species, api_specimen, api_status, \
     api_status_dict, api_track_config
+    
+from tol.api_base.resource import api_auth, api_environment
 
 from tol.api_base.auth import authorizations
 
