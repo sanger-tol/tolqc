@@ -6,9 +6,9 @@ SPDX-License-Identifier: MIT
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import { Home } from './pages';
 
 test('renders home page link', () => {
-  render(<App />);
-  expect(screen.queryAllByText("Search")).not.toHaveLength(0);
+  render(<Home />);
+  expect(screen.queryAllByText("TolQC")).not.toHaveLength(0);
 });

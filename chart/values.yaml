@@ -116,6 +116,9 @@ tolcore:
   ui:
     fullname: "tolqc-ui"
     probe_url: '/'
+    api_version: '1'
+    extra_env:
+      REACT_APP_API_VERSION: ui.api_version
   s3:
     uri: ""
     access_key: ""

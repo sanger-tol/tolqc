@@ -6,13 +6,19 @@ SPDX-License-Identifier: MIT
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import { Home } from './pages';
 import reportWebVitals from './reportWebVitals';
+import { TolApp } from '@tol/tol-ui'
+import './scss/styling.scss';
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <TolApp
+      brand='TolQC'
+      home_page={<Home />}
+      pages={[]}
+    />
   </React.StrictMode>,
   document.getElementById('root')
 );

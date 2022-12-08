@@ -2,17 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.swagger import BaseSwagger # noqa
-
 from .sex import SexSwagger # noqa
 from .allocation import AllocationSwagger # noqa
 from .centre import CentreSwagger # noqa
-from .environment import EnvironmentSwagger # noqa
 from .library_type import LibraryTypeSwagger # noqa
 from .library import LibrarySwagger # noqa
 from .platform import PlatformSwagger # noqa
 from .project import ProjectSwagger # noqa
-from .role import RoleSwagger # noqa
 from .run import RunSwagger # noqa
 from .sample import SampleSwagger # noqa
 from .species import SpeciesSwagger # noqa
