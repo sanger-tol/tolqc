@@ -118,3 +118,26 @@ services:
     working_dir: /migrations
     volumes:
       - ./tolqc-api/migrations/alembic/versions:/migrations/alembic/versions
+
+  tolqc-python-db:
+    image: postgres:11
+    environment:
+      - POSTGRES_USER=test-user
+      - POSTGRES_PASSWORD=test-password
+      - POSTGRES_DB=test-db
+  
+  tolqc-python-unit-test:
+    build:
+      context: tolqc-api
+      dockerfile: Dockerfile.test
+    command: pytest -v unit
+
+  tolqc-python-system-test:
+    build:
+      context: tolqc-api
+      dockerfile: Dockerfile.test
+    command: pytest -v system
+    environment:
+      - DB_URI=postgresql://test-user:test-password@tolqc-python-db:5432/test-db
+    depends_on:
+      - tolqc-python-db

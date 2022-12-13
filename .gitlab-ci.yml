@@ -4,9 +4,9 @@
 
 include:
   - project: 'tol/tol-core'
-    ref: v1.2.0
+    ref: v1.2.2
     file: '/gitlab/app.yml'
 
 variables:
-  APP_NAME: 'tolqc'
-  SERVICE_NAME: 'qc'
+  APP_NAME: tolqc
+  SERVICE_NAME: qc

@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+flask_testing==0.8.0
+coverage>=4.0.3
+pluggy>=0.3.1
+py>=1.4.31
+randomize>=0.13
+pytest==6.0.1
+responses
