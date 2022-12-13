@@ -9,7 +9,6 @@ from .library_type import LibraryTypeSchema # noqa
 from .library import LibrarySchema # noqa
 from .platform import PlatformSchema # noqa
 from .project import ProjectSchema # noqa
-from .role import RoleSchema # noqa
 from .run import RunSchema # noqa
 from .sample import SampleSchema # noqa
 from .species import SpeciesSchema # noqa

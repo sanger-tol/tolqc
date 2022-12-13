@@ -5,7 +5,6 @@
 from .sex import api_sex # noqa
 from .allocation import api_allocation # noqa
 from .centre import api_centre # noqa
-from .environment import api_environment # noqa
 from .library_type import api_library_type # noqa
 from .library import api_library # noqa
 from .platform import api_platform # noqa

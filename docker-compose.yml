@@ -51,6 +51,7 @@ services:
     stdin_open: true
     environment:
       - NODE_ENV=development
+      - REACT_APP_API_VERSION
     ports:
       - 3004:3000
     volumes:
