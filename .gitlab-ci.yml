@@ -4,9 +4,9 @@
 
 include:
   - project: 'tol/tol-core'
-    ref: v1.1.0
-    file: '/gitlab/main.yml'
+    ref: 'ee33104fabcf2c1140a6d3584784173240bb5672' # TODO put back to fixed version
+    file: '/gitlab/app.yml'
 
 variables:
-  APP_NAME: 'tolqc'
-  SERVICE_NAME: 'qc'
+  APP_NAME: tolqc
+  SERVICE_NAME: qc
