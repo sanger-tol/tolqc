@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from test.base import TolqcTestCase
+from test.system import TolqcTestCase
 
 
 class TestFake(TolqcTestCase):

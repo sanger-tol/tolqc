@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+FROM python:3.8
+
+WORKDIR /app
+
+ENV FLASK_ENV=development
+ENV PYTHONPATH=/app
+ENV PYTHONDONTWRITEBYTECODE 1
+
+RUN apt-get update -y
+RUN apt-get install -y python3-pip python3-setuptools
+
+RUN pip3 install --upgrade setuptools
+
+COPY ./app/setup.py .
+RUN python3 setup.py install
+
+COPY ./app/requirements.txt .
+RUN pip3 --no-cache-dir install -r requirements.txt
+
+COPY ./requirements-test.txt .
+RUN pip3 --no-cache-dir install -r requirements-test.txt
+
+COPY ./app /app
+COPY ./migrations /migrations
+
+WORKDIR /app/test
