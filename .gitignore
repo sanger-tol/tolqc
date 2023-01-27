@@ -16,3 +16,5 @@ launch.json
 values-*.yaml
 *.tgz
 chart/charts/
+.yalc/
+yalc.lock

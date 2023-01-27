@@ -57,6 +57,7 @@ services:
     volumes:
       - './tolqc-ui/app:/usr/src/app'
       - '/usr/src/app/node_modules'
+      - '../tol-ui:/packages/tol-ui:rw'
     
   tolqc-api-test:
     image: tolqc-api
