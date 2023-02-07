@@ -40,6 +40,7 @@ services:
       - 8082:80
     volumes:
       - './tolqc-api/app/main:/app/main'
+      - '../tol-sdk:/packages/tol-sdk:rw'
 
   tolqc-ui:
     build:

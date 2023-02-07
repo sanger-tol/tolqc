@@ -4,11 +4,7 @@
 
 --extra-index-url=https://gitlab.internal.sanger.ac.uk/api/v4/projects/3429/packages/pypi/simple
 
-Cython == 0.29.21
 python_dateutil == 2.8.1
 setuptools == 53.0.0
-markupsafe==2.0.1
-jwt
-alembic==1.8.0
-tol-sdk==0.4.2
+tol-sdk==0.6.0
 psycopg2-binary==2.9.1

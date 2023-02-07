@@ -12,6 +12,15 @@ function Home() {
     <div className="home">
       <CentreContents>
         <AutoTable endpoint="species"
+          requiredFields={{
+            'hierarchy_name': 'Project',
+            'name': 'Name',
+            'common_name': 'Common name',
+            'taxon_id': "Taxon ID",
+            'taxon_family': 'Family',
+            'taxon_order': 'Order',
+            'taxon_phylum': 'Phylum'
+          }}
         />
       </CentreContents>
 
