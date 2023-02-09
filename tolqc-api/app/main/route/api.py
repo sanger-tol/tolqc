@@ -15,7 +15,7 @@ from main.resource import api_accession, api_accession_type_dict, api_allocation
     api_status_dict, api_track_config
 
 from tol.api_base.auth import authorizations
-from tol.api_base.resource import api_auth, api_environment
+from tol.api_base.resource import api_auth, api_environment, api_user
 
 
 def _get_environment_string(app):
@@ -36,6 +36,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_track_config)
     api.add_namespace(api_auth)
     api.add_namespace(api_environment)
+    api.add_namespace(api_user)
     api.add_namespace(api_specimen)
     api.add_namespace(api_species)
     api.add_namespace(api_sample)
