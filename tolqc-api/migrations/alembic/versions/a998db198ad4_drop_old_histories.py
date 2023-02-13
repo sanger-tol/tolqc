@@ -30,12 +30,12 @@ def upgrade() -> None:
         ]
         if 'history' in column_names:
             # remove all history
-            conn.execute(
+            conn.execute(sa.text(
                 f'''
                 UPDATE "{table}"
                 SET history='[]'::json;
                 '''
-            )
+            ))
 
 def downgrade() -> None:
     pass

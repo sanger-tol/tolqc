@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade() -> None:
     connection = op.get_bind()
-    connection.execute("""
+    connection.execute(sa.text("""
         ALTER TABLE public.user DROP COLUMN token;
         CREATE SEQUENCE public.auth_id_seq
             INCREMENT 1
@@ -61,7 +61,7 @@ def upgrade() -> None:
         WHERE api_key is not null;
 
         ALTER TABLE public.user DROP COLUMN api_key;
-        """)
+        """))
 
 
 
