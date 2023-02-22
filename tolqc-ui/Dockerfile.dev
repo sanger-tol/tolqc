@@ -13,10 +13,14 @@ RUN echo \"@tol:registry\" \"https://gitlab.internal.sanger.ac.uk/api/v4/project
 
 ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
+VOLUME ["/packages"]
+
 COPY ./app/package.json ./
 
 RUN yarn install
 
 COPY ./app/ ./
 
-CMD yarn start
+RUN yarn global add yalc;
+
+CMD if [ -d /packages/tol-ui ] ; then cd /packages/tol-ui; yarn build; yalc push --scripts --update --replace; cd /usr/src/app; yalc link @tol/tol-ui; yarn install; fi; yarn start
