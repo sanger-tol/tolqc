@@ -36,6 +36,7 @@ function checkAndConvertDate(text: string) {
 function checkAndConvertText(text: any) {
   try {
     new URL(text) // fails if not link
+    // eslint-disable-next-line
     const linkRegEx = /^https?:\/\/([^\/]*).*/
     const imgRegEx = /.*\.(?:png|jpg|jpeg)/i
     if (imgRegEx.test(text.toLowerCase())) {
