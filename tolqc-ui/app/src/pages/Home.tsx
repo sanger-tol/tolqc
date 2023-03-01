@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import React from "react";
-import { AutoTable, CentreContents } from '@tol/tol-ui'
+import AutoTable from "../table/AutoTable";
+import { CentreContents } from '@tol/tol-ui'
 
 function Home() {
   return (
@@ -23,7 +23,6 @@ function Home() {
           }}
         />
       </CentreContents>
-
     </div>
   );
 }

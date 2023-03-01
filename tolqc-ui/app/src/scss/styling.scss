@@ -4,6 +4,23 @@
  * SPDX-License-Identifier: MIT
  */
 
-@import "variables.scss";
+ // In your app, import any variable overrides before importing this file
+ // for example setting $primary and $secondary
 
-@import '~@tol/tol-ui/src/scss/tol-styling.scss';
+$color-mode-type: media-query;
+@import "~bootstrap/scss/bootstrap.scss";
+@import url('https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900');
+@import url('https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900');
+// Core variables and mixins
+@import "variables.scss";
+@import "mixins.scss";
+// Global CSS
+@import "global.scss";
+// Components
+@import "navbar.scss";
+@import "masthead.scss";
+//@import "bootstrap-overrides.scss";
+@import "login.scss";
+@import "loading-helix.scss";
+@import "table.scss";
+

@@ -13,13 +13,11 @@ import './scss/styling.scss';
 
 
 ReactDOM.render(
-  <React.StrictMode>
-    <TolApp
-      brand='TolQC'
-      home_page={<Home />}
-      pages={[]}
-    />
-  </React.StrictMode>,
+  <TolApp
+    brand='TolQC'
+    home_page={<Home />}
+    pages={[]}
+  />,
   document.getElementById('root')
 );
 

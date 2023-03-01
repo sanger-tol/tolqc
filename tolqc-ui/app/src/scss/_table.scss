@@ -1,0 +1,149 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Genome Research Ltd.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+.tol-table {
+  // table sorting arrows
+  button span .caret { // hides duplicate page size dropdown arrow
+    display: none;
+  }
+
+  .caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: 4px dashed;
+    border-top: 4px solid \9;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+  }
+
+  .dropup .caret, .navbar-fixed-bottom .dropdown .caret {
+    border-top: 0;
+    border-bottom: 4px dashed;
+    border-bottom: 4px solid \9;
+    content: "";
+  }
+
+  // hide or show filter search
+  .filter-search-input-show {
+    display: flex;
+  }
+
+  .filter-search-input-hide {
+    display: none;
+  }
+
+  // table filtering
+  .filter-label {
+    display: flex;
+    margin: 0;
+  }
+
+  // pagination buttons
+  #pageDropDown {
+    float: right;
+    margin: 6px;
+    margin-right: 0;
+    background-color: $primary;
+    border-color: $primary;
+  }
+
+  .btn.btn-primary,
+  .react-bootstrap-table-page-btns-ul {
+    float: right;
+    margin: 6px;
+    margin-right: 0;
+  }
+
+//  .page-link,
+//  .page-link:hover {
+//    color: $primary
+//  }
+
+//  .active.page-item .page-link {
+//    background-color: $primary;
+//    border-color: $primary;
+//  }
+
+  // page size dropdown
+  span.open.show.react-bs-table-sizePerPage-dropdown.dropdown {
+    float: right;
+  }
+
+  ul.dropdown-menu.open.show {
+    min-width: 0;
+  }
+
+  li.dropdown-item a {
+    color: $primary
+  }
+
+  // filter visability
+  .filter-search-input-hide {
+    display: var(--filter-visability, none);
+  }
+
+  // filter button
+  button svg {
+    margin-right: 8px;
+    //fill: white;
+  }
+
+  // align header titles at top
+  .table thead th {
+    vertical-align: top;
+  }
+
+  // make table scrollable and auto-resize
+  .table {
+    overflow: auto;
+    display: block;
+    table-layout: auto;
+  }
+
+  .table-bordered td, .table-bordered th {
+    width: 1% !important;
+  }
+
+  // relationship link
+  .relationship-box {
+    background-color: lighten($primary, 50%) !important;;
+    padding: 10px;
+    border-style: solid;
+    border-color: lighten($primary, 45%) !important;
+  }
+
+  .relationship-box:hover {
+    background-color: lighten($primary, 45%) !important;
+    cursor: pointer;
+  }
+
+  // tooltip
+  .relationship-tooltip {
+    margin: 5px;
+  }
+
+  .tooltip-key {
+    margin-right: 5px;
+    font-size: small;
+    font-weight: bold;
+  }
+
+  .tooltip-value {
+    font-size: small;
+  }
+
+  .tooltip-wrapper {
+    display: inline-block;
+  }
+
+  // This is here because react-table uses Bootstrap 4 classes
+  .sr-only {
+    @extend .visually-hidden
+  }
+}

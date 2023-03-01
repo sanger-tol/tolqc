@@ -1,0 +1,106 @@
+/*
+ * SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+.loader {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	width: 30px;
+	height: 15px;
+}
+
+.dna-circle {
+	position: relative;
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	margin: 0 5px;
+	height: 20px;
+	width: 2px;
+}
+
+.dna-circle:first-of-type {
+  margin-left: 0
+}
+
+.dna-circle:last-of-type {
+  margin-right: 0
+}
+
+.dna-circle::before,
+.dna-circle::after {
+	content: "";
+	position: absolute;
+	bottom: -5px;
+	display: block;
+	width: 4px;
+	height: 4px;
+	background: $primary;
+	border-radius: 4px;
+	box-shadow: 1px 1px 4px rgba(0,0,0,.15);
+	animation: dna-helix 1.25s ease-in-out infinite;
+}
+
+.dna-circle::after {
+	bottom: 100%;
+	animation: dna-helix-reversed 1.25s ease-in-out infinite;
+}
+
+.dna-circle i {
+	position: absolute;
+	z-index: 25;
+	align-self: center;
+	width: 2px;
+	height: 10px;
+	background: rgba($secondary, .10);
+	animation: dna-helix-bar 1.25s ease-in-out infinite;
+}
+
+.dna-circle2::before, .dna-circle2::after, .dna-circle2 i {
+  animation-delay: 0.05s
+}
+
+.dna-circle3::before, .dna-circle3::after, .dna-circle3 i {
+  animation-delay: 0.13s
+}
+
+.dna-circle4::before, .dna-circle4::after, .dna-circle4 i {
+  animation-delay: 0.21s
+}
+
+.dna-circle5::before, .dna-circle5::after, .dna-circle5 i {
+  animation-delay: 0.29s
+}
+
+.dna-circle6::before, .dna-circle6::after, .dna-circle6 i {
+  animation-delay: 0.37s
+}
+
+@keyframes dna-helix {
+	  0% { width: 5px; height: 5px; bottom: -5px; z-index: 10 }
+	 25% { width: 2px; height: 2px }
+	 50% { width: 5px; height: 5px; bottom: 100%; z-index: 20 }
+	 75% { width: 8px; height: 8px }
+	100% { width: 5px; height: 5px; bottom: -5px }
+}
+
+@keyframes dna-helix-reversed {
+	  0% { width: 5px; height: 5px; bottom: 100%; z-index: 20 }
+	 25% { width: 8px; height: 8px }
+	 50% { width: 5px; height: 5px; bottom: -5px; z-index: 10 }
+	 75% { width: 2px; height: 2px }
+	100% { width: 5px; height: 5px; bottom: 100% }
+}
+
+@keyframes dna-helix-bar {
+	  0% { height: 15px }
+	 25% { height:  8px }
+	 50% { height: 15px }
+	 75% { height:  8px }
+	100% { height: 15px }
+}
