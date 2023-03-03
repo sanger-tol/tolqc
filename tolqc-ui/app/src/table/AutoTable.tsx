@@ -10,6 +10,7 @@ import Table from "./Table";
 import LoadingHelix from "./LoadingHelix";
 import NoDataAlert from "./NoDataAlert";
 import TableErrorAlert from './TableErrorAlert';
+import { Fields } from "./Field";
 import { convertTableData,
          convertHeadingData,
          structureFieldData,
@@ -18,7 +19,7 @@ import { convertTableData,
 
 export interface Props {
   endpoint: string,
-  requiredFields?: object
+  fields?: Fields
 }
 
 export interface State {
@@ -105,12 +106,12 @@ class AutoTable extends React.Component<Props, State> {
         })
 
         // check if any data is returned
-        if (typeof data[0] !== 'undefined') {
+        if (data[0] !== undefined) {
           let fieldMeta = {};
 
-          // checking if the fields have been defined
-          if (typeof this.props.requiredFields !== 'undefined') {
-            fieldMeta = structureFieldData(this.props.requiredFields)
+          // checking if 'fields' has been defined
+          if (this.props.fields !== undefined) {
+            fieldMeta = structureFieldData(this.props.fields)
           } else {
             if ('attributes' in data[0]) {
               const attributes = structureFieldData(data[0].attributes,

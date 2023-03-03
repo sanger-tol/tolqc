@@ -78,7 +78,7 @@ class RelationshipLink extends React.Component<Props, State> {
             displayText = data.attributes[attribute]
           }
           // if defined attribute is incorrect, raise warning
-          if (typeof displayText === 'undefined') {
+          if (displayText === undefined) {
             this.setState({
               text: 'ERROR: See console',
               contents: { ERROR: 'See console' }

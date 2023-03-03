@@ -8,6 +8,7 @@ import { textFilter } from 'react-bootstrap-table2-filter';
 import { format } from 'date-fns'
 import RelationshipLink from './RelationshipLink';
 import CellTooltip from './CellTooltip';
+import { addFieldDefaults } from './Field';
 
 
 export function normaliseCaps(fieldName: string) {
@@ -16,6 +17,10 @@ export function normaliseCaps(fieldName: string) {
     words[count] = words[count][0].toUpperCase() + words[count].substring(1);
   }
   return words.join(' ');
+}
+
+function isEmptyOrNull(option: string) {
+  return option === '' || option === null
 }
 
 function checkAndConvertDate(text: string) {
@@ -78,7 +83,7 @@ function formatRelationshipData(data: object, fieldMeta: object) {
   for (const [key, splitKey] of Object.entries(relationshipKeys)) {
     const currentObject = splitKey[0]
     // checking relationship object is correct
-    if (typeof data[currentObject] === 'undefined') {
+    if (data[currentObject] === undefined) {
       throw Error('\'' + key + '\' is not a correct relationship object. ' +
                   'Please check your spelling and pluralisation.')
     }
@@ -113,7 +118,7 @@ export function convertHeadingData(fieldMeta: object) {
     let headerWidth = '200px'
     let hidden = false
 
-    if (meta.rename === '') {
+    if (isEmptyOrNull(meta.rename)) {
       capsHeading = normaliseCaps(key)
     } else {
       capsHeading = meta.rename
@@ -162,41 +167,57 @@ export function convertTableData(data: any[], fieldMeta: object) {
   return updatedData;
 }
 
-export function structureFieldData(apiFields: object, type?: string) {
-  const fields = {}
-  if (typeof type === 'undefined') {
-    for (let [key, rename] of Object.entries(apiFields)) {
-      fields[key] = {
-        'rename': rename
-      }
-      if (key.includes('.')) {
-        if (rename === '') {
-          throw Error('Relationship field \'' + key + '\' requires a rename')
-        }
-        fields[key]['type'] = 'relationship'
-      } else {
-        fields[key]['type'] = 'attribute'
-      }
+// structure fields via the prop 'fields'
+function structureFieldsUsingProp(fields: object) {
+  const updatedFields = {}
+  for (let [key, field] of Object.entries(fields)) {
+    field = addFieldDefaults(field)
+    updatedFields[key] = {
+      'rename': field.name
     }
-  } else {
-    fields['id'] = {
-      'rename': 'ID',
-      'type': 'attribute'
-    }
-    for (let [key, data] of Object.entries(apiFields)) {
-      // ignoring one-to-many relationships
-      if (type === 'relationship' && !('data' in data)) {
-        console.warn('\'' + key + '\' is on the many side of the relationship' + 
-                     ' - therefore it is being ignored.')
-        continue
+    // if key is a relationship
+    if (key.includes('.')) {
+      if (isEmptyOrNull(field.name)) {
+        throw Error('Relationship field \'' + key + '\' requires a rename')
       }
-      fields[key] = {
-        'rename': '',
-        'type': type
-      }
+      updatedFields[key]['type'] = 'relationship'
+    } else {
+      updatedFields[key]['type'] = 'attribute'
     }
   }
-  return fields
+  return updatedFields
+}
+
+// structure fields using the json-api spec
+function structureFieldsAuto(apiFields: object, type: string) {
+  const updatedFields = {}
+  // adds ID automatically if fields are not defined
+  updatedFields['id'] = {
+    'rename': 'ID',
+    'type': 'attribute'
+  }
+  for (let [key, data] of Object.entries(apiFields)) {
+    // ignoring one-to-many relationships
+    if (type === 'relationship' && !('data' in data)) {
+      console.warn('\'' + key + '\' is on the many side of the relationship' + 
+                    ' - therefore it is being ignored.')
+      continue
+    }
+    updatedFields[key] = {
+      'rename': '',
+      'type': type
+    }
+  }
+  return updatedFields
+}
+
+export function structureFieldData(fields: object, type?: string) {
+  // if fields prop is defined, type will not be parsed
+  if (type === undefined) {
+    return structureFieldsUsingProp(fields)
+  } else {
+    return structureFieldsAuto(fields, type)
+  }
 }
 
 export function switchFilterVisability() {

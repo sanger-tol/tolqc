@@ -11,15 +11,27 @@ function Home() {
   return (
     <div className="home">
       <CentreContents>
-        <AutoTable endpoint="species"
-          requiredFields={{
-            'hierarchy_name': 'Project',
-            'name': 'Name',
-            'common_name': 'Common name',
-            'taxon_id': "Taxon ID",
-            'taxon_family': 'Family',
-            'taxon_order': 'Order',
-            'taxon_phylum': 'Phylum'
+      <AutoTable endpoint="species"
+          fields={{
+            'hierarchy_name': {
+              name: 'Project'
+            },
+            'name': {},
+            'common_name': {
+              name: 'Common name'
+            },
+            'taxon_id': {
+              name: 'Taxon ID'
+            },
+            'taxon_family': {
+              name: 'Family'
+            },
+            'taxon_order': {
+              name: 'Order'
+            },
+            'taxon_phylum': {
+              name: 'Phylum'
+            }
           }}
         />
       </CentreContents>
