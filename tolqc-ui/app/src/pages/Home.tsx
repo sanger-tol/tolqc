@@ -11,26 +11,33 @@ function Home() {
   return (
     <div className="home">
       <CentreContents>
+      <AutoTable endpoint="species"/>
       <AutoTable endpoint="species"
           fields={{
+            'creator.name': {
+              rename: 'x123',
+              link: 'hello'
+            },
             'hierarchy_name': {
-              name: 'Project'
+              rename: 'Project',
+              width: 600,
+              link: 'common_name'
             },
             'name': {},
             'common_name': {
-              name: 'Common name'
+              rename: 'Common Name'
             },
             'taxon_id': {
-              name: 'Taxon ID'
+              rename: 'Taxon ID'
             },
             'taxon_family': {
-              name: 'Family'
+              rename: 'Family'
             },
             'taxon_order': {
-              name: 'Order'
+              rename: 'Order'
             },
             'taxon_phylum': {
-              name: 'Phylum'
+              rename: 'Phylum'
             }
           }}
         />

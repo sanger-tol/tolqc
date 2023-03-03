@@ -5,9 +5,10 @@ SPDX-License-Identifier: MIT
 */
 
 interface Field {
-  name?: string|null;
   filter?: boolean;
   link?: string|null;
+  rename?: string|null;
+  type?: string,
   width?: number;
 }
 
@@ -16,10 +17,11 @@ export interface Fields {
 }
 
 const fieldDefaults: Field = {
-  name: null,
   filter: true,
   link: null,
-  width: 300,
+  rename: null,
+  type: 'attribute',
+  width: 200,
 }
 
 export function addFieldDefaults(field: Field) {

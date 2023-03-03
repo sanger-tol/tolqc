@@ -37,8 +37,7 @@ function checkAndConvertDate(text: string) {
   }
 }
 
-// will need improving...
-function checkAndConvertText(text: any) {
+function checkAndAutoConvertText(text: any) {
   try {
     new URL(text) // fails if not link
     // eslint-disable-next-line
@@ -58,10 +57,23 @@ function checkAndConvertText(text: any) {
   }
 }
 
-function formatAttributeData(data: object) {
+function createLink(text: any, url: string) {
+  return <a href={url} target="_blank" rel="noopener noreferrer">
+    {text}
+  </a>
+}
+
+function formatAttributeData(data: object, fieldMeta: object) {
   const updatedData: object = {}
   for (const [key, value] of Object.entries(data)) {
-    updatedData[key] = checkAndConvertText(value)
+    if (fieldMeta[key] !== undefined) {
+      if (fieldMeta[key].link !== null) {
+        const linkField = fieldMeta[key].link
+        updatedData[key] = createLink(value, data[linkField])
+        continue
+      }
+    }
+    updatedData[key] = checkAndAutoConvertText(value)
   }
   return updatedData
 }
@@ -91,9 +103,9 @@ function formatRelationshipData(data: object, fieldMeta: object) {
     if ('data' in data[currentObject]) {
       const headingId = splitKey.join('.')
       updatedData[headingId] = <RelationshipLink
-                                 initialEndpoint={ data[currentObject].links.related }
-                                 relationships={ splitKey }
-                               />
+        initialEndpoint={ data[currentObject].links.related }
+        relationships={ splitKey }
+      />
     } else {
       throw Error(key + ' not in API data call')
     }
@@ -115,7 +127,7 @@ export function convertHeadingData(fieldMeta: object) {
 
   for (const [key, meta] of Object.entries(fieldMeta)) {
     let capsHeading = ''
-    let headerWidth = '200px'
+    let headerWidth = meta.width.toString() + 'px'
     let hidden = false
 
     if (isEmptyOrNull(meta.rename)) {
@@ -155,7 +167,7 @@ export function convertTableData(data: any[], fieldMeta: object) {
   data.forEach(row => {
     let fieldData = { 'id': row.id }
     if ('attributes' in row) {
-      const attributes = formatAttributeData(row.attributes)
+      const attributes = formatAttributeData(row.attributes, fieldMeta)
       fieldData = Object.assign(fieldData, attributes)
     }
     if ('relationships' in row) {
@@ -169,33 +181,30 @@ export function convertTableData(data: any[], fieldMeta: object) {
 
 // structure fields via the prop 'fields'
 function structureFieldsUsingProp(fields: object) {
-  const updatedFields = {}
-  for (let [key, field] of Object.entries(fields)) {
-    field = addFieldDefaults(field)
-    updatedFields[key] = {
-      'rename': field.name
-    }
+  const fieldsMeta = {}
+  for (let [key, meta] of Object.entries(fields)) {
+    fieldsMeta[key] = addFieldDefaults(meta)
     // if key is a relationship
     if (key.includes('.')) {
-      if (isEmptyOrNull(field.name)) {
+      if (isEmptyOrNull(meta.rename)) {
         throw Error('Relationship field \'' + key + '\' requires a rename')
       }
-      updatedFields[key]['type'] = 'relationship'
+      fieldsMeta[key]['type'] = 'relationship'
     } else {
-      updatedFields[key]['type'] = 'attribute'
+      fieldsMeta[key]['type'] = 'attribute'
     }
   }
-  return updatedFields
+  return fieldsMeta
 }
 
 // structure fields using the json-api spec
 function structureFieldsAuto(apiFields: object, type: string) {
-  const updatedFields = {}
+  const fieldsMeta = {}
   // adds ID automatically if fields are not defined
-  updatedFields['id'] = {
-    'rename': 'ID',
-    'type': 'attribute'
-  }
+  fieldsMeta['id'] = addFieldDefaults({
+    'rename': 'ID'
+  })
+  fieldsMeta['id']['type'] = 'attribute'
   for (let [key, data] of Object.entries(apiFields)) {
     // ignoring one-to-many relationships
     if (type === 'relationship' && !('data' in data)) {
@@ -203,12 +212,10 @@ function structureFieldsAuto(apiFields: object, type: string) {
                     ' - therefore it is being ignored.')
       continue
     }
-    updatedFields[key] = {
-      'rename': '',
-      'type': type
-    }
+    fieldsMeta[key] = addFieldDefaults(data)
+    fieldsMeta[key]['type'] = type
   }
-  return updatedFields
+  return fieldsMeta
 }
 
 export function structureFieldData(fields: object, type?: string) {
