@@ -141,15 +141,20 @@ export function convertHeadingData(fieldMeta: object) {
         headerWidth = '100px'
         hidden = true
       }
-      updatedHeadings.push({
+      let heading = {
         dataField: key,
         text: capsHeading,
-        sort: true,
         headerSortingStyle,
-        filter: searchFilter(capsHeading),
         headerStyle: headerStyling(headerWidth),
         hidden: hidden
-      });
+      }
+      if (meta.filter === true) {
+        heading['filter'] = searchFilter(capsHeading)
+      }
+      if (meta.sort === true) {
+        heading['sort'] = true
+      }
+      updatedHeadings.push(heading);
     } else if (meta.type === 'relationship') {
       updatedHeadings.push({
         dataField: key,

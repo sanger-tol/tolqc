@@ -8,6 +8,7 @@ interface Field {
   filter?: boolean;
   link?: string|null;
   rename?: string|null;
+  sort?: boolean,
   type?: string,
   width?: number;
 }
@@ -20,6 +21,7 @@ const fieldDefaults: Field = {
   filter: true,
   link: null,
   rename: null,
+  sort: true,
   type: 'attribute',
   width: 200,
 }
