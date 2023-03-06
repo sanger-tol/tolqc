@@ -11,6 +11,18 @@ import CellTooltip from './CellTooltip';
 import { addFieldDefaults } from './Field';
 
 
+function isEmptyOrNull(option: string) {
+  return option === '' || option === null
+}
+
+function isAttribute(type: boolean) {
+  return type // type is an attribute if it is true
+}
+
+function isRelationship(type: boolean) {
+  return !type // type is a relationship if it is false
+}
+
 export function normaliseCaps(fieldName: string) {
   const words = fieldName.split('_');
   for (let count = 0; count < words.length; count++) {
