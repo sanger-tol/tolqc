@@ -15,14 +15,6 @@ function isEmptyOrNull(option: string) {
   return option === '' || option === null
 }
 
-function isAttribute(type: boolean) {
-  return type // type is an attribute if it is true
-}
-
-function isRelationship(type: boolean) {
-  return !type // type is a relationship if it is false
-}
-
 export function normaliseCaps(fieldName: string) {
   const words = fieldName.split('_');
   for (let count = 0; count < words.length; count++) {
@@ -31,13 +23,11 @@ export function normaliseCaps(fieldName: string) {
   return words.join(' ');
 }
 
-function isEmptyOrNull(option: string) {
-  return option === '' || option === null
-}
-
 function checkAndConvertDate(text: string) {
   let date = new Date(text)
-  if (date.toLocaleDateString("en-US") === 'Invalid Date') {
+  // if num - return text as a num can be converted to date incorrectly
+  if (date.toLocaleDateString("en-US") === 'Invalid Date' ||
+      !isNaN(Number(text))) {
     return text
   } else {
     const dateText = format(date, 'dd/MM/yyyy')
@@ -93,7 +83,7 @@ function formatAttributeData(data: object, fieldMeta: object) {
 function splitRelationshipKeys(fieldMeta: object) {
   const relationshipKeys = {};
   for (let key of Object.keys(fieldMeta)) {
-    if (fieldMeta[key]['type'] === 'relationship') {
+    if (fieldMeta[key]['isAttribute'] === false) {
       const splitKey: string[] = key.split('.')
       relationshipKeys[key] = splitKey
     }
@@ -148,7 +138,7 @@ export function convertHeadingData(fieldMeta: object) {
       capsHeading = meta.rename
     }
 
-    if (meta.type === 'attribute') {
+    if (meta.isAttribute === true) {
       if (key === 'id') {
         headerWidth = '100px'
         hidden = true
@@ -167,7 +157,8 @@ export function convertHeadingData(fieldMeta: object) {
         heading['sort'] = true
       }
       updatedHeadings.push(heading);
-    } else if (meta.type === 'relationship') {
+      // if heading is a relationship
+    } else if (meta.isAttribute === false) {
       updatedHeadings.push({
         dataField: key,
         text: capsHeading,
@@ -197,51 +188,41 @@ export function convertTableData(data: any[], fieldMeta: object) {
 }
 
 // structure fields via the prop 'fields'
-function structureFieldsUsingProp(fields: object) {
-  const fieldsMeta = {}
+export function structureFieldsUsingProp(fields: object) {
   for (let [key, meta] of Object.entries(fields)) {
-    fieldsMeta[key] = addFieldDefaults(meta)
+    fields[key] = addFieldDefaults(meta)
     // if key is a relationship
     if (key.includes('.')) {
       if (isEmptyOrNull(meta.rename)) {
         throw Error('Relationship field \'' + key + '\' requires a rename')
       }
-      fieldsMeta[key]['type'] = 'relationship'
+      fields[key]['isAttribute'] = false
     } else {
-      fieldsMeta[key]['type'] = 'attribute'
+      fields[key]['isAttribute'] = true
     }
   }
-  return fieldsMeta
+  return fields
 }
 
 // structure fields using the json-api spec
-function structureFieldsAuto(apiFields: object, type: string) {
-  const fieldsMeta = {}
-  // adds ID automatically if fields are not defined
-  fieldsMeta['id'] = addFieldDefaults({
-    'rename': 'ID'
+export function structureFieldsAuto(apiFields: object, isAttribute: boolean) {
+  const fields = {}
+  // adding internal ID to row
+  fields['id'] = addFieldDefaults({
+    'rename': 'ID',
+    'isAttribute': true
   })
-  fieldsMeta['id']['type'] = 'attribute'
   for (let [key, data] of Object.entries(apiFields)) {
     // ignoring one-to-many relationships
-    if (type === 'relationship' && !('data' in data)) {
+    if (isAttribute === false && !('data' in data)) {
       console.warn('\'' + key + '\' is on the many side of the relationship' + 
                     ' - therefore it is being ignored.')
       continue
     }
-    fieldsMeta[key] = addFieldDefaults(data)
-    fieldsMeta[key]['type'] = type
+    fields[key] = addFieldDefaults(data)
+    fields[key]['isAttribute'] = isAttribute
   }
-  return fieldsMeta
-}
-
-export function structureFieldData(fields: object, type?: string) {
-  // if fields prop is defined, type will not be parsed
-  if (type === undefined) {
-    return structureFieldsUsingProp(fields)
-  } else {
-    return structureFieldsAuto(fields, type)
-  }
+  return fields
 }
 
 export function switchFilterVisability() {

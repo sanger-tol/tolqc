@@ -14,8 +14,7 @@ function Home() {
       <AutoTable endpoint="species"
           fields={{
             'creator.name': {
-              rename: 'x123',
-              link: 'hello'
+              rename: 'x123'
             },
             'hierarchy_name': {
               rename: 'Project',

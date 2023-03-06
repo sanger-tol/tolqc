@@ -6,10 +6,10 @@ SPDX-License-Identifier: MIT
 
 interface Field {
   filter?: boolean;
+  isAttribute?: boolean|null;
   link?: string|null;
   rename?: string|null;
-  sort?: boolean,
-  type?: string,
+  sort?: boolean;
   width?: number;
 }
 
@@ -19,10 +19,10 @@ export interface Fields {
 
 const fieldDefaults: Field = {
   filter: true,
+  isAttribute: null,
   link: null,
   rename: null,
   sort: true,
-  type: 'attribute',
   width: 200,
 }
 
