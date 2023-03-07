@@ -5,12 +5,12 @@ SPDX-License-Identifier: MIT
 */
 
 interface Field {
-  filter?: boolean;
-  isAttribute?: boolean|null;
-  link?: string|null;
-  rename?: string|null;
-  sort?: boolean;
-  width?: number;
+  filter?: boolean,
+  isAttribute?: boolean|null,
+  link?: string|null,
+  rename?: string|null,
+  sort?: boolean,
+  width?: number,
 }
 
 export interface Fields {

@@ -11,7 +11,7 @@ const TableErrorAlert = () => (
   <div className="d-flex justify-content-center p-5">
     <Alert 
       type="danger"
-      message="See console for errors - please ensure you have a working database"
+      message="See console for errors"
     />
   </div>
 )

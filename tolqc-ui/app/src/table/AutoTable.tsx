@@ -21,7 +21,7 @@ import { convertTableData,
 export interface Props {
   endpoint: string,
   fields?: Fields,
-  filter?: string[]
+  filter?: object
 }
 
 export interface State {
@@ -66,23 +66,18 @@ class AutoTable extends React.Component<Props, State> {
     sortOrder?: string,
     sortField?: string
   }) => {
-    let searchFilters: string = '';
+    let searchFilters: object = {};
 
-    // filtering
+    // always on filtering - (wildcard or exact)
+    if (this.props.filter !== undefined) {
+      searchFilters = this.props.filter
+    }
+    // column specific filtering (wildcard)
     if (type === 'filter') {
-      searchFilters = '['
-      // always on filtering
-      for (const filter in this.props.filter) {
-        searchFilters += filter + ','
-      }
-      // column specific filtering - TODO: wildcard
+      searchFilters['wildcard'] = {}
       for (const dataField in filters) {
-        const filterVal: string = filters[dataField]['filterVal']
-        searchFilters += dataField + '==\'' + filterVal + '\','
-      }
-      searchFilters = searchFilters.slice(0, -1) // rm last coma
-      if (searchFilters.length !== 0) {
-        searchFilters += ']'
+        console.log(filters)
+        searchFilters['wildcard'][dataField] = filters[dataField]['filterVal']
       }
     }
 
@@ -109,6 +104,12 @@ class AutoTable extends React.Component<Props, State> {
           totalSize: meta.total,
           error: false,
         })
+        
+        // error if endpoint doesn't return 200
+        if (res.status !== 200) {
+          console.error(res)
+          throw Error()
+        }
 
         // check if any data is returned
         if (data[0] !== undefined) {
