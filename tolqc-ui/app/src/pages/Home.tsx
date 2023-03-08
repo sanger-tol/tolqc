@@ -46,7 +46,6 @@ function Home() {
             "taxon_family": "Inachidae"
           }
         }}
-        includeNav={true}
       />
       <AutoTable endpoint="species" />
       </CentreContents>

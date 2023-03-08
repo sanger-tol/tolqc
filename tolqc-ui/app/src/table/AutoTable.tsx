@@ -70,8 +70,8 @@ class AutoTable extends React.Component<Props, State> {
     let searchFilters: object = {};
 
     // always on filtering - (wildcard or exact)
-    if (this.props.filter !== undefined) {
-      searchFilters = this.props.filter
+    if (this.props.fixedFilter !== undefined) {
+      searchFilters = this.props.fixedFilter
     }
     // column specific filtering (wildcard)
     if (type === 'filter') {
@@ -149,6 +149,12 @@ class AutoTable extends React.Component<Props, State> {
 
   render() {
     const { tableData, headings, page, sizePerPage, totalSize, error } = this.state;
+    
+    // show nav as default
+    let includeNav = this.props.includeNav;
+    if (includeNav === undefined) {
+      includeNav = true
+    }
 
     return (
       <div>
@@ -160,8 +166,8 @@ class AutoTable extends React.Component<Props, State> {
             noDataIndication = <NoDataAlert />
           } else {
             noDataIndication = <div className='p-5'>
-                <LoadingHelix />
-              </div>
+              <LoadingHelix />
+            </div>
           }
           return (
             <Table
@@ -172,7 +178,7 @@ class AutoTable extends React.Component<Props, State> {
               page={ page }
               sizePerPage={ sizePerPage }
               totalSize={ totalSize }
-              includeNav={ this.props.includeNav }
+              includeNav={ includeNav }
               noDataIndication={ noDataIndication }
             />
           )
