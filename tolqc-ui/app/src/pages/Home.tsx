@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 */
 
 import AutoTable from "../table/AutoTable";
-import { CentreContents } from '@tol/tol-ui'
+import { CentreContents } from "@tol/tol-ui"
 
 function Home() {
   return (
@@ -13,40 +13,41 @@ function Home() {
       <CentreContents>
       <AutoTable
         endpoint="species"
-        filter={{
+        fields={{
+          "creator.name": {
+            rename: "x123"
+          },
+          "hierarchy_name": {
+            rename: "Project",
+            width: 600,
+            link: "common_name",
+            sort: false
+          },
+          "name": {},
+          "common_name": {
+            rename: "Common Name",
+            filter: false
+          },
+          "taxon_id": {
+            rename: "Taxon ID"
+          },
+          "taxon_family": {
+            rename: "Family"
+          },
+          "taxon_order": {
+            rename: "Order"
+          },
+          "taxon_phylum": {
+            rename: "Phylum"
+          }
+        }}
+        fixedFilter={{
           "exact": {
             "taxon_family": "Inachidae"
           }
         }}
-        fields={{
-          'creator.name': {
-            rename: 'x123'
-          },
-          'hierarchy_name': {
-            rename: 'Project',
-            width: 600,
-            link: 'common_name',
-            sort: false
-          },
-          'name': {},
-          'common_name': {
-            rename: 'Common Name',
-            filter: false
-          },
-          'taxon_id': {
-            rename: 'Taxon ID'
-          },
-          'taxon_family': {
-            rename: 'Family'
-          },
-          'taxon_order': {
-            rename: 'Order'
-          },
-          'taxon_phylum': {
-            rename: 'Phylum'
-          }
-        }}
-        />
+        includeNav={true}
+      />
       <AutoTable endpoint="species" />
       </CentreContents>
     </div>

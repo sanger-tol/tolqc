@@ -24,6 +24,7 @@ function Table ({
   page,
   sizePerPage,
   totalSize,
+  includeNav,
   noDataIndication
 }) {
   const options = {
@@ -42,16 +43,20 @@ function Table ({
         paginationTableProps
       }) => (
         <div className='tol-table'>
-          <Button variant="primary" onClick={ onFilterButton }>
-            <SearchIcon />
-            Filter
-          </Button>
-          <SizePerPageDropdownStandalone
-            { ...paginationProps }
-          />
-          <PaginationListStandalone
-            { ...paginationProps }
-          />
+          {includeNav &&
+            <div>
+              <Button variant="primary" onClick={ onFilterButton }>
+                <SearchIcon />
+                Filter
+              </Button>
+              <SizePerPageDropdownStandalone
+                { ...paginationProps }
+              />
+              <PaginationListStandalone
+                { ...paginationProps }
+              />
+            </div>
+          }
           <BootstrapTable
             { ...paginationTableProps }
             remote
@@ -63,9 +68,11 @@ function Table ({
             filter={ filterFactory() }
             noDataIndication={ () => noDataIndication }
           />
-          <PaginationTotalStandalone
-            { ...paginationProps }
-          />
+          {includeNav &&
+            <PaginationTotalStandalone
+              { ...paginationProps }
+            />
+          }
         </div>
       )
     }

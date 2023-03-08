@@ -21,7 +21,8 @@ import { convertTableData,
 export interface Props {
   endpoint: string,
   fields?: Fields,
-  filter?: object
+  fixedFilter?: object,
+  includeNav?: boolean
 }
 
 export interface State {
@@ -107,7 +108,6 @@ class AutoTable extends React.Component<Props, State> {
         
         // error if endpoint doesn't return 200
         if (res.status !== 200) {
-          console.error(res)
           throw Error()
         }
 
@@ -172,6 +172,7 @@ class AutoTable extends React.Component<Props, State> {
               page={ page }
               sizePerPage={ sizePerPage }
               totalSize={ totalSize }
+              includeNav={ this.props.includeNav }
               noDataIndication={ noDataIndication }
             />
           )
