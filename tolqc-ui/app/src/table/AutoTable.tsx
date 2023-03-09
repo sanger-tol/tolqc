@@ -74,13 +74,33 @@ class AutoTable extends React.Component<Props, State> {
       searchFilters = this.props.fixedFilter
     }
     // column specific filtering (wildcard)
-    if (type === 'filter') {
-      searchFilters['wildcard'] = {}
-      for (const dataField in filters) {
-        console.log(filters)
-        searchFilters['wildcard'][dataField] = filters[dataField]['filterVal']
+    if (type === 'filter' && filters !== undefined) {
+      // initialising if keys do not exist
+      if (!('wildcard' in searchFilters)) {
+        searchFilters['wildcard'] = {}
       }
+      if (!('exact' in searchFilters)) {
+        searchFilters['exact'] = {}
+      }
+      
+      for (const dataField in filters) {
+        const filterValue = filters[dataField]['filterVal']
+        if (this.props.fields !== undefined && 'dataField' in this.props.fields) {
+          const filterType = this.props.fields['dataField']['filterType']
+          // TEMP: default to wildcard for a specific field if not defined in fields
+          if (filterType === undefined) {
+            searchFilters['wildcard'][dataField] = filterValue
+          } else {
+            searchFilters[filterType][dataField] = filterValue
+          }
+        // TEMP: wildcard as default for all fields (will soon come from api meta)
+        } else {
+          searchFilters['wildcard'][dataField] = filterValue
+        }
+      }
+      console.log(searchFilters)
     }
+    console.log(type)
 
     // sorting
     if (sortOrder === 'desc') {

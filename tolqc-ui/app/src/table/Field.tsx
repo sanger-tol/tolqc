@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 interface Field {
   filter?: boolean,
+  filterType?: string,
   isAttribute?: boolean|null,
   link?: string|null,
   rename?: string|null,
@@ -19,6 +20,7 @@ export interface Fields {
 
 const fieldDefaults: Field = {
   filter: true,
+  filterType: 'wildcard',
   isAttribute: null,
   link: null,
   rename: null,

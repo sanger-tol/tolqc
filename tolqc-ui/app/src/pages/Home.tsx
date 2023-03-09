@@ -23,10 +23,12 @@ function Home() {
             link: "common_name",
             sort: false
           },
-          "name": {},
+          "name": {
+            filterType: 'exact'
+          },
           "common_name": {
             rename: "Common Name",
-            filter: false
+            filterType: 'substring'
           },
           "taxon_id": {
             rename: "Taxon ID"
