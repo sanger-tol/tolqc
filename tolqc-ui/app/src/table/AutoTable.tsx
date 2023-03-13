@@ -36,14 +36,14 @@ export interface State {
 
 class AutoTable extends React.Component<Props, State> {
   constructor(props: Props) {
-    const headings_default = [{
+    const headingsDefault = [{
       dataField: '',
       text: ''
     }]
     super(props);
     this.state = {
       tableData: [],
-      headings: headings_default,
+      headings: headingsDefault,
       page: 1,
       sizePerPage: 50,
       totalSize: -1,
@@ -71,10 +71,11 @@ class AutoTable extends React.Component<Props, State> {
 
     // always on filtering - (wildcard or exact)
     if (this.props.fixedFilter !== undefined) {
-      searchFilters = this.props.fixedFilter
+      searchFilters = Object.assign(searchFilters, this.props.fixedFilter)
     }
-    // column specific filtering (wildcard)
-    if (type === 'filter' && filters !== undefined) {
+
+    // column specific filtering (wildcard currently)
+    if (type === 'filter') {
       // initialising if keys do not exist
       if (!('wildcard' in searchFilters)) {
         searchFilters['wildcard'] = {}
@@ -82,25 +83,10 @@ class AutoTable extends React.Component<Props, State> {
       if (!('exact' in searchFilters)) {
         searchFilters['exact'] = {}
       }
-      
       for (const dataField in filters) {
-        const filterValue = filters[dataField]['filterVal']
-        if (this.props.fields !== undefined && 'dataField' in this.props.fields) {
-          const filterType = this.props.fields['dataField']['filterType']
-          // TEMP: default to wildcard for a specific field if not defined in fields
-          if (filterType === undefined) {
-            searchFilters['wildcard'][dataField] = filterValue
-          } else {
-            searchFilters[filterType][dataField] = filterValue
-          }
-        // TEMP: wildcard as default for all fields (will soon come from api meta)
-        } else {
-          searchFilters['wildcard'][dataField] = filterValue
-        }
+        searchFilters['exact'][dataField] = filters[dataField]['filterVal']
       }
-      console.log(searchFilters)
     }
-    console.log(type)
 
     // sorting
     if (sortOrder === 'desc') {
