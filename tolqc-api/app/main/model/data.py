@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcData(LogBase):
+class Data(LogBase):
     __tablename__ = 'data'
 
     class Meta:
@@ -27,14 +27,13 @@ class TolqcData(LogBase):
     qc = db.Column(db.Integer())
     withdrawn = db.Column(db.Boolean())
     manually_withdrawn = db.Column(db.Boolean())
-    date = db.Column(db.DateTime())
-    sample = db.relationship('TolqcSample', back_populates='data',
+    sample = db.relationship('Sample', back_populates='data',
                              foreign_keys=[sample_id])
-    library = db.relationship('TolqcLibrary', back_populates='data',
+    library = db.relationship('Library', back_populates='data',
                               foreign_keys=[library_id])
-    run = db.relationship('TolqcRun', back_populates='data',
+    run = db.relationship('Run', back_populates='data',
                           foreign_keys=[run_id])
-    accession = db.relationship('TolqcAccession', back_populates='data',
+    accession = db.relationship('Accession', back_populates='data',
                                 foreign_keys=[accession_id])
-    set = db.relationship('TolqcSet', back_populates='data')  # noqa A003
-    file = db.relationship('TolqcFile', back_populates='data')
+    set = db.relationship('Set', back_populates='data')  # noqa A003
+    file = db.relationship('File', back_populates='data')

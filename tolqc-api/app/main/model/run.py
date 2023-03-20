@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcRun(LogBase):
+class Run(LogBase):
     __tablename__ = 'run'
 
     class Meta:
@@ -20,9 +20,10 @@ class TolqcRun(LogBase):
     lims_id = db.Column(db.Integer())
     element = db.Column(db.String())
     instrument_name = db.Column(db.String())
-    data = db.relationship('TolqcData', back_populates='run')
-    platform = db.relationship('TolqcPlatform', back_populates='run',
+    date = db.Column(db.DateTime())
+    data = db.relationship('Data', back_populates='run')
+    platform = db.relationship('Platform', back_populates='run',
                                foreign_keys=[platform_id])
-    centre = db.relationship('TolqcCentre', back_populates='run',
+    centre = db.relationship('Centre', back_populates='run',
                              foreign_keys=[centre_id])
-    pacbio_run_metrics = db.relationship('TolqcPacbioRunMetrics', back_populates='run')
+    pacbio_run_metrics = db.relationship('PacbioRunMetrics', back_populates='run')

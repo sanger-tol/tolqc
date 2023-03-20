@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcMerquryMetrics(LogBase):
+class MerquryMetrics(LogBase):
     __tablename__ = 'merqury_metrics'
 
     class Meta:
@@ -24,12 +24,12 @@ class TolqcMerquryMetrics(LogBase):
     qv_alternate = db.Column(db.Float())
     qv_all = db.Column(db.Float())
     software_version_id = db.Column(db.Integer(), db.ForeignKey('software_version.id'))
-    assembly = db.relationship('TolqcAssembly', back_populates='merqury_metrics',
+    assembly = db.relationship('Assembly', back_populates='merqury_metrics',
                                foreign_keys=[assembly_id])
-    dataset = db.relationship('TolqcDataset', back_populates='merqury_metrics',
+    dataset = db.relationship('Dataset', back_populates='merqury_metrics',
                               foreign_keys=[dataset_id])
-    assembly_component = db.relationship('TolqcAssemblyComponent',
+    assembly_component = db.relationship('AssemblyComponent',
                                          back_populates='merqury_metrics',
                                          foreign_keys=[assembly_component_id])
-    software_version = db.relationship('TolqcSoftwareVersion', back_populates='merqury_metrics',
+    software_version = db.relationship('SoftwareVersion', back_populates='merqury_metrics',
                                        foreign_keys=[software_version_id])

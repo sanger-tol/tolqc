@@ -6,7 +6,7 @@ from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class TolqcCentre(Base):
+class Centre(Base):
     __tablename__ = 'centre'
 
     class Meta:
@@ -15,4 +15,4 @@ class TolqcCentre(Base):
     id = db.Column(db.Integer(), primary_key=True)  # noqa A003
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
-    run = db.relationship('TolqcRun', back_populates='centre')
+    run = db.relationship('Run', back_populates='centre')

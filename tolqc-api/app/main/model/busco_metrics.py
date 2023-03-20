@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcBuscoMetrics(LogBase):
+class BuscoMetrics(LogBase):
     __tablename__ = 'busco_metrics'
 
     class Meta:
@@ -24,12 +24,12 @@ class TolqcBuscoMetrics(LogBase):
     busco_lineage_id = db.Column(db.Integer(), db.ForeignKey('busco_lineage.id'))
     summary = db.Column(db.String())
     software_version_id = db.Column(db.Integer(), db.ForeignKey('software_version.id'))
-    assembly = db.relationship('TolqcAssembly', back_populates='busco_metrics',
+    assembly = db.relationship('Assembly', back_populates='busco_metrics',
                                foreign_keys=[assembly_id])
-    assembly_component = db.relationship('TolqcAssemblyComponent',
+    assembly_component = db.relationship('AssemblyComponent',
                                          back_populates='busco_metrics',
                                          foreign_keys=[assembly_component_id])
-    busco_lineage = db.relationship('TolqcBuscoLineage', back_populates='busco_metrics',
+    busco_lineage = db.relationship('BuscoLineage', back_populates='busco_metrics',
                                     foreign_keys=[busco_lineage_id])
-    software_version = db.relationship('TolqcSoftwareVersion', back_populates='busco_metrics',
+    software_version = db.relationship('SoftwareVersion', back_populates='busco_metrics',
                                        foreign_keys=[software_version_id])

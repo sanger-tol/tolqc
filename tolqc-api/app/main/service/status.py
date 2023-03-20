@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcStatus
+from main.model import Status
 from main.schema import StatusSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class StatusService(BaseService):
     class Meta:
-        model = TolqcStatus
+        model = Status
         schema = StatusSchema

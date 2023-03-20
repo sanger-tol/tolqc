@@ -6,7 +6,7 @@ from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class TolqcPlatform(Base):
+class Platform(Base):
     __tablename__ = 'platform'
 
     class Meta:
@@ -15,4 +15,4 @@ class TolqcPlatform(Base):
     id = db.Column(db.Integer(), primary_key=True)  # noqa A003
     name = db.Column(db.String())
     model = db.Column(db.String())
-    run = db.relationship('TolqcRun', back_populates='platform')
+    run = db.relationship('Run', back_populates='platform')

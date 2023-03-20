@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcSpecies
+from main.model import Species
 from main.schema import SpeciesSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class SpeciesService(BaseService):
     class Meta:
-        model = TolqcSpecies
+        model = Species
         schema = SpeciesSchema

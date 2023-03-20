@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcPlatform
+from main.model import Platform
 from main.schema import PlatformSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class PlatformService(BaseService):
     class Meta:
-        model = TolqcPlatform
+        model = Platform
         schema = PlatformSchema

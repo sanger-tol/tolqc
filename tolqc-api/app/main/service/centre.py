@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcCentre
+from main.model import Centre
 from main.schema import CentreSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class CentreService(BaseService):
     class Meta:
-        model = TolqcCentre
+        model = Centre
         schema = CentreSchema

@@ -7,7 +7,7 @@ from tol.api_base.model import setup_model
 
 
 @setup_model
-class TolqcAssemblyMetrics(LogBase):
+class AssemblyMetrics(LogBase):
     __tablename__ = 'assembly_metrics'
 
     class Meta:
@@ -41,8 +41,8 @@ class TolqcAssemblyMetrics(LogBase):
     scaffold_aun = db.Column(db.Float())
     gap_n = db.Column(db.Integer())
     gap_n50 = db.Column(db.Integer())
-    assembly = db.relationship('TolqcAssembly', back_populates='assembly_metrics',
+    assembly = db.relationship('Assembly', back_populates='assembly_metrics',
                                foreign_keys=[assembly_id])
-    assembly_component = db.relationship('TolqcAssemblyComponent',
+    assembly_component = db.relationship('AssemblyComponent',
                                          back_populates='assembly_metrics',
                                          foreign_keys=[assembly_component_id])

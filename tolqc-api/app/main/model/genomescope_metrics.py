@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcGenomescopeMetrics(LogBase):
+class GenomescopeMetrics(LogBase):
     __tablename__ = 'genomescope_metrics'
 
     class Meta:
@@ -28,10 +28,10 @@ class TolqcGenomescopeMetrics(LogBase):
     json = db.Column(db.String())
     qc_id = db.Column(db.Integer(), db.ForeignKey('qc_dict.id'))
     software_version_id = db.Column(db.Integer(), db.ForeignKey('software_version.id'))
-    dataset = db.relationship('TolqcDataset', back_populates='genomescope_metrics',
+    dataset = db.relationship('Dataset', back_populates='genomescope_metrics',
                               foreign_keys=[dataset_id])
-    qc_dict = db.relationship('TolqcQcDict', back_populates='genomescope_metrics',
+    qc_dict = db.relationship('QcDict', back_populates='genomescope_metrics',
                               foreign_keys=[qc_id])
-    software_version = db.relationship('TolqcSoftwareVersion',
+    software_version = db.relationship('SoftwareVersion',
                                        back_populates='genomescope_metrics',
                                        foreign_keys=[software_version_id])

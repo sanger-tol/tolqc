@@ -6,7 +6,7 @@ from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class TolqcTrackConfig(Base):
+class TrackConfig(Base):
     __tablename__ = 'track_config'
 
     class Meta:

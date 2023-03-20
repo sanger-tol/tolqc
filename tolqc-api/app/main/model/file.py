@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcFile(LogBase):
+class File(LogBase):
     __tablename__ = 'file'
 
     class Meta:
@@ -17,5 +17,5 @@ class TolqcFile(LogBase):
     name = db.Column(db.String())
     type = db.Column(db.String())  # noqa A003
     md5 = db.Column(db.String())
-    data = db.relationship('TolqcData', back_populates='file',
+    data = db.relationship('Data', back_populates='file',
                            foreign_keys=[data_id])

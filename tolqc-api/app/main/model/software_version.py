@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcSoftwareVersion(LogBase):
+class SoftwareVersion(LogBase):
     __tablename__ = 'software_version'
 
     class Meta:
@@ -16,7 +16,7 @@ class TolqcSoftwareVersion(LogBase):
     name = db.Column(db.String())
     version = db.Column(db.String())
     cmd = db.Column(db.String())
-    busco_metrics = db.relationship('TolqcBuscoMetrics', back_populates='software_version')
-    merqury_metrics = db.relationship('TolqcMerquryMetrics', back_populates='software_version')
-    genomescope_metrics = db.relationship('TolqcGenomescopeMetrics',
+    busco_metrics = db.relationship('BuscoMetrics', back_populates='software_version')
+    merqury_metrics = db.relationship('MerquryMetrics', back_populates='software_version')
+    genomescope_metrics = db.relationship('GenomescopeMetrics',
                                           back_populates='software_version')
