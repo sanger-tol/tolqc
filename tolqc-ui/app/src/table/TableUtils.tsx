@@ -8,7 +8,12 @@ import { textFilter } from 'react-bootstrap-table2-filter';
 import { format } from 'date-fns'
 import RelationshipLink from './RelationshipLink';
 import CellTooltip from './CellTooltip';
+import { addFieldDefaults } from './Field';
 
+
+function isEmptyOrNull(option: string) {
+  return option === '' || option === null
+}
 
 export function normaliseCaps(fieldName: string) {
   const words = fieldName.split('_');
@@ -20,7 +25,9 @@ export function normaliseCaps(fieldName: string) {
 
 function checkAndConvertDate(text: string) {
   let date = new Date(text)
-  if (date.toLocaleDateString("en-US") === 'Invalid Date') {
+  // if num - return text as a num can be converted to date incorrectly
+  if (date.toLocaleDateString("en-US") === 'Invalid Date' ||
+      !isNaN(Number(text))) {
     return text
   } else {
     const dateText = format(date, 'dd/MM/yyyy')
@@ -32,8 +39,7 @@ function checkAndConvertDate(text: string) {
   }
 }
 
-// will need improving...
-function checkAndConvertText(text: any) {
+function checkAndAutoConvertText(text: any) {
   try {
     new URL(text) // fails if not link
     // eslint-disable-next-line
@@ -53,10 +59,23 @@ function checkAndConvertText(text: any) {
   }
 }
 
-function formatAttributeData(data: object) {
+function createLink(text: any, url: string) {
+  return <a href={url} target="_blank" rel="noopener noreferrer">
+    {text}
+  </a>
+}
+
+function formatAttributeData(data: object, fieldMeta: object) {
   const updatedData: object = {}
   for (const [key, value] of Object.entries(data)) {
-    updatedData[key] = checkAndConvertText(value)
+    if (fieldMeta[key] !== undefined) {
+      if (fieldMeta[key].link !== null) {
+        const linkField = fieldMeta[key].link
+        updatedData[key] = createLink(value, data[linkField])
+        continue
+      }
+    }
+    updatedData[key] = checkAndAutoConvertText(value)
   }
   return updatedData
 }
@@ -64,7 +83,7 @@ function formatAttributeData(data: object) {
 function splitRelationshipKeys(fieldMeta: object) {
   const relationshipKeys = {};
   for (let key of Object.keys(fieldMeta)) {
-    if (fieldMeta[key]['type'] === 'relationship') {
+    if (fieldMeta[key]['isAttribute'] === false) {
       const splitKey: string[] = key.split('.')
       relationshipKeys[key] = splitKey
     }
@@ -78,7 +97,7 @@ function formatRelationshipData(data: object, fieldMeta: object) {
   for (const [key, splitKey] of Object.entries(relationshipKeys)) {
     const currentObject = splitKey[0]
     // checking relationship object is correct
-    if (typeof data[currentObject] === 'undefined') {
+    if (data[currentObject] === undefined) {
       throw Error('\'' + key + '\' is not a correct relationship object. ' +
                   'Please check your spelling and pluralisation.')
     }
@@ -86,9 +105,9 @@ function formatRelationshipData(data: object, fieldMeta: object) {
     if ('data' in data[currentObject]) {
       const headingId = splitKey.join('.')
       updatedData[headingId] = <RelationshipLink
-                                 initialEndpoint={ data[currentObject].links.related }
-                                 relationships={ splitKey }
-                               />
+        initialEndpoint={ data[currentObject].links.related }
+        relationships={ splitKey }
+      />
     } else {
       throw Error(key + ' not in API data call')
     }
@@ -110,30 +129,36 @@ export function convertHeadingData(fieldMeta: object) {
 
   for (const [key, meta] of Object.entries(fieldMeta)) {
     let capsHeading = ''
-    let headerWidth = '200px'
+    let headerWidth = meta.width.toString() + 'px'
     let hidden = false
 
-    if (meta.rename === '') {
+    if (isEmptyOrNull(meta.rename)) {
       capsHeading = normaliseCaps(key)
     } else {
       capsHeading = meta.rename
     }
 
-    if (meta.type === 'attribute') {
+    if (meta.isAttribute === true) {
       if (key === 'id') {
         headerWidth = '100px'
         hidden = true
       }
-      updatedHeadings.push({
+      let heading = {
         dataField: key,
         text: capsHeading,
-        sort: true,
         headerSortingStyle,
-        filter: searchFilter(capsHeading),
         headerStyle: headerStyling(headerWidth),
         hidden: hidden
-      });
-    } else if (meta.type === 'relationship') {
+      }
+      if (meta.filter === true) {
+        heading['filter'] = searchFilter(capsHeading)
+      }
+      if (meta.sort === true) {
+        heading['sort'] = true
+      }
+      updatedHeadings.push(heading);
+      // if heading is a relationship
+    } else if (meta.isAttribute === false) {
       updatedHeadings.push({
         dataField: key,
         text: capsHeading,
@@ -150,7 +175,7 @@ export function convertTableData(data: any[], fieldMeta: object) {
   data.forEach(row => {
     let fieldData = { 'id': row.id }
     if ('attributes' in row) {
-      const attributes = formatAttributeData(row.attributes)
+      const attributes = formatAttributeData(row.attributes, fieldMeta)
       fieldData = Object.assign(fieldData, attributes)
     }
     if ('relationships' in row) {
@@ -162,39 +187,40 @@ export function convertTableData(data: any[], fieldMeta: object) {
   return updatedData;
 }
 
-export function structureFieldData(apiFields: object, type?: string) {
+// structure fields via the prop 'fields'
+export function structureFieldsUsingProp(fields: object) {
+  for (let [key, meta] of Object.entries(fields)) {
+    fields[key] = addFieldDefaults(meta)
+    // if key is a relationship
+    if (key.includes('.')) {
+      if (isEmptyOrNull(meta.rename)) {
+        throw Error('Relationship field \'' + key + '\' requires a rename')
+      }
+      fields[key]['isAttribute'] = false
+    } else {
+      fields[key]['isAttribute'] = true
+    }
+  }
+  return fields
+}
+
+// structure fields using the json-api spec
+export function structureFieldsAuto(apiFields: object, isAttribute: boolean) {
   const fields = {}
-  if (typeof type === 'undefined') {
-    for (let [key, rename] of Object.entries(apiFields)) {
-      fields[key] = {
-        'rename': rename
-      }
-      if (key.includes('.')) {
-        if (rename === '') {
-          throw Error('Relationship field \'' + key + '\' requires a rename')
-        }
-        fields[key]['type'] = 'relationship'
-      } else {
-        fields[key]['type'] = 'attribute'
-      }
+  // adding internal ID to row
+  fields['id'] = addFieldDefaults({
+    'rename': 'ID',
+    'isAttribute': true
+  })
+  for (let [key, data] of Object.entries(apiFields)) {
+    // ignoring one-to-many relationships
+    if (isAttribute === false && !('data' in data)) {
+      console.warn('\'' + key + '\' is on the many side of the relationship' + 
+                    ' - therefore it is being ignored.')
+      continue
     }
-  } else {
-    fields['id'] = {
-      'rename': 'ID',
-      'type': 'attribute'
-    }
-    for (let [key, data] of Object.entries(apiFields)) {
-      // ignoring one-to-many relationships
-      if (type === 'relationship' && !('data' in data)) {
-        console.warn('\'' + key + '\' is on the many side of the relationship' + 
-                     ' - therefore it is being ignored.')
-        continue
-      }
-      fields[key] = {
-        'rename': '',
-        'type': type
-      }
-    }
+    fields[key] = addFieldDefaults(data)
+    fields[key]['isAttribute'] = isAttribute
   }
   return fields
 }

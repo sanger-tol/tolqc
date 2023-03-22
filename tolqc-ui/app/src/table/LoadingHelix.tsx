@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 */
 
 const LoadingHelix = () => (
-  <div className="d-flex justify-content-center p-5">
+  <div className="d-flex justify-content-center">
     <div className="loader">
       <div className="dna-circle dna-circle1"><i></i></div>
       <div className="dna-circle dna-circle2"><i></i></div>

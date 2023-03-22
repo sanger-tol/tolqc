@@ -10,21 +10,24 @@ import Table from "./Table";
 import LoadingHelix from "./LoadingHelix";
 import NoDataAlert from "./NoDataAlert";
 import TableErrorAlert from './TableErrorAlert';
+import { Fields } from "./Field";
 import { convertTableData,
          convertHeadingData,
-         structureFieldData,
+         structureFieldsAuto,
+         structureFieldsUsingProp,
          switchFilterVisability } from "./TableUtils"
 
 
 export interface Props {
   endpoint: string,
-  requiredFields?: object
+  fields?: Fields,
+  fixedFilter?: object,
+  includeNav?: boolean
 }
 
 export interface State {
   tableData: any[],
   headings: any[],
-  relationships: any,
   page: number,
   sizePerPage: number,
   totalSize: number,
@@ -33,15 +36,14 @@ export interface State {
 
 class AutoTable extends React.Component<Props, State> {
   constructor(props: Props) {
-    const headings_default = [{
+    const headingsDefault = [{
       dataField: '',
       text: ''
     }]
     super(props);
     this.state = {
       tableData: [],
-      headings: headings_default,
-      relationships: {},
+      headings: headingsDefault,
       page: 1,
       sizePerPage: 50,
       totalSize: -1,
@@ -65,18 +67,24 @@ class AutoTable extends React.Component<Props, State> {
     sortOrder?: string,
     sortField?: string
   }) => {
-    let searchFilters: string = '';
+    let searchFilters: object = {};
 
-    // filtering
+    // always on filtering - (wildcard or exact)
+    if (this.props.fixedFilter !== undefined) {
+      searchFilters = Object.assign(searchFilters, this.props.fixedFilter)
+    }
+
+    // column specific filtering (wildcard currently)
     if (type === 'filter') {
-      searchFilters = '['
-      for (const dataField in filters) {
-        const filterVal: string = filters[dataField]['filterVal'];
-        searchFilters += dataField + '==\'' + filterVal + '\','
+      // initialising if keys do not exist
+      if (!('wildcard' in searchFilters)) {
+        searchFilters['wildcard'] = {}
       }
-      searchFilters = searchFilters.slice(0, -1)
-      if (searchFilters.length !== 0) {
-        searchFilters += ']'
+      if (!('exact' in searchFilters)) {
+        searchFilters['exact'] = {}
+      }
+      for (const dataField in filters) {
+        searchFilters['exact'][dataField] = filters[dataField]['filterVal']
       }
     }
 
@@ -103,23 +111,26 @@ class AutoTable extends React.Component<Props, State> {
           totalSize: meta.total,
           error: false,
         })
+        
+        // error if endpoint doesn't return 200
+        if (res.status !== 200) {
+          throw Error()
+        }
 
         // check if any data is returned
-        if (typeof data[0] !== 'undefined') {
+        if (data[0] !== undefined) {
           let fieldMeta = {};
 
-          // checking if the fields have been defined
-          if (typeof this.props.requiredFields !== 'undefined') {
-            fieldMeta = structureFieldData(this.props.requiredFields)
+          // checking if 'fields' has been defined
+          if (this.props.fields !== undefined) {
+            fieldMeta = structureFieldsUsingProp(this.props.fields)
           } else {
             if ('attributes' in data[0]) {
-              const attributes = structureFieldData(data[0].attributes,
-                                                    'attribute')
+              const attributes = structureFieldsAuto(data[0].attributes, true)
               fieldMeta = Object.assign(fieldMeta, attributes)
             }
             if ('relationships' in data[0]) {
-              const relationships = structureFieldData(data[0].relationships,
-                                                       'relationship')
+              const relationships = structureFieldsAuto(data[0].relationships, false)
               fieldMeta = Object.assign(fieldMeta, relationships)
             }
           }
@@ -144,6 +155,12 @@ class AutoTable extends React.Component<Props, State> {
 
   render() {
     const { tableData, headings, page, sizePerPage, totalSize, error } = this.state;
+    
+    // show nav as default
+    let includeNav = this.props.includeNav;
+    if (includeNav === undefined) {
+      includeNav = true
+    }
 
     return (
       <div>
@@ -155,8 +172,8 @@ class AutoTable extends React.Component<Props, State> {
             noDataIndication = <NoDataAlert />
           } else {
             noDataIndication = <div className='p-5'>
-                <LoadingHelix />
-              </div>
+              <LoadingHelix />
+            </div>
           }
           return (
             <Table
@@ -167,6 +184,7 @@ class AutoTable extends React.Component<Props, State> {
               page={ page }
               sizePerPage={ sizePerPage }
               totalSize={ totalSize }
+              includeNav={ includeNav }
               noDataIndication={ noDataIndication }
             />
           )

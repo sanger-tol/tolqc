@@ -38,7 +38,7 @@ class ToolTipOverlay extends React.Component<Props, State> {
 
   render() {
     let placement = 'auto'
-    if (typeof this.props.placement !== 'undefined') {
+    if (this.props.placement !== undefined) {
       placement = this.props.placement
     }
     return (

@@ -5,23 +5,51 @@ SPDX-License-Identifier: MIT
 */
 
 import AutoTable from "../table/AutoTable";
-import { CentreContents } from '@tol/tol-ui'
+import { CentreContents } from "@tol/tol-ui"
 
 function Home() {
   return (
     <div className="home">
       <CentreContents>
-        <AutoTable endpoint="species"
-          requiredFields={{
-            'hierarchy_name': 'Project',
-            'name': 'Name',
-            'common_name': 'Common name',
-            'taxon_id': "Taxon ID",
-            'taxon_family': 'Family',
-            'taxon_order': 'Order',
-            'taxon_phylum': 'Phylum'
-          }}
-        />
+      <AutoTable
+        endpoint="species"
+        fields={{
+          "creator.name": {
+            rename: "x123"
+          },
+          "hierarchy_name": {
+            rename: "Project",
+            width: 600,
+            link: "common_name",
+            sort: false
+          },
+          "name": {
+            filterType: 'exact'
+          },
+          "common_name": {
+            rename: "Common Name",
+            filterType: 'substring'
+          },
+          "taxon_id": {
+            rename: "Taxon ID"
+          },
+          "taxon_family": {
+            rename: "Family"
+          },
+          "taxon_order": {
+            rename: "Order"
+          },
+          "taxon_phylum": {
+            rename: "Phylum"
+          }
+        }}
+        fixedFilter={{
+          "exact": {
+            "taxon_family": "Inachidae"
+          }
+        }}
+      />
+      <AutoTable endpoint="species" />
       </CentreContents>
     </div>
   );
