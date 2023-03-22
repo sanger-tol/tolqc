@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-.tol-table {
+ .tol-table {
   // table sorting arrows
   button span .caret { // hides duplicate page size dropdown arrow
     display: none;
@@ -46,11 +46,16 @@
 
   // pagination buttons
   #pageDropDown {
+    color: white;
     float: right;
     margin: 6px;
     margin-right: 0;
     background-color: $primary;
     border-color: $primary;
+  }
+
+  .dropdown-toggle {
+    color: white;
   }
 
   .btn.btn-primary,
@@ -59,16 +64,6 @@
     margin: 6px;
     margin-right: 0;
   }
-
-//  .page-link,
-//  .page-link:hover {
-//    color: $primary
-//  }
-
-//  .active.page-item .page-link {
-//    background-color: $primary;
-//    border-color: $primary;
-//  }
 
   // page size dropdown
   span.open.show.react-bs-table-sizePerPage-dropdown.dropdown {
@@ -89,9 +84,14 @@
   }
 
   // filter button
-  button svg {
+  .tol-table-filter-button,
+  .tol-table-filter-button:active {
+    color: white;
+    fill: white;
+  }
+
+  .tol-table-filter-button svg {
     margin-right: 8px;
-    //fill: white;
   }
 
   // align header titles at top
@@ -112,7 +112,7 @@
 
   // relationship link
   .relationship-box {
-    background-color: lighten($primary, 50%) !important;;
+    background-color: lighten($primary, 50%) !important;
     padding: 10px;
     border-style: solid;
     border-color: lighten($primary, 45%) !important;
