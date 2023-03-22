@@ -69,22 +69,22 @@ class AutoTable extends React.Component<Props, State> {
   }) => {
     let searchFilters: object = {};
 
-    // always on filtering - (wildcard or exact)
+    // always on filtering - (contains or exact)
     if (this.props.fixedFilter !== undefined) {
       searchFilters = Object.assign(searchFilters, this.props.fixedFilter)
     }
 
-    // column specific filtering (wildcard currently)
+    // column specific filtering (contains currently)
     if (type === 'filter') {
       // initialising if keys do not exist
-      if (!('wildcard' in searchFilters)) {
-        searchFilters['wildcard'] = {}
+      if (!('contains' in searchFilters)) {
+        searchFilters['contains'] = {}
       }
       if (!('exact' in searchFilters)) {
         searchFilters['exact'] = {}
       }
       for (const dataField in filters) {
-        searchFilters['exact'][dataField] = filters[dataField]['filterVal']
+        searchFilters['contains'][dataField] = filters[dataField]['filterVal']
       }
     }
 
