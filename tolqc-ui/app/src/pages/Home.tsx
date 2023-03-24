@@ -6,10 +6,14 @@ SPDX-License-Identifier: MIT
 
 import AutoTable from "../table/AutoTable";
 import { CentreContents } from "@tol/tol-ui"
+import { DateRangePicker } from 'rsuite';
 
 function Home() {
   return (
     <div className="home">
+      <div className="tol-date-picker">
+        <DateRangePicker placeholder="Select Date Range" />
+      </div>
       <CentreContents>
       <AutoTable
         endpoint="species"
@@ -28,7 +32,7 @@ function Home() {
           },
           "common_name": {
             rename: "Common Name",
-            filterType: 'substring'
+            filterType: 'exact'
           },
           "taxon_id": {
             rename: "Taxon ID"

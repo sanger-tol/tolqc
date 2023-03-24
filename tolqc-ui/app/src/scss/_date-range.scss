@@ -1,0 +1,35 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Genome Research Ltd.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+.tol-date-picker {
+  --rs-text-primary: $primary;
+  --rs-calendar-date-selected-text: $primary;
+  --rs-border-primary: var(--bs-border-color-translucent);
+  --rs-listbox-option-hover-bg: $primary;
+  --rs-calendar-cell-selected-hover-bg: $primary;
+}
+
+/*
+  th {
+    background-color: rgba($primary, 0.1);
+  }
+
+  // hover effects
+  tr th:hover,
+  tbody tr:hover,
+  li.dropdown-item:active {
+    background-color: $opaque-grey;
+  }
+
+  // darken various buttons
+  #pageDropDown:hover,
+  .tol-table-filter-button:hover,
+  .tol-table-filter-button:active,
+  .active.page-item .page-link:hover {
+    background-color: darken($primary, 10%) !important;
+    border-color: darken($primary, 10%) !important;
+  }
+*/

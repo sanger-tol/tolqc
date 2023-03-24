@@ -4,7 +4,9 @@ SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import { textFilter } from 'react-bootstrap-table2-filter';
+import { textFilter, customFilter } from 'react-bootstrap-table2-filter';
+import { DateRangePicker } from 'rsuite';
+import DatePicker from './DatePicker';
 import { format } from 'date-fns'
 import RelationshipLink from './RelationshipLink';
 import CellTooltip from './CellTooltip';
@@ -132,6 +134,7 @@ export function convertHeadingData(fieldMeta: object) {
     let headerWidth = meta.width.toString() + 'px'
     let hidden = false
 
+    // rename via override or normalise a field name
     if (isEmptyOrNull(meta.rename)) {
       capsHeading = normaliseCaps(key)
     } else {
@@ -150,14 +153,22 @@ export function convertHeadingData(fieldMeta: object) {
         headerStyle: headerStyling(headerWidth),
         hidden: hidden
       }
-      if (meta.filter === true) {
-        heading['filter'] = searchFilter(capsHeading)
-      }
       if (meta.sort === true) {
         heading['sort'] = true
       }
+      if (meta.filter === true) {
+        if (meta.filterType === 'range') {
+          heading['filter'] = customFilter()
+          heading['filterRenderer'] = () => <DatePicker />
+          // temp remove sorting on datetime -> e.stopPropagation()
+          heading['sort'] = false
+        } else {
+          heading['filter'] = searchFilter(capsHeading)
+        }
+      }
       updatedHeadings.push(heading);
-      // if heading is a relationship
+    
+    // if heading is a relationship
     } else if (meta.isAttribute === false) {
       updatedHeadings.push({
         dataField: key,
@@ -187,8 +198,21 @@ export function convertTableData(data: any[], fieldMeta: object) {
   return updatedData;
 }
 
+function convertTypeToDefaultFilter(type: string) {
+  switch(type) {
+    case 'str':
+    case 'int':
+    case 'float':
+      return 'contains';
+    case 'datetime':
+      return 'range';
+    default:
+      return null;
+  }
+}
+
 // structure fields via the prop 'fields'
-export function structureFieldsUsingProp(fields: object) {
+export function structureFieldsUsingProp(fields: object, apiFieldMeta: object) {
   for (let [key, meta] of Object.entries(fields)) {
     fields[key] = addFieldDefaults(meta)
     // if key is a relationship
@@ -199,13 +223,23 @@ export function structureFieldsUsingProp(fields: object) {
       fields[key]['isAttribute'] = false
     } else {
       fields[key]['isAttribute'] = true
+      // you can currently only override with 'exact' filtering
+      if (fields[key]['filterType'] === 'exact') {
+        fields[key]['filterType'] = 'exact'
+      } else {
+        fields[key]['filterType'] = convertTypeToDefaultFilter(apiFieldMeta[key])
+      }
     }
   }
   return fields
 }
 
 // structure fields using the json-api spec
-export function structureFieldsAuto(apiFields: object, isAttribute: boolean) {
+export function structureFieldsAuto(
+  apiFields: object,
+  apiFieldMeta: object,
+  isAttribute: boolean
+) {
   const fields = {}
   // adding internal ID to row
   fields['id'] = addFieldDefaults({
@@ -214,13 +248,18 @@ export function structureFieldsAuto(apiFields: object, isAttribute: boolean) {
   })
   for (let [key, data] of Object.entries(apiFields)) {
     // ignoring one-to-many relationships
-    if (isAttribute === false && !('data' in data)) {
+    if (!isAttribute && !('data' in data)) {
       console.warn('\'' + key + '\' is on the many side of the relationship' + 
                     ' - therefore it is being ignored.')
       continue
     }
-    fields[key] = addFieldDefaults(data)
-    fields[key]['isAttribute'] = isAttribute
+    fields[key] = addFieldDefaults({
+      'isAttribute': isAttribute
+    })
+    // meta field type is 'data' for attributes
+    if (isAttribute) {
+      fields[key]['filterType'] = convertTypeToDefaultFilter(apiFieldMeta[key])
+    }
   }
   return fields
 }

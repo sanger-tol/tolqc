@@ -4,8 +4,16 @@
  * SPDX-License-Identifier: MIT
  */
 
+:root {
+  --primary: #d00000;
+  --opaque-primary: rgba(var(--primary), 0.1);
+}
+
 body {
   @include body-font;
+  --rs-input-bg: var(--bs-body-bg);
+  --rs-bg-overlay: var(--bs-body-bg);
+  --bs-dropdown-link-hover-bg: $opaque_grey;
 }
 
 h1,

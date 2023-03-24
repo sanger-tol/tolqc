@@ -73,16 +73,20 @@ class AutoTable extends React.Component<Props, State> {
     if (this.props.fixedFilter !== undefined) {
       searchFilters = Object.assign(searchFilters, this.props.fixedFilter)
     }
-
     // column specific filtering (contains currently)
     if (type === 'filter') {
+      console.log(filters)
       // initialising if keys do not exist
-      if (!('contains' in searchFilters)) {
+      if (!('exact' in searchFilters)) {
         searchFilters['contains'] = {}
       }
-      if (!('exact' in searchFilters)) {
+      if (!('contains' in searchFilters)) {
         searchFilters['exact'] = {}
       }
+      if (!('range' in searchFilters)) {
+        searchFilters['range'] = {}
+      }
+
       for (const dataField in filters) {
         searchFilters['contains'][dataField] = filters[dataField]['filterVal']
       }
@@ -103,12 +107,12 @@ class AutoTable extends React.Component<Props, State> {
       }
       })
       .then((res: any) => {
-        const data = res.data.data
-        const meta = res.data.meta
+        const apiData = res.data.data
+        const apiMeta = res.data.meta
         this.setState({
           page: page,
           sizePerPage: sizePerPage,
-          totalSize: meta.total,
+          totalSize: apiMeta.total,
           error: false,
         })
         
@@ -118,24 +122,32 @@ class AutoTable extends React.Component<Props, State> {
         }
 
         // check if any data is returned
-        if (data[0] !== undefined) {
+        if (apiData[0] !== undefined) {
           let fieldMeta = {};
 
           // checking if 'fields' has been defined
           if (this.props.fields !== undefined) {
-            fieldMeta = structureFieldsUsingProp(this.props.fields)
+            fieldMeta = structureFieldsUsingProp(this.props.fields, apiMeta.types)
           } else {
-            if ('attributes' in data[0]) {
-              const attributes = structureFieldsAuto(data[0].attributes, true)
+            if ('attributes' in apiData[0]) {
+              const attributes = structureFieldsAuto(
+                apiData[0].attributes,
+                apiMeta.types,
+                true
+              )
               fieldMeta = Object.assign(fieldMeta, attributes)
             }
-            if ('relationships' in data[0]) {
-              const relationships = structureFieldsAuto(data[0].relationships, false)
+            if ('relationships' in apiData[0]) {
+              const relationships = structureFieldsAuto(
+                apiData[0].relationships,
+                apiMeta.types,
+                false
+              )
               fieldMeta = Object.assign(fieldMeta, relationships)
             }
           }
           this.setState({
-            tableData: convertTableData(data, fieldMeta),
+            tableData: convertTableData(apiData, fieldMeta),
             headings: convertHeadingData(fieldMeta)
           })
         }

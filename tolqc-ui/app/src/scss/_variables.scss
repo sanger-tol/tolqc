@@ -5,5 +5,9 @@
  */
 
 // Required Variables
-$primary: #09a5ee !default;
-$secondary: #0059ff !default;
+$primary: #d00000 !default;
+$secondary: #00ff11 !default;
+
+// Hover
+$opaque-primary: rgba($primary, 0.1);
+$opaque-grey: rgba(140, 140, 140, 0.1);

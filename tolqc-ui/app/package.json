@@ -33,7 +33,8 @@
     "@types/react-bootstrap-table2-filter": "1.3.4",
     "react-bootstrap-table2-toolkit": "2.1.3",
     "@types/react-bootstrap-table2-toolkit": "2.1.7",
-    "date-fns": "2.29.3"
+    "date-fns": "2.29.3",
+    "rsuite": "5.28.3"
   },
   "scripts": {
     "start": "react-scripts start",
