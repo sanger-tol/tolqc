@@ -6,11 +6,11 @@ from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class TrackConfig(Base):
-    __tablename__ = 'track_config'
+class Study(Base):
+    __tablename__ = 'study'
 
     class Meta:
-        type_ = 'track_configs'
+        type_ = 'studies'
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa A003
     name = db.Column(db.String())

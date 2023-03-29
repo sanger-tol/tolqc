@@ -32,4 +32,4 @@ from .assembly_metrics import api_assembly_metrics # noqa
 from .merqury_metrics import api_merqury_metrics # noqa
 from .busco_metrics import api_busco_metrics # noqa
 from .genomescope_metrics import api_genomescope_metrics # noqa
-from .track_config import api_track_config # noqa
+from .study import api_study # noqa

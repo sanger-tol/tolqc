@@ -37,4 +37,4 @@ from .assembly_metrics import AssemblyMetrics  # noqa
 from .merqury_metrics import MerquryMetrics  # noqa
 from .busco_metrics import BuscoMetrics  # noqa
 from .genomescope_metrics import GenomescopeMetrics  # noqa
-from .track import TrackConfig # noqa
+from .study import Study # noqa

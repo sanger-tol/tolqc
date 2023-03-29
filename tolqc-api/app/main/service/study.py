@@ -2,14 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TrackConfig
-from main.schema import TrackConfigSchema
+from main.model import Study
+from main.schema import StudySchema
 
 from tol.api_base.service import BaseService, setup_service
 
 
 @setup_service
-class TrackConfigService(BaseService):
+class StudyService(BaseService):
     class Meta:
-        model = TrackConfig
-        schema = TrackConfigSchema
+        model = Study
+        schema = StudySchema
