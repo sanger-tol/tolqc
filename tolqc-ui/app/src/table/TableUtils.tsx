@@ -5,7 +5,6 @@ SPDX-License-Identifier: MIT
 */
 
 import { textFilter, customFilter } from 'react-bootstrap-table2-filter';
-import { DateRangePicker } from 'rsuite';
 import DatePicker from './DatePicker';
 import { format } from 'date-fns'
 import RelationshipLink from './RelationshipLink';
@@ -15,6 +14,24 @@ import { addFieldDefaults } from './Field';
 
 function isEmptyOrNull(option: string) {
   return option === '' || option === null
+}
+
+export function initialiseFilterDict(apiFilters: object, filterType: string) {
+  if (!(filterType in apiFilters)) {
+    apiFilters[filterType] = {}
+  }
+  return apiFilters
+}
+
+export function formatDateRange(dateRange: string[]) {
+  let from = new Date(dateRange[0])
+  let to = new Date(dateRange[1])
+  from.setHours(0, 0, 0, 0);
+  to.setHours(23, 59, 59, 999);
+  return {
+    from: from,
+    to: to
+  }
 }
 
 export function normaliseCaps(fieldName: string) {
@@ -117,13 +134,6 @@ function formatRelationshipData(data: object, fieldMeta: object) {
   return updatedData
 }
 
-function searchFilter(heading: string) { 
-  return textFilter({
-    className: 'filter-search-input-hide',
-    placeholder: heading
-  })
-}
-
 export function convertHeadingData(fieldMeta: object) {
   const headerSortingStyle = { backgroundColor: '#edffec' };
   const headerStyling = (width: string) => { return { minWidth: width } }
@@ -157,13 +167,19 @@ export function convertHeadingData(fieldMeta: object) {
         heading['sort'] = true
       }
       if (meta.filter === true) {
-        if (meta.filterType === 'range') {
-          heading['filter'] = customFilter()
-          heading['filterRenderer'] = () => <DatePicker />
+        if (meta.filterType === 'RANGE') {
+          heading['filter'] = customFilter({
+            type: meta.filterType
+          })
+          heading['filterRenderer'] = (onFilter: any, column: any) =>
+            <DatePicker onFilter={ onFilter } column={ column } />
           // temp remove sorting on datetime -> e.stopPropagation()
           heading['sort'] = false
         } else {
-          heading['filter'] = searchFilter(capsHeading)
+          heading['filter'] = textFilter({
+            className: 'filter-search-input-hide',
+            placeholder: capsHeading,
+          })
         }
       }
       updatedHeadings.push(heading);
@@ -203,9 +219,9 @@ function convertTypeToDefaultFilter(type: string) {
     case 'str':
     case 'int':
     case 'float':
-      return 'contains';
+      return 'CONTAINS';
     case 'datetime':
-      return 'range';
+      return 'RANGE';
     default:
       return null;
   }
@@ -225,7 +241,7 @@ export function structureFieldsUsingProp(fields: object, apiFieldMeta: object) {
       fields[key]['isAttribute'] = true
       // you can currently only override with 'exact' filtering
       if (fields[key]['filterType'] === 'exact') {
-        fields[key]['filterType'] = 'exact'
+        fields[key]['filterType'] = 'EXACT'
       } else {
         fields[key]['filterType'] = convertTypeToDefaultFilter(apiFieldMeta[key])
       }

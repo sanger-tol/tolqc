@@ -13,6 +13,8 @@ import TableErrorAlert from './TableErrorAlert';
 import { Fields } from "./Field";
 import { convertTableData,
          convertHeadingData,
+         formatDateRange,
+         initialiseFilterDict,
          structureFieldsAuto,
          structureFieldsUsingProp,
          switchFilterVisability } from "./TableUtils"
@@ -67,28 +69,25 @@ class AutoTable extends React.Component<Props, State> {
     sortOrder?: string,
     sortField?: string
   }) => {
-    let searchFilters: object = {};
+    let apiFilters: object = {};
 
     // always on filtering - (contains or exact)
     if (this.props.fixedFilter !== undefined) {
-      searchFilters = Object.assign(searchFilters, this.props.fixedFilter)
+      apiFilters = Object.assign(apiFilters, this.props.fixedFilter)
     }
-    // column specific filtering (contains currently)
-    if (type === 'filter') {
-      console.log(filters)
-      // initialising if keys do not exist
-      if (!('exact' in searchFilters)) {
-        searchFilters['contains'] = {}
-      }
-      if (!('contains' in searchFilters)) {
-        searchFilters['exact'] = {}
-      }
-      if (!('range' in searchFilters)) {
-        searchFilters['range'] = {}
-      }
 
-      for (const dataField in filters) {
-        searchFilters['contains'][dataField] = filters[dataField]['filterVal']
+    // column specific filtering
+    if (type === 'filter' && filters !== undefined) {
+      console.log(filters)
+      for (let [key, meta] of Object.entries(filters)) {
+        if (meta['filterType'] === 'TEXT') {
+          apiFilters = initialiseFilterDict(apiFilters, 'contains')
+          apiFilters['contains'][key] = meta['filterVal']
+        } else if (meta['filterType'] === 'RANGE') {
+          apiFilters = initialiseFilterDict(apiFilters, 'range')
+          apiFilters['range'][key] = formatDateRange(meta['filterVal'])
+          console.log(apiFilters['range'][key])
+        }
       }
     }
 
@@ -102,7 +101,7 @@ class AutoTable extends React.Component<Props, State> {
       params: {
         page: page,
         page_size: sizePerPage,
-        filter: searchFilters,
+        filter: apiFilters,
         sort_by: sortField
       }
       })
