@@ -163,27 +163,26 @@
     cursor: pointer;
   }
 
-  // tooltip
-  .relationship-tooltip {
-    margin: 5px;
-  }
-
-  .tooltip-key {
-    margin-right: 5px;
-    font-size: small;
-    font-weight: bold;
-  }
-
-  .tooltip-value {
-    font-size: small;
-  }
-
-  .tooltip-wrapper {
-    display: inline-block;
-  }
-
   // This is here because react-table uses Bootstrap 4 classes
   .sr-only {
     @extend .visually-hidden
   }
+}
+
+// tooltip
+.relationship-tooltip {
+  margin: 5px;
+}
+
+.tooltip-key {
+  margin-right: 5px;
+  font-size: small;
+}
+
+.tooltip-value {
+  font-size: small;
+}
+
+.tooltip-wrapper {
+  display: inline-block;
 }

@@ -71,7 +71,7 @@ class AutoTable extends React.Component<Props, State> {
   }) => {
     let apiFilters: object = {};
 
-    // always on filtering - (contains or exact)
+    // always on filtering - (contains, exact, range)
     if (this.props.fixedFilter !== undefined) {
       apiFilters = Object.assign(apiFilters, this.props.fixedFilter)
     }
@@ -80,13 +80,12 @@ class AutoTable extends React.Component<Props, State> {
     if (type === 'filter' && filters !== undefined) {
       console.log(filters)
       for (let [key, meta] of Object.entries(filters)) {
-        if (meta['filterType'] === 'TEXT') {
+        if (meta['filterType'] === 'CONTAINS') {
           apiFilters = initialiseFilterDict(apiFilters, 'contains')
           apiFilters['contains'][key] = meta['filterVal']
         } else if (meta['filterType'] === 'RANGE') {
           apiFilters = initialiseFilterDict(apiFilters, 'range')
           apiFilters['range'][key] = formatDateRange(meta['filterVal'])
-          console.log(apiFilters['range'][key])
         }
       }
     }

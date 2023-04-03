@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 import { textFilter, customFilter } from 'react-bootstrap-table2-filter';
 import DatePicker from './DatePicker';
+import TextInput from './TextInput';
 import { format } from 'date-fns'
 import RelationshipLink from './RelationshipLink';
 import CellTooltip from './CellTooltip';
@@ -164,22 +165,19 @@ export function convertHeadingData(fieldMeta: object) {
         hidden: hidden
       }
       if (meta.sort === true) {
-        heading['sort'] = true
+        heading['sort'] = false
+        // temp remove sorting on datetime -> e.stopPropagation()
       }
       if (meta.filter === true) {
+        heading['filter'] = customFilter({
+          type: meta.filterType
+        })
         if (meta.filterType === 'RANGE') {
-          heading['filter'] = customFilter({
-            type: meta.filterType
-          })
           heading['filterRenderer'] = (onFilter: any, column: any) =>
             <DatePicker onFilter={ onFilter } column={ column } />
-          // temp remove sorting on datetime -> e.stopPropagation()
-          heading['sort'] = false
         } else {
-          heading['filter'] = textFilter({
-            className: 'filter-search-input-hide',
-            placeholder: capsHeading,
-          })
+          heading['filterRenderer'] = (onFilter: any, column: any) => 
+            <TextInput onFilter={ onFilter } column={ column } />
         }
       }
       updatedHeadings.push(heading);

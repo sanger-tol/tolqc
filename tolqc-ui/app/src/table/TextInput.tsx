@@ -5,7 +5,8 @@ SPDX-License-Identifier: MIT
 */
 
 import React from "react";
-import { DateRangePicker } from 'rsuite';
+import { Input, InputGroup } from 'rsuite';
+import SearchIcon from '@rsuite/icons/Search';
 
 
 export interface Props {
@@ -17,16 +18,16 @@ export interface State {
   value: any
 }
 
-class DatePicker extends React.Component<Props, State> {
+class TextInput extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      value: []
+      value: ''
     }
     this.filter = this.filter.bind(this);
   }
 
-  filter = (value: any) => {
+  filter = (value: string) => {
     this.setState({ value: value });
     this.props.onFilter(value);
   }
@@ -34,15 +35,19 @@ class DatePicker extends React.Component<Props, State> {
   render() {
     return (
       <div className='tol-filter-input filter-search-input-hide'>
-        <DateRangePicker
-          onChange={ this.filter }
-          value={ this.state.value }
-          format="dd/MM/yyyy"
-          placeholder="Select Date Range"
-        />
+        <InputGroup inside>
+          <Input
+            onChange={ this.filter }
+            value={ this.state.value }
+            placeholder={ this.props.column['text'] }
+          />
+          <InputGroup.Addon>
+            <SearchIcon />
+          </InputGroup.Addon>
+        </InputGroup>
       </div>
     );
   }
 }
 
-export default DatePicker;
+export default TextInput;

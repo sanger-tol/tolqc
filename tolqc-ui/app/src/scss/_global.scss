@@ -14,6 +14,8 @@ body {
   --rs-input-bg: var(--bs-body-bg);
   --rs-bg-overlay: var(--bs-body-bg);
   --bs-dropdown-link-hover-bg: $opaque_grey;
+  --rs-tooltip-bg: var(--bs-body-bg);
+  --rs-tooltip-text: var(--bs-body-color);
 }
 
 h1,
