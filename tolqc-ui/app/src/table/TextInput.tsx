@@ -16,25 +16,34 @@ export interface Props {
 
 export interface State {
   value: any
+  timeout: any
 }
+
+const onClick = (e: { stopPropagation: () => any; }) => e.stopPropagation();
 
 class TextInput extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      value: ''
+      value: '',
+      timeout: null
     }
     this.filter = this.filter.bind(this);
   }
 
   filter = (value: string) => {
-    this.setState({ value: value });
-    this.props.onFilter(value);
+    clearTimeout(this.state.timeout)
+    this.setState({
+      value: value,
+      timeout: setTimeout(() => {
+        this.props.onFilter(value);
+      }, 800)
+    });
   }
   
   render() {
     return (
-      <div className='tol-filter-input filter-search-input-hide'>
+      <span onClick={ onClick } className='tol-filter-input filter-search-input-hide' id="tol-filter-input">
         <InputGroup inside>
           <Input
             onChange={ this.filter }
@@ -45,7 +54,7 @@ class TextInput extends React.Component<Props, State> {
             <SearchIcon />
           </InputGroup.Addon>
         </InputGroup>
-      </div>
+      </span>
     );
   }
 }

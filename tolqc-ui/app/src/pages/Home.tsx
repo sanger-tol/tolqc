@@ -6,54 +6,51 @@ SPDX-License-Identifier: MIT
 
 import AutoTable from "../table/AutoTable";
 import { CentreContents } from "@tol/tol-ui"
-import { DateRangePicker } from 'rsuite';
+import DatePicker from "../table/DatePicker";
 
 function Home() {
   return (
     <div className="home">
-      <div className="tol-date-picker">
-        <DateRangePicker placeholder="Select Date Range" />
-      </div>
       <CentreContents>
-      <AutoTable
-        endpoint="species"
-        fields={{
-          "creator.name": {
-            rename: "x123"
-          },
-          "hierarchy_name": {
-            rename: "Project",
-            width: 600,
-            link: "common_name",
-            sort: false
-          },
-          "name": {
-            filterType: 'exact'
-          },
-          "common_name": {
-            rename: "Common Name",
-            filterType: 'exact'
-          },
-          "taxon_id": {
-            rename: "Taxon ID"
-          },
-          "taxon_family": {
-            rename: "Family"
-          },
-          "taxon_order": {
-            rename: "Order"
-          },
-          "taxon_phylum": {
-            rename: "Phylum"
-          }
-        }}
-        fixedFilter={{
-          "exact": {
-            "taxon_family": "Inachidae"
-          }
-        }}
-      />
-      <AutoTable endpoint="species" />
+        <AutoTable
+          endpoint="species"
+          fields={{
+            "creator.name": {
+              rename: "x123"
+            },
+            "hierarchy_name": {
+              rename: "Project",
+              width: 600,
+              link: "common_name",
+              sort: false
+            },
+            "name": {
+              filterType: 'exact'
+            },
+            "common_name": {
+              rename: "Common Name",
+              filterType: 'exact'
+            },
+            "taxon_id": {
+              rename: "Taxon ID"
+            },
+            "taxon_family": {
+              rename: "Family"
+            },
+            "taxon_order": {
+              rename: "Order"
+            },
+            "taxon_phylum": {
+              rename: "Phylum"
+            }
+          }}
+          fixedFilter={{
+            "exact": {
+              "taxon_family": "Inachidae"
+            }
+          }}
+        />
+        <AutoTable endpoint="species" />
       </CentreContents>
     </div>
   );

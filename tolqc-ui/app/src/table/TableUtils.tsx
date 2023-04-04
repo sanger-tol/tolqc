@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import { textFilter, customFilter } from 'react-bootstrap-table2-filter';
+import { customFilter } from 'react-bootstrap-table2-filter';
 import DatePicker from './DatePicker';
 import TextInput from './TextInput';
 import { format } from 'date-fns'
@@ -27,6 +27,7 @@ export function initialiseFilterDict(apiFilters: object, filterType: string) {
 export function formatDateRange(dateRange: string[]) {
   let from = new Date(dateRange[0])
   let to = new Date(dateRange[1])
+  // ensure a whole day is selected
   from.setHours(0, 0, 0, 0);
   to.setHours(23, 59, 59, 999);
   return {
@@ -165,7 +166,7 @@ export function convertHeadingData(fieldMeta: object) {
         hidden: hidden
       }
       if (meta.sort === true) {
-        heading['sort'] = false
+        heading['sort'] = true
         // temp remove sorting on datetime -> e.stopPropagation()
       }
       if (meta.filter === true) {
