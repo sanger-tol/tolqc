@@ -281,10 +281,10 @@ export function structureFieldsAuto(
 
 export function switchFilterVisability() {
   let filterVisability = getComputedStyle(document.documentElement).getPropertyValue('--filter-visability')
-  if (filterVisability === 'flex') {
+  if (filterVisability === 'block') {
     filterVisability = 'none'
   } else {
-    filterVisability = 'flex'
+    filterVisability = 'block'
   }
   document.documentElement.style.setProperty('--filter-visability', filterVisability);
 }

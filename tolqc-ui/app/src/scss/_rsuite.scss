@@ -4,38 +4,21 @@
  * SPDX-License-Identifier: MIT
  */
 
-.tol-filter-input {
-  --rs-text-primary: $primary;
-  --rs-calendar-date-selected-text: $primary;
-  --rs-border-primary: var(--bs-border-color-translucent);
-  --rs-listbox-option-hover-bg: $primary;
-  --rs-calendar-cell-selected-hover-bg: $primary;
+:root {
+  --rs-tooltip-bg: var(--bs-body-bg);
+  --rs-bg-overlay: var(--bs-body-bg);
+  --rs-input-bg: var(--bs-body-bg);
+
+  --rs-tooltip-text: var(--bs-body-color);
+
+  --rs-btn-link-text: var(--primary);
+  --rs-btn-primary-hover-bg: var(--primary);
+  --rs-btn-primary-bg: var(--primary);
+  --rs-calendar-cell-selected-hover-bg: var(--primary);
+  --rs-bg-active: var(--primary);
+  --rs-listbox-option-hover-text: var(--primary);
+  --rs-input-focus-border: var(--primary);
+
+  --rs-calendar-range-bg: var(--primary-hover);
+  --rs-listbox-option-hover-bg: var(--grey-hover);
 }
-
-/*
-.rs-tooltip {
-  -webkit-box-shadow: 0px 0px 53px -18px rgba(var(--bs-body-color), 0.3);
-  -moz-box-shadow: 0px 0px 53px -18px rgba(var(--bs-body-color), 0.3);
-  box-shadow: 0px 0px 53px -18px rgba(var(--bs-body-color), 0.3);
-}
-
-  th {
-    background-color: rgba($primary, 0.1);
-  }
-
-  // hover effects
-  tr th:hover,
-  tbody tr:hover,
-  li.dropdown-item:active {
-    background-color: $opaque-grey;
-  }
-
-  // darken various buttons
-  #pageDropDown:hover,
-  .tol-table-filter-button:hover,
-  .tol-table-filter-button:active,
-  .active.page-item .page-link:hover {
-    background-color: darken($primary, 10%) !important;
-    border-color: darken($primary, 10%) !important;
-  }
-*/

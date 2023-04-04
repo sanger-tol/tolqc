@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 import React from "react";
 import { Input, InputGroup } from 'rsuite';
 import SearchIcon from '@rsuite/icons/Search';
+import { stopPropagation } from '../general/Utils'
 
 
 export interface Props {
@@ -18,8 +19,6 @@ export interface State {
   value: any
   timeout: any
 }
-
-const onClick = (e: { stopPropagation: () => any; }) => e.stopPropagation();
 
 class TextInput extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -43,7 +42,7 @@ class TextInput extends React.Component<Props, State> {
   
   render() {
     return (
-      <span onClick={ onClick } className='tol-filter-input filter-search-input-hide' id="tol-filter-input">
+      <span onClick={ stopPropagation } className='tol-filter-input filter-search-input-hide' id="tol-filter-input">
         <InputGroup inside>
           <Input
             onChange={ this.filter }

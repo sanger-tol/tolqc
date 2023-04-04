@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 import React from "react";
 import { DateRangePicker } from 'rsuite';
+import { stopPropagation } from '../general/Utils'
 
 
 export interface Props {
@@ -33,14 +34,15 @@ class DatePicker extends React.Component<Props, State> {
   
   render() {
     return (
-      <div className='tol-filter-input filter-search-input-hide'>
+      <span onClick={ stopPropagation } className='tol-filter-input filter-search-input-hide'>
         <DateRangePicker
+          block
           onChange={ this.filter }
           value={ this.state.value }
           format="dd/MM/yyyy"
           placeholder="Select Date Range"
         />
-      </div>
+      </span>
     );
   }
 }

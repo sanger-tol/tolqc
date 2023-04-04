@@ -6,12 +6,19 @@ SPDX-License-Identifier: MIT
 
 import AutoTable from "../table/AutoTable";
 import { CentreContents } from "@tol/tol-ui"
-import DatePicker from "../table/DatePicker";
+
 
 function Home() {
   return (
     <div className="home">
       <CentreContents>
+        <AutoTable 
+          endpoint="species"
+          fields={{
+            "created_at": {},
+            "name": {}
+          }}
+        />
         <AutoTable
           endpoint="species"
           fields={{

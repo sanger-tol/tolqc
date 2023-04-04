@@ -6,14 +6,20 @@
 
 .tol-table {
   th {
-    background-color: $opaque-primary;
+    background-color: $primary-hover;
   }
 
   // hover effects
   tr th:hover,
   tbody tr:hover,
-  li.dropdown-item:active {
-    background-color: $opaque-grey;
+  li.dropdown-item:hover,
+  li.dropdown-item:active,
+  .page-link:hover {
+    background-color: $grey-hover;
+  }
+
+  .page-link {
+    background-color: none;
   }
 
   // darken various buttons
@@ -21,8 +27,8 @@
   .tol-table-filter-button:hover,
   .tol-table-filter-button:active,
   .active.page-item .page-link:hover {
-    background-color: lighten($primary, 10%) !important;
-    border-color: lighten($primary, 10%) !important;
+    background-color: darken($primary, 10%) !important;
+    border-color: darken($primary, 10%) !important;
   }
 
   // table sorting arrows
@@ -149,7 +155,7 @@
     width: 1% !important;
   }
 
-  // link box
+  // link box (e.g. relationship)
   .link-box {
     background-color: rgba($primary, 0.1) !important;
     padding: 10px;

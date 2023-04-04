@@ -78,7 +78,6 @@ class AutoTable extends React.Component<Props, State> {
 
     // column specific filtering
     if (type === 'filter' && filters !== undefined) {
-      console.log(filters)
       for (let [key, meta] of Object.entries(filters)) {
         if (meta['filterType'] === 'CONTAINS') {
           apiFilters = initialiseFilterDict(apiFilters, 'contains')
