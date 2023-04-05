@@ -33,7 +33,8 @@ export interface State {
   page: number,
   sizePerPage: number,
   totalSize: number,
-  error: boolean
+  error: boolean,
+  initialLoad: boolean
 }
 
 class AutoTable extends React.Component<Props, State> {
@@ -49,7 +50,8 @@ class AutoTable extends React.Component<Props, State> {
       page: 1,
       sizePerPage: 50,
       totalSize: -1,
-      error: false
+      error: false,
+      initialLoad: false
     }
   }
 
@@ -85,6 +87,9 @@ class AutoTable extends React.Component<Props, State> {
         } else if (meta['filterType'] === 'RANGE') {
           apiFilters = initialiseFilterDict(apiFilters, 'range')
           apiFilters['range'][key] = formatDateRange(meta['filterVal'])
+        } else if (meta['filterType'] === 'EXACT') {
+          apiFilters = initialiseFilterDict(apiFilters, 'exact')
+          apiFilters['exact'][key] = meta['filterVal']
         }
       }
     }
@@ -143,9 +148,15 @@ class AutoTable extends React.Component<Props, State> {
               fieldMeta = Object.assign(fieldMeta, relationships)
             }
           }
+          // only updating heading state on first load
+          if (!this.state.initialLoad) {
+            this.setState({
+              headings: convertHeadingData(fieldMeta),
+              initialLoad: true
+            })
+          }
           this.setState({
-            tableData: convertTableData(apiData, fieldMeta),
-            headings: convertHeadingData(fieldMeta)
+            tableData: convertTableData(apiData, fieldMeta)
           })
         }
       })

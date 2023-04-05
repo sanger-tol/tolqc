@@ -55,6 +55,10 @@
     content: "";
   }
 
+  .sorting-active-colour {
+    background-color: $grey-hover;
+  }
+
   // hide or show filter search
   .filter-search-input-show {
     display: flex;

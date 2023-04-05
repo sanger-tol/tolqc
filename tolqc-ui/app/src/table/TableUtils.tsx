@@ -137,7 +137,7 @@ function formatRelationshipData(data: object, fieldMeta: object) {
 }
 
 export function convertHeadingData(fieldMeta: object) {
-  const headerSortingStyle = { backgroundColor: '#edffec' };
+  const headerSortingClasses = () => ('sorting-active-colour');
   const headerStyling = (width: string) => { return { minWidth: width } }
   const updatedHeadings: object[] = []
 
@@ -161,13 +161,12 @@ export function convertHeadingData(fieldMeta: object) {
       let heading = {
         dataField: key,
         text: capsHeading,
-        headerSortingStyle,
+        headerSortingClasses,
         headerStyle: headerStyling(headerWidth),
         hidden: hidden
       }
       if (meta.sort === true) {
         heading['sort'] = true
-        // temp remove sorting on datetime -> e.stopPropagation()
       }
       if (meta.filter === true) {
         heading['filter'] = customFilter({
@@ -191,7 +190,6 @@ export function convertHeadingData(fieldMeta: object) {
       updatedHeadings.push({
         dataField: key,
         text: capsHeading,
-        headerSortingStyle,
         headerStyle: headerStyling(headerWidth)
       });
     }
@@ -243,7 +241,7 @@ export function structureFieldsUsingProp(fields: object, apiFieldMeta: object) {
       fields[key]['isAttribute'] = true
       fields[key]['type'] = apiFieldMeta[key]
       // you can currently only override with 'exact' filtering
-      if (fields[key]['filterType'] === 'exact') {
+      if (fields[key]['filterType'] === 'EXACT') {
         fields[key]['filterType'] = 'EXACT'
       } else {
         fields[key]['filterType'] = convertTypeToDefaultFilter(apiFieldMeta[key])
