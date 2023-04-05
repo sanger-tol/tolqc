@@ -6,18 +6,18 @@
 
 // --SASS-- //
 // Required Variables
-$primary: #039be5 !default;
+$primary: #039be5 !default; //#039be5
 $secondary: #01579b !default;
 
 // Hover
 $grey: #808080 !default;
-$primary-hover: rgba($primary, 0.05);
+$primary-opaque: rgba($primary, 0.1);
 $grey-hover: rgba($grey, 0.1);
 
 // --CSS VARS-- //
 :root {
   --primary: #{$primary};
   --secondary: #{$secondary};
-  --primary-hover: #{$primary-hover};
+  --primary-opaque: #{$primary-opaque};
   --grey-hover: #{$grey-hover};
 }

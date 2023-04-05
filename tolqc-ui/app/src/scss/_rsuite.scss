@@ -19,6 +19,33 @@
   --rs-listbox-option-hover-text: var(--primary);
   --rs-input-focus-border: var(--primary);
 
-  --rs-calendar-range-bg: var(--primary-hover);
+  --rs-calendar-range-bg: var(--primary-opaque);
   --rs-listbox-option-hover-bg: var(--grey-hover);
+}
+
+.rs-input-group {
+  border: none !important;
+  -webkit-transition: border-color ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s;
+}
+
+.rs-picker-default .rs-picker-toggle {
+  border: none;
+}
+
+.rs-input:focus,
+.rs-input:hover,
+.rs-picker-default:hover,
+.rs-picker-default:focus,
+.rs-picker-default:focus-within {
+  border: 1px solid $primary !important;
+  border-radius: 6px;
+}
+
+.rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus,
+.rs-input-group:focus-within,
+.rs-input:focus,
+.rs-picker-toggle-active {
+  outline: none !important;
+  box-shadow: none !important;
 }
