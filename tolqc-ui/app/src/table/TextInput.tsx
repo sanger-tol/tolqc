@@ -13,6 +13,7 @@ import { stopPropagation } from '../general/Utils'
 export interface Props {
   column: object,
   onFilter: Function
+  type: string
 }
 
 export interface State {
@@ -30,14 +31,33 @@ class TextInput extends React.Component<Props, State> {
     this.filter = this.filter.bind(this);
   }
 
+  validateInput = (value: string) => {
+    const { type } = this.props
+    const intRegex = /^[-]?[0-9\b]*$|^$/
+    const floatRegex = /^[-]?\d*(\.\d*)?$|^$/
+    if (type === 'int' && !value.match(intRegex)) {
+      return true
+    } else if (type === 'float' && !value.match(floatRegex)) {
+      return true
+    }
+  }
+
   filter = (value: string) => {
-    clearTimeout(this.state.timeout)
-    this.setState({
-      value: value,
-      timeout: setTimeout(() => {
-        this.props.onFilter(value);
-      }, 800)
-    });
+    if (this.validateInput(value)) { return }
+    // can start with minus or period but won't call endpoint
+    if (value === '-' || value === '.') {
+      this.setState({
+        value: value
+      })
+    } else {
+      clearTimeout(this.state.timeout)
+      this.setState({
+        value: value,
+        timeout: setTimeout(() => {
+          this.props.onFilter(value);
+        }, 800)
+      });
+    }
   }
   
   render() {

@@ -177,8 +177,11 @@ export function convertHeadingData(fieldMeta: object) {
           heading['filterRenderer'] = (onFilter: any, column: any) =>
             <DatePicker onFilter={ onFilter } column={ column } />
         } else {
+          if (meta.type === null) {
+            console.log(key)
+          }
           heading['filterRenderer'] = (onFilter: any, column: any) => 
-            <TextInput onFilter={ onFilter } column={ column } />
+            <TextInput type={ meta.type } onFilter={ onFilter } column={ column } />
         }
       }
       updatedHeadings.push(heading);
@@ -238,6 +241,7 @@ export function structureFieldsUsingProp(fields: object, apiFieldMeta: object) {
       fields[key]['isAttribute'] = false
     } else {
       fields[key]['isAttribute'] = true
+      fields[key]['type'] = apiFieldMeta[key]
       // you can currently only override with 'exact' filtering
       if (fields[key]['filterType'] === 'exact') {
         fields[key]['filterType'] = 'EXACT'
@@ -259,7 +263,8 @@ export function structureFieldsAuto(
   // adding internal ID to row
   fields['id'] = addFieldDefaults({
     'rename': 'ID',
-    'isAttribute': true
+    'isAttribute': true,
+    'type': 'int'
   })
   for (let [key, data] of Object.entries(apiFields)) {
     // ignoring one-to-many relationships
@@ -273,6 +278,7 @@ export function structureFieldsAuto(
     })
     // meta field type is 'data' for attributes
     if (isAttribute) {
+      fields[key]['type'] = apiFieldMeta[key]
       fields[key]['filterType'] = convertTypeToDefaultFilter(apiFieldMeta[key])
     }
   }

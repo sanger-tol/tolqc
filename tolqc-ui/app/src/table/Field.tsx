@@ -11,6 +11,7 @@ interface Field {
   link?: string|null,
   rename?: string|null,
   sort?: boolean,
+  type?: string|null,
   width?: number,
 }
 
@@ -25,6 +26,7 @@ const fieldDefaults: Field = {
   link: null,
   rename: null,
   sort: true,
+  type: null,
   width: 200,
 }
 
