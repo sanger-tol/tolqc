@@ -21,3 +21,4 @@ class Project(LogBase):
     allocation = db.relationship('Allocation', back_populates='project')
     accession = db.relationship('Accession', back_populates='project',
                                 foreign_keys=[accession_id])
+    study = db.relationship('Study', back_populates='project')

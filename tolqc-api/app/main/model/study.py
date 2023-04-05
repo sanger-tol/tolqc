@@ -14,5 +14,7 @@ class Study(Base):
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa A003
     name = db.Column(db.String())
-    hierarchy_name = db.Column(db.String())
     lims_id = db.Column(db.Integer())
+    project_id = db.Column(db.Integer(), db.ForeignKey('project.id'))
+    project = db.relationship('Project', back_populates='study',
+                              foreign_keys=[project_id])

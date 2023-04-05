@@ -2,13 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import (
-    Accession, AccessionTypeDict, Data, Run, Sample, Species, Specimen
-)
+from main.model import Data
 from main.schema import DataSchema
 
-from tol.api_base.error import CandidateKeyNotProvidedExpection
-from tol.api_base.service import BaseService, provide_body_data, setup_service
+from tol.api_base.service import BaseService, setup_service
 
 
 @setup_service
