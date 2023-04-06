@@ -20,6 +20,7 @@
 
   .page-link {
     background-color: none;
+    text-decoration: none;
   }
 
   // darken various buttons
@@ -29,6 +30,7 @@
   .active.page-item .page-link:hover {
     background-color: darken($primary, 10%) !important;
     border-color: darken($primary, 10%) !important;
+    text-decoration: none;
   }
 
   // table sorting arrows
@@ -115,16 +117,14 @@
     right: 3px;
   }
 
-  ul.dropdown-menu.open.show a {
-    text-decoration: none;
-  }
-
-  ul.dropdown-menu.open.show a:hover {
-    text-decoration: underline;
-  }
-
   li.dropdown-item a {
-    color: $primary
+    color: $primary;
+    text-decoration: none;
+    padding: 10px !important;
+  }
+
+  li.dropdown-item {
+    padding: 4px !important;
   }
 
   // filter visability

@@ -17,19 +17,13 @@
   --rs-calendar-cell-selected-hover-bg: var(--primary);
   --rs-bg-active: var(--primary);
   --rs-listbox-option-hover-text: var(--primary);
-  --rs-input-focus-border: var(--primary);
 
   --rs-calendar-range-bg: var(--primary-opaque);
   --rs-listbox-option-hover-bg: var(--grey-hover);
 }
 
+.rs-picker-default .rs-picker-toggle,
 .rs-input-group {
-  border: none !important;
-  -webkit-transition: border-color ease-in-out 0.15s;
-  transition: border-color ease-in-out 0.15s;
-}
-
-.rs-picker-default .rs-picker-toggle {
   border: none;
 }
 
@@ -39,7 +33,14 @@
 .rs-picker-default:focus,
 .rs-picker-default:focus-within {
   border: 1px solid $primary !important;
-  border-radius: 6px;
+  border-radius: 7px;
+}
+
+.rs-input,
+.rs-picker-default {
+  border: 1px solid var(--bs-body-bg) !important;
+  border-radius: 7px;
+  color: $primary;
 }
 
 .rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus,
@@ -48,4 +49,9 @@
 .rs-picker-toggle-active {
   outline: none !important;
   box-shadow: none !important;
+}
+
+.rs-picker-toggle-read-only {
+  opacity: unset;
+  color: $primary;
 }

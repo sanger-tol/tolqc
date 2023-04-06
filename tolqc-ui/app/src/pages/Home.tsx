@@ -16,7 +16,10 @@ function Home() {
           endpoint="species"
           fields={{
             "created_at": {},
-            "name": {}
+            "name": {},
+            "taxon_id": {
+              filterType: 'EXACT'
+            }
           }}
         />
         <AutoTable
@@ -32,11 +35,11 @@ function Home() {
               sort: false
             },
             "name": {
-              filterType: 'exact'
+              filterType: 'EXACT'
             },
             "common_name": {
               rename: "Common Name",
-              filterType: 'exact'
+              filterType: 'EXACT'
             },
             "taxon_id": {
               rename: "Taxon ID"
