@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema import TrackConfigSchema
+from main.schema import StudySchema
 
 from tol.api_base.swagger import BaseSwagger, setup_swagger
 
 
 @setup_swagger
-class TrackConfigSwagger(BaseSwagger):
+class StudySwagger(BaseSwagger):
     class Meta:
-        schema = TrackConfigSchema
+        schema = StudySchema

@@ -12,7 +12,7 @@ from main.resource import api_accession, api_accession_type_dict, api_allocation
     api_library, api_library_type, api_merqury_metrics, api_milestone_dict, \
     api_pacbio_run_metrics, api_platform, api_project, api_qc_dict, api_run, api_sample, \
     api_set, api_sex, api_software_version, api_species, api_specimen, api_status, \
-    api_status_dict, api_track_config
+    api_status_dict, api_study
 
 from tol.api_base.auth import authorizations
 from tol.api_base.resource import api_auth, api_environment, api_user
@@ -33,7 +33,7 @@ def _setup_api(blueprint, app):
         authorizations=authorizations
     )
     api.add_namespace(api_centre)
-    api.add_namespace(api_track_config)
+    api.add_namespace(api_study)
     api.add_namespace(api_auth)
     api.add_namespace(api_environment)
     api.add_namespace(api_user)

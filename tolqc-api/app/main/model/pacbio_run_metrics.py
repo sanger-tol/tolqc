@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcPacbioRunMetrics(LogBase):
+class PacbioRunMetrics(LogBase):
     __tablename__ = 'pacbio_run_metrics'
 
     class Meta:
@@ -35,5 +35,5 @@ class TolqcPacbioRunMetrics(LogBase):
     demux_version_id = db.Column(db.String())
     demux_pass = db.Column(db.Integer())
     demux_fail = db.Column(db.Integer())
-    run = db.relationship('TolqcRun', back_populates='pacbio_run_metrics',
+    run = db.relationship('Run', back_populates='pacbio_run_metrics',
                           foreign_keys=[run_id])

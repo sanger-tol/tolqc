@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcStatus(LogBase):
+class Status(LogBase):
     __tablename__ = 'status'
 
     class Meta:
@@ -20,10 +20,10 @@ class TolqcStatus(LogBase):
     status_dict_id = db.Column(db.Integer(), db.ForeignKey('status_dict.id'))
     qc_dict_id = db.Column(db.Integer(), db.ForeignKey('qc_dict.id'))
     milestone_dict_id = db.Column(db.Integer(), db.ForeignKey('milestone_dict.id'))
-    specimen = db.relationship('TolqcSpecimen', back_populates='status')
-    status_dict = db.relationship('TolqcStatusDict', back_populates='status',
+    specimen = db.relationship('Specimen', back_populates='status')
+    status_dict = db.relationship('StatusDict', back_populates='status',
                                   foreign_keys=[status_dict_id])
-    qc_dict = db.relationship('TolqcQcDict', back_populates='status',
+    qc_dict = db.relationship('QcDict', back_populates='status',
                               foreign_keys=[qc_dict_id])
-    milestone_dict = db.relationship('TolqcMilestoneDict', back_populates='status',
+    milestone_dict = db.relationship('MilestoneDict', back_populates='status',
                                      foreign_keys=[milestone_dict_id])

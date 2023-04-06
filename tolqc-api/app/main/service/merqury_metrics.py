@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcMerquryMetrics
+from main.model import MerquryMetrics
 from main.schema import MerquryMetricsSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class MerquryMetricsService(BaseService):
     class Meta:
-        model = TolqcMerquryMetrics
+        model = MerquryMetrics
         schema = MerquryMetricsSchema

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcBuscoMetrics
+from main.model import BuscoMetrics
 from main.schema import BuscoMetricsSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class BuscoMetricsService(BaseService):
     class Meta:
-        model = TolqcBuscoMetrics
+        model = BuscoMetrics
         schema = BuscoMetricsSchema

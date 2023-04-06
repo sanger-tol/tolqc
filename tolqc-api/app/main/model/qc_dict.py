@@ -6,12 +6,12 @@ from tol.api_base.model import EnumBase, db, setup_model
 
 
 @setup_model
-class TolqcQcDict(EnumBase):
+class QcDict(EnumBase):
     __tablename__ = 'qc_dict'
 
     class Meta:
         type_ = 'qc_types'
 
-    status = db.relationship('TolqcStatus', back_populates='qc_dict')
-    genomescope_metrics = db.relationship('TolqcGenomescopeMetrics',
+    status = db.relationship('Status', back_populates='qc_dict')
+    genomescope_metrics = db.relationship('GenomescopeMetrics',
                                           back_populates='qc_dict')

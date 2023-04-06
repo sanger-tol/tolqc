@@ -6,10 +6,10 @@ from tol.api_base.model import EnumBase, db, setup_model
 
 
 @setup_model
-class TolqcAccessionTypeDict(EnumBase):
+class AccessionTypeDict(EnumBase):
     __tablename__ = 'accession_type_dict'
 
     class Meta:
         type_ = 'accession_types'
 
-    accession = db.relationship('TolqcAccession', back_populates='accession_type_dict')
+    accession = db.relationship('Accession', back_populates='accession_type_dict')

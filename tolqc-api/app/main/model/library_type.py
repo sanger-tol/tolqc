@@ -6,7 +6,7 @@ from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class TolqcLibraryType(Base):
+class LibraryType(Base):
     __tablename__ = 'library_type'
 
     class Meta:
@@ -17,4 +17,4 @@ class TolqcLibraryType(Base):
     hierarchy_name = db.Column(db.String())
     kit = db.Column(db.String())
     enzyme = db.Column(db.String())
-    library = db.relationship('TolqcLibrary', back_populates='library_type')
+    library = db.relationship('Library', back_populates='library_type')

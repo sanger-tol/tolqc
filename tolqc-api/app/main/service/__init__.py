@@ -32,4 +32,4 @@ from .assembly_metrics import AssemblyMetricsService # noqa
 from .merqury_metrics import MerquryMetricsService # noqa
 from .busco_metrics import BuscoMetricsService # noqa
 from .genomescope_metrics import GenomescopeMetricsService # noqa
-from .track_config import TrackConfigService # noqa
+from .study import StudyService # noqa

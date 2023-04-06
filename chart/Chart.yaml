@@ -25,5 +25,5 @@ appVersion: "0.0.1"
 
 dependencies:
 - name: tolcore
-  version: "0.1.3"
+  version: "0.1.5"
   repository: "https://gitlab.internal.sanger.ac.uk/api/v4/projects/2930/packages/helm/tol-core"

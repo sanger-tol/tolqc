@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcMilestoneDict
+from main.model import MilestoneDict
 from main.schema import MilestoneDictSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class MilestoneDictService(BaseService):
     class Meta:
-        model = TolqcMilestoneDict
+        model = MilestoneDict
         schema = MilestoneDictSchema

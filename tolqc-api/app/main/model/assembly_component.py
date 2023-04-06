@@ -6,15 +6,15 @@ from tol.api_base.model import EnumBase, LogBase, db, setup_model
 
 
 @setup_model
-class TolqcAssemblyComponent(LogBase, EnumBase):
+class AssemblyComponent(LogBase, EnumBase):
     __tablename__ = 'assembly_component'
 
     class Meta:
         type_ = 'assembly_components'
 
-    busco_metrics = db.relationship('TolqcBuscoMetrics',
+    busco_metrics = db.relationship('BuscoMetrics',
                                     back_populates='assembly_component')
-    merqury_metrics = db.relationship('TolqcMerquryMetrics',
+    merqury_metrics = db.relationship('MerquryMetrics',
                                       back_populates='assembly_component')
-    assembly_metrics = db.relationship('TolqcAssemblyMetrics',
+    assembly_metrics = db.relationship('AssemblyMetrics',
                                        back_populates='assembly_component')

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcSpecimen
+from main.model import Specimen
 from main.schema import SpecimenSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class SpecimenService(BaseService):
     class Meta:
-        model = TolqcSpecimen
+        model = Specimen
         schema = SpecimenSchema

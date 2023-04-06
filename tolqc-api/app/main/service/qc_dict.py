@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcQcDict
+from main.model import QcDict
 from main.schema import QcDictSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class QcDictService(BaseService):
     class Meta:
-        model = TolqcQcDict
+        model = QcDict
         schema = QcDictSchema

@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcSpecies(LogBase):
+class Species(LogBase):
     __tablename__ = 'species'
 
     class Meta:
@@ -24,4 +24,4 @@ class TolqcSpecies(LogBase):
     taxon_group = db.Column(db.String())
     genome_size = db.Column(db.Integer())
     chromosome_number = db.Column(db.Integer())
-    specimen = db.relationship('TolqcSpecimen', back_populates='species')
+    specimen = db.relationship('Specimen', back_populates='species')

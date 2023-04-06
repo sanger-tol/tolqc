@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcAccession
+from main.model import Accession
 from main.schema import AccessionSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class AccessionService(BaseService):
     class Meta:
-        model = TolqcAccession
+        model = Accession
         schema = AccessionSchema

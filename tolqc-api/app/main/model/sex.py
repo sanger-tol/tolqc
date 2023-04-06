@@ -6,10 +6,10 @@ from tol.api_base.model import EnumBase, db, setup_model
 
 
 @setup_model
-class TolqcSex(EnumBase):
+class Sex(EnumBase):
     __tablename__ = 'sex'
 
     class Meta:
         type_ = 'sexes'
 
-    specimen = db.relationship('TolqcSpecimen', back_populates='sex')
+    specimen = db.relationship('Specimen', back_populates='sex')

@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcBuscoLineage(LogBase):
+class BuscoLineage(LogBase):
     __tablename__ = 'busco_lineage'
 
     class Meta:
@@ -17,4 +17,4 @@ class TolqcBuscoLineage(LogBase):
     date_created = db.Column(db.DateTime())
     species_count = db.Column(db.Integer())
     gene_count = db.Column(db.Integer())
-    busco_metrics = db.relationship('TolqcBuscoMetrics', back_populates='busco_lineage')
+    busco_metrics = db.relationship('BuscoMetrics', back_populates='busco_lineage')

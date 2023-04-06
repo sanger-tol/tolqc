@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcRun
+from main.model import Run
 from main.schema import RunSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class RunService(BaseService):
     class Meta:
-        model = TolqcRun
+        model = Run
         schema = RunSchema

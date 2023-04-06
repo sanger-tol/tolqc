@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcAssemblyComponent
+from main.model import AssemblyComponent
 from main.schema import AssemblyComponentSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class AssemblyComponentService(BaseService):
     class Meta:
-        model = TolqcAssemblyComponent
+        model = AssemblyComponent
         schema = AssemblyComponentSchema

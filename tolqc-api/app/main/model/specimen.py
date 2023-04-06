@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcSpecimen(LogBase):
+class Specimen(LogBase):
     __tablename__ = 'specimen'
 
     class Meta:
@@ -24,12 +24,12 @@ class TolqcSpecimen(LogBase):
     karyotype = db.Column(db.String())
     father_id = db.Column(db.Integer())
     mother_id = db.Column(db.Integer())
-    allocation = db.relationship('TolqcAllocation', back_populates='specimen')
-    species = db.relationship('TolqcSpecies', back_populates='specimen',
+    allocation = db.relationship('Allocation', back_populates='specimen')
+    species = db.relationship('Species', back_populates='specimen',
                               foreign_keys=[species_id])
-    sample = db.relationship('TolqcSample', back_populates='specimen')
-    status = db.relationship('TolqcStatus', back_populates='specimen', uselist=False)
-    sex = db.relationship('TolqcSex', back_populates='specimen',
+    sample = db.relationship('Sample', back_populates='specimen')
+    status = db.relationship('Status', back_populates='specimen', uselist=False)
+    sex = db.relationship('Sex', back_populates='specimen',
                           foreign_keys=[sex_id])
-    accession = db.relationship('TolqcAccession', back_populates='specimen',
+    accession = db.relationship('Accession', back_populates='specimen',
                                 foreign_keys=[accession_id])

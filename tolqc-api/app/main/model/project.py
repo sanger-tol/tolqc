@@ -6,7 +6,7 @@ from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
-class TolqcProject(LogBase):
+class Project(LogBase):
     __tablename__ = 'project'
 
     class Meta:
@@ -18,6 +18,7 @@ class TolqcProject(LogBase):
     description = db.Column(db.String())
     lims_id = db.Column(db.Integer())
     accession_id = db.Column(db.Integer(), db.ForeignKey('accession.id'))
-    allocation = db.relationship('TolqcAllocation', back_populates='project')
-    accession = db.relationship('TolqcAccession', back_populates='project',
+    allocation = db.relationship('Allocation', back_populates='project')
+    accession = db.relationship('Accession', back_populates='project',
                                 foreign_keys=[accession_id])
+    study = db.relationship('Study', back_populates='project')

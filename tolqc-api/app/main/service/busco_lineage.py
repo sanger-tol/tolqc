@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcBuscoLineage
+from main.model import BuscoLineage
 from main.schema import BuscoLineageSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class BuscoLineageService(BaseService):
     class Meta:
-        model = TolqcBuscoLineage
+        model = BuscoLineage
         schema = BuscoLineageSchema

@@ -94,7 +94,7 @@ def __get_triplets():
 def __process_triplet(session, i, triplet):
     (lims_id, hierarchy_name, name) = triplet
     session.add(
-        model.TolqcTrackConfig(
+        model.Study(
             id=i,
             lims_id=lims_id,
             hierarchy_name=hierarchy_name,

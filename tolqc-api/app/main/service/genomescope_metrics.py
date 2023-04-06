@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import TolqcGenomescopeMetrics
+from main.model import GenomescopeMetrics
 from main.schema import GenomescopeMetricsSchema
 
 from tol.api_base.service import BaseService, setup_service
@@ -11,5 +11,5 @@ from tol.api_base.service import BaseService, setup_service
 @setup_service
 class GenomescopeMetricsService(BaseService):
     class Meta:
-        model = TolqcGenomescopeMetrics
+        model = GenomescopeMetrics
         schema = GenomescopeMetricsSchema
