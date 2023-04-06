@@ -17,14 +17,6 @@ interface LoginProps {
   environment: string;
 }
 
-const getLoginClass = (environment: string): string => {
-  switch (environment) {
-    case "production" || "":
-      return "login-light"
-  }
-  return "login-dark";
-}
-
 function Login(props: LoginProps) {
   const { token, setToken } = useAuth();
   useEffect(()=> {
@@ -41,7 +33,7 @@ function Login(props: LoginProps) {
   }, []);
 
   return (!token || tokenHasExpired(token)) ? (
-    LoginIcon(login, getLoginClass(props.environment))
+    LoginIcon(login)
   ) : (
     <Redirect to="/" />
   );
