@@ -21,7 +21,7 @@
   --rs-calendar-range-bg: var(--primary-opaque);
   --rs-listbox-option-hover-bg: var(--grey-hover);
 
-
+  // filtering inputs
   .rs-picker-default .rs-picker-toggle,
   .rs-input-group {
     border: none;
@@ -33,14 +33,15 @@
   .rs-picker-default:focus,
   .rs-picker-default:focus-within {
     border: 2px solid $primary !important;
-    border-radius: 7px;
+    border-radius: 6px;
   }
 
   .rs-input,
   .rs-picker-default {
     border: 2px solid var(--bs-body-bg) !important;
-    border-radius: 7px;
+    border-radius: 6px;
     color: $primary;
+    background-color: var(--bs-body-bg) !important;
   }
 
   .rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus,
@@ -56,16 +57,27 @@
     color: $primary;
   }
 
+  // icons in filters
+  .rs-input-group-addon .rs-icon,
+  .rs-picker-toggle-caret.rs-icon {
+    fill: $grey !important;
+  }
+
+  .rs-input-group-addon .rs-icon {
+    margin-top: 3px !important;
+  }
+
+  // placeholders
   input::-webkit-input-placeholder {
     font-family: 'Lato' !important;
     font-weight: 400 !important;
-    color: var(--bs-secondary-color) !important;
+    color: $grey !important;
   }
 
   input:-moz-placeholder {
     font-family: 'Lato' !important;
     font-weight: 400 !important;
-    color: var(--bs-secondary-color) !important;
+    color: $grey !important;
   }
 }
 
