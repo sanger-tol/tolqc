@@ -43,5 +43,6 @@ a {
 }
 
 a:hover {
+  text-decoration: none;
   color: darken($primary, 10%);
 }

@@ -37,7 +37,11 @@
   }
 
   .rs-input,
+  .rs-picker-toggle-value,
+  .rs-picker-toggle-textbox,
   .rs-picker-default {
+    font-family: 'Lato' !important;
+    font-weight: 400 !important;
     border: 2px solid var(--bs-body-bg) !important;
     border-radius: 6px;
     color: $primary;
@@ -80,14 +84,3 @@
     color: $grey !important;
   }
 }
-
-/*
-::placeholder,
-::-ms-input-placeholder,
-::-webkit-input-placeholder,
-.rs-input::placeholder,
-.rs-picker-toggle-textbox::placeholder {
-  font-family: 'Lato' !important;
-  font-weight: 400 !important;
-  color: red !important;
-*/
