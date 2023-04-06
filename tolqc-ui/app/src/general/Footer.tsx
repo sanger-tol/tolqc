@@ -10,7 +10,7 @@ import { Container } from "react-bootstrap"
 function Footer() {
   return (
     <div className="footer">
-      <footer className="py-2 bg-black fixed-bottom">
+      <footer className="py-2 fixed-bottom">
         <Container>
           <p className="m-0 text-center text-white small">Maintained by
             <a href="https://sanger.ac.uk"> Wellcome Sanger Institute</a>

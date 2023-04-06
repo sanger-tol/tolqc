@@ -4,6 +4,20 @@
  * SPDX-License-Identifier: MIT
  */
 
+// --SASS-- //
 // Required Variables
-$primary: #09a5ee !default;
-$secondary: #0059ff !default;
+$primary: #0d6efd !default;
+$secondary: #004b84 !default;
+
+// Hover
+$grey: #808080 !default;
+$primary-opaque: rgba($primary, 0.1);
+$grey-hover: rgba($grey, 0.1);
+
+// --CSS VARS-- //
+:root {
+  --primary: #{$primary};
+  --secondary: #{$secondary};
+  --primary-opaque: #{$primary-opaque};
+  --grey-hover: #{$grey-hover};
+}

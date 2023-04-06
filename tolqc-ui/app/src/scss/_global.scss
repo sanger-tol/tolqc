@@ -4,8 +4,12 @@
  * SPDX-License-Identifier: MIT
  */
 
+
 body {
   @include body-font;
+  --bs-dropdown-link-hover-bg: var(--grey-hover);
+  --bs-link-hover-color: var(--grey-hover);
+  --bs-pagination-hover-bg: var(--grey-hover);
 }
 
 h1,
@@ -25,10 +29,16 @@ h6 {
   letter-spacing: 0.1rem;
 }
 
-.bg-black {
-  background-color: $black !important;
-}
-
 .rounded-pill {
   border-radius: 5rem;
+}
+
+a {
+  text-decoration: none;
+  color: $primary;
+}
+
+a:hover {
+  text-decoration: none;
+  color: darken($primary, 10%);
 }

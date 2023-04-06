@@ -13,6 +13,8 @@ import TableErrorAlert from './TableErrorAlert';
 import { Fields } from "./Field";
 import { convertTableData,
          convertHeadingData,
+         formatDateRange,
+         initialiseFilterDict,
          structureFieldsAuto,
          structureFieldsUsingProp,
          switchFilterVisability } from "./TableUtils"
@@ -31,7 +33,8 @@ export interface State {
   page: number,
   sizePerPage: number,
   totalSize: number,
-  error: boolean
+  error: boolean,
+  initialLoad: boolean
 }
 
 class AutoTable extends React.Component<Props, State> {
@@ -47,7 +50,8 @@ class AutoTable extends React.Component<Props, State> {
       page: 1,
       sizePerPage: 50,
       totalSize: -1,
-      error: false
+      error: false,
+      initialLoad: false
     }
   }
 
@@ -67,24 +71,26 @@ class AutoTable extends React.Component<Props, State> {
     sortOrder?: string,
     sortField?: string
   }) => {
-    let searchFilters: object = {};
+    let apiFilters: object = {};
 
-    // always on filtering - (wildcard or exact)
+    // always on filtering - (contains, exact, range)
     if (this.props.fixedFilter !== undefined) {
-      searchFilters = Object.assign(searchFilters, this.props.fixedFilter)
+      apiFilters = Object.assign(apiFilters, this.props.fixedFilter)
     }
 
-    // column specific filtering (wildcard currently)
-    if (type === 'filter') {
-      // initialising if keys do not exist
-      if (!('wildcard' in searchFilters)) {
-        searchFilters['wildcard'] = {}
-      }
-      if (!('exact' in searchFilters)) {
-        searchFilters['exact'] = {}
-      }
-      for (const dataField in filters) {
-        searchFilters['exact'][dataField] = filters[dataField]['filterVal']
+    // column specific filtering
+    if (type === 'filter' && filters !== undefined) {
+      for (let [key, meta] of Object.entries(filters)) {
+        if (meta['filterType'] === 'CONTAINS') {
+          apiFilters = initialiseFilterDict(apiFilters, 'contains')
+          apiFilters['contains'][key] = meta['filterVal']
+        } else if (meta['filterType'] === 'RANGE') {
+          apiFilters = initialiseFilterDict(apiFilters, 'range')
+          apiFilters['range'][key] = formatDateRange(meta['filterVal'])
+        } else if (meta['filterType'] === 'EXACT') {
+          apiFilters = initialiseFilterDict(apiFilters, 'exact')
+          apiFilters['exact'][key] = meta['filterVal']
+        }
       }
     }
 
@@ -98,17 +104,17 @@ class AutoTable extends React.Component<Props, State> {
       params: {
         page: page,
         page_size: sizePerPage,
-        filter: searchFilters,
+        filter: apiFilters,
         sort_by: sortField
       }
       })
       .then((res: any) => {
-        const data = res.data.data
-        const meta = res.data.meta
+        const apiData = res.data.data
+        const apiMeta = res.data.meta
         this.setState({
           page: page,
           sizePerPage: sizePerPage,
-          totalSize: meta.total,
+          totalSize: apiMeta.total,
           error: false,
         })
         
@@ -118,25 +124,39 @@ class AutoTable extends React.Component<Props, State> {
         }
 
         // check if any data is returned
-        if (data[0] !== undefined) {
+        if (apiData[0] !== undefined) {
           let fieldMeta = {};
 
           // checking if 'fields' has been defined
           if (this.props.fields !== undefined) {
-            fieldMeta = structureFieldsUsingProp(this.props.fields)
+            fieldMeta = structureFieldsUsingProp(this.props.fields, apiMeta.types)
           } else {
-            if ('attributes' in data[0]) {
-              const attributes = structureFieldsAuto(data[0].attributes, true)
+            if ('attributes' in apiData[0]) {
+              const attributes = structureFieldsAuto(
+                apiData[0].attributes,
+                apiMeta.types,
+                true
+              )
               fieldMeta = Object.assign(fieldMeta, attributes)
             }
-            if ('relationships' in data[0]) {
-              const relationships = structureFieldsAuto(data[0].relationships, false)
+            if ('relationships' in apiData[0]) {
+              const relationships = structureFieldsAuto(
+                apiData[0].relationships,
+                apiMeta.types,
+                false
+              )
               fieldMeta = Object.assign(fieldMeta, relationships)
             }
           }
+          // only updating heading state on first load
+          if (!this.state.initialLoad) {
+            this.setState({
+              headings: convertHeadingData(fieldMeta),
+              initialLoad: true
+            })
+          }
           this.setState({
-            tableData: convertTableData(data, fieldMeta),
-            headings: convertHeadingData(fieldMeta)
+            tableData: convertTableData(apiData, fieldMeta)
           })
         }
       })

@@ -106,10 +106,10 @@ class RelationshipLink extends React.Component<Props, State> {
   render() {
     return (
       <ToolTipOverlay
-        placement='bottom'
+        placement='autoHorizontalStart'
         contents={ convertRelationshipData(this.state.contents) }
       >
-        <div className='relationship-box' key={ this.props.initialEndpoint }>
+        <div className='link-box' key={ this.props.initialEndpoint }>
           { this.state.text }
         </div>
       </ToolTipOverlay>

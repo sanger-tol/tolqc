@@ -1,0 +1,86 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Genome Research Ltd.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+:root {
+  --rs-tooltip-bg: var(--bs-body-bg);
+  --rs-bg-overlay: var(--bs-body-bg);
+  --rs-input-bg: var(--bs-body-bg);
+
+  --rs-tooltip-text: var(--bs-body-color);
+
+  --rs-btn-link-text: var(--primary);
+  --rs-btn-primary-hover-bg: var(--primary);
+  --rs-btn-primary-bg: var(--primary);
+  --rs-calendar-cell-selected-hover-bg: var(--primary);
+  --rs-bg-active: var(--primary);
+  --rs-listbox-option-hover-text: var(--primary);
+
+  --rs-calendar-range-bg: var(--primary-opaque);
+  --rs-listbox-option-hover-bg: var(--grey-hover);
+
+  // filtering inputs
+  .rs-picker-default .rs-picker-toggle,
+  .rs-input-group {
+    border: none;
+  }
+
+  .rs-input:focus,
+  .rs-input:hover,
+  .rs-picker-default:hover,
+  .rs-picker-default:focus,
+  .rs-picker-default:focus-within {
+    border: 2px solid $primary !important;
+    border-radius: 6px;
+  }
+
+  .rs-input,
+  .rs-picker-toggle-value,
+  .rs-picker-toggle-textbox,
+  .rs-picker-default {
+    font-family: 'Lato' !important;
+    font-weight: 400 !important;
+    border: 2px solid var(--bs-body-bg) !important;
+    border-radius: 6px;
+    color: $primary;
+    background-color: var(--bs-body-bg) !important;
+  }
+
+  .rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus,
+  .rs-input-group:focus-within,
+  .rs-input:focus,
+  .rs-picker-toggle-active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .rs-picker-toggle-read-only {
+    opacity: unset;
+    color: $primary;
+  }
+
+  // icons in filters
+  .rs-input-group-addon .rs-icon,
+  .rs-picker-toggle-caret.rs-icon {
+    fill: $grey !important;
+  }
+
+  .rs-input-group-addon .rs-icon {
+    margin-top: 3px !important;
+  }
+
+  // placeholders
+  input::-webkit-input-placeholder {
+    font-family: 'Lato' !important;
+    font-weight: 400 !important;
+    color: $grey !important;
+  }
+
+  input:-moz-placeholder {
+    font-family: 'Lato' !important;
+    font-weight: 400 !important;
+    color: $grey !important;
+  }
+}

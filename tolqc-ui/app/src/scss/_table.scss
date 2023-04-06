@@ -4,7 +4,35 @@
  * SPDX-License-Identifier: MIT
  */
 
- .tol-table {
+.tol-table {
+  th {
+    background-color: $primary-opaque;
+  }
+
+  // hover effects
+  tr th:hover,
+  tbody tr:hover,
+  li.dropdown-item:hover,
+  li.dropdown-item:active,
+  .page-link:hover {
+    background-color: $grey-hover;
+  }
+
+  .page-link {
+    background-color: none;
+    text-decoration: none;
+  }
+
+  // darken various buttons
+  #pageDropDown:hover,
+  .tol-table-filter-button:hover,
+  .tol-table-filter-button:active,
+  .active.page-item .page-link:hover {
+    background-color: darken($primary, 10%) !important;
+    border-color: darken($primary, 10%) !important;
+    text-decoration: none;
+  }
+
   // table sorting arrows
   button span .caret { // hides duplicate page size dropdown arrow
     display: none;
@@ -27,6 +55,10 @@
     border-bottom: 4px dashed;
     border-bottom: 4px solid \9;
     content: "";
+  }
+
+  .sorting-active-colour {
+    background-color: $grey-hover;
   }
 
   // hide or show filter search
@@ -65,6 +97,14 @@
     margin-right: 0;
   }
 
+  .active.page-item .page-link {
+    color: white;
+  }
+
+  .page-item .page-link {
+    color: $primary;
+  }
+
   // page size dropdown
   span.open.show.react-bs-table-sizePerPage-dropdown.dropdown {
     float: right;
@@ -72,10 +112,19 @@
 
   ul.dropdown-menu.open.show {
     min-width: 0;
+    position: absolute;
+    top: 50px;
+    right: 3px;
   }
 
   li.dropdown-item a {
-    color: $primary
+    color: $primary;
+    text-decoration: none;
+    padding: 10px !important;
+  }
+
+  li.dropdown-item {
+    padding: 4px !important;
   }
 
   // filter visability
@@ -110,40 +159,40 @@
     width: 1% !important;
   }
 
-  // relationship link
-  .relationship-box {
-    background-color: lighten($primary, 50%) !important;
+  // link box (e.g. relationship)
+  .link-box {
+    background-color: rgba($primary, 0.1) !important;
     padding: 10px;
-    border-style: solid;
-    border-color: lighten($primary, 45%) !important;
   }
 
-  .relationship-box:hover {
-    background-color: lighten($primary, 45%) !important;
+  .link-box:hover {
+    background-color: rgba($primary, 0.2) !important;
+  }
+
+  .link-box.clickable {
     cursor: pointer;
-  }
-
-  // tooltip
-  .relationship-tooltip {
-    margin: 5px;
-  }
-
-  .tooltip-key {
-    margin-right: 5px;
-    font-size: small;
-    font-weight: bold;
-  }
-
-  .tooltip-value {
-    font-size: small;
-  }
-
-  .tooltip-wrapper {
-    display: inline-block;
   }
 
   // This is here because react-table uses Bootstrap 4 classes
   .sr-only {
     @extend .visually-hidden
   }
+}
+
+// tooltip
+.relationship-tooltip {
+  margin: 5px;
+}
+
+.tooltip-key {
+  margin-right: 5px;
+  font-size: small;
+}
+
+.tooltip-value {
+  font-size: small;
+}
+
+.tooltip-wrapper {
+  display: inline-block;
 }

@@ -4,7 +4,9 @@ SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import { textFilter } from 'react-bootstrap-table2-filter';
+import { customFilter } from 'react-bootstrap-table2-filter';
+import DatePicker from './DatePicker';
+import TextInput from './TextInput';
 import { format } from 'date-fns'
 import RelationshipLink from './RelationshipLink';
 import CellTooltip from './CellTooltip';
@@ -13,6 +15,25 @@ import { addFieldDefaults } from './Field';
 
 function isEmptyOrNull(option: string) {
   return option === '' || option === null
+}
+
+export function initialiseFilterDict(apiFilters: object, filterType: string) {
+  if (!(filterType in apiFilters)) {
+    apiFilters[filterType] = {}
+  }
+  return apiFilters
+}
+
+export function formatDateRange(dateRange: string[]) {
+  let from = new Date(dateRange[0])
+  let to = new Date(dateRange[1])
+  // ensure a whole day is selected
+  from.setHours(0, 0, 0, 0);
+  to.setHours(23, 59, 59, 999);
+  return {
+    from: from,
+    to: to
+  }
 }
 
 export function normaliseCaps(fieldName: string) {
@@ -115,15 +136,8 @@ function formatRelationshipData(data: object, fieldMeta: object) {
   return updatedData
 }
 
-function searchFilter(heading: string) { 
-  return textFilter({
-    className: 'filter-search-input-hide',
-    placeholder: heading
-  })
-}
-
 export function convertHeadingData(fieldMeta: object) {
-  const headerSortingStyle = { backgroundColor: '#edffec' };
+  const headerSortingClasses = () => ('sorting-active-colour');
   const headerStyling = (width: string) => { return { minWidth: width } }
   const updatedHeadings: object[] = []
 
@@ -132,6 +146,7 @@ export function convertHeadingData(fieldMeta: object) {
     let headerWidth = meta.width.toString() + 'px'
     let hidden = false
 
+    // rename via override or normalise a field name
     if (isEmptyOrNull(meta.rename)) {
       capsHeading = normaliseCaps(key)
     } else {
@@ -146,23 +161,35 @@ export function convertHeadingData(fieldMeta: object) {
       let heading = {
         dataField: key,
         text: capsHeading,
-        headerSortingStyle,
+        headerSortingClasses,
         headerStyle: headerStyling(headerWidth),
         hidden: hidden
-      }
-      if (meta.filter === true) {
-        heading['filter'] = searchFilter(capsHeading)
       }
       if (meta.sort === true) {
         heading['sort'] = true
       }
+      if (meta.filter === true) {
+        heading['filter'] = customFilter({
+          type: meta.filterType
+        })
+        if (meta.filterType === 'RANGE') {
+          heading['filterRenderer'] = (onFilter: any, column: any) =>
+            <DatePicker onFilter={ onFilter } column={ column } />
+        } else {
+          if (meta.type === null) {
+            console.log(key)
+          }
+          heading['filterRenderer'] = (onFilter: any, column: any) => 
+            <TextInput type={ meta.type } onFilter={ onFilter } column={ column } />
+        }
+      }
       updatedHeadings.push(heading);
-      // if heading is a relationship
+    
+    // if heading is a relationship
     } else if (meta.isAttribute === false) {
       updatedHeadings.push({
         dataField: key,
         text: capsHeading,
-        headerSortingStyle,
         headerStyle: headerStyling(headerWidth)
       });
     }
@@ -187,8 +214,21 @@ export function convertTableData(data: any[], fieldMeta: object) {
   return updatedData;
 }
 
+function convertTypeToDefaultFilter(type: string) {
+  switch(type) {
+    case 'str':
+    case 'int':
+    case 'float':
+      return 'CONTAINS';
+    case 'datetime':
+      return 'RANGE';
+    default:
+      return null;
+  }
+}
+
 // structure fields via the prop 'fields'
-export function structureFieldsUsingProp(fields: object) {
+export function structureFieldsUsingProp(fields: object, apiFieldMeta: object) {
   for (let [key, meta] of Object.entries(fields)) {
     fields[key] = addFieldDefaults(meta)
     // if key is a relationship
@@ -199,38 +239,56 @@ export function structureFieldsUsingProp(fields: object) {
       fields[key]['isAttribute'] = false
     } else {
       fields[key]['isAttribute'] = true
+      fields[key]['type'] = apiFieldMeta[key]
+      // you can currently only override with 'exact' filtering
+      if (fields[key]['filterType'] === 'EXACT') {
+        fields[key]['filterType'] = 'EXACT'
+      } else {
+        fields[key]['filterType'] = convertTypeToDefaultFilter(apiFieldMeta[key])
+      }
     }
   }
   return fields
 }
 
 // structure fields using the json-api spec
-export function structureFieldsAuto(apiFields: object, isAttribute: boolean) {
+export function structureFieldsAuto(
+  apiFields: object,
+  apiFieldMeta: object,
+  isAttribute: boolean
+) {
   const fields = {}
   // adding internal ID to row
   fields['id'] = addFieldDefaults({
     'rename': 'ID',
-    'isAttribute': true
+    'isAttribute': true,
+    'type': 'int'
   })
   for (let [key, data] of Object.entries(apiFields)) {
     // ignoring one-to-many relationships
-    if (isAttribute === false && !('data' in data)) {
+    if (!isAttribute && !('data' in data)) {
       console.warn('\'' + key + '\' is on the many side of the relationship' + 
                     ' - therefore it is being ignored.')
       continue
     }
-    fields[key] = addFieldDefaults(data)
-    fields[key]['isAttribute'] = isAttribute
+    fields[key] = addFieldDefaults({
+      'isAttribute': isAttribute
+    })
+    // meta field type is 'data' for attributes
+    if (isAttribute) {
+      fields[key]['type'] = apiFieldMeta[key]
+      fields[key]['filterType'] = convertTypeToDefaultFilter(apiFieldMeta[key])
+    }
   }
   return fields
 }
 
 export function switchFilterVisability() {
   let filterVisability = getComputedStyle(document.documentElement).getPropertyValue('--filter-visability')
-  if (filterVisability === 'flex') {
+  if (filterVisability === 'block') {
     filterVisability = 'none'
   } else {
-    filterVisability = 'flex'
+    filterVisability = 'block'
   }
   document.documentElement.style.setProperty('--filter-visability', filterVisability);
 }

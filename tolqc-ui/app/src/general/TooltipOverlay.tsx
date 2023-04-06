@@ -5,16 +5,12 @@ SPDX-License-Identifier: MIT
 */
 
 import React from 'react';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
+import { Tooltip, Whisper } from 'rsuite';
 
 
 function renderTooltip(contents: JSX.Element|string, props?: any) {
   return(
-    <Tooltip 
-      id='button-tooltip'
-      { ...props }
-    >
+    <Tooltip>
       { contents }
     </Tooltip>
   );
@@ -42,14 +38,15 @@ class ToolTipOverlay extends React.Component<Props, State> {
       placement = this.props.placement
     }
     return (
-      <OverlayTrigger
+      <Whisper
         // @ts-ignore
         placement={ placement }
-        delay={{ show: 250, hide: 350 }}
-        overlay={ renderTooltip(this.props.contents) }
+        controlId="control-id-click"
+        trigger="click"
+        speaker={ renderTooltip(this.props.contents) }
       >
         { this.props.children }
-      </OverlayTrigger>
+      </Whisper>
     );
   }
 }
