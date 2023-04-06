@@ -18,6 +18,7 @@ function Home() {
             "created_at": {},
             "name": {},
             "taxon_id": {
+              rename: 'Taxon ID',
               filterType: 'EXACT'
             }
           }}

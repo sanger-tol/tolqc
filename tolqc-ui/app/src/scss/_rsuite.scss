@@ -20,38 +20,62 @@
 
   --rs-calendar-range-bg: var(--primary-opaque);
   --rs-listbox-option-hover-bg: var(--grey-hover);
+
+
+  .rs-picker-default .rs-picker-toggle,
+  .rs-input-group {
+    border: none;
+  }
+
+  .rs-input:focus,
+  .rs-input:hover,
+  .rs-picker-default:hover,
+  .rs-picker-default:focus,
+  .rs-picker-default:focus-within {
+    border: 2px solid $primary !important;
+    border-radius: 7px;
+  }
+
+  .rs-input,
+  .rs-picker-default {
+    border: 2px solid var(--bs-body-bg) !important;
+    border-radius: 7px;
+    color: $primary;
+  }
+
+  .rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus,
+  .rs-input-group:focus-within,
+  .rs-input:focus,
+  .rs-picker-toggle-active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .rs-picker-toggle-read-only {
+    opacity: unset;
+    color: $primary;
+  }
+
+  input::-webkit-input-placeholder {
+    font-family: 'Lato' !important;
+    font-weight: 400 !important;
+    color: var(--bs-secondary-color) !important;
+  }
+
+  input:-moz-placeholder {
+    font-family: 'Lato' !important;
+    font-weight: 400 !important;
+    color: var(--bs-secondary-color) !important;
+  }
 }
 
-.rs-picker-default .rs-picker-toggle,
-.rs-input-group {
-  border: none;
-}
-
-.rs-input:focus,
-.rs-input:hover,
-.rs-picker-default:hover,
-.rs-picker-default:focus,
-.rs-picker-default:focus-within {
-  border: 1px solid $primary !important;
-  border-radius: 7px;
-}
-
-.rs-input,
-.rs-picker-default {
-  border: 1px solid var(--bs-body-bg) !important;
-  border-radius: 7px;
-  color: $primary;
-}
-
-.rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus,
-.rs-input-group:focus-within,
-.rs-input:focus,
-.rs-picker-toggle-active {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.rs-picker-toggle-read-only {
-  opacity: unset;
-  color: $primary;
-}
+/*
+::placeholder,
+::-ms-input-placeholder,
+::-webkit-input-placeholder,
+.rs-input::placeholder,
+.rs-picker-toggle-textbox::placeholder {
+  font-family: 'Lato' !important;
+  font-weight: 400 !important;
+  color: red !important;
+*/
