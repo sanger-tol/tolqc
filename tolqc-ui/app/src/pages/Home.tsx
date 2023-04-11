@@ -4,7 +4,6 @@ SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import React from "react";
 import { AutoTable, CentreContents } from '@tol/tol-ui'
 
 function Home() {
@@ -12,14 +11,24 @@ function Home() {
     <div className="home">
       <CentreContents>
         <AutoTable endpoint="species"
-          requiredFields={{
-            'hierarchy_name': 'Project',
-            'name': 'Name',
-            'common_name': 'Common name',
-            'taxon_id': "Taxon ID",
-            'taxon_family': 'Family',
-            'taxon_order': 'Order',
-            'taxon_phylum': 'Phylum'
+          fields={{
+            'hierarchy_name': {
+              'rename': 'Project'
+            },
+            'name': {},
+            'common_name': {},
+            'taxon_id': {
+              'rename': 'Taxon ID'
+            },
+            'taxon_family': {
+              'rename': 'Family'
+            },
+            'taxon_order': {
+              'rename': 'Order'
+            },
+            'taxon_phylum': {
+              'rename': 'Phylum'
+            }
           }}
         />
       </CentreContents>
