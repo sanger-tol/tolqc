@@ -4,7 +4,6 @@ SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import React from 'react';
 import ReactDOM from 'react-dom';
 import { Home } from './pages';
 import reportWebVitals from './reportWebVitals';
@@ -13,13 +12,11 @@ import './scss/styling.scss';
 
 
 ReactDOM.render(
-  <React.StrictMode>
-    <TolApp
-      brand='TolQC'
-      home_page={<Home />}
-      pages={[]}
-    />
-  </React.StrictMode>,
+  <TolApp
+    brand='TolQC'
+    homePage={<Home />}
+    pages={[]}
+  />,
   document.getElementById('root')
 );
 
