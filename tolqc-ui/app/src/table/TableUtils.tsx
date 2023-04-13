@@ -39,7 +39,11 @@ export function formatDateRange(dateRange: string[]) {
 export function normaliseCaps(fieldName: string) {
   const words = fieldName.split('_');
   for (let count = 0; count < words.length; count++) {
-    words[count] = words[count][0].toUpperCase() + words[count].substring(1);
+    if (words[count] === 'id') {
+      words[count] = 'ID'
+    } else {
+      words[count] = words[count][0].toUpperCase() + words[count].substring(1); 
+    }
   }
   return words.join(' ');
 }
@@ -124,10 +128,12 @@ function formatRelationshipData(data: object, fieldMeta: object) {
     }
     // ignoring one-to-many relationships
     if ('data' in data[currentObject]) {
+      console.log(key, fieldMeta[key]['relationshipBox'])
       const headingId = splitKey.join('.')
       updatedData[headingId] = <RelationshipLink
         initialEndpoint={ data[currentObject].links.related }
         relationships={ splitKey }
+        relationshipBox={ fieldMeta[key]['relationshipBox'] }
       />
     } else {
       throw Error(key + ' not in API data call')

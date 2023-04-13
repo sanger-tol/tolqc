@@ -17,4 +17,12 @@ const LoadingHelix = () => (
   </div>
 )
 
+export const MiniLoadingHelix = () => {
+  return (
+    <div className='mini-loader'>
+      <LoadingHelix />
+    </div>
+  )
+}
+
 export default LoadingHelix;

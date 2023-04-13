@@ -12,59 +12,75 @@ function Home() {
   return (
     <div className="home">
       <CentreContents>
+
+        
         <AutoTable 
-          endpoint="species"
+          endpoint="specimens"
           fields={{
-            "created_at": {},
-            "name": {},
-            "taxon_id": {
-              rename: 'Taxon ID',
-              filterType: 'EXACT'
+            "species.id" : {
+              rename: "Species ID",
+              relationshipBox: true
+            },
+            "species.name" : {
+              rename : "Species Name"
+            },
+            "name" : {
+              rename : "Specimen Name"
+            },
+            "last_modified_at" : {},
+            "creator.name" : {
+              rename: "Creator",
+              relationshipBox: true
             }
           }}
         />
-        <AutoTable
-          endpoint="species"
-          fields={{
-            "creator.name": {
-              rename: "x123"
-            },
-            "hierarchy_name": {
-              rename: "Project",
-              width: 600,
-              link: "common_name",
-              sort: false
-            },
-            "name": {
-              filterType: 'EXACT'
-            },
-            "common_name": {
-              rename: "Common Name",
-              filterType: 'EXACT'
-            },
-            "taxon_id": {
-              rename: "Taxon ID"
-            },
-            "taxon_family": {
-              rename: "Family"
-            },
-            "taxon_order": {
-              rename: "Order"
-            },
-            "taxon_phylum": {
-              rename: "Phylum"
-            }
-          }}
-          fixedFilter={{
-            "exact": {
-              "taxon_family": "Inachidae"
-            }
-          }}
-        />
-        <AutoTable endpoint="species" />
+
       </CentreContents>
     </div>
   );
 }
 
 export default Home;
+
+
+/*
+<AutoTable
+  endpoint="species"
+  fields={{
+    "creator.name": {
+      rename: "x123"
+    },
+    "hierarchy_name": {
+      rename: "Project",
+      width: 600,
+      link: "common_name",
+      sort: false
+    },
+    "name": {
+      filterType: 'EXACT'
+    },
+    "common_name": {
+      rename: "Common Name",
+      filterType: 'EXACT'
+    },
+    "taxon_id": {
+      rename: "Taxon ID"
+    },
+    "taxon_family": {
+      rename: "Family"
+    },
+    "taxon_order": {
+      rename: "Order"
+    },
+    "taxon_phylum": {
+      rename: "Phylum"
+    }
+  }}
+  fixedFilter={{
+    "exact": {
+      "taxon_family": "Inachidae"
+    }
+  }}
+/>
+<AutoTable endpoint="species" />
+*/

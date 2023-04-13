@@ -7,34 +7,15 @@ SPDX-License-Identifier: MIT
 import React from 'react';
 import { httpClient } from '@tol/tol-ui'
 import ToolTipOverlay from '../general/TooltipOverlay';
-import LoadingHelix from './LoadingHelix';
+import FormatRelationshipTooltip from './FormatRelationshipTooltip';
 import { normaliseCaps } from './TableUtils'
+import { MiniLoadingHelix } from './LoadingHelix'
 
-
-function convertRelationshipData(contents: object|string) {
-  return (
-    <div>
-      {Object.entries(contents).map(([key, value]) => (
-        <div className='relationship-tooltip' key={ key }>
-          <span className='tooltip-key'>{ normaliseCaps(key) }:</span>
-          <span className='tooltip-value'>{ value }</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-const MiniLoader = () => {
-  return (
-    <div className='mini-loader'>
-      <LoadingHelix />
-    </div>
-  )
-}
 
 export interface Props {
   initialEndpoint: string,
-  relationships: string[]
+  relationships: string[],
+  relationshipBox: boolean
 }
 
 export interface State {
@@ -46,7 +27,7 @@ class RelationshipLink extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      text: <MiniLoader />,
+      text: <MiniLoadingHelix />,
       contents: {}
     }
   }
@@ -68,6 +49,7 @@ class RelationshipLink extends React.Component<Props, State> {
       await httpClient().get(endpoint)
       .then((res: any) => { // eslint-disable-line no-loop-func
         const data = res.data.data
+        const attributes = Object.assign({'id': data.id}, data.attributes)
         // if endpoint is the last relationship, set state
         if (count === relationshipTotal-1) {
           // if no requiredFields are set, there is no attribute
@@ -75,7 +57,7 @@ class RelationshipLink extends React.Component<Props, State> {
           if (attribute === '') {
             displayText = normaliseCaps(data.type) + ': ' + data.id
           } else {
-            displayText = data.attributes[attribute]
+            displayText = attributes[attribute]
           }
           // if defined attribute is incorrect, raise warning
           if (displayText === undefined) {
@@ -88,7 +70,7 @@ class RelationshipLink extends React.Component<Props, State> {
           }
           this.setState({
             text: displayText,
-            contents: data.attributes
+            contents: attributes
           })
         } else {
           // assign detail endpoint where relationship title is
@@ -105,14 +87,24 @@ class RelationshipLink extends React.Component<Props, State> {
 
   render() {
     return (
-      <ToolTipOverlay
-        placement='autoHorizontalStart'
-        contents={ convertRelationshipData(this.state.contents) }
-      >
-        <div className='link-box' key={ this.props.initialEndpoint }>
-          { this.state.text }
-        </div>
-      </ToolTipOverlay>
+      <div>
+        {(() => {
+          if (this.props.relationshipBox) {
+            return (
+              <ToolTipOverlay
+                placement='autoHorizontalStart'
+                contents={ <FormatRelationshipTooltip contents={ this.state.contents } /> }
+              >
+                <div className='link-box' key={ this.props.initialEndpoint }>
+                  { this.state.text }
+                </div>
+              </ToolTipOverlay>
+            )
+          } else {
+            return <div>{ this.state.text }</div>
+          }
+        })()}
+      </div>
     );
   }
 }

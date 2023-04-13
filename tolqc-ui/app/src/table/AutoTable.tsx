@@ -148,6 +148,9 @@ class AutoTable extends React.Component<Props, State> {
               fieldMeta = Object.assign(fieldMeta, relationships)
             }
           }
+          console.log('data', apiData)
+          console.log(fieldMeta)
+          console.log(convertTableData(apiData, fieldMeta))
           // only updating heading state on first load
           if (!this.state.initialLoad) {
             this.setState({

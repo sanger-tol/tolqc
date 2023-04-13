@@ -187,11 +187,14 @@
 .tooltip-key {
   margin-right: 5px;
   font-size: small;
+  font-weight: 1000;
 }
 
-.tooltip-value {
-  font-size: small;
+.tooltip-value-none {
+  color: $grey;
+  font-weight: 400;
 }
+
 
 .tooltip-wrapper {
   display: inline-block;

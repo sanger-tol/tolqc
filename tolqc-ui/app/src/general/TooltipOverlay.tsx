@@ -41,8 +41,8 @@ class ToolTipOverlay extends React.Component<Props, State> {
       <Whisper
         // @ts-ignore
         placement={ placement }
-        controlId="control-id-click"
-        trigger="click"
+        controlId="hover-id-click"
+        trigger="hover"
         speaker={ renderTooltip(this.props.contents) }
       >
         { this.props.children }
