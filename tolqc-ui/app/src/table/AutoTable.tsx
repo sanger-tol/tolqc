@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 import React from "react";
 import { httpClient } from '@tol/tol-ui'
 import Table from "./Table";
-import LoadingHelix from "./LoadingHelix";
+import LoadingHelix from "../general/LoadingHelix";
 import NoDataAlert from "./NoDataAlert";
 import TableErrorAlert from './TableErrorAlert';
 import { Fields } from "./Field";

@@ -9,7 +9,7 @@ import { httpClient } from '@tol/tol-ui'
 import ToolTipOverlay from '../general/TooltipOverlay';
 import FormatRelationshipTooltip from './FormatRelationshipTooltip';
 import { normaliseCaps } from './TableUtils'
-import { MiniLoadingHelix } from './LoadingHelix'
+import { MiniLoadingHelix } from '../general/LoadingHelix'
 
 
 export interface Props {
