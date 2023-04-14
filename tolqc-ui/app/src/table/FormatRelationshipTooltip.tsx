@@ -24,7 +24,6 @@ const updateContents = (contents: object) => {
     if (!value) {
       contents[key] = <span className="tooltip-value-none">None</span>
     }
-    console.log(value)
   }
   return contents
 }

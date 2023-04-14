@@ -9,6 +9,10 @@
     background-color: $primary-opaque;
   }
 
+  td:hover {
+    background-color: var(--bs-body-bg);
+  }
+
   // hover effects
   tr th:hover,
   tbody tr:hover,
@@ -194,7 +198,6 @@
   color: $grey;
   font-weight: 400;
 }
-
 
 .tooltip-wrapper {
   display: inline-block;

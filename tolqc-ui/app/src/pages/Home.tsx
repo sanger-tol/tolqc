@@ -13,6 +13,10 @@ function Home() {
     <div className="home">
       <CentreContents>
 
+      <AutoTable
+        debug
+        endpoint="specimens"
+      />
         
         <AutoTable 
           endpoint="specimens"
