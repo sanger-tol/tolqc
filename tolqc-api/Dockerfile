@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM tiangolo/uwsgi-nginx-flask:python3.8
+FROM tiangolo/uwsgi-nginx-flask:python3.11
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV UWSGI_CHEAPER 4
