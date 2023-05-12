@@ -10,24 +10,19 @@ function Home() {
   return (
     <div className="home">
       <CentreContents>
-        <AutoTable endpoint="species"
+        <AutoTable endpoint="data"
           fields={{
-            'hierarchy_name': {
-              'rename': 'Project'
+            'name': {
+              'rename': 'Run/element/tag'
             },
-            'name': {},
-            'common_name': {},
-            'taxon_id': {
-              'rename': 'Taxon ID'
+            'runs.start_date': {
+              'rename': 'Run'
             },
-            'taxon_family': {
-              'rename': 'Family'
+            'samples.name': {
+              'rename': 'Sanger Sample ID'
             },
-            'taxon_order': {
-              'rename': 'Order'
-            },
-            'taxon_phylum': {
-              'rename': 'Phylum'
+            'samples.specimens.species.name': {
+              'rename': 'Species'
             }
           }}
         />

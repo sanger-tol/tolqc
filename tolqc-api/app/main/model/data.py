@@ -20,6 +20,7 @@ class Data(LogBase):
     accession_id = db.Column(db.Integer(), db.ForeignKey('accession.id'))
     run_id = db.Column(db.Integer(), db.ForeignKey('run.id'))
     processed = db.Column(db.Integer())
+    tag_index = db.Column(db.String())
     tag1_id = db.Column(db.String())
     tag2_id = db.Column(db.String())
     lims_qc = db.Column(db.Integer())
@@ -27,6 +28,7 @@ class Data(LogBase):
     qc = db.Column(db.Integer())
     withdrawn = db.Column(db.Boolean())
     manually_withdrawn = db.Column(db.Boolean())
+    checksum_from_mlwh = db.Column(db.String())
     sample = db.relationship('Sample', back_populates='data',
                              foreign_keys=[sample_id])
     library = db.relationship('Library', back_populates='data',

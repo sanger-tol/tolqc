@@ -21,6 +21,9 @@ class Run(LogBase):
     element = db.Column(db.String())
     instrument_name = db.Column(db.String())
     date = db.Column(db.DateTime())
+    start_date = db.Column(db.DateTime())
+    qc_date = db.Column(db.DateTime())
+    complete_date = db.Column(db.DateTime())
     data = db.relationship('Data', back_populates='run')
     platform = db.relationship('Platform', back_populates='run',
                                foreign_keys=[platform_id])
