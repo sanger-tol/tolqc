@@ -15,7 +15,7 @@ class Set(LogBase):
     id = db.Column(db.Integer(), primary_key=True)  # noqa A003
     data_id = db.Column(db.Integer(), db.ForeignKey('data.id'))
     dataset_id = db.Column(db.Integer(), db.ForeignKey('dataset.id'))
-    data = db.relationship('Data', back_populates='set',
-                           foreign_keys=[data_id])
-    dataset = db.relationship('Dataset', back_populates='set',
-                              foreign_keys=[dataset_id])
+    data = db.relationship('Data', back_populates='set', foreign_keys=[data_id])
+    dataset = db.relationship(
+        'Dataset', back_populates='set', foreign_keys=[dataset_id]
+    )

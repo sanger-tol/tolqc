@@ -21,9 +21,12 @@ class Status(LogBase):
     qc_dict_id = db.Column(db.Integer(), db.ForeignKey('qc_dict.id'))
     milestone_dict_id = db.Column(db.Integer(), db.ForeignKey('milestone_dict.id'))
     specimen = db.relationship('Specimen', back_populates='status')
-    status_dict = db.relationship('StatusDict', back_populates='status',
-                                  foreign_keys=[status_dict_id])
-    qc_dict = db.relationship('QcDict', back_populates='status',
-                              foreign_keys=[qc_dict_id])
-    milestone_dict = db.relationship('MilestoneDict', back_populates='status',
-                                     foreign_keys=[milestone_dict_id])
+    status_dict = db.relationship(
+        'StatusDict', back_populates='status', foreign_keys=[status_dict_id]
+    )
+    qc_dict = db.relationship(
+        'QcDict', back_populates='status', foreign_keys=[qc_dict_id]
+    )
+    milestone_dict = db.relationship(
+        'MilestoneDict', back_populates='status', foreign_keys=[milestone_dict_id]
+    )

@@ -18,5 +18,6 @@ class Library(LogBase):
     library_type_id = db.Column(db.Integer(), db.ForeignKey('library_type.id'))
     lims_id = db.Column(db.Integer())
     data = db.relationship('Data', back_populates='library')
-    library_type = db.relationship('LibraryType', back_populates='library',
-                                   foreign_keys=[library_type_id])
+    library_type = db.relationship(
+        'LibraryType', back_populates='library', foreign_keys=[library_type_id]
+    )

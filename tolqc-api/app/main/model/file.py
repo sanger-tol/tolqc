@@ -17,5 +17,4 @@ class File(LogBase):
     name = db.Column(db.String())
     type = db.Column(db.String())  # noqa A003
     md5 = db.Column(db.String())
-    data = db.relationship('Data', back_populates='file',
-                           foreign_keys=[data_id])
+    data = db.relationship('Data', back_populates='file', foreign_keys=[data_id])

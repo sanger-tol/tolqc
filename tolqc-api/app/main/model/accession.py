@@ -21,8 +21,11 @@ class Accession(LogBase):
     title = db.Column(db.String())
     description = db.Column(db.String())
 
-    accession_type_dict = db.relationship('AccessionTypeDict', back_populates='accession',
-                                          foreign_keys=[accession_type_id])
+    accession_type_dict = db.relationship(
+        'AccessionTypeDict',
+        back_populates='accession',
+        foreign_keys=[accession_type_id],
+    )
     project = db.relationship('Project', back_populates='accession')
     specimen = db.relationship('Specimen', back_populates='accession')
     sample = db.relationship('Sample', back_populates='accession')

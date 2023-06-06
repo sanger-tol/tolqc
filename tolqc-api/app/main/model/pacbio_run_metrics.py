@@ -35,5 +35,6 @@ class PacbioRunMetrics(LogBase):
     demux_version_id = db.Column(db.String())
     demux_pass = db.Column(db.Integer())
     demux_fail = db.Column(db.Integer())
-    run = db.relationship('Run', back_populates='pacbio_run_metrics',
-                          foreign_keys=[run_id])
+    run = db.relationship(
+        'Run', back_populates='pacbio_run_metrics', foreign_keys=[run_id]
+    )

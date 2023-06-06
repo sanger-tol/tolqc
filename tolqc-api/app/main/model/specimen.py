@@ -25,11 +25,12 @@ class Specimen(LogBase):
     father_id = db.Column(db.Integer())
     mother_id = db.Column(db.Integer())
     allocation = db.relationship('Allocation', back_populates='specimen')
-    species = db.relationship('Species', back_populates='specimen',
-                              foreign_keys=[species_id])
+    species = db.relationship(
+        'Species', back_populates='specimen', foreign_keys=[species_id]
+    )
     sample = db.relationship('Sample', back_populates='specimen')
     status = db.relationship('Status', back_populates='specimen', uselist=False)
-    sex = db.relationship('Sex', back_populates='specimen',
-                          foreign_keys=[sex_id])
-    accession = db.relationship('Accession', back_populates='specimen',
-                                foreign_keys=[accession_id])
+    sex = db.relationship('Sex', back_populates='specimen', foreign_keys=[sex_id])
+    accession = db.relationship(
+        'Accession', back_populates='specimen', foreign_keys=[accession_id]
+    )

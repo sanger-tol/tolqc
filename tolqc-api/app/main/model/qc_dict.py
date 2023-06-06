@@ -13,5 +13,6 @@ class QcDict(EnumBase):
         type_ = 'qc_types'
 
     status = db.relationship('Status', back_populates='qc_dict')
-    genomescope_metrics = db.relationship('GenomescopeMetrics',
-                                          back_populates='qc_dict')
+    genomescope_metrics = db.relationship(
+        'GenomescopeMetrics', back_populates='qc_dict'
+    )

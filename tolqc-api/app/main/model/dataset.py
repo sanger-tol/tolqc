@@ -20,5 +20,6 @@ class Dataset(LogBase):
     set = db.relationship('Set', back_populates='dataset')  # noqa A003
     merqury_metrics = db.relationship('MerquryMetrics', back_populates='dataset')
     assembly = db.relationship('Assembly', back_populates='dataset')
-    genomescope_metrics = db.relationship('GenomescopeMetrics',
-                                          back_populates='dataset')
+    genomescope_metrics = db.relationship(
+        'GenomescopeMetrics', back_populates='dataset'
+    )

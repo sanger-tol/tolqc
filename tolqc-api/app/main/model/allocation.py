@@ -16,7 +16,9 @@ class Allocation(LogBase):
     project_id = db.Column(db.Integer(), db.ForeignKey('project.id'))
     specimen_id = db.Column(db.Integer(), db.ForeignKey('specimen.id'))
     is_primary = db.Column(db.Boolean())
-    project = db.relationship('Project', back_populates='allocation',
-                              foreign_keys=[project_id])
-    specimen = db.relationship('Specimen', back_populates='allocation',
-                               foreign_keys=[specimen_id])
+    project = db.relationship(
+        'Project', back_populates='allocation', foreign_keys=[project_id]
+    )
+    specimen = db.relationship(
+        'Specimen', back_populates='allocation', foreign_keys=[specimen_id]
+    )

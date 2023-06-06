@@ -25,8 +25,8 @@ class Run(LogBase):
     qc_date = db.Column(db.DateTime())
     complete_date = db.Column(db.DateTime())
     data = db.relationship('Data', back_populates='run')
-    platform = db.relationship('Platform', back_populates='run',
-                               foreign_keys=[platform_id])
-    centre = db.relationship('Centre', back_populates='run',
-                             foreign_keys=[centre_id])
+    platform = db.relationship(
+        'Platform', back_populates='run', foreign_keys=[platform_id]
+    )
+    centre = db.relationship('Centre', back_populates='run', foreign_keys=[centre_id])
     pacbio_run_metrics = db.relationship('PacbioRunMetrics', back_populates='run')

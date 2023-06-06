@@ -18,8 +18,10 @@ class Sample(LogBase):
     lims_id = db.Column(db.Integer())
     specimen_id = db.Column(db.Integer(), db.ForeignKey('specimen.id'))
     accession_id = db.Column(db.Integer(), db.ForeignKey('accession.id'))
-    specimen = db.relationship('Specimen', back_populates='sample',
-                               foreign_keys=[specimen_id])
-    accession = db.relationship('Accession', back_populates='sample',
-                                foreign_keys=[accession_id])
+    specimen = db.relationship(
+        'Specimen', back_populates='sample', foreign_keys=[specimen_id]
+    )
+    accession = db.relationship(
+        'Accession', back_populates='sample', foreign_keys=[accession_id]
+    )
     data = db.relationship('Data', back_populates='sample')

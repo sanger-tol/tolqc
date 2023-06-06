@@ -16,8 +16,9 @@ class Assembly(LogBase):
     dataset_id = db.Column(db.Integer(), db.ForeignKey('dataset.id'))
     name = db.Column(db.String())
     description = db.Column(db.String())
-    dataset = db.relationship('Dataset', back_populates='assembly',
-                              foreign_keys=[dataset_id])
+    dataset = db.relationship(
+        'Dataset', back_populates='assembly', foreign_keys=[dataset_id]
+    )
     assembly_metrics = db.relationship('AssemblyMetrics', back_populates='assembly')
     busco_metrics = db.relationship('BuscoMetrics', back_populates='assembly')
     merqury_metrics = db.relationship('MerquryMetrics', back_populates='assembly')

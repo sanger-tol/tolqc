@@ -3,10 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from tol.api_base.model import db, Base, LogBase  # noqa
-from tol.api_base.model import ( # noqa
-    User,
-    Role
-)
+from tol.api_base.model import User, Role  # noqa
 from .accession_type_dict import AccessionTypeDict  # noqa
 from .accession import Accession  # noqa
 from .assembly_component import AssemblyComponent  # noqa
@@ -37,4 +34,4 @@ from .assembly_metrics import AssemblyMetrics  # noqa
 from .merqury_metrics import MerquryMetrics  # noqa
 from .busco_metrics import BuscoMetrics  # noqa
 from .genomescope_metrics import GenomescopeMetrics  # noqa
-from .study import Study # noqa
+from .study import Study  # noqa

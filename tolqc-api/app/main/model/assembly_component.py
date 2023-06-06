@@ -12,9 +12,10 @@ class AssemblyComponent(LogBase, EnumBase):
     class Meta:
         type_ = 'assembly_components'
 
-    busco_metrics = db.relationship('BuscoMetrics',
-                                    back_populates='assembly_component')
-    merqury_metrics = db.relationship('MerquryMetrics',
-                                      back_populates='assembly_component')
-    assembly_metrics = db.relationship('AssemblyMetrics',
-                                       back_populates='assembly_component')
+    busco_metrics = db.relationship('BuscoMetrics', back_populates='assembly_component')
+    merqury_metrics = db.relationship(
+        'MerquryMetrics', back_populates='assembly_component'
+    )
+    assembly_metrics = db.relationship(
+        'AssemblyMetrics', back_populates='assembly_component'
+    )

@@ -16,5 +16,6 @@ class Study(Base):
     name = db.Column(db.String())
     lims_id = db.Column(db.Integer())
     project_id = db.Column(db.Integer(), db.ForeignKey('project.id'))
-    project = db.relationship('Project', back_populates='study',
-                              foreign_keys=[project_id])
+    project = db.relationship(
+        'Project', back_populates='study', foreign_keys=[project_id]
+    )

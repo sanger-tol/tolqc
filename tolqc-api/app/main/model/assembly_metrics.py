@@ -15,8 +15,9 @@ class AssemblyMetrics(LogBase):
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa A003
     assembly_id = db.Column(db.Integer, db.ForeignKey('assembly.id'))
-    assembly_component_id = db.Column(db.Integer,
-                                      db.ForeignKey('assembly_component.id'))
+    assembly_component_id = db.Column(
+        db.Integer, db.ForeignKey('assembly_component.id')
+    )
     bases = db.Column(db.Integer())
     a = db.Column(db.Integer())
     c = db.Column(db.Integer())
@@ -41,8 +42,11 @@ class AssemblyMetrics(LogBase):
     scaffold_aun = db.Column(db.Float())
     gap_n = db.Column(db.Integer())
     gap_n50 = db.Column(db.Integer())
-    assembly = db.relationship('Assembly', back_populates='assembly_metrics',
-                               foreign_keys=[assembly_id])
-    assembly_component = db.relationship('AssemblyComponent',
-                                         back_populates='assembly_metrics',
-                                         foreign_keys=[assembly_component_id])
+    assembly = db.relationship(
+        'Assembly', back_populates='assembly_metrics', foreign_keys=[assembly_id]
+    )
+    assembly_component = db.relationship(
+        'AssemblyComponent',
+        back_populates='assembly_metrics',
+        foreign_keys=[assembly_component_id],
+    )

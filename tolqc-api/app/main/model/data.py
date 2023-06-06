@@ -29,13 +29,13 @@ class Data(LogBase):
     withdrawn = db.Column(db.Boolean())
     manually_withdrawn = db.Column(db.Boolean())
     checksum_from_mlwh = db.Column(db.String())
-    sample = db.relationship('Sample', back_populates='data',
-                             foreign_keys=[sample_id])
-    library = db.relationship('Library', back_populates='data',
-                              foreign_keys=[library_id])
-    run = db.relationship('Run', back_populates='data',
-                          foreign_keys=[run_id])
-    accession = db.relationship('Accession', back_populates='data',
-                                foreign_keys=[accession_id])
+    sample = db.relationship('Sample', back_populates='data', foreign_keys=[sample_id])
+    library = db.relationship(
+        'Library', back_populates='data', foreign_keys=[library_id]
+    )
+    run = db.relationship('Run', back_populates='data', foreign_keys=[run_id])
+    accession = db.relationship(
+        'Accession', back_populates='data', foreign_keys=[accession_id]
+    )
     set = db.relationship('Set', back_populates='data')  # noqa A003
     file = db.relationship('File', back_populates='data')

@@ -17,6 +17,9 @@ class SoftwareVersion(LogBase):
     version = db.Column(db.String())
     cmd = db.Column(db.String())
     busco_metrics = db.relationship('BuscoMetrics', back_populates='software_version')
-    merqury_metrics = db.relationship('MerquryMetrics', back_populates='software_version')
-    genomescope_metrics = db.relationship('GenomescopeMetrics',
-                                          back_populates='software_version')
+    merqury_metrics = db.relationship(
+        'MerquryMetrics', back_populates='software_version'
+    )
+    genomescope_metrics = db.relationship(
+        'GenomescopeMetrics', back_populates='software_version'
+    )

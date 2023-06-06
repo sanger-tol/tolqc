@@ -6,13 +6,39 @@ from flask import Blueprint
 
 from flask_restx import Api
 
-from main.resource import api_accession, api_accession_type_dict, api_allocation, api_assembly, \
-    api_assembly_component, api_assembly_metrics, api_busco_lineage, api_busco_metrics, \
-    api_centre, api_data, api_dataset, api_file, api_genomescope_metrics, \
-    api_library, api_library_type, api_merqury_metrics, api_milestone_dict, \
-    api_pacbio_run_metrics, api_platform, api_project, api_qc_dict, api_run, api_sample, \
-    api_set, api_sex, api_software_version, api_species, api_specimen, api_status, \
-    api_status_dict, api_study
+from main.resource import (
+    api_accession,
+    api_accession_type_dict,
+    api_allocation,
+    api_assembly,
+    api_assembly_component,
+    api_assembly_metrics,
+    api_busco_lineage,
+    api_busco_metrics,
+    api_centre,
+    api_data,
+    api_dataset,
+    api_file,
+    api_genomescope_metrics,
+    api_library,
+    api_library_type,
+    api_merqury_metrics,
+    api_milestone_dict,
+    api_pacbio_run_metrics,
+    api_platform,
+    api_project,
+    api_qc_dict,
+    api_run,
+    api_sample,
+    api_set,
+    api_sex,
+    api_software_version,
+    api_species,
+    api_specimen,
+    api_status,
+    api_status_dict,
+    api_study,
+)
 
 from tol.api_base.auth import authorizations
 from tol.api_base.resource import api_auth, api_environment, api_user
@@ -30,7 +56,7 @@ def _setup_api(blueprint, app):
         blueprint,
         doc='/ui',
         title=f'Tree of Life Quality Control{_get_environment_string(app)}',
-        authorizations=authorizations
+        authorizations=authorizations,
     )
     api.add_namespace(api_centre)
     api.add_namespace(api_study)
