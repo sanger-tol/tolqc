@@ -1,18 +1,17 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import EnumBase, db, setup_model
+
+from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class QcDict(EnumBase):
+class QCDict(Base):
     __tablename__ = 'qc_dict'
 
     class Meta:
-        type_ = 'qc_types'
+        type_ = 'qc_dict'
+        id_column = 'qc_state'
 
-    status = db.relationship('Status', back_populates='qc_dict')
-    genomescope_metrics = db.relationship(
-        'GenomescopeMetrics', back_populates='qc_dict'
-    )
+    qc_state = db.Column(db.String(), primary_key=True)

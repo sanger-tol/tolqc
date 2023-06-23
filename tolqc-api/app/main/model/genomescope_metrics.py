@@ -1,6 +1,7 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
+
 
 from tol.api_base.model import LogBase, db, setup_model
 
@@ -12,8 +13,12 @@ class GenomescopeMetrics(LogBase):
     class Meta:
         type_ = 'genomescope_metrics'
 
-    id = db.Column(db.Integer(), primary_key=True)  # noqa A003
-    dataset_id = db.Column(db.Integer(), db.ForeignKey('dataset.id'))
+    id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
+    dataset_id = db.Column(db.String(), db.ForeignKey('dataset.dataset_id'))
+    software_version_id = db.Column(
+        db.Integer(), db.ForeignKey('software_version.software_version_id')
+    )
+    review_id = db.Column(db.String(), db.ForeignKey('review_dict.review_id'))
     kmer = db.Column(db.Integer())
     ploidy = db.Column(db.Integer())
     homozygous = db.Column(db.Float())
@@ -25,17 +30,10 @@ class GenomescopeMetrics(LogBase):
     kcov_init = db.Column(db.Integer())
     model_fit = db.Column(db.Float())
     read_error_rate = db.Column(db.Float())
-    json = db.Column(db.String())
-    qc_id = db.Column(db.Integer(), db.ForeignKey('qc_dict.id'))
-    software_version_id = db.Column(db.Integer(), db.ForeignKey('software_version.id'))
-    dataset = db.relationship(
-        'Dataset', back_populates='genomescope_metrics', foreign_keys=[dataset_id]
-    )
-    qc_dict = db.relationship(
-        'QcDict', back_populates='genomescope_metrics', foreign_keys=[qc_id]
-    )
+    results = db.Column(db.JSON())
+
+    dataset = db.relationship('Dataset', back_populates='genomescope_metrics')
     software_version = db.relationship(
-        'SoftwareVersion',
-        back_populates='genomescope_metrics',
-        foreign_keys=[software_version_id],
+        'SoftwareVersion', back_populates='genomescope_metrics'
     )
+    review = db.relationship('ReviewDict', back_populates='genomescope_metrics')

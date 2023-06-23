@@ -1,12 +1,15 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
-from main.model import Sample
 
-from tol.api_base.schema import BaseSchema, setup_schema
+
+from main.model import Sample
+from tol.api_base.schema import BaseSchema, Str, setup_schema
 
 
 @setup_schema
 class SampleSchema(BaseSchema):
     class Meta(BaseSchema.BaseMeta):
         model = Sample
+
+    id = Str(attribute='sample_id', dump_only=True)  # noqa: A003

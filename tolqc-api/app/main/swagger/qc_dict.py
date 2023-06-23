@@ -1,13 +1,13 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema import QcDictSchema
 
+from main.schema import QCDictSchema
 from tol.api_base.swagger import BaseSwagger, setup_swagger
 
 
 @setup_swagger
-class QcDictSwagger(BaseSwagger):
+class QCDictSwagger(BaseSwagger):
     class Meta:
-        schema = QcDictSchema
+        schema = QCDictSchema

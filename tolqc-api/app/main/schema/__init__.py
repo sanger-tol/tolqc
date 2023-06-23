@@ -2,34 +2,44 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .sex import SexSchema  # noqa
-from .allocation import AllocationSchema  # noqa
-from .centre import CentreSchema  # noqa
-from .library_type import LibraryTypeSchema  # noqa
-from .library import LibrarySchema  # noqa
-from .platform import PlatformSchema  # noqa
-from .project import ProjectSchema  # noqa
-from .run import RunSchema  # noqa
-from .sample import SampleSchema  # noqa
-from .species import SpeciesSchema  # noqa
-from .specimen import SpecimenSchema  # noqa
-from .software_version import SoftwareVersionSchema  # noqa
-from .status import StatusSchema  # noqa
-from .file import FileSchema  # noqa
-from .accession_type_dict import AccessionTypeDictSchema  # noqa
-from .accession import AccessionSchema  # noqa
-from .assembly_component import AssemblyComponentSchema  # noqa
-from .status_dict import StatusDictSchema  # noqa
-from .qc_dict import QcDictSchema  # noqa
-from .milestone_dict import MilestoneDictSchema  # noqa
-from .pacbio_run_metrics import PacbioRunMetricsSchema  # noqa
-from .data import DataSchema  # noqa
-from .dataset import DatasetSchema  # noqa
-from .set import SetSchema  # noqa
-from .busco_lineage import BuscoLineageSchema  # noqa
-from .assembly import AssemblySchema  # noqa
-from .assembly_metrics import AssemblyMetricsSchema  # noqa
-from .merqury_metrics import MerquryMetricsSchema  # noqa
-from .busco_metrics import BuscoMetricsSchema  # noqa
-from .genomescope_metrics import GenomescopeMetricsSchema  # noqa
-from .study import StudySchema  # noqa
+
+from .accession import AccessionSchema  # noqa: F401
+from .accession_type_dict import AccessionTypeDictSchema  # noqa: F401
+from .allocation import AllocationSchema  # noqa: F401
+from .assembly import AssemblySchema  # noqa: F401
+from .assembly_component_type import AssemblyComponentTypeSchema  # noqa: F401
+from .assembly_metrics import AssemblyMetricsSchema  # noqa: F401
+from .assembly_source import AssemblySourceSchema  # noqa: F401
+from .assembly_status import AssemblyStatusSchema  # noqa: F401
+from .assembly_status_type import AssemblyStatusTypeSchema  # noqa: F401
+from .barcode_metrics import BarcodeMetricsSchema  # noqa: F401
+from .busco_lineage import BuscoLineageSchema  # noqa: F401
+from .busco_metrics import BuscoMetricsSchema  # noqa: F401
+from .centre import CentreSchema  # noqa: F401
+from .contigviz_metrics import ContigvizMetricsSchema  # noqa: F401
+from .data import DataSchema  # noqa: F401
+from .dataset import DatasetSchema  # noqa: F401
+from .dataset_element import DatasetElementSchema  # noqa: F401
+from .dataset_status import DatasetStatusSchema  # noqa: F401
+from .dataset_status_type import DatasetStatusTypeSchema  # noqa: F401
+from .file import FileSchema  # noqa: F401
+from .genomescope_metrics import GenomescopeMetricsSchema  # noqa: F401
+from .library import LibrarySchema  # noqa: F401
+from .library_type import LibraryTypeSchema  # noqa: F401
+from .markerscan_metrics import MarkerscanMetricsSchema  # noqa: F401
+from .merqury_metrics import MerquryMetricsSchema  # noqa: F401
+from .offspring import OffspringSchema  # noqa: F401
+from .pacbio_run_metrics import PacbioRunMetricsSchema  # noqa: F401
+from .platform import PlatformSchema  # noqa: F401
+from .ploidyplot_metrics import PloidyplotMetricsSchema  # noqa: F401
+from .project import ProjectSchema  # noqa: F401
+from .qc_dict import QCDictSchema  # noqa: F401
+from .review_dict import ReviewDictSchema  # noqa: F401
+from .run import RunSchema  # noqa: F401
+from .sample import SampleSchema  # noqa: F401
+from .sex import SexSchema  # noqa: F401
+from .software_version import SoftwareVersionSchema  # noqa: F401
+from .species import SpeciesSchema  # noqa: F401
+from .specimen import SpecimenSchema  # noqa: F401
+from .specimen_status import SpecimenStatusSchema  # noqa: F401
+from .specimen_status_type import SpecimenStatusTypeSchema  # noqa: F401

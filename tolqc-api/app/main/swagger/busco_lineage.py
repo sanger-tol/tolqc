@@ -1,9 +1,9 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from main.schema import BuscoLineageSchema
 
+from main.schema import BuscoLineageSchema
 from tol.api_base.swagger import BaseSwagger, setup_swagger
 
 

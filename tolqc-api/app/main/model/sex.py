@@ -1,15 +1,20 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import EnumBase, db, setup_model
+
+from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class Sex(EnumBase):
+class Sex(Base):
     __tablename__ = 'sex'
 
     class Meta:
         type_ = 'sexes'
+        id_column = 'sex_id'
 
-    specimen = db.relationship('Specimen', back_populates='sex')
+    sex_id = db.Column(db.String(), primary_key=True)
+    description = db.Column(db.String())
+
+    specimens = db.relationship('Specimen', back_populates='sex')
