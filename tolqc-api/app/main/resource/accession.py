@@ -5,6 +5,7 @@
 
 from main.service import AccessionService
 from main.swagger import AccessionSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

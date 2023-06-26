@@ -5,6 +5,7 @@
 
 from main.service import PacbioRunMetricsService
 from main.swagger import PacbioRunMetricsSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

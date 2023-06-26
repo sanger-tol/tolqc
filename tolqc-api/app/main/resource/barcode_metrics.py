@@ -5,6 +5,7 @@
 
 from main.service import BarcodeMetricsService
 from main.swagger import BarcodeMetricsSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

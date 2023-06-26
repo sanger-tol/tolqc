@@ -5,6 +5,7 @@
 
 from main.service import QCDictService
 from main.swagger import QCDictSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

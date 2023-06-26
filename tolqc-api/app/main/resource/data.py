@@ -5,6 +5,7 @@
 
 from main.service import DataService
 from main.swagger import DataSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

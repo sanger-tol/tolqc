@@ -5,6 +5,7 @@
 
 from main.model import PacbioRunMetrics
 from main.schema import PacbioRunMetricsSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 
-from tol.api_base.model import LogBase, db, setup_model
 from sqlalchemy.ext.associationproxy import association_proxy
+
+from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
@@ -29,8 +30,12 @@ class Dataset(LogBase):
     genomescope_metrics = db.relationship(
         'GenomescopeMetrics', back_populates='dataset'
     )
-    merqury_metrics = db.relationship('MerquryMetrics', back_populates='dataset')
-    ploidyplot_metrics = db.relationship('PloidyplotMetrics', back_populates='dataset')
+    merqury_metrics = db.relationship(
+        'MerquryMetrics', back_populates='dataset'
+    )
+    ploidyplot_metrics = db.relationship(
+        'PloidyplotMetrics', back_populates='dataset'
+    )
 
     status = db.relationship('DatasetStatus', foreign_keys=[dataset_status_id])
     status_history = db.relationship(

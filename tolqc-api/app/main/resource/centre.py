@@ -5,6 +5,7 @@
 
 from main.service import CentreService
 from main.swagger import CentreSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

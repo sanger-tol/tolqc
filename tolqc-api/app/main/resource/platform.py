@@ -5,6 +5,7 @@
 
 from main.service import PlatformService
 from main.swagger import PlatformSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

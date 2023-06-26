@@ -18,4 +18,6 @@ class BuscoLineage(Base):
     date_created = db.Column(db.DateTime())
     species_count = db.Column(db.Integer())
     gene_count = db.Column(db.Integer())
-    busco_metrics = db.relationship('BuscoMetrics', back_populates='busco_lineage')
+    busco_metrics = db.relationship(
+        'BuscoMetrics', back_populates='busco_lineage'
+    )

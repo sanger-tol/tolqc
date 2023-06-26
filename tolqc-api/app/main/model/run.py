@@ -26,4 +26,6 @@ class Run(Base):
     data = db.relationship('Data', back_populates='run')
     platform = db.relationship('Platform', back_populates='run')
     centre = db.relationship('Centre', back_populates='run')
-    pacbio_run_metrics = db.relationship('PacbioRunMetrics', back_populates='run')
+    pacbio_run_metrics = db.relationship(
+        'PacbioRunMetrics', back_populates='run'
+    )

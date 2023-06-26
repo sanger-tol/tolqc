@@ -5,6 +5,7 @@
 
 from main.model import BuscoLineage
 from main.schema import BuscoLineageSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

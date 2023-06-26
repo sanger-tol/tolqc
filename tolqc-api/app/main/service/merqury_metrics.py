@@ -5,6 +5,7 @@
 
 from main.model import MerquryMetrics
 from main.schema import MerquryMetricsSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

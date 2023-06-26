@@ -5,6 +5,7 @@
 
 from main.model import Platform
 from main.schema import PlatformSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

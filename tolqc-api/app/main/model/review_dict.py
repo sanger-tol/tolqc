@@ -17,4 +17,6 @@ class ReviewDict(Base):
     review_id = db.Column(db.String(), primary_key=True)
     description = db.Column(db.String())
 
-    genomescope_metrics = db.relationship('GenomescopeMetrics', back_populates='review')
+    genomescope_metrics = db.relationship(
+        'GenomescopeMetrics', back_populates='review'
+    )

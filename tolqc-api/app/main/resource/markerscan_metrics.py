@@ -5,6 +5,7 @@
 
 from main.service import MarkerscanMetricsService
 from main.swagger import MarkerscanMetricsSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

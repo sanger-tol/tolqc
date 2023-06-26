@@ -28,4 +28,6 @@ class SpecimenStatus(LogBase):
     specimen = db.relationship(
         'Specimen', foreign_keys=[specimen_id], back_populates='status_history'
     )
-    status_type = db.relationship('SpecimenStatusType', back_populates='statuses')
+    status_type = db.relationship(
+        'SpecimenStatusType', back_populates='statuses'
+    )

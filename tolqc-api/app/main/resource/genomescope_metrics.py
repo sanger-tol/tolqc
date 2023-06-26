@@ -5,6 +5,7 @@
 
 from main.service import GenomescopeMetricsService
 from main.swagger import GenomescopeMetricsSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

@@ -77,6 +77,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_assembly_source)
     api.add_namespace(api_assembly_status)
     api.add_namespace(api_assembly_status_type)
+    api.add_namespace(api_auth)
     api.add_namespace(api_barcode_metrics)
     api.add_namespace(api_busco_lineage)
     api.add_namespace(api_busco_metrics)
@@ -87,6 +88,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_dataset_element)
     api.add_namespace(api_dataset_status)
     api.add_namespace(api_dataset_status_type)
+    api.add_namespace(api_environment)
     api.add_namespace(api_file)
     api.add_namespace(api_genomescope_metrics)
     api.add_namespace(api_library)
@@ -108,6 +110,7 @@ def _setup_api(blueprint, app):
     api.add_namespace(api_specimen)
     api.add_namespace(api_specimen_status)
     api.add_namespace(api_specimen_status_type)
+    api.add_namespace(api_user)
 
 
 def init_blueprints(app):

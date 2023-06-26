@@ -14,7 +14,9 @@ class SoftwareVersion(Base):
         type_ = 'software_versions'
         id_column = 'software_version_id'
 
-    software_version_id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
+    software_version_id = db.Column(
+        db.Integer(), primary_key=True
+    )  # noqa: A003
     name = db.Column(db.String())
     version = db.Column(db.String())
     cmd = db.Column(db.String())
@@ -22,7 +24,9 @@ class SoftwareVersion(Base):
     db.UniqueConstraint('name', 'version')
 
     assemblies = db.relationship('Assembly', back_populates='software_version')
-    busco_metrics = db.relationship('BuscoMetrics', back_populates='software_version')
+    busco_metrics = db.relationship(
+        'BuscoMetrics', back_populates='software_version'
+    )
     contigviz_metrics = db.relationship(
         'ContigvizMetrics', back_populates='software_version'
     )

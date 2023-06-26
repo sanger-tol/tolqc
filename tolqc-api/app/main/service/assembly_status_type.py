@@ -5,6 +5,7 @@
 
 from main.model import AssemblyStatusType
 from main.schema import AssemblyStatusTypeSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

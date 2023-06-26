@@ -18,7 +18,9 @@ class Sample(LogBase):
     hierarchy_name = db.Column(db.String())
     lims_id = db.Column(db.Integer())
     specimen_id = db.Column(db.String(), db.ForeignKey('specimen.specimen_id'))
-    accession_id = db.Column(db.String(), db.ForeignKey('accession.accession_id'))
+    accession_id = db.Column(
+        db.String(), db.ForeignKey('accession.accession_id')
+    )
 
     specimen = db.relationship('Specimen', back_populates='samples')
     accession = db.relationship('Accession', back_populates='samples')

@@ -14,7 +14,9 @@ class AssemblyMetrics(Base):
         type_ = 'assembly_metrics'
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
-    assembly_id = db.Column(db.Integer(), db.ForeignKey('assembly.assembly_id'))
+    assembly_id = db.Column(
+        db.Integer(), db.ForeignKey('assembly.assembly_id')
+    )
     bases = db.Column(db.Integer())
     a = db.Column(db.Integer())
     c = db.Column(db.Integer())

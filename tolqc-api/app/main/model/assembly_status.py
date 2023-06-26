@@ -28,4 +28,6 @@ class AssemblyStatus(LogBase):
     assembly = db.relationship(
         'Assembly', foreign_keys=[assembly_id], back_populates='status_history'
     )
-    status_type = db.relationship('AssemblyStatusType', back_populates='statuses')
+    status_type = db.relationship(
+        'AssemblyStatusType', back_populates='statuses'
+    )

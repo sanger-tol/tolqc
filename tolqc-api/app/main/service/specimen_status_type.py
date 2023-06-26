@@ -5,6 +5,7 @@
 
 from main.model import SpecimenStatusType
 from main.schema import SpecimenStatusTypeSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

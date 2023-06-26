@@ -5,6 +5,7 @@
 
 from main.service import ContigvizMetricsService
 from main.swagger import ContigvizMetricsSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

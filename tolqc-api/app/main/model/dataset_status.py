@@ -19,11 +19,15 @@ class DatasetStatus(LogBase):
         db.String(), db.ForeignKey('dataset.dataset_id'), nullable=False
     )
     status_type_id = db.Column(
-        db.String(), db.ForeignKey('dataset_status_type.status_type_id'), nullable=False
+        db.String(),
+        db.ForeignKey('dataset_status_type.status_type_id'),
+        nullable=False,
     )
     status_time = db.Column(db.DateTime(), nullable=False)
 
     dataset = db.relationship(
         'Dataset', foreign_keys=[dataset_id], back_populates='status_history'
     )
-    status_type = db.relationship('DatasetStatusType', back_populates='statuses')
+    status_type = db.relationship(
+        'DatasetStatusType', back_populates='statuses'
+    )

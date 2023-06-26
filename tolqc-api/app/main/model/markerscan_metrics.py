@@ -14,7 +14,9 @@ class MarkerscanMetrics(Base):
         type_ = 'markerscan_metrics'
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
-    assembly_id = db.Column(db.Integer(), db.ForeignKey('assembly.assembly_id'))
+    assembly_id = db.Column(
+        db.Integer(), db.ForeignKey('assembly.assembly_id')
+    )
     software_version_id = db.Column(
         db.Integer(), db.ForeignKey('software_version.software_version_id')
     )

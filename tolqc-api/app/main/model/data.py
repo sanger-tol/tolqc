@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 
-from tol.api_base.model import LogBase, db, setup_model
 from sqlalchemy.ext.associationproxy import association_proxy
+
+from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
@@ -20,7 +21,9 @@ class Data(LogBase):
     hierarchy_name = db.Column(db.String())
     sample_id = db.Column(db.String(), db.ForeignKey('sample.sample_id'))
     library_id = db.Column(db.String(), db.ForeignKey('library.library_id'))
-    accession_id = db.Column(db.String(), db.ForeignKey('accession.accession_id'))
+    accession_id = db.Column(
+        db.String(), db.ForeignKey('accession.accession_id')
+    )
     run_id = db.Column(db.Integer(), db.ForeignKey('run.id'))
     processed = db.Column(db.Integer())
     tag1_sequence = db.Column(db.String())

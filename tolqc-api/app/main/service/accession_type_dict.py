@@ -5,6 +5,7 @@
 
 from main.model import AccessionTypeDict
 from main.schema import AccessionTypeDictSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

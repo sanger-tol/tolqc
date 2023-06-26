@@ -14,7 +14,9 @@ class MerquryMetrics(Base):
         type_ = 'merqury_metrics'
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
-    assembly_id = db.Column(db.Integer(), db.ForeignKey('assembly.assembly_id'))
+    assembly_id = db.Column(
+        db.Integer(), db.ForeignKey('assembly.assembly_id')
+    )
     dataset_id = db.Column(db.String(), db.ForeignKey('dataset.dataset_id'))
     kmer = db.Column(db.String())
     complete_primary = db.Column(db.Integer())

@@ -4,6 +4,7 @@
 
 
 from main.model import AssemblyStatusType
+
 from tol.api_base.schema import BaseSchema, Str, setup_schema
 
 

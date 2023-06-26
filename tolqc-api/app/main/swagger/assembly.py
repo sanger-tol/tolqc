@@ -4,6 +4,7 @@
 
 
 from main.schema import AssemblySchema
+
 from tol.api_base.swagger import BaseSwagger, setup_swagger
 
 

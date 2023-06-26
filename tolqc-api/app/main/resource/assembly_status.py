@@ -5,6 +5,7 @@
 
 from main.service import AssemblyStatusService
 from main.swagger import AssemblyStatusSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

@@ -5,6 +5,7 @@
 
 from main.model import AssemblyMetrics
 from main.schema import AssemblyMetricsSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

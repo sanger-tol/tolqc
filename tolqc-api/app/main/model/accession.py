@@ -24,7 +24,9 @@ class Accession(Base):
     title = db.Column(db.String())
     description = db.Column(db.String())
 
-    accession_type = db.relationship('AccessionTypeDict', back_populates='accessions')
+    accession_type = db.relationship(
+        'AccessionTypeDict', back_populates='accessions'
+    )
     projects = db.relationship('Project', back_populates='accession')
     specimens = db.relationship('Specimen', back_populates='accession')
     samples = db.relationship('Sample', back_populates='accession')

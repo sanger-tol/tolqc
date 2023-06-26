@@ -5,6 +5,7 @@
 
 from main.model import AssemblyComponentType
 from main.schema import AssemblyComponentTypeSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

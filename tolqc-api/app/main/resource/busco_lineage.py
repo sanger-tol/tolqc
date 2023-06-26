@@ -5,6 +5,7 @@
 
 from main.service import BuscoLineageService
 from main.swagger import BuscoLineageSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

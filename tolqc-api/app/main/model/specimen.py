@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 
-from tol.api_base.model import LogBase, db, setup_model
 from sqlalchemy.ext.associationproxy import association_proxy
+
+from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
@@ -23,7 +24,9 @@ class Specimen(LogBase):
     species_id = db.Column(db.String(), db.ForeignKey('species.species_id'))
     lims_id = db.Column(db.Integer())
     supplied_name = db.Column(db.String())
-    accession_id = db.Column(db.String(), db.ForeignKey('accession.accession_id'))
+    accession_id = db.Column(
+        db.String(), db.ForeignKey('accession.accession_id')
+    )
     sex_id = db.Column(db.String(), db.ForeignKey('sex.sex_id'))
     ploidy = db.Column(db.String())
     karyotype = db.Column(db.String())
@@ -33,7 +36,9 @@ class Specimen(LogBase):
     sex = db.relationship('Sex', back_populates='specimens')
     accession = db.relationship('Accession', back_populates='specimens')
 
-    status = db.relationship('SpecimenStatus', foreign_keys=[specimen_status_id])
+    status = db.relationship(
+        'SpecimenStatus', foreign_keys=[specimen_status_id]
+    )
     status_history = db.relationship(
         'SpecimenStatus',
         primaryjoin='Specimen.specimen_id == SpecimenStatus.specimen_id',

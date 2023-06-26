@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 
-from tol.api_base.model import LogBase, db, setup_model
 from sqlalchemy.ext.associationproxy import association_proxy
+
+from tol.api_base.model import LogBase, db, setup_model
 
 
 @setup_model
@@ -33,15 +34,27 @@ class Assembly(LogBase):
     component_type = db.relationship(
         'AssemblyComponentType', back_populates='assemblies'
     )
-    software_version = db.relationship('SoftwareVersion', back_populates='assemblies')
+    software_version = db.relationship(
+        'SoftwareVersion', back_populates='assemblies'
+    )
 
-    assembly_metrics = db.relationship('AssemblyMetrics', back_populates='assembly')
+    assembly_metrics = db.relationship(
+        'AssemblyMetrics', back_populates='assembly'
+    )
     busco_metrics = db.relationship('BuscoMetrics', back_populates='assembly')
-    contigviz_metrics = db.relationship('ContigvizMetrics', back_populates='assembly')
-    merqury_metrics = db.relationship('MerquryMetrics', back_populates='assembly')
-    markerscan_metrics = db.relationship('MarkerscanMetrics', back_populates='assembly')
+    contigviz_metrics = db.relationship(
+        'ContigvizMetrics', back_populates='assembly'
+    )
+    merqury_metrics = db.relationship(
+        'MerquryMetrics', back_populates='assembly'
+    )
+    markerscan_metrics = db.relationship(
+        'MarkerscanMetrics', back_populates='assembly'
+    )
 
-    status = db.relationship('AssemblyStatus', foreign_keys=[assembly_status_id])
+    status = db.relationship(
+        'AssemblyStatus', foreign_keys=[assembly_status_id]
+    )
     status_history = db.relationship(
         'AssemblyStatus',
         primaryjoin='Assembly.assembly_id == AssemblyStatus.assembly_id',
@@ -60,7 +73,7 @@ class Assembly(LogBase):
     # Components are assemblies which have this assembly as their source
     component_assembly_assn = db.relationship(
         'AssemblySource',
-        primaryjoin='Assembly.assembly_id == AssemblySource.source_assembly_id',
+        primaryjoin='Assembly.assembly_id == AssemblySource.source_assembly_id',  # noqa: E501
         back_populates='source',
     )
     components = association_proxy('component_assembly_assn', 'component')

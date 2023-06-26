@@ -36,4 +36,6 @@ class GenomescopeMetrics(LogBase):
     software_version = db.relationship(
         'SoftwareVersion', back_populates='genomescope_metrics'
     )
-    review = db.relationship('ReviewDict', back_populates='genomescope_metrics')
+    review = db.relationship(
+        'ReviewDict', back_populates='genomescope_metrics'
+    )

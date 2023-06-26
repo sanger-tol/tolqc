@@ -5,6 +5,7 @@
 
 from main.service import AssemblyComponentTypeService
 from main.swagger import AssemblyComponentTypeSwagger
+
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 

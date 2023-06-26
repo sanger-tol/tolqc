@@ -5,6 +5,7 @@
 
 from main.model import Data
 from main.schema import DataSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

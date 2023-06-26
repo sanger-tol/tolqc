@@ -5,6 +5,7 @@
 
 from main.model import GenomescopeMetrics
 from main.schema import GenomescopeMetricsSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 

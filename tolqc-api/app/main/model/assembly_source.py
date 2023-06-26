@@ -14,8 +14,12 @@ class AssemblySource(Base):
         type_ = 'assembly_sources'
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
-    assembly_id = db.Column(db.Integer(), db.ForeignKey('assembly.assembly_id'))
-    source_assembly_id = db.Column(db.Integer(), db.ForeignKey('assembly.assembly_id'))
+    assembly_id = db.Column(
+        db.Integer(), db.ForeignKey('assembly.assembly_id')
+    )
+    source_assembly_id = db.Column(
+        db.Integer(), db.ForeignKey('assembly.assembly_id')
+    )
 
     db.UniqueConstraint('assembly_id', 'source_assembly_id')
 

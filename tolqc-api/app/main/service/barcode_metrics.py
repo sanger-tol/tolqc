@@ -5,6 +5,7 @@
 
 from main.model import BarcodeMetrics
 from main.schema import BarcodeMetricsSchema
+
 from tol.api_base.service import BaseService, setup_service
 
 
