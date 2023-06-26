@@ -4,13 +4,12 @@
 
 from datetime import datetime
 
-# from flask.json import JSONEncoder as FlaskJSONEncoder
-from json import JSONEncoder as PythonJSONEncoder
+from flask.json import JSONEncoder as FlaskJSONEncoder
 
 from main.model import Base
 
 
-class JSONEncoder(PythonJSONEncoder):
+class JSONEncoder(FlaskJSONEncoder):
     include_nulls = False
 
     def default(self, o):
