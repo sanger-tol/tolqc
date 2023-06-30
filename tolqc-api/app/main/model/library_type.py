@@ -1,6 +1,7 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
+
 
 from tol.api_base.model import Base, db, setup_model
 
@@ -11,10 +12,13 @@ class LibraryType(Base):
 
     class Meta:
         type_ = 'library_types'
+        id_column = 'library_type_id'
 
-    id = db.Column(db.Integer(), primary_key=True)  # noqa A003
-    name = db.Column(db.String())
+    library_type_id = db.Column(db.String(), primary_key=True)
     hierarchy_name = db.Column(db.String())
+    category = db.Column(db.String())
     kit = db.Column(db.String())
-    enzyme = db.Column(db.String())
+    enzymes = db.Column(db.String())
+    cut_sites = db.Column(db.String())
+
     library = db.relationship('Library', back_populates='library_type')

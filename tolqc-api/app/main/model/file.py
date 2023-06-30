@@ -1,21 +1,24 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import LogBase, db, setup_model
+
+from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class File(LogBase):
+class File(Base):
     __tablename__ = 'file'
 
     class Meta:
         type_ = 'files'
 
-    id = db.Column(db.Integer(), primary_key=True)  # noqa A003
-    data_id = db.Column(db.Integer(), db.ForeignKey('data.id'))
+    id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
+    data_id = db.Column(db.Integer(), db.ForeignKey('data.data_id'))
     name = db.Column(db.String())
-    type = db.Column(db.String())  # noqa A003
+    realtive_path = db.Column(db.String())
+    remote_path = db.Column(db.String())
+    size_bytes = db.Column(db.Integer())
     md5 = db.Column(db.String())
-    data = db.relationship('Data', back_populates='file',
-                           foreign_keys=[data_id])
+
+    data = db.relationship('Data', back_populates='files')

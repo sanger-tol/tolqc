@@ -1,18 +1,19 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from main.service import QcDictService
-from main.swagger import QcDictSwagger
+
+from main.service import QCDictService
+from main.swagger import QCDictSwagger
 
 from tol.api_base.resource import AutoResourceGroup, setup_resource_group
 
 
-api_qc_dict = QcDictSwagger.api
+api_qc_dict = QCDictSwagger.api
 
 
 @setup_resource_group
-class QcDictResourceGroup(AutoResourceGroup):
+class QCDictResourceGroup(AutoResourceGroup):
     class Meta:
-        service = QcDictService
-        swagger = QcDictSwagger
+        service = QCDictService
+        swagger = QCDictSwagger

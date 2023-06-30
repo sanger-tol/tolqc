@@ -1,22 +1,22 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from tol.api_base.model import LogBase, db
-from tol.api_base.model import setup_model
+
+from tol.api_base.model import Base, db, setup_model
 
 
 @setup_model
-class AssemblyMetrics(LogBase):
+class AssemblyMetrics(Base):
     __tablename__ = 'assembly_metrics'
 
     class Meta:
         type_ = 'assembly_metrics'
 
-    id = db.Column(db.Integer(), primary_key=True)  # noqa A003
-    assembly_id = db.Column(db.Integer, db.ForeignKey('assembly.id'))
-    assembly_component_id = db.Column(db.Integer,
-                                      db.ForeignKey('assembly_component.id'))
+    id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
+    assembly_id = db.Column(
+        db.Integer(), db.ForeignKey('assembly.assembly_id')
+    )
     bases = db.Column(db.Integer())
     a = db.Column(db.Integer())
     c = db.Column(db.Integer())
@@ -41,8 +41,4 @@ class AssemblyMetrics(LogBase):
     scaffold_aun = db.Column(db.Float())
     gap_n = db.Column(db.Integer())
     gap_n50 = db.Column(db.Integer())
-    assembly = db.relationship('Assembly', back_populates='assembly_metrics',
-                               foreign_keys=[assembly_id])
-    assembly_component = db.relationship('AssemblyComponent',
-                                         back_populates='assembly_metrics',
-                                         foreign_keys=[assembly_component_id])
+    assembly = db.relationship('Assembly', back_populates='assembly_metrics')

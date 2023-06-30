@@ -1,6 +1,7 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
+
 
 from tol.api_base.model import Base, db, setup_model
 
@@ -12,7 +13,8 @@ class Centre(Base):
     class Meta:
         type_ = 'centres'
 
-    id = db.Column(db.Integer(), primary_key=True)  # noqa A003
+    id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
+
     run = db.relationship('Run', back_populates='centre')

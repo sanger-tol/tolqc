@@ -1,15 +1,16 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-from main.model import QcDict
-from main.schema import QcDictSchema
+
+from main.model import QCDict
+from main.schema import QCDictSchema
 
 from tol.api_base.service import BaseService, setup_service
 
 
 @setup_service
-class QcDictService(BaseService):
+class QCDictService(BaseService):
     class Meta:
-        model = QcDict
-        schema = QcDictSchema
+        model = QCDict
+        schema = QCDictSchema
