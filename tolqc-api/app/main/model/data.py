@@ -17,7 +17,7 @@ class Data(LogBase):
         id_column = 'data_id'
 
     data_id = db.Column(db.Integer(), primary_key=True)
-    name_root = db.Column(db.String())
+    name_root = db.Column(db.String(), index=True)
     hierarchy_name = db.Column(db.String())
     sample_id = db.Column(db.String(), db.ForeignKey('sample.sample_id'))
     library_id = db.Column(db.String(), db.ForeignKey('library.library_id'))
@@ -26,8 +26,9 @@ class Data(LogBase):
     )
     run_id = db.Column(db.Integer(), db.ForeignKey('run.id'))
     processed = db.Column(db.Integer())
-    tag1_sequence = db.Column(db.String())
-    tag2_sequence = db.Column(db.String())
+    tag_index = db.Column(db.String())
+    tag1_id = db.Column(db.String())
+    tag2_id = db.Column(db.String())
     date = db.Column(db.DateTime())
     lims_qc = db.Column(db.String(), db.ForeignKey('qc_dict.qc_state'))
     auto_qc = db.Column(db.String(), db.ForeignKey('qc_dict.qc_state'))
