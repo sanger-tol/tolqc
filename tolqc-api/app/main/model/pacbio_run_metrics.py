@@ -17,7 +17,7 @@ class PacbioRunMetrics(Base):
     run_id = db.Column(db.Integer(), db.ForeignKey('run.id'))
     movie_time = db.Column(db.Integer())
     pre_extension_time = db.Column(db.Integer())
-    total_bases = db.Column(db.Integer())
+    total_bases = db.Column(db.BigInteger())
     polymerase_reads = db.Column(db.Integer())
     polymerase_reads_bases = db.Column(db.Integer())
     polymerase_reads_mean = db.Column(db.Float())

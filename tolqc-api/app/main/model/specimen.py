@@ -17,7 +17,7 @@ class Specimen(LogBase):
         id_column = 'specimen_id'
 
     specimen_id = db.Column(db.String(), primary_key=True)
-    hierarchy_name = db.Column(db.String(), nullable=False, unique=True)
+    hierarchy_name = db.Column(db.String())
     specimen_status_id = db.Column(
         db.Integer(), db.ForeignKey('specimen_status.specimen_status_id')
     )

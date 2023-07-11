@@ -23,7 +23,7 @@ class Species(LogBase):
     taxon_order = db.Column(db.String())
     taxon_phylum = db.Column(db.String())
     taxon_group = db.Column(db.String())
-    genome_size = db.Column(db.Integer())
+    genome_size = db.Column(db.BigInteger())
     chromosome_number = db.Column(db.Integer())
 
     specimens = db.relationship('Specimen', back_populates='species')

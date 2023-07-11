@@ -22,7 +22,7 @@ class Dataset(LogBase):
     )
     dataset_list_md5 = db.Column(db.String())
     reads = db.Column(db.Integer())
-    bases = db.Column(db.Integer())
+    bases = db.Column(db.BigInteger())
     read_length_mean = db.Column(db.Float())
     read_length_n50 = db.Column(db.Integer())
 
