@@ -1,0 +1,16 @@
+tasks:
+  Run All Tasks:
+    shell: python -m pytest test
+
+
+condaConfigFile: conda.yaml
+artifactsDir: output
+PATH:
+  - .
+  - resources
+PYTHONPATH:
+  - .
+  - libraries
+  - resources
+ignoreFiles:
+  - .gitignore
