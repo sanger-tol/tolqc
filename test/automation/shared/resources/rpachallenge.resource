@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
 *** Settings ***
 Documentation     Robot to solve the first challenge at rpachallenge.com, which
 ...               consists of filling a form that randomly rearranges itself,
