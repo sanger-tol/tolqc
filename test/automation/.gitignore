@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+.idea
+
+/results/
+/webdriver/
+/cached/
+
+__pycache__
