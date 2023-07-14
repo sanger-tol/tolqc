@@ -14,7 +14,7 @@ class PacbioRunMetrics(Base):
         type_ = 'pacbio_run_metrics'
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
-    run_id = db.Column(db.Integer(), db.ForeignKey('run.id'))
+    run_id = db.Column(db.String(), db.ForeignKey('run.run_id'))
     movie_time = db.Column(db.Integer())
     pre_extension_time = db.Column(db.Integer())
     total_bases = db.Column(db.BigInteger())

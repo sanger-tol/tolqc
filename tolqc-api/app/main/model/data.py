@@ -24,7 +24,7 @@ class Data(LogBase):
     accession_id = db.Column(
         db.String(), db.ForeignKey('accession.accession_id')
     )
-    run_id = db.Column(db.Integer(), db.ForeignKey('run.id'))
+    run_id = db.Column(db.String(), db.ForeignKey('run.run_id'))
     processed = db.Column(db.Integer())
     tag_index = db.Column(db.String())
     tag1_id = db.Column(db.String())

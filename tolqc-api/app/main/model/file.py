@@ -16,7 +16,7 @@ class File(Base):
     id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
     data_id = db.Column(db.Integer(), db.ForeignKey('data.data_id'))
     name = db.Column(db.String())
-    realtive_path = db.Column(db.String())
+    relative_path = db.Column(db.String())
     remote_path = db.Column(db.String())
     size_bytes = db.Column(db.Integer())
     md5 = db.Column(db.String())

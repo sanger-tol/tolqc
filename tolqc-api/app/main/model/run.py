@@ -12,8 +12,9 @@ class Run(Base):
 
     class Meta:
         type_ = 'runs'
+        id_column = 'run_id'
 
-    id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
+    run_id = db.Column(db.String(), primary_key=True)
     name = db.Column(db.String())
     hierarchy_name = db.Column(db.String())
     platform_id = db.Column(db.Integer(), db.ForeignKey('platform.id'))
