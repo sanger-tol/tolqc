@@ -8,6 +8,7 @@ import argparse
 import yaml
 from time import sleep
 from robot.run import run, run_cli
+# from tol.testing.webdriver import WebDriverManagerBase
 from scripts.webdriver.web_driver_manager import WebDriverManagerBase
 from scripts.webdriver.chrome import ChromeDriverManager
 from scripts.webdriver.gecko import GeckoDriverManager
