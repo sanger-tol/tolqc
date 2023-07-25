@@ -19,9 +19,10 @@ class Run(Base):
     hierarchy_name = db.Column(db.String())
     platform_id = db.Column(db.Integer(), db.ForeignKey('platform.id'))
     centre_id = db.Column(db.Integer(), db.ForeignKey('centre.id'))
-    lims_id = db.Column(db.Integer())
+    lims_id = db.Column(db.String())
     element = db.Column(db.String())
     instrument_name = db.Column(db.String())
+    start = db.Column(db.DateTime())
     complete = db.Column(db.DateTime())
 
     data = db.relationship('Data', back_populates='run')
