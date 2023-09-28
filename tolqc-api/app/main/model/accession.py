@@ -20,7 +20,7 @@ class Accession(Base):
     )
     secondary = db.Column(db.String())
     submission = db.Column(db.String())
-    date_submitted = db.Column(db.DateTime())
+    date_submitted = db.Column(db.DateTime(timezone=True))
     title = db.Column(db.String())
     description = db.Column(db.String())
 

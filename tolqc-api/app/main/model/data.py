@@ -29,7 +29,7 @@ class Data(LogBase):
     tag_index = db.Column(db.String())
     tag1_id = db.Column(db.String())
     tag2_id = db.Column(db.String())
-    date = db.Column(db.DateTime())
+    date = db.Column(db.DateTime(timezone=True))
     lims_qc = db.Column(db.String(), db.ForeignKey('qc_dict.qc_state'))
     auto_qc = db.Column(db.String(), db.ForeignKey('qc_dict.qc_state'))
     qc = db.Column(db.String(), db.ForeignKey('qc_dict.qc_state'))

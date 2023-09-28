@@ -15,7 +15,7 @@ class BuscoLineage(Base):
 
     id = db.Column(db.Integer(), primary_key=True)  # noqa: A003
     name = db.Column(db.String())
-    date_created = db.Column(db.DateTime())
+    date_created = db.Column(db.DateTime(timezone=True))
     species_count = db.Column(db.Integer())
     gene_count = db.Column(db.Integer())
     busco_metrics = db.relationship(

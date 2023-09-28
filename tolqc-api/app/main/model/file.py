@@ -18,7 +18,7 @@ class File(Base):
     name = db.Column(db.String())
     relative_path = db.Column(db.String())
     remote_path = db.Column(db.String())
-    size_bytes = db.Column(db.Integer())
+    size_bytes = db.Column(db.BigInteger())
     md5 = db.Column(db.String())
 
     data = db.relationship('Data', back_populates='files')

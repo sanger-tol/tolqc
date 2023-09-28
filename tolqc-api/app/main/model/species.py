@@ -15,7 +15,7 @@ class Species(LogBase):
         id_column = 'species_id'
 
     species_id = db.Column(db.String(), primary_key=True)
-    hierarchy_name = db.Column(db.String(), nullable=False, unique=True)
+    hierarchy_name = db.Column(db.String(), nullable=False, index=True)
     strain = db.Column(db.String())
     common_name = db.Column(db.String())
     taxon_id = db.Column(db.Integer(), index=True)

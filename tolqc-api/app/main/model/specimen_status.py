@@ -23,7 +23,7 @@ class SpecimenStatus(LogBase):
         db.ForeignKey('specimen_status_type.status_type_id'),
         nullable=False,
     )
-    status_time = db.Column(db.DateTime(), nullable=False)
+    status_time = db.Column(db.DateTime(timezone=True), nullable=False)
 
     specimen = db.relationship(
         'Specimen', foreign_keys=[specimen_id], back_populates='status_history'
