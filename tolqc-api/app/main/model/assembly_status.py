@@ -23,7 +23,7 @@ class AssemblyStatus(LogBase):
         db.ForeignKey('assembly_status_type.status_type_id'),
         nullable=False,
     )
-    status_time = db.Column(db.DateTime(), nullable=False)
+    status_time = db.Column(db.DateTime(timezone=True), nullable=False)
 
     assembly = db.relationship(
         'Assembly', foreign_keys=[assembly_id], back_populates='status_history'

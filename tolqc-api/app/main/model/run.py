@@ -22,8 +22,8 @@ class Run(Base):
     lims_id = db.Column(db.String())
     element = db.Column(db.String())
     instrument_name = db.Column(db.String())
-    start = db.Column(db.DateTime())
-    complete = db.Column(db.DateTime())
+    start = db.Column(db.DateTime(timezone=True))
+    complete = db.Column(db.DateTime(timezone=True))
 
     data = db.relationship('Data', back_populates='run')
     platform = db.relationship('Platform', back_populates='run')

@@ -23,7 +23,7 @@ class DatasetStatus(LogBase):
         db.ForeignKey('dataset_status_type.status_type_id'),
         nullable=False,
     )
-    status_time = db.Column(db.DateTime(), nullable=False)
+    status_time = db.Column(db.DateTime(timezone=True), nullable=False)
 
     dataset = db.relationship(
         'Dataset', foreign_keys=[dataset_id], back_populates='status_history'

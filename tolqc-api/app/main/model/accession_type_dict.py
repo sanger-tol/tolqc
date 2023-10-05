@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 
+import re
+from functools import cached_property
+
 from tol.api_base.model import Base, db, setup_model
 
 
@@ -19,3 +22,10 @@ class AccessionTypeDict(Base):
     url = db.Column(db.String())
 
     accessions = db.relationship('Accession', back_populates='accession_type')
+
+    @cached_property
+    def compiled_regexp(self):
+        return re.compile(self.regexp)
+
+    def valid_accession(self, accn):
+        return True if self.compiled_regexp.search(accn) else False

@@ -6,5 +6,5 @@
 
 python_dateutil == 2.8.1
 setuptools == 53.0.0
-tol-sdk[all]
+tol-sdk [all] ~= 0.14.18
 psycopg2-binary==2.9.1
