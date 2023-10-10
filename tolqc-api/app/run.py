@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from main import application
+from tolqc import application
 
 app = application()
 
