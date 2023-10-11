@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: MIT
 
 # This is used for local development only
-version: '3.1'
+version: '3.2'
 
 services:
   tolqc-db:
     image: postgres:12
     environment:
+      - TZ=Europe/London
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
@@ -17,7 +18,7 @@ services:
 
   tolqc-api:
     build:
-      context: tolqc-api/.
+      context: ./tolqc-api
       dockerfile: Dockerfile.dev
     image: tolqc-api
     # force amd64 on M1 MacOS
@@ -44,7 +45,7 @@ services:
 
   tolqc-ui:
     build:
-      context: tolqc-ui/.
+      context: ./tolqc-ui
       dockerfile: Dockerfile.dev
     image: tolqc-ui
     # force amd64 on M1 MacOS
@@ -121,21 +122,22 @@ services:
       - ./tolqc-api/migrations/alembic/versions:/migrations/alembic/versions
 
   tolqc-python-db:
-    image: postgres:11
+    image: postgres:12
     environment:
+      - TZ=Europe/London
       - POSTGRES_USER=test-user
       - POSTGRES_PASSWORD=test-password
       - POSTGRES_DB=test-db
   
   tolqc-python-unit-test:
     build:
-      context: tolqc-api
+      context: ./tolqc-api
       dockerfile: Dockerfile.test
     command: pytest -v unit
 
   tolqc-python-system-test:
     build:
-      context: tolqc-api
+      context: ./tolqc-api
       dockerfile: Dockerfile.test
     command: pytest -v system
     environment:
