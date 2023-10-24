@@ -394,8 +394,12 @@ class Data(LogBase):
     lims_qc = Column(String, ForeignKey('qc_dict.qc_state'))
     auto_qc = Column(String, ForeignKey('qc_dict.qc_state'))
     qc = Column(String, ForeignKey('qc_dict.qc_state'))
-    withdrawn = Column(Boolean)
-    manually_withdrawn = Column(Boolean)
+    visibility = Column(
+        String,
+        ForeignKey('visibility_dict.visibility'),
+        default="Always",
+        index=True,
+    )
     reads = Column(Integer)
     bases = Column(BigInteger)
     read_length_mean = Column(Float)
@@ -970,3 +974,14 @@ class SpecimenStatusType(Base):
     assign_order = Column(Integer)
 
     statuses = relationship('SpecimenStatus', back_populates='status_type')
+
+
+class VisibilityDict(Base):
+    __tablename__ = 'visibility_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'visibility'
+
+    visibility = Column(String, primary_key=True)
+    description = Column(String)
