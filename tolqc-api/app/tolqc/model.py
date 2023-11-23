@@ -22,7 +22,7 @@ from sqlalchemy.orm import relationship
 from tol.sql import model_base
 
 Base = model_base()
-LogBase = Base  # No LogBase yet in v2 API
+LogBase = Base.Log
 
 
 class User(Base):

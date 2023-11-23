@@ -19,6 +19,7 @@ from tolqc.model import (
     AssemblySource,
     AssemblyStatus,
     AssemblyStatusType,
+    Base,
     BarcodeMetrics,
     BuscoLineage,
     BuscoMetrics,
