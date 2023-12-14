@@ -25,6 +25,51 @@ Base = model_base()
 LogBase = Base.Log
 
 
+def models_list():
+    return [
+        Accession,
+        AccessionTypeDict,
+        Allocation,
+        Assembly,
+        AssemblyComponentType,
+        AssemblyMetrics,
+        AssemblySource,
+        AssemblyStatus,
+        AssemblyStatusType,
+        BarcodeMetrics,
+        BuscoLineage,
+        BuscoMetrics,
+        Centre,
+        ContigvizMetrics,
+        Data,
+        Dataset,
+        DatasetElement,
+        DatasetStatus,
+        DatasetStatusType,
+        File,
+        GenomescopeMetrics,
+        Library,
+        LibraryType,
+        MarkerscanMetrics,
+        MerquryMetrics,
+        Offspring,
+        PacbioRunMetrics,
+        Platform,
+        PloidyplotMetrics,
+        Project,
+        QCDict,
+        ReviewDict,
+        Run,
+        Sample,
+        Sex,
+        SoftwareVersion,
+        Species,
+        Specimen,
+        SpecimenStatus,
+        SpecimenStatusType,
+    ]
+
+
 class User(Base):
     """
     Temporary class while v2 API authentication is being developed.
@@ -397,7 +442,7 @@ class Data(LogBase):
     visibility = Column(
         String,
         ForeignKey('visibility_dict.visibility'),
-        default="Always",
+        default='Always',
         index=True,
     )
     reads = Column(Integer)
