@@ -24,6 +24,8 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('visibility'),
     )
 
+    op.drop_column('data', 'withdrawn')
+    op.drop_column('data', 'manually_withdrawn')
     data_rel_tables = (
         'allocation',
         'barcode_metrics',
@@ -48,8 +50,6 @@ def upgrade() -> None:
         batch_op.create_index(
             op.f('ix_data_visibility'), ['visibility'], unique=False
         )
-        batch_op.drop_column('withdrawn')
-        batch_op.drop_column('manually_withdrawn')
 
     for tbl in data_rel_tables:
         op.create_foreign_key(
