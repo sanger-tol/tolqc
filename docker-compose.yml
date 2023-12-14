@@ -26,6 +26,8 @@ services:
     environment:
       - DB_URI
       - TOLQC_URL
+      - API_PATH
+      - API_TOKEN
       - ELIXIR_CLIENT_ID
       - ELIXIR_CLIENT_SECRET
       - ELIXIR_REDIRECT_URI
@@ -68,6 +70,8 @@ services:
     environment:
       - DB_URI
       - TOLQC_URL
+      - API_PATH
+      - API_TOKEN
       - ELIXIR_CLIENT_ID
       - ELIXIR_CLIENT_SECRET
       - ELIXIR_REDIRECT_URI
