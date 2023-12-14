@@ -19,6 +19,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
+
 from tol.sql import model_base
 
 Base = model_base()

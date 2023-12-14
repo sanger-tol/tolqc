@@ -6,6 +6,7 @@ Create Date: 2023-09-28 16:41:31.283922
 
 """
 from alembic import op
+
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
@@ -77,5 +78,8 @@ def upgrade() -> None:
     # species.hierarchy_name is not always unique
     op.drop_constraint('species_hierarchy_name_key', 'species', type_='unique')
     op.create_index(
-        op.f('ix_species_hierarchy_name'), 'species', ['hierarchy_name'], unique=False
+        op.f('ix_species_hierarchy_name'),
+        'species',
+        ['hierarchy_name'],
+        unique=False,
     )

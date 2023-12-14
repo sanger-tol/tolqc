@@ -1,10 +1,9 @@
+import os
 from logging.config import fileConfig
 
-import os
+from alembic import context
 
 from sqlalchemy import create_engine
-
-from alembic import context
 
 from tolqc.model import Base
 
@@ -42,7 +41,9 @@ def run_migrations_online() -> None:
     connectable = create_engine(DB_URI)
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata, compare_type=True
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
         )
 
         with context.begin_transaction():

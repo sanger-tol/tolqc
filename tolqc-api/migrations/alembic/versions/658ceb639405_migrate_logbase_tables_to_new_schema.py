@@ -6,8 +6,8 @@ Create Date: 2023-12-13 17:03:45.937960
 
 """
 from alembic import op
+
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '658ceb639405'
@@ -45,7 +45,10 @@ def upgrade() -> None:
             insert_after='qc',
         )
         batch_op.create_foreign_key(
-            'data_visibility_fkey', 'visibility_dict', ['visibility'], ['visibility']
+            'data_visibility_fkey',
+            'visibility_dict',
+            ['visibility'],
+            ['visibility'],
         )
         batch_op.create_index(
             op.f('ix_data_visibility'), ['visibility'], unique=False
@@ -71,9 +74,7 @@ def upgrade() -> None:
         op.drop_constraint(
             f'{tbl}_last_modified_by_fkey', tbl, type_='foreignkey'
         )
-        op.drop_constraint(
-            f'{tbl}_created_by_fkey', tbl, type_='foreignkey'
-        )
+        op.drop_constraint(f'{tbl}_created_by_fkey', tbl, type_='foreignkey')
         op.alter_column(tbl, 'last_modified_at', new_column_name='modified_at')
         op.alter_column(tbl, 'last_modified_by', new_column_name='modified_by')
         op.drop_column(tbl, 'created_at')
