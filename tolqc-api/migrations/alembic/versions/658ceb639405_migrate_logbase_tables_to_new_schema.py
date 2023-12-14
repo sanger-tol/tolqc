@@ -1,4 +1,4 @@
-"""Migrage LogBase tables to new schema
+"""Migrate LogBase tables to new schema
 
 Revision ID: 658ceb639405
 Revises: 6f373edef955
