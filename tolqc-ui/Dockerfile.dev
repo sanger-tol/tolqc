@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # This is used for local development only.
-FROM node:14.17.0-alpine
+FROM node:14.21.3-alpine
 
 RUN npm install react-scripts@2.1.8 -g --silent
 
