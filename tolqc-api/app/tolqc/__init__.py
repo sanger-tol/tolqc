@@ -6,7 +6,7 @@ import os
 
 from flask import Flask
 
-from tol.api_base2 import data_blueprint
+from tol.api_base2 import data_blueprint, system_blueprint
 from tol.api_base2.misc import quick_and_dirty_auth
 from tol.core import core_data_object
 from tol.sql import create_sql_datasource
@@ -31,6 +31,8 @@ def application():
         db_uri=os.getenv('DB_URI'),
     )
     authenticator = quick_and_dirty_auth(os.getenv('API_TOKEN'))
+
+    # Data endpoints
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds, authenticator=authenticator
     )
@@ -39,7 +41,13 @@ def application():
         name='tolqc',
         url_prefix=os.getenv('API_PATH'),
     )
-
     core_data_object(tolqc_ds)
+
+    # System endpoints
+    blueprint_system = system_blueprint(sql_datasource)
+    app.register_blueprint(
+        blueprint_system,
+        url_prefix=os.getenv('API_PATH') + '/system',
+    )
 
     return app
