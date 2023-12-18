@@ -11,7 +11,15 @@ from tol.api_base2.misc import quick_and_dirty_auth
 from tol.core import core_data_object
 from tol.sql import create_sql_datasource
 
-import tolqc.model
+import tolqc.assembly_models
+import tolqc.sample_data_models
+
+
+def models_list():
+    return [
+        *tolqc.assembly_models.models_list(),
+        *tolqc.sample_data_models.models_list(),
+    ]
 
 
 def application():
@@ -19,7 +27,7 @@ def application():
 
     # Tol QC endpoints
     tolqc_ds = create_sql_datasource(
-        models=tolqc.model.models_list(),
+        models=models_list(),
         db_uri=os.getenv('DB_URI'),
     )
     authenticator = quick_and_dirty_auth(os.getenv('API_TOKEN'))

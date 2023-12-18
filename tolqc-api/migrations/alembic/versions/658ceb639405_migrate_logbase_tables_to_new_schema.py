@@ -75,11 +75,27 @@ def upgrade() -> None:
             f'{tbl}_last_modified_by_fkey', tbl, type_='foreignkey'
         )
         op.drop_constraint(f'{tbl}_created_by_fkey', tbl, type_='foreignkey')
-        op.alter_column(tbl, 'last_modified_at', new_column_name='modified_at')
-        op.alter_column(tbl, 'last_modified_by', new_column_name='modified_by')
         op.drop_column(tbl, 'created_at')
         op.drop_column(tbl, 'created_by')
+        op.drop_column(tbl, 'last_modified_at')
+        op.drop_column(tbl, 'last_modified_by')
         op.drop_column(tbl, 'history')
+        op.add_column(
+            tbl,
+            sa.Column(
+                'modified_at',
+                sa.DateTime(timezone=True),
+                nullable=True,
+            ),
+        )
+        op.add_column(
+            tbl,
+            sa.Column(
+                'modified_by',
+                sa.String,
+                nullable=True,
+            ),
+        )
 
 
 def downgrade() -> None:
