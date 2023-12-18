@@ -34,7 +34,8 @@ def application():
 
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
-        tolqc_ds, authenticator=authenticator
+        tolqc_ds,
+        authenticator=authenticator,
     )
     app.register_blueprint(
         blueprint_data_tolqc,
@@ -44,7 +45,10 @@ def application():
     core_data_object(tolqc_ds)
 
     # System endpoints
-    blueprint_system = system_blueprint(sql_datasource)
+    blueprint_system = system_blueprint(
+        tolqc_ds,
+        authenticator=authenticator,
+    )
     app.register_blueprint(
         blueprint_system,
         url_prefix=os.getenv('API_PATH') + '/system',
