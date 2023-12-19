@@ -3,24 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 # This is used for local development only.
-FROM node:14.17.0-alpine
-
-RUN npm install react-scripts@2.1.8 -g --silent
-
-WORKDIR /usr/src/app
-
-RUN echo \"@tol:registry\" \"https://gitlab.internal.sanger.ac.uk/api/v4/projects/3596/packages/npm/\" >> .yarnrc
-
-ENV PATH /usr/src/app/node_modules/.bin:$PATH
-
-VOLUME ["/packages"]
+FROM gitlab-registry.internal.sanger.ac.uk/tol/tol-core/web-base-dev:1.0.4
 
 COPY ./app/package.json ./
 
 RUN yarn install
 
 COPY ./app/ ./
-
-RUN yarn global add yalc;
-
-CMD if [ -d /packages/tol-ui ] ; then cd /packages/tol-ui; yarn build; yalc push --scripts --update --replace; cd /usr/src/app; yalc link @tol/tol-ui; yarn install; fi; yarn start

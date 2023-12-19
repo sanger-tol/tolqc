@@ -1,12 +1,11 @@
-from logging.config import fileConfig
-
 import os
-
-from sqlalchemy import create_engine
+from logging.config import fileConfig
 
 from alembic import context
 
-from main.model import Base
+from sqlalchemy import create_engine
+
+from tolqc.model import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -42,7 +41,9 @@ def run_migrations_online() -> None:
     connectable = create_engine(DB_URI)
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata, compare_type=True
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
         )
 
         with context.begin_transaction():

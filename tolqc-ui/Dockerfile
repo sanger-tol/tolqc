@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2023 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
 # This is used for a production build
 # stage 1 as builder
-FROM node:14.17.0-alpine as builder
+FROM node:18.16.0-alpine as builder
 
 RUN apk add yarn
 RUN mkdir /workspace
@@ -19,14 +19,9 @@ RUN yarn build
 
 
 # Stage 2
-FROM nginx:alpine
-
-COPY nginx.conf /etc/nginx/
-
-## Remove default nginx index page
-RUN rm -rf /var/www/tolqc-ui/*
+FROM gitlab-registry.internal.sanger.ac.uk/tol/tol-core/web-base:1.0.2
 
 # Copy from the stage 1
-COPY --from=builder /workspace/build/ /var/www/tolqc-ui/
+COPY --from=builder /workspace/build/ /var/www/
 
 EXPOSE 80

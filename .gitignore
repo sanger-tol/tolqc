@@ -19,3 +19,4 @@ chart/charts/
 .dccache
 .yalc/
 yalc.lock
+inject.js
