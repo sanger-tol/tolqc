@@ -93,13 +93,13 @@ tolcore:
   deployment:
     environment: "dev"
   db:
+    enabled: true
     fullname: "tolqc-db"
     user: ""
     password: ""
     name: ""
     host: ""
     port: "" # specify as a string
-    create_local: ""
   dbutils:
     image:
       repository: ""
@@ -109,16 +109,23 @@ tolcore:
       repository: ""
       tag: ""
   api:
+    enabled: true
     fullname: "tolqc-api"
-    probe_url: '/api/v1/ui'
+    probe_url: '/api/v1/system/healthz'
+    path: '/api/v1'
+    token: ""
+    extra_env:
+      API_PATH: api.path
+      API_TOKEN: api.token
   flask:
     env: ""
   ui:
     fullname: "tolqc-ui"
     probe_url: '/'
-    api_version: '1'
+    matomo_site_id: ''
     extra_env:
-      REACT_APP_API_VERSION: ui.api_version
+      REACT_APP_API_PATH: api.path
+      REACT_APP_MATOMO_SITE_ID: ui.matomo_site_id
   s3:
     uri: ""
     access_key: ""
