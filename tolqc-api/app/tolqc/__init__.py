@@ -45,10 +45,7 @@ def application():
     core_data_object(tolqc_ds)
 
     # System endpoints
-    blueprint_system = system_blueprint(
-        tolqc_ds,
-        authenticator=authenticator,
-    )
+    blueprint_system = system_blueprint(tolqc_ds)
     app.register_blueprint(
         blueprint_system,
         url_prefix=os.getenv('API_PATH') + '/system',
