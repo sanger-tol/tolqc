@@ -4,32 +4,65 @@ SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import { AutoTable, CentreContents } from '@tol/tol-ui'
+import { RemoteTable, Widgets, Button, Row, Col} from '@tol/tol-ui'
+
+const button = (
+	<Button
+		href="https://portal.tol.sanger.ac.uk"
+		style={{float: "right"}}
+	>
+		Visit ToL Portal
+	</Button>
+)
+
+const title = (
+	<span>
+		<p className='mt-2'>
+			Welcome to ToLQC. The preferred place to view ToLQC data is in the ToL Portal.
+		</p>
+	</span>
+)
+
+const intro = (
+	<Row>
+		<Col xs={12} sm={8}>{title}</Col>
+		<Col xs={12} sm={4}>{button}</Col>
+	</Row>
+)
+
+const dataTable = (
+  <RemoteTable
+		id="data-home-table-v2"
+    endpoint="data"
+    height={500}
+    fields={{
+      "id": {
+        rename: "ID"
+      },
+      "date": {
+        rename: "Date"
+      },
+      "name_root": {
+        rename: "Name root"
+      },
+      "sample.id": {
+        rename: "Sanger Sample ID",
+        relationshipBox: true
+      }
+    }}
+  />
+)
+
+
 
 function Home() {
   return (
-    <div className="home">
-      <CentreContents>
-        <AutoTable endpoint="data"
-          fields={{
-            'name': {
-              'rename': 'Run/element/tag'
-            },
-            'runs.start_date': {
-              'rename': 'Run'
-            },
-            'samples.name': {
-              'rename': 'Sanger Sample ID'
-            },
-            'samples.specimens.species.name': {
-              'rename': 'Species'
-            }
-          }}
-        />
-      </CentreContents>
-
+    <div className="data">
+      <Widgets components={[intro]}/>
+      <Widgets components={[
+				dataTable
+			]}/>
     </div>
   );
 }
-
 export default Home;

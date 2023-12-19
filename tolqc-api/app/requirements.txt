@@ -6,5 +6,7 @@
 
 python_dateutil == 2.8.1
 setuptools == 53.0.0
-tol-sdk [all] ~= 0.14.18
+tol-sdk == 0.15.2
 psycopg2-binary==2.9.1
+Flask == 2.2.2
+Werkzeug == 2.2.2

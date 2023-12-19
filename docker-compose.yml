@@ -55,7 +55,8 @@ services:
     stdin_open: true
     environment:
       - NODE_ENV=development
-      - REACT_APP_API_VERSION
+      - REACT_APP_API_PATH=${API_PATH}
+      - REACT_APP_MATOMO_SITE_ID=${MATOMO_SITE_ID}
     ports:
       - 3004:3000
     volumes:
