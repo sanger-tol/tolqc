@@ -113,7 +113,7 @@ services:
       - BACKUP_S3_BUCKET
       - BACKUP_S3_SECURE
       - RESTORE_FILE_PREFIX
-      - FLASK_ENV
+      - FLAST_DEBUG
       - BACKUP_SCHEDULE
   
   tolqc-alembic:

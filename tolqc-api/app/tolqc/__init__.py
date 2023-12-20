@@ -14,6 +14,8 @@ from tol.sql import create_sql_datasource
 import tolqc.assembly_models
 import tolqc.sample_data_models
 
+from .reports import reports_blueprint
+
 
 def models_list():
     return [
@@ -43,6 +45,14 @@ def application():
         url_prefix=os.getenv('API_PATH'),
     )
     core_data_object(tolqc_ds)
+
+    # Reports
+    blueprint_reports = reports_blueprint(
+        db_uri=os.getenv('DB_URI'),
+        authenticator=authenticator,
+        url_prefix='/reports',
+    )
+    app.register_blueprint(blueprint_reports)
 
     # System endpoints
     blueprint_system = system_blueprint(tolqc_ds)
