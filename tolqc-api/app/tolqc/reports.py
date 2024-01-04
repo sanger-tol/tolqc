@@ -51,7 +51,7 @@ def reports_blueprint(
 
         # Suggested filename for web browsers
         today = datetime.date.today().isoformat()
-        filename = f'pacbio_run_data_{today}.{format}'
+        filename = f'pacbio_run_data_{today}.{req_fmt}'
         headers = {
             'Content-Type': mime_type,
             'Content-Disposition': f'attachment; filename="{filename}"',
