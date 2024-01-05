@@ -57,9 +57,12 @@ def reports_blueprint(
             'Content-Disposition': f'attachment; filename="{filename}"',
         }
 
-        session = session_factory()
-        query = pacbio_run_report_query()
-        row_itr = session.execute(query)
+        # Must either (as here) use session as a context manager or call
+        # session.close() to avoid SELECT statements accumulating on server
+        # with 'idle in transaction' state.
+        with session_factory() as session:
+            query = pacbio_run_report_query()
+            row_itr = session.execute(query)
 
         # Streams formatted data from the SQL query to the client
         return out_formatter(row_itr, query), 200, headers
