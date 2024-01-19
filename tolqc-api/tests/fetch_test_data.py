@@ -1,10 +1,10 @@
 import gzip
 import pathlib
+import pickle
 
 import click
 
 from sqlalchemy import create_engine, select
-from sqlalchemy.ext.serializer import dumps
 from sqlalchemy.orm import selectinload, sessionmaker
 
 from tolqc.sample_data_models import (
@@ -49,7 +49,7 @@ def cli(db_uri, echo_sql):
     session = ssn_maker()
     fetched = []
 
-    # Fetch data from
+    # Fetch data from the dictionary-like tables
     for cls in (
         AccessionTypeDict,
         LibraryType,
@@ -60,14 +60,16 @@ def cli(db_uri, echo_sql):
         VisibilityDict,
     ):
         entries = session.scalars(select(cls)).all()
-        fetched.append(entries)
+        fetched.extend(entries)
 
+    # Fetch data for a list of test species
     species_list = 'Adalia bipunctata', 'Quercus robur', 'Juncus effusus'
-    fetched.append(fetch_species_data(session, species_list))
+    fetched.extend(fetch_species_data(session, species_list))
+
     pkl_file = data_dir() / 'test_db.pkl.gz'
     with gzip.open(pkl_file, 'wb') as pkl:
-        pkl.write(dumps(fetched))
-    click.echo(f"Wrote to: '{pkl_file}'")
+        pickle.dump(fetched, pkl)
+    click.echo(f"Wrote data for test DB to: '{pkl_file}'")
 
 
 def data_dir():
@@ -75,10 +77,15 @@ def data_dir():
 
 
 def fetch_species_data(session, species_list):
+    """
+    Fetches a list of Species from the database, with all their data that
+    we're interested in pre-fetched and attached via SELECT IN loads.
+    """
+
     statement = (
-        # Enumerate a `selectinload` path to each leaf we want
         select(Species)
         .filter(Species.species_id.in_(species_list))
+        # Specify a `selectinload` path to each leaf we want
         .options(
             selectinload(Species.specimens).selectinload(Specimen.accession)
         )
