@@ -23,6 +23,8 @@ from tolqc.sample_data_models import (
     VisibilityDict,
 )
 
+data_dir = pathlib.Path(__file__).parents / 'data'
+
 db_uri = click.option(
     '--db-uri',
     envvar='DB_URI',
@@ -42,7 +44,9 @@ pickled_data = click.option(
         readable=True,
         path_type=pathlib.Path,
     ),
+    default=data_dir / 'test_db.pkl.gz',
     required=True,
+    show_default=True,
 )
 
 
