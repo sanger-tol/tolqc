@@ -23,27 +23,41 @@ from tolqc.sample_data_models import (
     VisibilityDict,
 )
 
+db_uri = click.option(
+    '--db-uri',
+    envvar='DB_URI',
+    help=(
+        'URI of the ToLQC test database.'
+        ' Uses DB_URI environment variable if not specified'
+    ),
+    required=True,
+)
+
+pickled_data = click.option(
+    '--pickled-data',
+    help='File of pickled and gzipped data for test database',
+    type=click.Path(
+        dir_okay=False,
+        exists=True,
+        readable=True,
+        path_type=pathlib.Path,
+    ),
+    required=True,
+)
+
 
 @click.command(
     help='Dump sample data from the production ToLQC database',
 )
-@click.option(
-    '--db-uri',
-    envvar='DB_URI',
-    help=(
-        'URI of the ToLQC source database to use.'
-        ' Uses DB_URI environment variable if not specified'
-    ),
-    required=True,
-    show_default=True,
-)
+@db_uri
+@pickled_data
 @click.option(
     '--echo-sql/--no-echo-sql',
     help='Echo SQLAlchemy SQL to STDERR',
     default=False,
     show_default=True,
 )
-def cli(db_uri, echo_sql):
+def cli(db_uri, pickled_data, echo_sql):
     engine = create_engine(db_uri, echo=echo_sql)
     ssn_maker = sessionmaker(bind=engine)
     session = ssn_maker()
@@ -66,10 +80,9 @@ def cli(db_uri, echo_sql):
     species_list = 'Adalia bipunctata', 'Quercus robur', 'Juncus effusus'
     fetched.extend(fetch_species_data(session, species_list))
 
-    pkl_file = data_dir() / 'test_db.pkl.gz'
-    with gzip.open(pkl_file, 'wb') as pkl:
+    with gzip.open(pickled_data, 'wb') as pkl:
         pickle.dump(fetched, pkl)
-    click.echo(f"Wrote data for test DB to: '{pkl_file}'")
+    click.echo(f"Wrote data for test DB to: '{pickled_data}'")
 
 
 def data_dir():
