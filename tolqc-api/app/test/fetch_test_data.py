@@ -67,7 +67,7 @@ def cli(db_uri, pickled_data, echo_sql):
     session = ssn_maker()
     fetched = []
 
-    # Fetch data from the dictionary-like tables
+    # Fetch data from all of the dictionary-like tables
     for cls in (
         AccessionTypeDict,
         LibraryType,
@@ -84,13 +84,10 @@ def cli(db_uri, pickled_data, echo_sql):
     species_list = 'Adalia bipunctata', 'Quercus robur', 'Juncus effusus'
     fetched.extend(fetch_species_data(session, species_list))
 
+    # Save the list of SQLAlchemy
     with gzip.open(pickled_data, 'wb') as pkl:
         pickle.dump(fetched, pkl)
     click.echo(f"Wrote data for test DB to: '{pickled_data}'")
-
-
-def data_dir():
-    return pathlib.Path(__file__).parent / 'data'
 
 
 def fetch_species_data(session, species_list):
@@ -101,10 +98,11 @@ def fetch_species_data(session, species_list):
 
     statement = (
         select(Species)
-        .filter(Species.species_id.in_(species_list))
-        # Specify a `selectinload` path to each leaf we want
+        .where(Species.species_id.in_(species_list))
+        # Specify a `selectinload` path to each leaf we want fetched
         .options(
-            selectinload(Species.specimens).selectinload(Specimen.accession)
+            selectinload(Species.specimens)
+            .selectinload(Specimen.accession)
         )
         .options(
             selectinload(Species.specimens)

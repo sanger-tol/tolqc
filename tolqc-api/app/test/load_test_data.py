@@ -1,5 +1,4 @@
 import gzip
-import pathlib
 import pickle
 
 import click
@@ -12,7 +11,9 @@ from tolqc.model import Base
 from .fetch_test_data import db_uri, pickled_data
 
 
-@click.command(help='Create and load test database')
+@click.command(
+    help=('Create and load a test database from pickled, gzipped data')
+)
 @db_uri
 @pickled_data
 @click.option(
