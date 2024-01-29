@@ -30,14 +30,14 @@ from tolqc.sample_data_models import (
 
 
 def reports_blueprint(
-    db_uri: str = None,
+    session_factory,
     url_prefix: str = '/reports',
     authenticator: Optional[Authenticator] = None,
 ) -> Blueprint:
     rep = custom_blueprint(
         name='reports', url_prefix=url_prefix, authenticator=authenticator
     )
-    session_factory = create_session_factory(db_uri)
+    # session_factory = create_session_factory(db_uri)
 
     @rep.route('/pacbio-run-data')
     def pacbio_run_data():
@@ -60,6 +60,7 @@ def reports_blueprint(
         # Must either (as here) use session as a context manager or call
         # session.close() to avoid SELECT statements accumulating on server
         # with 'idle in transaction' state.
+        
         with session_factory() as session:
             query = pacbio_run_report_query()
             row_itr = session.execute(query)

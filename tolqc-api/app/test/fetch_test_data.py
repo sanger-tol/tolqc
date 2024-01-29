@@ -23,7 +23,7 @@ from tolqc.sample_data_models import (
     VisibilityDict,
 )
 
-data_dir = pathlib.Path(__file__).parents / 'data'
+data_dir = pathlib.Path(__file__).parent / 'data'
 
 db_uri = click.option(
     '--db-uri',
@@ -33,6 +33,13 @@ db_uri = click.option(
         ' Uses DB_URI environment variable if not specified'
     ),
     required=True,
+)
+
+echo_sql = click.option(
+    '--echo-sql/--no-echo-sql',
+    help='Echo SQLAlchemy SQL to STDERR',
+    default=False,
+    show_default=True,
 )
 
 pickled_data = click.option(
@@ -49,18 +56,12 @@ pickled_data = click.option(
     show_default=True,
 )
 
-
 @click.command(
     help='Dump sample data from the production ToLQC database',
 )
 @db_uri
+@echo_sql
 @pickled_data
-@click.option(
-    '--echo-sql/--no-echo-sql',
-    help='Echo SQLAlchemy SQL to STDERR',
-    default=False,
-    show_default=True,
-)
 def cli(db_uri, pickled_data, echo_sql):
     engine = create_engine(db_uri, echo=echo_sql)
     ssn_maker = sessionmaker(bind=engine)

@@ -5,9 +5,14 @@ import pickle
 
 import pytest
 
+from contextlib import contextmanager
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from tol.sql.database import DefaultDatabase
+
+from tolqc import application, models_list
 from tolqc.model import Base
 
 
@@ -44,7 +49,7 @@ def unpickled_data(pkl_gz_file):
     return test_data
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def db_connection():
     """
     Creates a connection to the database specified in the `DB_URI` environment
@@ -54,19 +59,19 @@ def db_connection():
     """
     db_uri = os.getenv('DB_URI')
     assert db_uri
-    engine = create_engine(db_uri)
+    engine = create_engine(db_uri, echo=True)
     connection = engine.connect()
-    trnsctn = connection.begin()
+    txn = connection.begin()
 
     # Create the database schema
     Base.metadata.create_all(connection)
 
     yield connection
-    trnsctn.rollback()
+    txn.rollback()
     connection.close()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def make_session(db_connection, unpickled_data):
     """
     Creates a `sessionmaker` bound to the `db_connection` which created the
@@ -92,10 +97,44 @@ def make_session(db_connection, unpickled_data):
 @pytest.fixture
 def db_session(make_session):
     """
-    Yields a session for each test function, which is then rolled back, so
-    that the next test function which uses the database sees it in the same
-    state.
+    Yields a session for each test function (the default scope), which by
+    default is rolled back after the function returns. Note: changes which
+    have been committed will remain after the function returns.
     """
     with make_session() as session:
         yield session
         session.rollback()
+
+
+@pytest.fixture(scope='module')
+def database_factory(make_session):
+
+    @contextmanager
+    def session_factory():
+        with make_session() as session:
+            yield session
+            session.rollback()
+
+    def db_factory_for_testing(_, __):
+        return DefaultDatabase(
+            session_factory=session_factory, models=models_list()
+        )
+
+    return db_factory_for_testing
+
+
+@pytest.fixture
+def flask_app(database_factory):
+    app = application(database_factory=database_factory)
+    app.config.update(
+        {
+            'TESTING': True,
+        }
+    )
+
+    return app
+
+
+@pytest.fixture()
+def client(flask_app):
+    return flask_app.test_client()
