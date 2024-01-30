@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
 import gzip
 import pathlib
 import pickle

@@ -60,6 +60,7 @@ def application(database_factory=None):
     blueprint_reports = reports_blueprint(
         # db_uri=os.getenv('DB_URI'),
         session_factory=(
+            ### Fix needed to avoid reaching past private properties ###
             tolqc_ds._SqlDataSource__db._DefaultDatabase__session_factory
         ),
         authenticator=authenticator,
