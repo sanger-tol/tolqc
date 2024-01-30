@@ -56,6 +56,7 @@ pickled_data = click.option(
     show_default=True,
 )
 
+
 @click.command(
     help='Dump sample data from the production ToLQC database',
 )
@@ -102,8 +103,7 @@ def fetch_species_data(session, species_list):
         .where(Species.species_id.in_(species_list))
         # Specify a `selectinload` path to each leaf we want fetched
         .options(
-            selectinload(Species.specimens)
-            .selectinload(Specimen.accession)
+            selectinload(Species.specimens).selectinload(Specimen.accession)
         )
         .options(
             selectinload(Species.specimens)

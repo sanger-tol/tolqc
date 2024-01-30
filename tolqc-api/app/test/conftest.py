@@ -2,10 +2,9 @@ import gzip
 import os
 import pathlib
 import pickle
+from contextlib import contextmanager
 
 import pytest
-
-from contextlib import contextmanager
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

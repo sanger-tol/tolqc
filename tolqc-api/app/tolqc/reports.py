@@ -13,7 +13,6 @@ from sqlalchemy.orm import Bundle
 
 from tol.api_base2 import custom_blueprint
 from tol.api_base2.misc import Authenticator
-from tol.sql.session import create_session_factory
 
 from tolqc.sample_data_models import (
     Allocation,
@@ -60,7 +59,6 @@ def reports_blueprint(
         # Must either (as here) use session as a context manager or call
         # session.close() to avoid SELECT statements accumulating on server
         # with 'idle in transaction' state.
-        
         with session_factory() as session:
             query = pacbio_run_report_query()
             row_itr = session.execute(query)
