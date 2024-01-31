@@ -110,15 +110,19 @@ def db_session(make_session):
 
 
 @pytest.fixture(scope='module')
-def database_factory(make_session):
-
+def session_factory(make_session):
     @contextmanager
     def session_factory():
         with make_session() as session:
             yield session
             session.rollback()
 
-    def db_factory_for_testing(_, __):
+    return session_factory
+
+
+@pytest.fixture(scope='module')
+def database_factory(session_factory):
+    def db_factory_for_testing(*_):
         return DefaultDatabase(
             session_factory=session_factory, models=models_list()
         )
@@ -127,8 +131,11 @@ def database_factory(make_session):
 
 
 @pytest.fixture
-def flask_app(database_factory):
-    app = application(database_factory=database_factory)
+def flask_app(session_factory, database_factory):
+    app = application(
+        session_factory=session_factory,
+        database_factory=database_factory,
+    )
     app.config.update(
         {
             'TESTING': True,

@@ -24,9 +24,10 @@ def models_list():
     ]
 
 
-def application(database_factory=None):
+def application(session_factory=None, database_factory=None):
     """
-    The `database_factory` argument is used during testing.
+    The `session_factory` and `database_factory` arguments are used during
+    testing.
     """
     app = Flask(__name__)
 
@@ -58,11 +59,8 @@ def application(database_factory=None):
 
     # Reports
     blueprint_reports = reports_blueprint(
-        # db_uri=os.getenv('DB_URI'),
-        session_factory=(
-            #  *** Fix needed to avoid reaching past private properties ***
-            tolqc_ds._SqlDataSource__db._DefaultDatabase__session_factory
-        ),
+        db_uri=os.getenv('DB_URI'),
+        session_factory=session_factory,
         authenticator=authenticator,
         url_prefix='/reports',
     )

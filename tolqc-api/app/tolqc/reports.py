@@ -29,14 +29,16 @@ from tolqc.sample_data_models import (
 
 
 def reports_blueprint(
-    session_factory,
+    db_uri=None,
+    session_factory=None,
     url_prefix: str = '/reports',
     authenticator: Optional[Authenticator] = None,
 ) -> Blueprint:
     rep = custom_blueprint(
         name='reports', url_prefix=url_prefix, authenticator=authenticator
     )
-    # session_factory = create_session_factory(db_uri)
+    if not session_factory:
+        session_factory = create_session_factory(db_uri)
 
     @rep.route('/pacbio-run-data')
     def pacbio_run_data():
