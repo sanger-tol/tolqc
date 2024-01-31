@@ -13,6 +13,7 @@ from sqlalchemy.orm import Bundle
 
 from tol.api_base2 import custom_blueprint
 from tol.api_base2.misc import Authenticator
+from tol.sql.session import create_session_factory
 
 from tolqc.sample_data_models import (
     Allocation,
