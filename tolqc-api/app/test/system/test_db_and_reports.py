@@ -88,7 +88,7 @@ def test_pacbio_run_data_report_tsv(client, pacbio_row_count):
     # Check Content-Disposition header
     dspstn = response.headers.get('Content-Disposition')
     assert re.fullmatch(
-        r'attachment; filename="pacbio_run_data_\d{4}-\d\d-\d\d.tsv"',
+        r'attachment; filename="pacbio_run_data_\d{4}-\d\d-\d\d\.tsv"',
         dspstn,
     )
 
