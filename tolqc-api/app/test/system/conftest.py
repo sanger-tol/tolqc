@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import logging
 import os
 import pathlib
 
@@ -58,7 +59,8 @@ def db_connection(sql_data):
     """
     db_uri = os.getenv('DB_URI')
     assert db_uri
-    engine = create_engine(db_uri, echo=True)
+    engine = create_engine(db_uri)
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     connection = engine.connect()
     txn = connection.begin()
 

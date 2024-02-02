@@ -51,7 +51,8 @@ def test_insert_visibility_dubious(db_session):
 
 def test_fetch_visibility_dubious_is_now_none(db_session):
     """
-    Dubious was not committed to VisibilityDict, so should now be none.
+    Dubious should now be absent from VisibilityDict, despite being committed
+    by test_insert_visibility_dubious()
     """
     assert db_session.get(VisibilityDict, 'Dubious') is None
 
