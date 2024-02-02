@@ -33,8 +33,7 @@ def data_dir():
 @pytest.fixture(scope='session')
 def sql_data_file(data_dir):
     """
-    The file containing sample test data as SQLAlchemy ORM data objects,
-    pickled and gzipped.
+    The file containing sample test data as SQL
     """
     return data_dir / 'test_data.sql'
 
@@ -42,7 +41,7 @@ def sql_data_file(data_dir):
 @pytest.fixture(scope='session')
 def sql_data(sql_data_file):
     """
-    Returns the list of unpickled SQLAlchemy ORM data objects.
+    Returns SQL data as an SQLAlchemy `text` object
     """
     with open(sql_data_file, 'r') as sql_fh:
         test_data = sql_fh.read()
