@@ -110,7 +110,7 @@ def make_sql_data_file(build_url, sql_data_file):
             (
                 'pg_dump',
                 '--data-only',
-                '--inserts',
+                '--rows-per-insert=1000',
                 build_url.render_as_string(),
             ),
             stdout=sql_fh,
