@@ -44,9 +44,9 @@ def test_insert_visibility_dubious(db_session):
         description='Data under investigation',
     )
     db_session.add(dubious)
-    # commit() instead of flush() here would make it visible to the next
-    # function / session
-    assert db_session.flush() is None
+    # Even though we commit() here, it will not be visible in the next test
+    # function called
+    assert db_session.commit() is None
 
 
 def test_fetch_visibility_dubious_is_now_none(db_session):

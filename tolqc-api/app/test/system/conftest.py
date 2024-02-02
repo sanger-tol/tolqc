@@ -2,15 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-import gzip
 import os
 import pathlib
-import pickle
-from contextlib import contextmanager
 
 import pytest
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from tol.sql.database import DefaultDatabase
@@ -34,26 +31,26 @@ def data_dir():
 
 
 @pytest.fixture(scope='session')
-def pkl_gz_file(data_dir):
+def sql_data_file(data_dir):
     """
     The file containing sample test data as SQLAlchemy ORM data objects,
     pickled and gzipped.
     """
-    return data_dir / 'test_db.pkl.gz'
+    return data_dir / 'test_data.sql'
 
 
 @pytest.fixture(scope='session')
-def unpickled_data(pkl_gz_file):
+def sql_data(sql_data_file):
     """
     Returns the list of unpickled SQLAlchemy ORM data objects.
     """
-    with gzip.open(pkl_gz_file, 'rb') as pkl_fh:
-        test_data = pickle.load(pkl_fh)
-    return test_data
+    with open(sql_data_file, 'r') as sql_fh:
+        test_data = sql_fh.read()
+    return text(test_data)
 
 
-@pytest.fixture(scope='module')
-def db_connection():
+@pytest.fixture
+def db_connection(sql_data):
     """
     Creates a connection to the database specified in the `DB_URI` environment
     variable, creates the database schema, starts a transaction, and yields
@@ -68,18 +65,19 @@ def db_connection():
 
     # Create the database schema
     Base.metadata.create_all(connection)
+    connection.execute(sql_data)
+    connection.execute(text('SET search_path TO public'))
 
     yield connection
     txn.rollback()
     connection.close()
 
 
-@pytest.fixture(scope='module')
-def make_session(db_connection, unpickled_data):
+@pytest.fixture
+def session_factory(db_connection):
     """
     Creates a `sessionmaker` bound to the `db_connection` which created the
-    database, uses a `Session` to populate the test database using the
-    pickled ORM objects, and returns the `sessionmaker`.
+    database.
     """
     maker = sessionmaker(
         # Bind to the single connection that created and populated the
@@ -90,48 +88,32 @@ def make_session(db_connection, unpickled_data):
         # db_connection's existing transaction.
         join_transaction_mode='create_savepoint',
     )
-    with maker() as session:
-        for obj in unpickled_data:
-            session.merge(obj)
-        session.commit()
     return maker
 
 
 @pytest.fixture
-def db_session(make_session):
+def db_session(session_factory):
     """
     Yields a session for each test function (the default scope), which by
-    default is rolled back after the function returns. Note: changes which
-    have been committed will remain after the function returns.
+    default is rolled back after the function returns.
     """
-    with make_session() as session:
+    with session_factory() as session:
         yield session
-        session.rollback()
 
 
-@pytest.fixture(scope='module')
-def session_factory(make_session):
-    @contextmanager
-    def session_factory():
-        with make_session() as session:
-            yield session
-            session.rollback()
-
-    return session_factory
-
-
-@pytest.fixture(scope='module')
-def database_factory(session_factory):
+@pytest.fixture
+def database_factory_and_session(session_factory):
     def db_factory_for_testing(*_):
         return DefaultDatabase(
             session_factory=session_factory, models=models_list()
         )
 
-    return db_factory_for_testing
+    return db_factory_for_testing, session_factory
 
 
 @pytest.fixture
-def flask_app(session_factory, database_factory):
+def flask_app(database_factory_and_session):
+    database_factory, session_factory = database_factory_and_session
     app = application(
         session_factory=session_factory,
         database_factory=database_factory,
