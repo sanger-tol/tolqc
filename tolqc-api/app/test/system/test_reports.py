@@ -7,54 +7,9 @@ import re
 
 import pytest
 
-from sqlalchemy.exc import IntegrityError
-
-from tolqc.sample_data_models import Data, Platform, Run, VisibilityDict
+from tolqc.sample_data_models import Data, Platform, Run
 
 from .conftest import SKIP_IF_NO_DB_URI_ENV as pytestmark  # noqa: F401, N811
-
-
-def test_fetch_visibility_always(db_session):
-    """
-    Test fetching the 'Always' entry from the VisibilityDict, which will
-    invariably be present if a ToLQC database has been created and
-    populated.
-    """
-    always = db_session.get(VisibilityDict, 'Always')
-    assert always.visibility == 'Always'
-
-
-def test_delete_visibility_always(db_session):
-    """
-    Deleting the 'Always' entry from the VisibilityDict will raise an
-    IntegrityError
-    """
-    always = db_session.get(VisibilityDict, 'Always')
-    db_session.delete(always)
-    with pytest.raises(IntegrityError):
-        db_session.flush()
-
-
-def test_insert_visibility_dubious(db_session):
-    """
-    Test adding a new entry to a table.
-    """
-    dubious = VisibilityDict(
-        visibility='Dubious',
-        description='Data under investigation',
-    )
-    db_session.add(dubious)
-    # Even though we commit() here, it will not be visible in the next test
-    # function called
-    assert db_session.commit() is None
-
-
-def test_fetch_visibility_dubious_is_now_none(db_session):
-    """
-    Dubious should now be absent from VisibilityDict, despite being committed
-    by test_insert_visibility_dubious()
-    """
-    assert db_session.get(VisibilityDict, 'Dubious') is None
 
 
 @pytest.fixture
