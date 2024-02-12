@@ -499,8 +499,8 @@ TEST_DATA = [
                                                 'Sequel II Binding Kit 2.2'
                                             ),
                                             sequencing_kit=(
-                                                'Sequel II Sequencing Plate 2'
-                                                '.0 (4 rxn)'
+                                                'Sequel II Sequencing Plate'
+                                                ' 2.0 (4 rxn)'
                                             ),
                                             include_kinetics='true',
                                             loading_conc=70.0,
@@ -882,8 +882,8 @@ TEST_DATA = [
                                                 'Sequel II Binding Kit 2.0'
                                             ),
                                             sequencing_kit=(
-                                                'Sequel II Sequencing Plate 2'
-                                                '.0 (4 rxn)'
+                                                'Sequel II Sequencing Plate'
+                                                ' 2.0 (4 rxn)'
                                             ),
                                             include_kinetics='true',
                                             loading_conc=45.0,
