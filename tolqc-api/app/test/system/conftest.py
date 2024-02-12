@@ -43,7 +43,8 @@ def session_factory():
     db_uri = os.getenv('DB_URI')
     assert db_uri
     engine = create_engine(db_uri)
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    if os.getenv('SQL_ECHO'):
+        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     connection = engine.connect()
     txn = connection.begin()
     Base.metadata.create_all(engine)
