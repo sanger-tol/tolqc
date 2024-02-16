@@ -44,6 +44,7 @@ def models_list():
         Specimen,
         SpecimenStatus,
         SpecimenStatusType,
+        VisibilityDict,
     ]
 
 
