@@ -6,6 +6,8 @@ import logging
 import os
 import pathlib
 
+from flask import testing
+
 import pytest
 
 from sqlalchemy import create_engine
@@ -13,10 +15,12 @@ from sqlalchemy.orm import sessionmaker
 
 from tol.sql.database import DefaultDatabase
 
-from tolqc import application, models_list
+from tolqc.flask import application, models_list
 from tolqc.model import Base
 
-from .data_objects import TEST_DATA
+from werkzeug.datastructures import Headers
+
+from .data_objects import test_data
 
 SKIP_IF_NO_DB_URI_ENV = pytest.mark.skipif(
     os.getenv('DB_URI') is None,
@@ -47,12 +51,10 @@ def session_factory():
         logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     connection = engine.connect()
     txn = connection.begin()
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(connection)
 
-    """
     # Create a `sessionmaker` bound to the `connection` which created the
-    database.
-    """
+    # database.
     ssn_fctry = sessionmaker(
         # Bind to the single connection that created and populated the
         # database with test data.
@@ -65,7 +67,7 @@ def session_factory():
 
     with ssn_fctry() as session:
         # Create the database schema
-        for obj in TEST_DATA:
+        for obj in test_data():
             session.merge(obj)
         session.commit()
 
@@ -110,6 +112,14 @@ def flask_app(database_factory_and_session):
     return app
 
 
+class TestClient(testing.FlaskClient):
+    def open(self, *args, **kwargs):  # noqa: A003
+        headers = kwargs.setdefault('headers', Headers())
+        headers.add('token', os.getenv('API_TOKEN'))
+        return super().open(*args, **kwargs)
+
+
 @pytest.fixture()
 def client(flask_app):
+    flask_app.test_client_class = TestClient
     return flask_app.test_client()

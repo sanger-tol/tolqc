@@ -4,7 +4,6 @@
 
 import datetime
 import json
-from typing import Optional
 
 from flask import Blueprint, request
 
@@ -12,7 +11,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Bundle
 
 from tol.api_base2 import custom_blueprint
-from tol.api_base2.misc import Authenticator
 from tol.sql.session import create_session_factory
 
 from tolqc.sample_data_models import (
@@ -32,12 +30,9 @@ from tolqc.sample_data_models import (
 def reports_blueprint(
     db_uri=None,
     session_factory=None,
-    url_prefix: str = '/reports',
-    authenticator: Optional[Authenticator] = None,
+    url_prefix: str = '/report',
 ) -> Blueprint:
-    rep = custom_blueprint(
-        name='reports', url_prefix=url_prefix, authenticator=authenticator
-    )
+    rep = custom_blueprint(name='reports', url_prefix=url_prefix)
     if not session_factory:
         session_factory = create_session_factory(db_uri)
 

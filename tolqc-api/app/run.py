@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from tolqc import application
+from tolqc.flask import application
 
 app = application()
 
