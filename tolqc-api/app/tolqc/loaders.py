@@ -26,6 +26,6 @@ def loaders_blueprint(
         session.commit()
 
         # Report data loaded and updated
-        return changes, 200
+        return changes, 200, {'Content-Type': 'application/json'}
 
     return ldr

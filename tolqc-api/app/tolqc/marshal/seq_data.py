@@ -55,7 +55,8 @@ def ndjson_rows(stream):
 
 def parse_ndjson_row(line):
     if len(line) > 100_000:
-        msg = f'Unexpectedly long line ({len(line):_d} characters) in input)'
+        # Don't get hung up parsing excessively large strings
+        msg = f'Unexpectedly long line ({len(line):_d} characters) in input'
         raise ValueError(msg)
     row = json.loads(line)
     if type(row) is not dict:
@@ -63,9 +64,11 @@ def parse_ndjson_row(line):
         raise ValueError(msg)
     for k, v in row.items():
         if type(v) in (dict, list):
+            # Don't allow collections to be smuggled in the values
             msg = 'Values of JSON row must all be scalars'
             raise ValueError(msg)
         if type(v) is str:
+            # Avoid empty strings
             stripped = v.strip()
             row[k] = None if stripped == '' else stripped
     return row
