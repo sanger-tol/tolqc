@@ -5,9 +5,10 @@
 import datetime
 import json
 import os
-import pytz
 
 from flask.json.provider import JSONProvider
+
+import pytz
 
 
 class JSONDateTimeProvider(JSONProvider):
