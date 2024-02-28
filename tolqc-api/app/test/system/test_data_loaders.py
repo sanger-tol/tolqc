@@ -15,6 +15,7 @@ from tolqc.marshal.seq_data import (
     build_sample,
     get_centre,
     maybe_datetime,
+    parse_ndjson_row,
     row_message,
     valid_accession,
 )
@@ -213,6 +214,17 @@ def test_maybe_datetime():
     dt_str = '1981-09-19T18:30:00-04:00'
     dt = maybe_datetime({'date_x': dt_str}, 'date_x')
     assert dt.isoformat() == dt_str
+
+
+def test_row_parse():
+    too_big = json.dumps({'x': '#' * 100_000})
+    with pytest.raises(ValueError):
+        parse_ndjson_row(too_big)
+    with pytest.raises(ValueError):
+        parse_ndjson_row('["ele"]')
+    with pytest.raises(ValueError):
+        parse_ndjson_row('{"x": ["y"]}')
+    assert parse_ndjson_row('{"x": "  "}') == {'x': None}
 
 
 def to_ndjson(row_dict):

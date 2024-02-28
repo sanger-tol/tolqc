@@ -50,7 +50,25 @@ def load_seq_data_stream(
 
 def ndjson_rows(stream):
     for line in stream:
-        yield json.loads(line)
+        yield parse_ndjson_row(line)
+
+
+def parse_ndjson_row(line):
+    if len(line) > 100_000:
+        msg = f'Unexpectedly long line ({len(line):_d} characters) in input)'
+        raise ValueError(msg)
+    row = json.loads(line)
+    if type(row) is not dict:
+        msg = f'JSON must decode to a dict, not a {type(row)}'
+        raise ValueError(msg)
+    for k, v in row.items():
+        if type(v) in (dict, list):
+            msg = 'Values of JSON row must all be scalars'
+            raise ValueError(msg)
+        if type(v) is str:
+            stripped = v.strip()
+            row[k] = None if stripped == '' else stripped
+    return row
 
 
 def headline_data_fields(data):
