@@ -12,6 +12,7 @@ from tol.sql import create_sql_datasource
 
 import tolqc.assembly_models
 import tolqc.sample_data_models
+from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
 
@@ -29,7 +30,7 @@ def application(session_factory=None, database_factory=None):
     testing.
     """
     app = Flask(__name__)
-    app.json.sort_keys = False
+    app.json = JSONDateTimeProvider(app)
 
     api_path = os.getenv('API_PATH', '/api/v1')
     db_uri = os.getenv('DB_URI')

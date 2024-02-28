@@ -191,6 +191,7 @@ def test_seq_data_loader(client, ndjson_row_data):
 def test_seq_data_loader_update(client, row_data):
     response = client.post('/loader/seq-data', data=to_ndjson(row_data))
     row_data['pacbio']['lims_qc'] = 'fail'
+    row_data['pacbio']['qc_date'] = '2023-07-02T10:45:00+01:00'
     response = client.post('/loader/seq-data', data=to_ndjson(row_data))
     assert response.status == '200 OK'
     assert response.json == {
@@ -203,7 +204,13 @@ def test_seq_data_loader_update(client, row_data):
                 'library_type': 'PacBio - HiFi',
                 'sample': 'DTOL13630432',
                 'project': 'DTOL_Darwin Tree of Life',
-                'changes': {'lims_qc': ['pass', 'fail']},
+                'changes': {
+                    'lims_qc': ['pass', 'fail'],
+                    'date': [
+                        '2023-06-30T11:29:00+01:00',
+                        '2023-07-02T10:45:00+01:00',
+                    ],
+                },
             }
         ],
     }
