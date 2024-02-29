@@ -18,6 +18,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 
+from tolqc.assembly_models import DatasetElement  # noqa: F401
 from tolqc.model import Base, LogBase
 
 
@@ -239,9 +240,7 @@ class Offspring(Base):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     specimen_id = mapped_column(String, ForeignKey('specimen.specimen_id'))
-    offspring_specimen_id = mapped_column(
-        String, ForeignKey('specimen.specimen_id')
-    )
+    offspring_specimen_id = mapped_column(String, ForeignKey('specimen.specimen_id'))
 
     UniqueConstraint('specimen_id', 'offspring_specimen_id')
 
