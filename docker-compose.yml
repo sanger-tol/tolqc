@@ -24,7 +24,6 @@ services:
     # force amd64 on M1 MacOS
     #platform: linux/amd64
     environment:
-      - TZ=Europe/London
       - DB_URI
       - TOLQC_URL
       - API_PATH

@@ -6,6 +6,8 @@ import json
 
 import pytest
 
+from sqlalchemy import text
+
 from tolqc.marshal.seq_data import (
     accession_if_valid,
     build_data,
@@ -53,6 +55,15 @@ def test_row_message():
         )
         == expected
     )
+
+
+def test_tz_is_europe_london(db_session):
+    """
+    Check that the database server is set to the expected time
+    zone 'Europe/London'
+    """
+    tz, = db_session.execute(text('SHOW timezone')).one()
+    assert tz == 'Europe/London'
 
 
 def test_valid_accession(db_session):
