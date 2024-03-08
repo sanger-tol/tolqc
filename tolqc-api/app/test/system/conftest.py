@@ -29,6 +29,11 @@ SKIP_IF_NO_DB_URI_ENV = pytest.mark.skipif(
 
 
 @pytest.fixture(scope='session')
+def api_path():
+    return os.getenv('TOLQC_API_PATH', os.getenv('API_PATH', '/api/v1'))
+
+
+@pytest.fixture(scope='session')
 def data_dir():
     """
     The directory where test data checked in to version control is stored.
@@ -103,11 +108,7 @@ def flask_app(database_factory_and_session):
         session_factory=session_factory,
         database_factory=database_factory,
     )
-    app.config.update(
-        {
-            'TESTING': True,
-        }
-    )
+    app.testing = True
 
     return app
 

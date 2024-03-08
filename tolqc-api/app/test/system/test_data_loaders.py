@@ -157,13 +157,13 @@ def test_build_data(db_session, row_data):
     assert i_data.sample.specimen.species is p_data.sample.specimen.species
 
 
-def test_fail_mising_name_root(client):
+def test_fail_mising_name_root(client, api_path):
     with pytest.raises(ValueError, match=r"Missing 'name_root'"):
-        client.post('/loader/seq-data', data='{"study_id":"1001"}')
+        client.post(api_path + '/loader/seq-data', data='{"study_id":"1001"}')
 
 
-def test_seq_data_loader(client, ndjson_row_data):
-    response = client.post('/loader/seq-data', data=ndjson_row_data)
+def test_seq_data_loader(client, api_path, ndjson_row_data):
+    response = client.post(api_path + '/loader/seq-data', data=ndjson_row_data)
     assert response.status == '200 OK'
     assert response.json == {
         'new': [
@@ -188,11 +188,11 @@ def test_seq_data_loader(client, ndjson_row_data):
     }
 
 
-def test_seq_data_loader_update(client, row_data):
-    response = client.post('/loader/seq-data', data=to_ndjson(row_data))
+def test_seq_data_loader_update(client, api_path, row_data):
+    response = client.post(api_path + '/loader/seq-data', data=to_ndjson(row_data))
     row_data['pacbio']['lims_qc'] = 'fail'
     row_data['pacbio']['qc_date'] = '2023-07-02T10:45:00+01:00'
-    response = client.post('/loader/seq-data', data=to_ndjson(row_data))
+    response = client.post(api_path + '/loader/seq-data', data=to_ndjson(row_data))
     assert response.status == '200 OK'
     assert response.json == {
         'new': [],

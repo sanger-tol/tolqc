@@ -32,7 +32,7 @@ def application(session_factory=None, database_factory=None):
     app = Flask(__name__)
     app.json = JSONDateTimeProvider(app)
 
-    api_path = os.getenv('API_PATH', '/api/v1')
+    api_path = os.getenv('TOLQC_API_PATH', os.getenv('API_PATH', '/api/v1'))
     db_uri = os.getenv('DB_URI')
 
     ds_args = {}
@@ -51,7 +51,7 @@ def application(session_factory=None, database_factory=None):
     app.register_blueprint(
         blueprint_data_tolqc,
         name='tolqc',
-        url_prefix=api_path,
+        url_prefix=api_path + '/data',
     )
     core_data_object(tolqc_ds)
 
@@ -59,7 +59,7 @@ def application(session_factory=None, database_factory=None):
     blueprint_reports = reports_blueprint(
         db_uri=db_uri,
         session_factory=session_factory,
-        url_prefix='/report',
+        url_prefix=api_path + '/report',
     )
     app.register_blueprint(blueprint_reports)
 
@@ -67,7 +67,7 @@ def application(session_factory=None, database_factory=None):
     blueprint_loaders = loaders_blueprint(
         db_uri=db_uri,
         session_factory=session_factory,
-        url_prefix='/loader',
+        url_prefix=api_path + '/loader',
     )
     app.register_blueprint(blueprint_loaders)
 
