@@ -34,11 +34,11 @@ def pacbio_row_count(db_session):
     return n
 
 
-def test_pacbio_run_data_report_tsv(client, pacbio_row_count):
+def test_pacbio_run_data_report_tsv(client, api_path, pacbio_row_count):
     """
     Test PacBio run report with default format
     """
-    response = client.get('/report/pacbio-run-data')
+    response = client.get(api_path + '/report/pacbio-run-data')
     assert response.status == '200 OK'
 
     # Check Content-Disposition header
@@ -52,20 +52,20 @@ def test_pacbio_run_data_report_tsv(client, pacbio_row_count):
     assert len(tsv_lines) == 1 + pacbio_row_count
 
 
-def test_pacbio_run_data_report_ndjson(client, pacbio_row_count):
+def test_pacbio_run_data_report_ndjson(client, api_path, pacbio_row_count):
     """
     Test NDJSON format request.
     """
-    response = client.get('/report/pacbio-run-data?format=NDJSON')
+    response = client.get(api_path + '/report/pacbio-run-data?format=NDJSON')
     assert response.status == '200 OK'
 
     tsv_lines = io.StringIO(response.text).readlines()
     assert len(tsv_lines) == pacbio_row_count
 
 
-def test_pacbio_run_data_report_csv(client):
+def test_pacbio_run_data_report_csv(client, api_path):
     """
     Requesting an unsupported format should be a 400
     """
-    response = client.get('/report/pacbio-run-data?format=CSV')
+    response = client.get(api_path + '/report/pacbio-run-data?format=CSV')
     assert response.status == '400 BAD REQUEST'

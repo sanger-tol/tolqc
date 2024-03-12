@@ -139,13 +139,13 @@ services:
     build:
       context: ./tolqc-api
       dockerfile: Dockerfile.test
-    command: pytest -v unit
+    command: pytest -vv unit
 
   tolqc-python-system-test:
     build:
       context: ./tolqc-api
       dockerfile: Dockerfile.test
-    command: pytest -v system
+    command: pytest -vv system
     environment:
       - DB_URI=postgresql://test-user:test-password@tolqc-python-db:5432/test-db
     depends_on:
