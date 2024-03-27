@@ -148,6 +148,5 @@ services:
     command: pytest -vv system
     environment:
       - DB_URI=postgresql://test-user:test-password@tolqc-python-db:5432/test-db
-      - API_TOKEN='I love tokens!!!'
     depends_on:
       - tolqc-python-db

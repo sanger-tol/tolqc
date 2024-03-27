@@ -41,8 +41,13 @@ def data_dir():
     return pathlib.Path(__file__).parent / 'data'
 
 
+@pytest.fixture(scope='session')
+def token() -> str:
+    return 'I love tokens!!!'
+
+
 @pytest.fixture
-def session_factory():
+def session_factory(token: str):
     """
     Creates a connection to the database specified in the `DB_URI` environment
     variable, creates the database schema, starts a transaction, and yields
@@ -72,7 +77,7 @@ def session_factory():
 
     with ssn_fctry() as session:
         # Create the database schema
-        for obj in test_data():
+        for obj in test_data(token):
             session.merge(obj)
         session.commit()
 
@@ -113,14 +118,14 @@ def flask_app(database_factory_and_session):
     return app
 
 
-class TestClient(testing.FlaskClient):
-    def open(self, *args, **kwargs):  # noqa: A003
-        headers = kwargs.setdefault('headers', Headers())
-        headers.add('token', os.getenv('API_TOKEN'))
-        return super().open(*args, **kwargs)
-
-
 @pytest.fixture()
-def client(flask_app):
+def client(flask_app, token):
+
+    class TestClient(testing.FlaskClient):
+        def open(self, *args, **kwargs):  # noqa: A003
+            headers = kwargs.setdefault('headers', Headers())
+            headers.add('token', token)
+            return super().open(*args, **kwargs)
+
     flask_app.test_client_class = TestClient
     return flask_app.test_client()

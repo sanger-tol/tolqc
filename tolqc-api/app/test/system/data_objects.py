@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
-
 from tolqc.sample_data_models import (
     Accession,
     AccessionTypeDict,
@@ -26,7 +24,7 @@ from tolqc.sample_data_models import (
 from tolqc.system_models import User
 
 
-def test_data():
+def test_data(token: str):
     return [
         AccessionTypeDict(
             accession_type_id='GenBank Genome Assembly',
@@ -877,7 +875,7 @@ def test_data():
         User(
             id=100,
             email='skdsjdkj',
-            token=os.environ['API_TOKEN'],
+            token=token,
             name='lol',
             registered=True,
         ),
