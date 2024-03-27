@@ -38,9 +38,7 @@ def application(session_factory=None, database_factory=None):
     api_path = os.getenv('TOLQC_API_PATH', os.getenv('API_PATH', '/api/v1'))
     db_uri = os.getenv('DB_URI')
 
-    auth_ctx_setter = create_auth_ctx_setter(
-        create_session_factory(db_uri)
-    )
+    auth_ctx_setter = create_auth_ctx_setter(session_factory)
 
     @app.before_request
     def set_auth_ctx() -> None:
