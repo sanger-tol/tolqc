@@ -129,9 +129,6 @@ services:
 
   tolqc-python-db:
     image: postgres:12
-    #TODO remmove
-    ports:
-      - 9091:5432
     environment:
       - TZ=Europe/London
       - POSTGRES_USER=test-user
