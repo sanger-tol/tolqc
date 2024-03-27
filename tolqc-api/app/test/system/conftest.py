@@ -17,7 +17,6 @@ from tol.sql.database import DefaultDatabase
 
 from tolqc.flask import application, models_list
 from tolqc.model import Base
-from tolqc.system_models import User
 
 from werkzeug.datastructures import Headers
 
@@ -75,14 +74,6 @@ def session_factory():
         # Create the database schema
         for obj in test_data():
             session.merge(obj)
-        session.add(
-            User(
-                id=100,
-                email='skdsjdkj',
-                token=os.environ['API_TOKEN'],
-                name='lol'
-            )
-        )
         session.commit()
 
     yield ssn_fctry
