@@ -878,6 +878,7 @@ def test_data():
             id=100,
             email='skdsjdkj',
             token=os.environ['API_TOKEN'],
-            name='lol'
+            name='lol',
+            registered=True,
         ),
     ]

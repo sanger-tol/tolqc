@@ -42,7 +42,7 @@ def application(session_factory=None, database_factory=None):
 
     @app.before_request
     def set_auth_ctx() -> None:
-        token = request.headers.get('Token')
+        token = request.headers.get('token')
         if token is not None:
             auth_ctx_setter(token)
 
