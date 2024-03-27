@@ -8,7 +8,7 @@ from flask import Flask, request
 
 from tol.api_base2 import data_blueprint, system_blueprint
 from tol.core import core_data_object
-from tol.sql import create_session_factory, create_sql_datasource
+from tol.sql import create_sql_datasource
 
 import tolqc.assembly_models
 import tolqc.sample_data_models
