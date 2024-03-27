@@ -2,11 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Any
+from __future__ import annotations
 
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import Any, Optional
 
-from .model import Base
+from sqlalchemy.orm import Mapped, Session, mapped_column
+
+from tolqc.model import Base
 
 
 def models_list() -> list[Any]:
@@ -49,3 +51,12 @@ class User(Base):
     @property
     def roles(self) -> list[str]:
         return [] if self.registered is False else ['registered']
+
+    @classmethod
+    def get_by_token(
+        cls,
+        token: str,
+        session: Session
+    ) -> Optional[User]:
+
+        return session.query(cls).filter_by(token=token).one_or_none()

@@ -4,15 +4,16 @@
 
 import os
 
-from flask import Flask
+from flask import Flask, request
 
 from tol.api_base2 import data_blueprint, system_blueprint
 from tol.core import core_data_object
-from tol.sql import create_sql_datasource
+from tol.sql import create_session_factory, create_sql_datasource
 
 import tolqc.assembly_models
 import tolqc.sample_data_models
 import tolqc.system_models
+from tolqc.auth import create_auth_ctx_setter, create_auth_inspector
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
@@ -37,6 +38,16 @@ def application(session_factory=None, database_factory=None):
     api_path = os.getenv('TOLQC_API_PATH', os.getenv('API_PATH', '/api/v1'))
     db_uri = os.getenv('DB_URI')
 
+    auth_ctx_setter = create_auth_ctx_setter(
+        create_session_factory(db_uri)
+    )
+
+    @app.before_request
+    def set_auth_ctx() -> None:
+        token = request.headers.get('Token')
+        if token is not None:
+            auth_ctx_setter(token)
+
     ds_args = {}
     if database_factory:
         ds_args['database_factory'] = database_factory
@@ -49,7 +60,10 @@ def application(session_factory=None, database_factory=None):
     )
 
     # Data endpoints
-    blueprint_data_tolqc = data_blueprint(tolqc_ds)
+    blueprint_data_tolqc = data_blueprint(
+        tolqc_ds,
+        auth_inspector=create_auth_inspector(),
+    )
     app.register_blueprint(
         blueprint_data_tolqc,
         name='tolqc',
