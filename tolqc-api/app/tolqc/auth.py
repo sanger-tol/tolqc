@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Callable
+
 from tol.api_base2.auth import AuthInspector, require_auth
 from tol.api_base2.auth.error import ForbiddenError
 from tol.api_base2.misc.auth_context import CtxGetter, default_ctx_getter
