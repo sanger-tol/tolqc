@@ -11,3 +11,5 @@ variables:
   APP_NAME: tolqc
   SERVICE_NAME: qc
   TZ: "Europe/London"
+
+  DISABLE_UI_LINT: "true"
