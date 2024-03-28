@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2024 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
+
 from tolqc.sample_data_models import (
     Accession,
     AccessionTypeDict,
@@ -20,9 +21,10 @@ from tolqc.sample_data_models import (
     Specimen,
     VisibilityDict,
 )
+from tolqc.system_models import User
 
 
-def test_data():
+def test_data(token: str):
     return [
         AccessionTypeDict(
             accession_type_id='GenBank Genome Assembly',
@@ -869,5 +871,12 @@ def test_data():
                     ),
                 )
             ],
+        ),
+        User(
+            id=100,
+            email='skdsjdkj',
+            token=token,
+            name='lol',
+            registered=True,
         ),
     ]
