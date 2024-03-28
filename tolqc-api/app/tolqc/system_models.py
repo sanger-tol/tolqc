@@ -59,7 +59,8 @@ class Token(Base):
     __tablename__ = 'oidc_token'
 
     id: Mapped[int] = mapped_column(  # noqa A003
-        primary_key=True
+        primary_key=True,
+        autoincrement=True
     )
 
     token: Mapped[str] = mapped_column(
