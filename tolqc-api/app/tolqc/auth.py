@@ -4,45 +4,14 @@
 
 from typing import Callable
 
-from tol.api_base2.auth import AuthInspector, require_auth
-from tol.api_base2.auth.error import ForbiddenError
+from tol.api_base2.auth import require_auth
 from tol.api_base2.misc.auth_context import CtxGetter, default_ctx_getter
-from tol.core.operator import OperatorMethod
 from tol.sql.session import SessionFactory
 
 from tolqc.system_models import User
 
 
 require_registered = require_auth(role='registered')
-
-
-NO_AUTH = [
-    OperatorMethod.COUNT,
-    OperatorMethod.DETAIL,
-    OperatorMethod.EXPORT,
-    OperatorMethod.PAGE,
-    OperatorMethod.TO_MANY,
-    OperatorMethod.TO_ONE,
-]
-
-
-def create_auth_inspector(
-    ctx_getter: CtxGetter = default_ctx_getter
-) -> AuthInspector:
-
-    def auth_inspector(
-        __object_type: str,
-        method: OperatorMethod
-    ) -> None:
-
-        if method in NO_AUTH:
-            return
-
-        roles = ctx_getter().roles
-        if 'registered' not in roles:
-            raise ForbiddenError()
-
-    return auth_inspector
 
 
 def create_auth_ctx_setter(

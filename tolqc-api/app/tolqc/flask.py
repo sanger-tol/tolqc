@@ -7,13 +7,14 @@ import os
 from flask import Flask, request
 
 from tol.api_base2 import data_blueprint, system_blueprint
+from tol.api_base2.auth import basic_auth_inspector
 from tol.core import core_data_object
 from tol.sql import create_sql_datasource
 
 import tolqc.assembly_models
 import tolqc.sample_data_models
 import tolqc.system_models
-from tolqc.auth import create_auth_ctx_setter, create_auth_inspector
+from tolqc.auth import create_auth_ctx_setter
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
@@ -60,7 +61,7 @@ def application(session_factory=None, database_factory=None):
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds,
-        auth_inspector=create_auth_inspector(),
+        auth_inspector=basic_auth_inspector('registered'),
     )
     app.register_blueprint(
         blueprint_data_tolqc,
