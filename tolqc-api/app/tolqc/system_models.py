@@ -48,11 +48,9 @@ class User(Base):
         back_populates='user'
     )
 
-
     @property
     def roles(self) -> list[str]:
         return [] if self.registered is False else ['registered']
-
 
 
 class Token(Base):

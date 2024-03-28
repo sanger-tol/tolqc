@@ -31,7 +31,7 @@ def create_auth_ctx_setter(
 
             if token_row is None:
                 return
-    
+
             user: User = token_row.user
             auth_ctx = ctx_getter()
 
