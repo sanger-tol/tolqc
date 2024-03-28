@@ -7,6 +7,7 @@ from flask import Blueprint, request
 from tol.api_base2 import custom_blueprint
 from tol.sql.session import create_session_factory
 
+from tolqc.auth import require_registered
 from tolqc.marshal.seq_data import load_seq_data_stream
 
 
@@ -20,6 +21,7 @@ def loaders_blueprint(
         session_factory = create_session_factory(db_uri)
 
     @ldr.route('/seq-data', methods=['POST'])
+    @require_registered
     def load_seq_data():
         session = session_factory()
         changes = load_seq_data_stream(session, request.stream)

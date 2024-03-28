@@ -13,7 +13,6 @@ from sqlalchemy.orm import Bundle
 from tol.api_base2 import custom_blueprint
 from tol.sql.session import create_session_factory
 
-from tolqc.auth import require_registered
 from tolqc.sample_data_models import (
     Allocation,
     Data,
@@ -38,7 +37,6 @@ def reports_blueprint(
         session_factory = create_session_factory(db_uri)
 
     @rep.route('/pacbio-run-data')
-    @require_registered
     def pacbio_run_data():
         # File format if requested; defaults to TSV
         req_fmt = request.args.get('format', 'tsv').lower()

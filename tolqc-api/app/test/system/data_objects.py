@@ -21,7 +21,7 @@ from tolqc.sample_data_models import (
     Specimen,
     VisibilityDict,
 )
-from tolqc.system_models import User
+from tolqc.system_models import Token, User
 
 
 def test_data(token: str):
@@ -875,8 +875,12 @@ def test_data(token: str):
         User(
             id=100,
             email='skdsjdkj',
-            token=token,
             name='lol',
             registered=True,
+        ),
+        Token(
+            id=200,
+            token=token,
+            user_id=100
         ),
     ]

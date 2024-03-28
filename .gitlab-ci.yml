@@ -4,10 +4,12 @@
 
 include:
   - project: 'tol/tol-core'
-    ref: v1.3.6
+    ref: v1.3.17
     file: '/gitlab/app.yml'
 
 variables:
   APP_NAME: tolqc
   SERVICE_NAME: qc
   TZ: "Europe/London"
+
+  DISABLE_UI_LINT: "true"
