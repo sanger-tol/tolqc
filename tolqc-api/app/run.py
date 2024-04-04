@@ -2,9 +2,21 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
+from tol.sql import create_session_factory
+
 from tolqc.flask import application
 
-app = application()
+
+session_factory = create_session_factory(
+    os.environ['DB_URI']
+)
+
+
+app = application(
+    session_factory=session_factory
+)
 
 
 def main():
