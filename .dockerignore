@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+.tox/
+venv/
+.virtualenv/
+build/
+dist/
+instance/
+__pycache__
+swagger_server.egg-info/
+__init__.pyc
+launch.json
+.env.dev
+.env.prod
+values-*.yaml
+*.tgz
+chart/charts/
+.dccache
+.yalc/
+yalc.lock
+inject.js
