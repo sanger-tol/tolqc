@@ -2,44 +2,21 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 from sqlalchemy import (
     BigInteger,
     DateTime,
     Float,
     ForeignKey,
     Integer,
-    JSON,
     String,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 
 from tolqc.model import Base, LogBase
-
-
-def models_list():
-    return [
-        Assembly,
-        AssemblyComponentType,
-        AssemblyMetrics,
-        AssemblySource,
-        AssemblyStatus,
-        AssemblyStatusType,
-        BuscoLineage,
-        BuscoMetrics,
-        ContigvizMetrics,
-        Dataset,
-        DatasetElement,
-        DatasetStatus,
-        DatasetStatusType,
-        GenomescopeMetrics,
-        MarkerscanMetrics,
-        MerquryMetrics,
-        PloidyplotMetrics,
-        ReviewDict,
-        SoftwareVersion,
-    ]
 
 
 class Assembly(LogBase):
@@ -166,9 +143,7 @@ class AssemblySource(Base):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
-    source_assembly_id = mapped_column(
-        Integer, ForeignKey('assembly.assembly_id')
-    )
+    source_assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
 
     UniqueConstraint('assembly_id', 'source_assembly_id')
 
@@ -278,7 +253,7 @@ class ContigvizMetrics(Base):
         Integer,
         ForeignKey('software_version.software_version_id'),
     )
-    results = mapped_column(JSON)
+    results = mapped_column(JSONB)
 
     assembly = relationship('Assembly', back_populates='contigviz_metrics')
     software_version = relationship(
@@ -403,7 +378,7 @@ class GenomescopeMetrics(LogBase):
     kcov_init = mapped_column(Integer)
     model_fit = mapped_column(Float)
     read_error_rate = mapped_column(Float)
-    results = mapped_column(JSON)
+    results = mapped_column(JSONB)
 
     dataset = relationship('Dataset', back_populates='genomescope_metrics')
     software_version = relationship(
@@ -422,7 +397,7 @@ class MarkerscanMetrics(Base):
         Integer,
         ForeignKey('software_version.software_version_id'),
     )
-    results = mapped_column(JSON)
+    results = mapped_column(JSONB)
 
     assembly = relationship('Assembly', back_populates='markerscan_metrics')
     software_version = relationship(

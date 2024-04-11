@@ -22,33 +22,6 @@ from tolqc.assembly_models import DatasetElement  # noqa: F401
 from tolqc.model import Base, LogBase
 
 
-def models_list():
-    return [
-        Accession,
-        AccessionTypeDict,
-        Allocation,
-        BarcodeMetrics,
-        Centre,
-        Data,
-        File,
-        Library,
-        LibraryType,
-        Offspring,
-        PacbioRunMetrics,
-        Platform,
-        Project,
-        QCDict,
-        Run,
-        Sample,
-        Sex,
-        Species,
-        Specimen,
-        SpecimenStatus,
-        SpecimenStatusType,
-        VisibilityDict,
-    ]
-
-
 class Accession(Base):
     __tablename__ = 'accession'
 

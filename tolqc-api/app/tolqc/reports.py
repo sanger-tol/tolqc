@@ -11,7 +11,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Bundle
 
 from tol.api_base2 import custom_blueprint
-from tol.sql.session import create_session_factory
 
 from tolqc.sample_data_models import (
     Allocation,
@@ -28,13 +27,10 @@ from tolqc.sample_data_models import (
 
 
 def reports_blueprint(
-    db_uri=None,
-    session_factory=None,
+    session_factory,
     url_prefix: str = '/report',
 ) -> Blueprint:
     rep = custom_blueprint(name='reports', url_prefix=url_prefix)
-    if not session_factory:
-        session_factory = create_session_factory(db_uri)
 
     @rep.route('/pacbio-run-data')
     def pacbio_run_data():
@@ -54,12 +50,8 @@ def reports_blueprint(
             'Content-Disposition': f'attachment; filename="{filename}"',
         }
 
-        # Must either (as here) use session as a context manager or call
-        # session.close() to avoid SELECT statements accumulating on server
-        # with 'idle in transaction' state.
-        with session_factory() as session:
-            query = pacbio_run_report_query()
-            row_itr = session.execute(query)
+        query = pacbio_run_report_query()
+        row_itr = session_factory().execute(query)
 
         # Streams formatted data from the SQL query to the client
         return out_formatter(row_itr, query), 200, headers

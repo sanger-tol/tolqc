@@ -10,13 +10,13 @@ from flask import testing
 
 import pytest
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import and_, create_engine, select
+from sqlalchemy.event import listen, remove
+from sqlalchemy.orm import configure_mappers, sessionmaker
 
-from tol.sql.database import DefaultDatabase
-
-from tolqc.flask import application, models_list
-from tolqc.model import Base
+from tolqc.flask import application
+from tolqc.model import Base, update_logbase_closure
+from tolqc.system_models import Token, User
 
 from werkzeug.datastructures import Headers
 
@@ -61,6 +61,7 @@ def session_factory(token: str):
         logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     connection = engine.connect()
     txn = connection.begin()
+    configure_mappers()  # Required for creation of EditBase subclasses
     Base.metadata.create_all(connection)
 
     # Create a `sessionmaker` bound to the `connection` which created the
@@ -77,8 +78,9 @@ def session_factory(token: str):
 
     with ssn_fctry() as session:
         # Create the database schema
-        for obj in test_data(token):
-            session.merge(obj)
+        with session.no_autoflush:
+            for obj in test_data(token):
+                session.merge(obj)
         session.commit()
 
     yield ssn_fctry
@@ -97,30 +99,36 @@ def db_session(session_factory):
 
 
 @pytest.fixture
-def database_factory_and_session(session_factory):
-    def db_factory_for_testing(*_):
-        return DefaultDatabase(
-            session_factory=session_factory, models=models_list()
-        )
-
-    return db_factory_for_testing, session_factory
-
-
-@pytest.fixture
-def flask_app(database_factory_and_session):
-    database_factory, session_factory = database_factory_and_session
+def flask_app(session_factory):
     app = application(
         session_factory=session_factory,
-        database_factory=database_factory,
     )
     app.testing = True
 
     return app
 
 
+@pytest.fixture
+def logbase_db_session(session_factory, token):
+    with session_factory() as ssn:
+        user_id = ssn.scalar(
+            select(User.id)
+            .join(Token)
+            .where(
+                and_(
+                    User.registered == True,  # noqa: E712
+                    Token.token == token,
+                )
+            )
+        )
+        hook_params = ssn, 'before_flush', update_logbase_closure(user_id)
+        listen(*hook_params)
+        yield ssn
+        remove(*hook_params)
+
+
 @pytest.fixture()
 def client(flask_app, token):
-
     class TestClient(testing.FlaskClient):
         def open(self, *args, **kwargs):  # noqa: A003
             headers = kwargs.setdefault('headers', Headers())

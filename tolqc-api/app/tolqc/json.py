@@ -16,7 +16,7 @@ class JSONDateTimeProvider(JSONProvider):
     """
 
     def dumps(self, obj, **kwargs):
-        return json.dumps(obj, separators=(',', ':'), cls=JSONDateTimeEncoder, **kwargs)
+        return json_dumps(obj, **kwargs)
 
     def loads(self, string, **kwargs):
         return json.loads(string, **kwargs)
@@ -34,3 +34,7 @@ class JSONDateTimeEncoder(json.JSONEncoder):
 
         # This line means any exceptions raised will come from the base class
         return json.JSONEncoder.default(self, obj)
+
+
+def json_dumps(obj, **kwargs):
+    return json.dumps(obj, separators=(',', ':'), cls=JSONDateTimeEncoder, **kwargs)

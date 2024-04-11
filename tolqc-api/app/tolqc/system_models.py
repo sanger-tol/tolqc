@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
@@ -12,17 +12,11 @@ from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from tolqc.model import Base
 
 
-def models_list() -> list[Any]:
-    return [
-        User
-    ]
-
-
 class User(Base):
 
     __tablename__ = 'user'
 
-    id: Mapped[int] = mapped_column(  # noqa
+    id: Mapped[int] = mapped_column(  # noqa: A003
         primary_key=True,
         autoincrement=True
     )
@@ -58,7 +52,7 @@ class Token(Base):
     # this has to be prefixed with 'oidc_' for future compatbility
     __tablename__ = 'oidc_token'
 
-    id: Mapped[int] = mapped_column(  # noqa A003
+    id: Mapped[int] = mapped_column(  # noqa: A003
         primary_key=True,
         autoincrement=True
     )
