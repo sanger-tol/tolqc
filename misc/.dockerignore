@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2024 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+## this .dockerignore prevents a large transfer of many
+## files and directories while mounting this "parent_dir"
+## under `additional_contexts`
+## 
+## 
+## please copy it into the parent directory, which should
+## also contain:
+## 
+## - tolqc
+## - tol-sdk (optional)
+
+# ignore everything
+*
+
+# except `tol-sdk` and `openfaas-core`
+!/tol-sdk/
+!/openfaas-core/
+
+# definitely ignore a load of detritus
+**/venv/
+**/.virtualenv/
