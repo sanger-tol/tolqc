@@ -7,8 +7,8 @@
 ## under `additional_contexts`
 ## 
 ## 
-## please copy it into the parent directory, which should
-## also contain:
+## please copy it into the parent directory, of this
+## git repo, which should also contain:
 ## 
 ## - tolqc
 ## - tol-sdk (optional)
