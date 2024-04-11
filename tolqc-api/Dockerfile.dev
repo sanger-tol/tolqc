@@ -21,20 +21,15 @@ RUN wget --no-check-certificate https://github.com/jwilder/dockerize/releases/do
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-COPY tolqc/tolqc-api/app/setup.py .
+COPY ./app/setup.py .
 RUN python3 setup.py install
 
-COPY tolqc/tolqc-api/app/requirements.txt .
+COPY ./app/requirements.txt .
 RUN pip3 --no-cache-dir install -r requirements.txt
 
 # We install the tol-sdk here in editable mode
 VOLUME ["/packages"]
 
-# only copy tol-sdk into /packages if an exact match is found. Only upgrade to local if copied
-COPY tol-sd[k]/ /packages/tol-sdk/
-RUN if [ -d /packages/tol-sdk/src ] ; then pip3 install --editable /packages/tol-sdk[api_base2]; fi;
-
-COPY tolqc/tolqc-api/app /app
-COPY tolqc/tolqc-api/migrations /migrations
-
-CMD flask --app run run --debugger --port 80 --host 0.0.0.0
+COPY ./app /app
+COPY ./migrations /migrations
+CMD if [ -d /packages/tol-sdk/src ] ; then pip3 install --editable /packages/tol-sdk[api_base2]; fi; python run.py
