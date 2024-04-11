@@ -11,7 +11,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Bundle
 
 from tol.api_base2 import custom_blueprint
-from tol.sql.session import create_session_factory
 
 from tolqc.sample_data_models import (
     Allocation,
@@ -31,13 +30,10 @@ from werkzeug.exceptions import BadRequest
 
 
 def reports_blueprint(
-    db_uri=None,
-    session_factory=None,
+    session_factory,
     url_prefix: str = '/report',
 ) -> Blueprint:
     rep = custom_blueprint(name='reports', url_prefix=url_prefix)
-    if not session_factory:
-        session_factory = create_session_factory(db_uri)
 
     @rep.route('/pacbio-data')
     def pacbio_run_data():

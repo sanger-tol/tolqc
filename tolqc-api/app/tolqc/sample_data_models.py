@@ -23,35 +23,6 @@ from tolqc.folder_models import HasFolder
 from tolqc.model import Base, LogBase
 
 
-def models_list():
-    return [
-        Accession,
-        AccessionTypeDict,
-        Allocation,
-        BarcodeMetrics,
-        Centre,
-        Data,
-        File,
-        Library,
-        LibraryType,
-        MappingMetrics,
-        Offspring,
-        PacbioRunMetrics,
-        Platform,
-        Project,
-        QCDict,
-        Run,
-        Sample,
-        Sex,
-        Species,
-        Specimen,
-        SpecimenStatus,
-        SpecimenStatusType,
-        Umbrella,
-        VisibilityDict,
-    ]
-
-
 class Accession(LogBase):
     __tablename__ = 'accession'
 
