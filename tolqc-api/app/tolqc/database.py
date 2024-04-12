@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+from typing import Callable
 
 import flask
 
@@ -17,11 +18,8 @@ from tolqc.model import update_logbase_closure
 __ssn_key = 'TOLQC_FLASK_SESSION'
 
 
-def build_database_factory(session_factory, models_list) -> Database:
+def build_database_factory(session_factory, models_list) -> (Database, Callable):
     def sesssion_factory_wrapper():
-        # setdefault() does not behave as expected. The flask_session()
-        # function is called even when it is already set, so we must fetch it
-        # with get() and then test for it.
         ssn = flask.g.get(__ssn_key)
         if not ssn:
             ssn = flask.g.setdefault(__ssn_key, build_flask_session(session_factory))
@@ -30,7 +28,7 @@ def build_database_factory(session_factory, models_list) -> Database:
     def db_factory(*_):
         return DefaultDatabase(sesssion_factory_wrapper, models_list)
 
-    return db_factory
+    return db_factory, sesssion_factory_wrapper
 
 
 def flask_session():

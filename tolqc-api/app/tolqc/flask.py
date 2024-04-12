@@ -70,9 +70,13 @@ def application(session_factory=None):
             auth_ctx_setter(token)
 
     @app.teardown_request
-    def remove_before_flush_hook(t_dwn):
+    def remove_before_flush_hook(*_):
         if ssn := flask_session():
             logging.debug(f'Tearing down {ssn = }')
+
+            # Ensure session cannot be reused after close()
+            ssn.close_resets_only = False
+
             # Session.close() must be called to avoid SELECT statements
             # accumulating on server with 'idle in transaction' state.
             # (Alternative is to use `Session` as a context manager.)
@@ -82,7 +86,10 @@ def application(session_factory=None):
             remove(*hook_params)
 
     models = models_list()
-    database_factory = build_database_factory(session_factory, models)
+
+    # session_factory is now a wrapped factory which returns the same Session
+    # instance during each Flask request.
+    database_factory, session_factory = build_database_factory(session_factory, models)
 
     # Tol QC endpoints
     tolqc_ds = create_sql_datasource(
@@ -90,9 +97,6 @@ def application(session_factory=None):
         db_uri=db_uri,
         database_factory=database_factory,
     )
-
-    #  *** Ugly private attribute access ***
-    session_factory = tolqc_ds._SqlDataSource__db._DefaultDatabase__session_factory
 
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
