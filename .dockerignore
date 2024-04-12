@@ -1,23 +1,25 @@
-# SPDX-FileCopyrightText: 2022 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2024 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
-.tox/
-venv/
-.virtualenv/
-build/
-dist/
-instance/
-__pycache__
-swagger_server.egg-info/
-__init__.pyc
-launch.json
-.env.dev
-.env.prod
-values-*.yaml
-*.tgz
-chart/charts/
-.dccache
-.yalc/
-yalc.lock
-inject.js
+## this .dockerignore prevents a large transfer of many
+## files and directories while mounting this "parent_dir"
+## under `additional_contexts`
+## 
+## 
+## please copy it into the parent directory, of this
+## git repo, which should also contain:
+## 
+## - tolqc
+## - tol-sdk (optional)
+
+# ignore everything
+*
+
+# except `tol-sdk` and `openfaas-core`
+!/tol-sdk/
+!/openfaas-core/
+
+# definitely ignore a load of detritus
+**/venv/
+**/.virtualenv/
