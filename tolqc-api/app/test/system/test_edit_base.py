@@ -97,9 +97,49 @@ def test_modify_data(logbase_db_session):
 
     # Check history entries for date and string are as expected
     edit2, edit1 = (json.loads(h.changes) for h in hist)
-    assert len(edit1) == 2  # Check that we only have two
-    assert len(edit2) == 2  # keys in each changes dict.
+    edited_keys = {'date', 'lims_qc'}
+    assert edit1.keys() == edited_keys
+    assert edit2.keys() == edited_keys
     assert edit1['lims_qc'] == 'pass'
     assert edit2['lims_qc'] == 'fail'
     assert datetime.fromisoformat(edit1['date']) == date1
     assert datetime.fromisoformat(edit2['date']) == date2
+
+
+def test_edits_via_client(client, api_path):
+    obj_spec = {
+        'type': 'data',
+        'id': '1001',
+        'attributes': {
+            'name_root': 'Test#1',
+            'qc': 'pass',
+        },
+    }
+    upsrt = {'data': [obj_spec]}
+
+    # Create a data object
+    response = client.post(api_path + '/data/data:upsert', json=upsrt)
+    assert response.status == '200 OK'
+
+    # Change data.qc to "fail"
+    obj_spec['attributes']['qc'] = 'fail'
+    response = client.post(api_path + '/data/data:upsert', json=upsrt)
+    assert response.status == '200 OK'
+
+    # Get edit_data data for data_id = 1001
+    filt = json.dumps(
+        {
+            'in_list': {
+                'data_id': [1001],
+            },
+        }
+    )
+    response = client.get(api_path + '/data/edit_data', query_string=f'filter={filt}')
+    assert response.status == '200 OK'
+    changes = list(x['attributes']['changes'] for x in response.json['data'])
+
+    # There should only be one change, containing the old qc value of "pass".
+    # If the stringified ID is not turned back into a integer by the server's
+    # DefaultDataObjectConverter then the `changes` list will be:
+    #   ['{"data_id":1001,"qc":"pass"}', '{"data_id":1001}']
+    assert changes == ['{"qc":"pass"}']
