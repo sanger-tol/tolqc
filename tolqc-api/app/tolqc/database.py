@@ -40,6 +40,7 @@ __hook_key = 'TOLQC_HOOK_PARAMS'
 
 def build_flask_session(session_factory):
     ssn = session_factory()
+    ssn.close_resets_only = False
     logging.debug(f'Created {ssn = }')
 
     ctx = default_ctx_getter()
