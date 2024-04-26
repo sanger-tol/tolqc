@@ -55,6 +55,7 @@ def application(session_factory=None, database_factory=None):
     tolqc_ds = create_sql_datasource(
         models=models_list(),
         db_uri=db_uri,
+        behind_api=True,
         **ds_args,
     )
 
