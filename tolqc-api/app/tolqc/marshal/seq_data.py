@@ -59,7 +59,7 @@ def parse_ndjson_row(line):
         msg = f'Unexpectedly long line ({len(line):_d} characters) in input'
         raise ValueError(msg)
     row = json.loads(line)
-    if type(row) is not dict:
+    if type(row) is not dict:  # noqa: E721
         msg = f'JSON must decode to a dict, not a {type(row)}'
         raise ValueError(msg)
     for k, v in row.items():
@@ -67,7 +67,7 @@ def parse_ndjson_row(line):
             # Don't allow collections to be smuggled in the values
             msg = 'Values of JSON row must all be scalars'
             raise ValueError(msg)
-        if type(v) is str:
+        if type(v) is str:  # noqa: E721
             # Avoid empty strings
             stripped = v.strip()
             row[k] = None if stripped == '' else stripped
@@ -139,6 +139,7 @@ def build_data(session, centre, row):
     data = Data(
         # Data fields
         name_root=row['name_root'],
+        processed=0,  # Setting processed to 0 flags new data
         tag_index=row.get('tag_index'),  # Illumina only field
         tag1_id=row['tag1_id'],
         tag2_id=row['tag2_id'],
@@ -270,6 +271,7 @@ def build_sample(session, row):
     if smpl := session.get(Sample, sample_name):
         return smpl
 
+    spcmn = None
     if spcmn_id := row['tol_specimen_id']:
         spcmn = session.get(Specimen, spcmn_id)
         if not spcmn and re.match(r'[a-z]{1,2}[A-Z][a-z]', spcmn_id):
