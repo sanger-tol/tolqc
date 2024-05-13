@@ -344,6 +344,7 @@ class Run(Base):
     instrument_name = mapped_column(String)
     start = mapped_column(DateTime(timezone=True))
     complete = mapped_column(DateTime(timezone=True))
+    plex_count = mapped_column(Integer)
 
     data = relationship('Data', back_populates='run')
     platform = relationship('Platform', back_populates='run')

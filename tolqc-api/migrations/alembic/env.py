@@ -5,6 +5,9 @@ from alembic import context
 
 from sqlalchemy import create_engine
 
+import tolqc.sample_data_models
+import tolqc.assembly_models
+import tolqc.system_models
 from tolqc.model import Base
 
 # this is the Alembic Config object, which provides

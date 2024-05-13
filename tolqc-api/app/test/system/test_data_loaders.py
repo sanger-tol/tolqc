@@ -141,6 +141,7 @@ def test_build_data(db_session, row_data):
         db_session.flush()
 
     assert isinstance(p_data, Data)
+    assert p_data.run.plex_count == 4
     assert p_data.run.platform.name == 'PacBio'
     assert p_data.visibility == 'Always'
     assert len(p_data.projects) == 1
@@ -280,6 +281,7 @@ def row_data():
             'run_complete': '2023-06-29T03:57:38+01:00',
             'lims_qc': 'pass',
             'qc_date': '2023-06-30T11:29:00+01:00',
+            'plex_count': 4,
             'tag1_id': 'bc2050',
             'tag2_id': None,
             'library_id': 'DTOL13630432',

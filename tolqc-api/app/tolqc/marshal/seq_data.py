@@ -258,6 +258,7 @@ def build_run(session, row, centre):
         complete=maybe_datetime(row, 'run_complete'),
         lims_id=row.get('lims_run_id'),  # PacBio only field
         element=row.get('well_label'),  # PacBio only field
+        plex_count=row.get('plex_count'),
         centre=centre,
         platform=platform,
         pacbio_run_metrics=run_metrics,
