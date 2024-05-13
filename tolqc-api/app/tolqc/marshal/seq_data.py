@@ -168,7 +168,7 @@ def build_files(row):
         msg = row_message(row, "'irods_path' set but no 'irods_file' field in row")
         raise ValueError(msg)
 
-    rp = path.rstrip('/') + '/' + file_name
+    rp = 'irods:' + path.rstrip('/') + '/' + file_name
     file = File(remote_path=rp)
     return [file]
 
