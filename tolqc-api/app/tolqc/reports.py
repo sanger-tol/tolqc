@@ -16,6 +16,7 @@ from tol.sql.session import create_session_factory
 from tolqc.sample_data_models import (
     Allocation,
     Data,
+    File,
     Library,
     PacbioRunMetrics,
     Platform,
@@ -38,31 +39,19 @@ def reports_blueprint(
 
     @rep.route('/pacbio-run-data')
     def pacbio_run_data():
-        # File format if requested; defaults to TSV
-        req_fmt = request.args.get('format', 'tsv').lower()
-        fmt_mime = FORMATTERS.get(req_fmt)
-        if not fmt_mime:
-            valid = tuple(FORMATTERS)
-            return {'error': f'format parameter must be one of: {valid}'}, 400
-        out_formatter, mime_type = fmt_mime
+        return tolqc_report(
+            session_factory,
+            'pacbio_run_data',
+            pacbio_run_report_query,
+        )
 
-        # Suggested filename for web browsers
-        today = datetime.date.today().isoformat()
-        filename = f'pacbio_run_data_{today}.{req_fmt}'
-        headers = {
-            'Content-Type': mime_type,
-            'Content-Disposition': f'attachment; filename="{filename}"',
-        }
-
-        # Must either (as here) use session as a context manager or call
-        # session.close() to avoid SELECT statements accumulating on server
-        # with 'idle in transaction' state.
-        with session_factory() as session:
-            query = pacbio_run_report_query()
-            row_itr = session.execute(query)
-
-        # Streams formatted data from the SQL query to the client
-        return out_formatter(row_itr, query), 200, headers
+    @rep.route('/pipeline-data')
+    def pipeline_data():
+        return tolqc_report(
+            session_factory,
+            'pipeline_data',
+            pipeline_data_report_query,
+        )
 
     return rep
 
@@ -82,6 +71,77 @@ FORMATTERS = {
     'ndjson': (ndjson_rows, 'application/x-ndjson'),
     'tsv': (tsv_rows, 'text/tab-separated-values'),
 }
+
+
+def tolqc_report(session_factory, report_name, build_query):
+    # File format if requested; defaults to TSV
+    req_fmt = request.args.get('format', 'tsv').lower()
+    fmt_mime = FORMATTERS.get(req_fmt)
+    if not fmt_mime:
+        valid = tuple(FORMATTERS)
+        return {'error': f'format parameter must be one of: {valid}'}, 400
+    out_formatter, mime_type = fmt_mime
+
+    # Suggested filename for web browsers
+    today = datetime.date.today().isoformat()
+    filename = f'{report_name}_{today}.{req_fmt}'
+    headers = {
+        'Content-Type': mime_type,
+        'Content-Disposition': f'attachment; filename="{filename}"',
+    }
+
+    # Must either (as here) use session as a context manager or call
+    # session.close() to avoid SELECT statements accumulating on server
+    # with 'idle in transaction' state.
+    with session_factory() as session:
+        query = build_query()
+        row_itr = session.execute(query)
+
+    # Streams formatted data from the SQL query to the client
+    return out_formatter(row_itr, query), 200, headers
+
+
+def pipeline_data_report_query():
+    """
+    data_id data.data_id
+    name_root data.name_root
+    iRods path file.remote_path
+    ToL ID specimen.specimen_id
+    Species species.species_id
+    Species species.hierarchy_name
+    Pipeline name library.library_type_id
+    Project LIMS ID project.lims_id
+    Processed data.processed
+    """
+
+    query = (
+        select(
+            Data.data_id.label('data_id'),
+            Data.name_root.label('name_root'),
+            File.remote_path.label('irods_path'),
+            Species.species_id.label('species'),
+            Species.hierarchy_name.label('species_hierarchy'),
+            Specimen.specimen_id.label('specimen'),
+            Library.library_type_id.label('pipeline'),
+            Project.lims_id.label('project_lims_id'),
+            Data.processed.label('data_processed'),
+        )
+        .select_from(Data)
+        .outerjoin(Sample)
+        .outerjoin(Specimen)
+        .outerjoin(Species)
+        .join(File)
+        .join(Library)
+        .join(Allocation)
+        .join(Project)
+        .where(Project.lims_id != None)  # noqa: E711
+        .order_by(
+            Data.date.desc(),
+            Specimen.specimen_id,
+        )
+    )
+
+    return query
 
 
 def pacbio_run_report_query():
