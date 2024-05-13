@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import logging
 import os
 
 from flask import Flask, request
@@ -35,6 +36,10 @@ def application(session_factory=None, database_factory=None):
     """
     app = Flask(__name__)
     app.json = JSONDateTimeProvider(app)
+    if os.getenv('ECHO_SQL'):
+        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    if os.getenv('TOLQC_DEBUG'):
+        logging.getLogger().setLevel(logging.DEBUG)
 
     api_path = os.getenv('TOLQC_API_PATH', os.getenv('API_PATH', '/api/v1'))
     db_uri = os.getenv('DB_URI')
