@@ -18,8 +18,8 @@ services:
 
   tolqc-api:
     build:
-      context: ../
-      dockerfile: tolqc/tolqc-api/Dockerfile.dev
+      context: ./tolqc-api
+      dockerfile: Dockerfile.dev
     image: tolqc-api
     # force amd64 on M1 MacOS
     #platform: linux/amd64
