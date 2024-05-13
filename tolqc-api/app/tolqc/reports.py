@@ -7,6 +7,8 @@ import json
 
 from flask import Blueprint, request
 
+from werkzeug.exceptions import BadRequest
+
 from sqlalchemy import select
 from sqlalchemy.orm import Bundle
 
@@ -53,6 +55,10 @@ def reports_blueprint(
             pipeline_data_report_query,
         )
 
+    @rep.errorhandler(BadRequest)
+    def handle_bad_request(e):
+        return {'error': e.description}, 400
+
     return rep
 
 
@@ -79,7 +85,7 @@ def tolqc_report(session_factory, report_name, build_query):
     fmt_mime = FORMATTERS.get(req_fmt)
     if not fmt_mime:
         valid = tuple(FORMATTERS)
-        return {'error': f'format parameter must be one of: {valid}'}, 400
+        raise BadRequest(f'format parameter must be one of: {valid}')
     out_formatter, mime_type = fmt_mime
 
     # Suggested filename for web browsers
@@ -102,29 +108,19 @@ def tolqc_report(session_factory, report_name, build_query):
 
 
 def pipeline_data_report_query():
-    """
-    data_id data.data_id
-    name_root data.name_root
-    iRods path file.remote_path
-    ToL ID specimen.specimen_id
-    Species species.species_id
-    Species species.hierarchy_name
-    Pipeline name library.library_type_id
-    Project LIMS ID project.lims_id
-    Processed data.processed
-    """
-
     query = (
         select(
-            Data.data_id.label('data_id'),
-            Data.name_root.label('name_root'),
-            File.remote_path.label('irods_path'),
+            Data.data_id,
+            Data.name_root,
+            File.remote_path,
             Species.species_id.label('species'),
             Species.hierarchy_name.label('species_hierarchy'),
             Specimen.specimen_id.label('specimen'),
             Library.library_type_id.label('pipeline'),
             Project.lims_id.label('project_lims_id'),
-            Data.processed.label('data_processed'),
+            Data.visibility,
+            Data.lims_qc,
+            Data.processed,
         )
         .select_from(Data)
         .outerjoin(Sample)
@@ -141,7 +137,40 @@ def pipeline_data_report_query():
         )
     )
 
+    query = add_argument(
+        query,
+        Data.processed,
+        lookup={
+            'null': None,
+            '0': 0,
+            '1': 1,
+        },
+    )
+    query = add_argument(query, Data.visibility)
+    query = add_argument(query, Data.lims_qc)
+    query = add_argument(query, Library.library_type_id, name='pipeline')
+
     return query
+
+
+def add_argument(query, column, name=None, lookup=None):
+    if not name:
+        name = column.name
+
+    arg = request.args.get(name)
+    if not arg:
+        return query
+
+    if lookup:
+        try:
+            val = lookup[arg.lower()]
+        except KeyError:
+            valid = tuple(lookup)
+            raise BadRequest(f"'{name}' parameter must be one of: {valid}")
+    else:
+        val = arg
+
+    return query.where(column == val)
 
 
 def pacbio_run_report_query():
