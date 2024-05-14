@@ -131,10 +131,7 @@ def pipeline_data_report_query():
         .join(Allocation)
         .join(Project)
         .where(Project.lims_id != None)  # noqa: E711
-        .order_by(
-            Data.date.desc(),
-            Specimen.specimen_id,
-        )
+        .order_by(Data.data_id.desc())
     )
 
     query = add_argument(
@@ -149,6 +146,7 @@ def pipeline_data_report_query():
     query = add_argument(query, Data.visibility)
     query = add_argument(query, Data.lims_qc)
     query = add_argument(query, Library.library_type_id, name='pipeline')
+    query = add_argument(query, Project.lims_id, name='project_lims_id')
 
     return query
 
@@ -161,14 +159,15 @@ def add_argument(query, column, name=None, lookup=None):
     if not arg:
         return query
 
+    # Guard against being passed excessively long param values
+    val = arg[:256]
+
     if lookup:
         try:
-            val = lookup[arg.lower()]
+            val = lookup[arg]
         except KeyError:
             valid = tuple(lookup)
             raise BadRequest(f"'{name}' parameter must be one of: {valid}")
-    else:
-        val = arg
 
     return query.where(column == val)
 

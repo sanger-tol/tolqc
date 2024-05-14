@@ -251,6 +251,7 @@ def build_run(session, row, centre):
     run_metrics = []
     if platform.name == 'PacBio':
         run_metrics = build_pacbio_run_metrics(row)
+
     return Run(
         run_id=row['run_id'],
         instrument_name=row['instrument_name'],

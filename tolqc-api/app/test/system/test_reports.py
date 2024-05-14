@@ -3,7 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 import io
+import json
 import re
+
+from urllib.parse import urlencode
 
 import pytest
 
@@ -68,4 +71,68 @@ def test_pacbio_run_data_report_csv(client, api_path):
     Requesting an unsupported format should be a 400
     """
     response = client.get(api_path + '/report/pacbio-run-data?format=CSV')
+    assert response.status == '400 BAD REQUEST'
+
+
+def test_pipeline_data_report(client, api_path):
+    response = client.get(api_path + '/report/pipeline-data')
+    assert response.status == '200 OK'
+
+
+def good_param_combinations():
+    for param in (
+        {'processed': '1'},
+        {'processed': '0'},
+        {'processed': 'null'},
+        {'lims_qc': 'pass'},
+        {'lims_qc': 'fail'},
+        {'pipeline': 'Chromium genome'},
+        {'pipeline': 'RNA PolyA'},
+        {'pipeline': 'Hi-C - Arima v2'},
+        {'visibility': 'Always'},
+        {'visibility': 'Testing'},
+        {'project_lims_id': '5901'},
+        # Combinations:
+        {'processed': 'null', 'lims_qc': 'fail'},
+        {'visibility': 'Always', 'lims_qc': 'pass'},
+        {'project_lims_id': '5901', 'lims_qc': 'fail'},
+    ):
+        yield {'format': 'NDJSON', **param}
+
+
+@pytest.mark.parametrize('params', good_param_combinations())
+def test_data_report_good_params(client, api_path, params):
+    response = client.get(api_path + '/report/pipeline-data?' + urlencode(params))
+    assert response.status == '200 OK'
+
+    json_lines = list(json.loads(x) for x in io.StringIO(response.text).readlines())
+    assert json_lines
+
+    # Check that values match those requested
+    expected = expected_values(params)
+    for row in json_lines:
+        for col, val in expected.items():
+            assert row.get(col) == val
+
+
+def expected_values(params):
+    expected = {}
+    for col, val in params.items():
+        if col == 'format':
+            continue
+
+        if val == 'null':
+            exp = None
+        else:
+            try:
+                exp = int(val)
+            except ValueError:
+                exp = val
+        expected[col] = exp
+
+    return expected
+
+
+def test_data_report_bad_params(client, api_path):
+    response = client.get(api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'}))
     assert response.status == '400 BAD REQUEST'

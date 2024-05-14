@@ -81,7 +81,7 @@ def test_valid_accession(db_session):
 def test_build_file():
     (file1,) = build_files({'irods_path': '/seq/data', 'irods_file': 'd.cram'})
     assert isinstance(file1, File)
-    assert file1.remote_path == '/seq/data/d.cram'
+    assert file1.remote_path == 'irods:/seq/data/d.cram'
     (file2,) = build_files({'irods_path': '/seq/data/', 'irods_file': 'd.cram'})
     assert file1.remote_path == file2.remote_path
     assert build_files({'irods_path': None}) is None
