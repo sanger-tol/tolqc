@@ -7,8 +7,6 @@ import json
 
 from flask import Blueprint, request
 
-from werkzeug.exceptions import BadRequest
-
 from sqlalchemy import select
 from sqlalchemy.orm import Bundle
 
@@ -28,6 +26,8 @@ from tolqc.sample_data_models import (
     Species,
     Specimen,
 )
+
+from werkzeug.exceptions import BadRequest
 
 
 def reports_blueprint(

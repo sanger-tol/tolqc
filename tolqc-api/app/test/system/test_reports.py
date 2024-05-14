@@ -5,7 +5,6 @@
 import io
 import json
 import re
-
 from urllib.parse import urlencode
 
 import pytest
@@ -105,7 +104,7 @@ def test_data_report_good_params(client, api_path, params):
     response = client.get(api_path + '/report/pipeline-data?' + urlencode(params))
     assert response.status == '200 OK'
 
-    json_lines = list(json.loads(x) for x in io.StringIO(response.text).readlines())
+    json_lines = [json.loads(x) for x in io.StringIO(response.text).readlines()]
     assert json_lines
 
     # Check that values match those requested
@@ -134,5 +133,7 @@ def expected_values(params):
 
 
 def test_data_report_bad_params(client, api_path):
-    response = client.get(api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'}))
+    response = client.get(
+        api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'})
+    )
     assert response.status == '400 BAD REQUEST'
