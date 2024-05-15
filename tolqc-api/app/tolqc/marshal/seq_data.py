@@ -168,7 +168,7 @@ def build_files(row):
         msg = row_message(row, "'irods_path' set but no 'irods_file' field in row")
         raise ValueError(msg)
 
-    rp = path.rstrip('/') + '/' + file_name
+    rp = 'irods:' + path.rstrip('/') + '/' + file_name
     file = File(remote_path=rp)
     return [file]
 
@@ -251,6 +251,7 @@ def build_run(session, row, centre):
     run_metrics = []
     if platform.name == 'PacBio':
         run_metrics = build_pacbio_run_metrics(row)
+
     return Run(
         run_id=row['run_id'],
         instrument_name=row['instrument_name'],
