@@ -99,7 +99,7 @@ def headline_data_fields(data):
 def updated_data_fields(data):
     state = inspect(data)
     changes = {}
-    for col_name in state.mapper.columns.keys():
+    for col_name in state.mapper.columns:
         attr = state.attrs[col_name]
         hist = attr.history
         if hist.has_changes():

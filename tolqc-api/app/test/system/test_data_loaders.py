@@ -62,7 +62,7 @@ def test_tz_is_europe_london(db_session):
     Check that the database server is set to the expected time
     zone 'Europe/London'
     """
-    tz, = db_session.execute(text('SHOW timezone')).one()
+    (tz,) = db_session.execute(text('SHOW timezone')).one()
     assert tz == 'Europe/London'
 
 
