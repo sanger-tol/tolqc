@@ -85,7 +85,8 @@ def tolqc_report(session_factory, report_name, build_query):
     fmt_mime = FORMATTERS.get(req_fmt)
     if not fmt_mime:
         valid = tuple(FORMATTERS)
-        raise BadRequest(f'format parameter must be one of: {valid}')
+        msg = f'format parameter must be one of: {valid}'
+        raise BadRequest(msg)
     out_formatter, mime_type = fmt_mime
 
     # Suggested filename for web browsers
@@ -167,7 +168,8 @@ def add_argument(query, column, name=None, lookup=None):
             val = lookup[arg]
         except KeyError:
             valid = tuple(lookup)
-            raise BadRequest(f"'{name}' parameter must be one of: {valid}")
+            msg = f"'{name}' parameter must be one of: {valid}"
+            raise BadRequest(msg) from None
 
     return query.where(column == val)
 
