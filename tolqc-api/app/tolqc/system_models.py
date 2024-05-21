@@ -55,8 +55,7 @@ class User(Base):
 
 class Token(Base):
 
-    # this has to be prefixed with 'oidc_' for future compatbility
-    __tablename__ = 'oidc_token'
+    __tablename__ = 'token'
 
     id: Mapped[int] = mapped_column(  # noqa A003
         primary_key=True,
