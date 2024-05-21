@@ -39,12 +39,12 @@ def reports_blueprint(
     if not session_factory:
         session_factory = create_session_factory(db_uri)
 
-    @rep.route('/pacbio-run-data')
+    @rep.route('/pacbio-data')
     def pacbio_run_data():
         return tolqc_report(
             session_factory,
-            'pacbio_run_data',
-            pacbio_run_report_query,
+            'pacbio_data',
+            pacbio_data_report_query,
         )
 
     @rep.route('/pipeline-data')
@@ -85,7 +85,8 @@ def tolqc_report(session_factory, report_name, build_query):
     fmt_mime = FORMATTERS.get(req_fmt)
     if not fmt_mime:
         valid = tuple(FORMATTERS)
-        raise BadRequest(f'format parameter must be one of: {valid}')
+        msg = f'format parameter must be one of: {valid}'
+        raise BadRequest(msg)
     out_formatter, mime_type = fmt_mime
 
     # Suggested filename for web browsers
@@ -167,12 +168,13 @@ def add_argument(query, column, name=None, lookup=None):
             val = lookup[arg]
         except KeyError:
             valid = tuple(lookup)
-            raise BadRequest(f"'{name}' parameter must be one of: {valid}")
+            msg = f"'{name}' parameter must be one of: {valid}"
+            raise BadRequest(msg) from None
 
     return query.where(column == val)
 
 
-def pacbio_run_report_query():
+def pacbio_data_report_query():
     return (
         select(
             ProjectGroupBundle(
@@ -191,21 +193,24 @@ def pacbio_run_report_query():
             Run.run_id.label('movie_name'),
             Run.element.label('well'),
             Run.instrument_name.label('instrument'),
+            Run.plex_count,
             PacbioRunMetrics.movie_minutes.label('movie_length'),
             Data.tag_index,
             Data.tag1_id.label('tag'),
             Sample.accession_id.label('sample_accession'),
             Data.accession_id.label('run_accession'),
             Data.library_id.label('library_load_name'),
-            PacbioRunMetrics.hifi_num_reads.label('reads'),
-            PacbioRunMetrics.hifi_read_bases.label('bases'),
-            PacbioRunMetrics.insert_length_mean.label('mean'),
-            PacbioRunMetrics.insert_length_n50.label('n50'),
+            Data.reads.label('reads'),
+            Data.bases.label('bases'),
+            Data.read_length_mean.label('mean'),
+            Data.read_length_n50.label('n50'),
             Species.species_id.label('species'),
             PacbioRunMetrics.loading_conc,
             PacbioRunMetrics.binding_kit,
             PacbioRunMetrics.sequencing_kit,
-            PacbioRunMetrics.include_kinetics,
+            PacbioRunMetrics.p0_num,
+            PacbioRunMetrics.p1_num,
+            PacbioRunMetrics.p2_num,
         )
         .select_from(Data)
         .outerjoin(Sample)

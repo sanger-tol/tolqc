@@ -172,8 +172,6 @@ class Data(LogBase):
     read_length_n50 = mapped_column(BigInteger)
     elastic_mlwh_cksum = mapped_column(String)
 
-    # UniqueConstraint('name')
-
     sample = relationship('Sample', back_populates='data')
     library = relationship('Library', back_populates='data')
     accession = relationship('Accession', back_populates='data')
