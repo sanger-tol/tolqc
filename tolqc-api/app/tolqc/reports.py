@@ -205,7 +205,7 @@ def pacbio_data_report_query():
             Data.read_length_mean.label('mean'),
             Data.read_length_n50.label('n50'),
             Species.species_id.label('species'),
-            PacbioRunMetrics.loading_conc,
+            PacbioRunMetrics.loading_conc.label('loading_concentration'),
             PacbioRunMetrics.binding_kit,
             PacbioRunMetrics.sequencing_kit,
             PacbioRunMetrics.p0_num,
