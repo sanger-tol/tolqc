@@ -42,8 +42,8 @@ const dataTable = (
       "date": {
         rename: "Date"
       },
-      "name_root": {
-        rename: "Name root"
+      "name": {
+        rename: "Name"
       },
       "sample.id": {
         rename: "Sanger Sample ID",

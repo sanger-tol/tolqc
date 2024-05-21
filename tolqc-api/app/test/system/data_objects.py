@@ -191,7 +191,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=115631,
-                                    name_root='37939_1#2',
+                                    name='37939_1#2',
                                     sample_id='DTOL_RD10244236',
                                     library_id='DN805609I:B3',
                                     run_id='37939',
@@ -234,7 +234,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=117751,
-                                    name_root='35344_1#1',
+                                    name='35344_1#1',
                                     sample_id='DTOL9310949',
                                     library_id='DN683544F:A5',
                                     run_id='35344',
@@ -268,7 +268,7 @@ def test_data(token: str):
                                 ),
                                 Data(
                                     data_id=117752,
-                                    name_root='35344_1#2',
+                                    name='35344_1#2',
                                     sample_id='DTOL9310949',
                                     library_id='DN683544F:A5',
                                     run_id='35344',
@@ -302,7 +302,7 @@ def test_data(token: str):
                                 ),
                                 Data(
                                     data_id=117753,
-                                    name_root='35344_1#3',
+                                    name='35344_1#3',
                                     sample_id='DTOL9310949',
                                     library_id='DN683544F:A5',
                                     run_id='35344',
@@ -336,7 +336,7 @@ def test_data(token: str):
                                 ),
                                 Data(
                                     data_id=117754,
-                                    name_root='35344_1#4',
+                                    name='35344_1#4',
                                     sample_id='DTOL9310949',
                                     library_id='DN683544F:A5',
                                     run_id='35344',
@@ -380,7 +380,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=117960,
-                                    name_root='35528_4#8',
+                                    name='35528_4#8',
                                     sample_id='DTOL9384820',
                                     library_id='DN703060C:H1',
                                     run_id='35528',
@@ -424,7 +424,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=124055,
-                                    name_root='m64089e_210601_133425#1022',
+                                    name='m64089e_210601_133425#1022',
                                     sample_id='DTOL9397431',
                                     library_id='DN695911V-H1',
                                     run_id='m64089e_210601_133425',
@@ -498,7 +498,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=127430,
-                                    name_root='36703_5#4',
+                                    name='36703_5#4',
                                     sample_id='DTOLRNA9465095',
                                     library_id='DN611904M:F3',
                                     run_id='36703',
@@ -566,7 +566,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=118427,
-                                    name_root='36691_2#5',
+                                    name='36691_2#5',
                                     sample_id='DTOL9702654',
                                     library_id='DN771163M:G8',
                                     run_id='36691',
@@ -603,7 +603,7 @@ def test_data(token: str):
                                 ),
                                 Data(
                                     data_id=118428,
-                                    name_root='36691_2#6',
+                                    name='36691_2#6',
                                     sample_id='DTOL9702654',
                                     library_id='DN771163M:G8',
                                     run_id='36691',
@@ -639,7 +639,7 @@ def test_data(token: str):
                                 ),
                                 Data(
                                     data_id=118429,
-                                    name_root='36691_2#7',
+                                    name='36691_2#7',
                                     sample_id='DTOL9702654',
                                     library_id='DN771163M:G8',
                                     run_id='36691',
@@ -675,7 +675,7 @@ def test_data(token: str):
                                 ),
                                 Data(
                                     data_id=118430,
-                                    name_root='36691_2#8',
+                                    name='36691_2#8',
                                     sample_id='DTOL9702654',
                                     library_id='DN771163M:G8',
                                     run_id='36691',
@@ -721,7 +721,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=121083,
-                                    name_root='40666_2#2',
+                                    name='40666_2#2',
                                     sample_id='DTOL10341656',
                                     library_id='DN826505P:B3',
                                     run_id='40666',
@@ -768,7 +768,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=124432,
-                                    name_root='m64097e_210221_172213#1019',
+                                    name='m64097e_210221_172213#1019',
                                     sample_id='DTOL9838614',
                                     library_id='DN765124Q-B1',
                                     run_id='m64097e_210221_172213',
@@ -841,7 +841,7 @@ def test_data(token: str):
                             data=[
                                 Data(
                                     data_id=127563,
-                                    name_root='37935_8#13',
+                                    name='37935_8#13',
                                     sample_id='DTOLRNA10187174',
                                     library_id='DN612239G:G9',
                                     run_id='37935',

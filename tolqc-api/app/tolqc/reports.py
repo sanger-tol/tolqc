@@ -111,7 +111,7 @@ def pipeline_data_report_query():
     query = (
         select(
             Data.data_id,
-            Data.name_root,
+            Data.name,
             File.remote_path,
             Species.species_id.label('species'),
             Species.hierarchy_name.label('species_hierarchy'),
