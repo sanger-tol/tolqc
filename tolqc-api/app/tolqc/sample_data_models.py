@@ -146,7 +146,7 @@ class Data(LogBase):
         return 'data_id'
 
     data_id = mapped_column(Integer, primary_key=True)
-    name_root = mapped_column(String, index=True)
+    name = mapped_column(String, unique=True)
     hierarchy_name = mapped_column(String)
     sample_id = mapped_column(String, ForeignKey('sample.sample_id'))
     library_id = mapped_column(String, ForeignKey('library.library_id'))
@@ -166,10 +166,10 @@ class Data(LogBase):
         default='Always',
         index=True,
     )
-    reads = mapped_column(Integer)
+    reads = mapped_column(BigInteger)
     bases = mapped_column(BigInteger)
     read_length_mean = mapped_column(Float)
-    read_length_n50 = mapped_column(Integer)
+    read_length_n50 = mapped_column(BigInteger)
     elastic_mlwh_cksum = mapped_column(String)
 
     sample = relationship('Sample', back_populates='data')

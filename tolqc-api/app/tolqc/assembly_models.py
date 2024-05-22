@@ -8,10 +8,10 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
-    JSON,
     String,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 
@@ -147,17 +147,17 @@ class AssemblyMetrics(Base):
     tv = mapped_column(Integer)
     cpg_ts = mapped_column(Integer)
     contig_n = mapped_column(Integer)
-    contig_length = mapped_column(Integer)
-    contig_n50 = mapped_column(Integer)
+    contig_length = mapped_column(BigInteger)
+    contig_n50 = mapped_column(BigInteger)
     contig_aun = mapped_column(Float)
-    contig_longest = mapped_column(Integer)
-    contig_shortest = mapped_column(Integer)
+    contig_longest = mapped_column(BigInteger)
+    contig_shortest = mapped_column(BigInteger)
     contig_length_mean = mapped_column(Float)
     scaffold_n = mapped_column(Integer)
-    scaffold_n50 = mapped_column(Integer)
+    scaffold_n50 = mapped_column(BigInteger)
     scaffold_aun = mapped_column(Float)
     gap_n = mapped_column(Integer)
-    gap_n50 = mapped_column(Integer)
+    gap_n50 = mapped_column(BigInteger)
     assembly = relationship('Assembly', back_populates='assembly_metrics')
 
 
@@ -278,7 +278,7 @@ class ContigvizMetrics(Base):
         Integer,
         ForeignKey('software_version.software_version_id'),
     )
-    results = mapped_column(JSON)
+    results = mapped_column(JSONB)
 
     assembly = relationship('Assembly', back_populates='contigviz_metrics')
     software_version = relationship(
@@ -300,10 +300,10 @@ class Dataset(LogBase):
         ForeignKey('dataset_status.dataset_status_id'),
     )
     dataset_list_md5 = mapped_column(String)
-    reads = mapped_column(Integer)
+    reads = mapped_column(BigInteger)
     bases = mapped_column(BigInteger)
     read_length_mean = mapped_column(Float)
-    read_length_n50 = mapped_column(Integer)
+    read_length_n50 = mapped_column(BigInteger)
 
     assembly = relationship('Assembly', back_populates='dataset')
     genomescope_metrics = relationship(
@@ -403,14 +403,13 @@ class GenomescopeMetrics(LogBase):
     kcov_init = mapped_column(Integer)
     model_fit = mapped_column(Float)
     read_error_rate = mapped_column(Float)
-    results = mapped_column(JSON)
+    results = mapped_column(JSONB)
 
     dataset = relationship('Dataset', back_populates='genomescope_metrics')
     software_version = relationship(
         'SoftwareVersion',
         back_populates='genomescope_metrics',
     )
-    review = relationship('ReviewDict', back_populates='genomescope_metrics')
 
 
 class MarkerscanMetrics(Base):
@@ -422,7 +421,7 @@ class MarkerscanMetrics(Base):
         Integer,
         ForeignKey('software_version.software_version_id'),
     )
-    results = mapped_column(JSON)
+    results = mapped_column(JSONB)
 
     assembly = relationship('Assembly', back_populates='markerscan_metrics')
     software_version = relationship(
@@ -488,11 +487,6 @@ class ReviewDict(Base):
 
     review_id = mapped_column(String, primary_key=True)
     description = mapped_column(String)
-
-    genomescope_metrics = relationship(
-        'GenomescopeMetrics',
-        back_populates='review',
-    )
 
 
 class SoftwareVersion(Base):

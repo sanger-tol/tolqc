@@ -86,7 +86,7 @@ def headline_data_fields(data):
             species_id = spcmn.species_id
 
     return {
-        'name_root': data.name_root,
+        'name': data.name,
         'specimen': specimen_id,
         'species': species_id,
         'library_type': data.library.library_type_id,
@@ -99,7 +99,7 @@ def headline_data_fields(data):
 def updated_data_fields(data):
     state = inspect(data)
     changes = {}
-    for col_name in state.mapper.columns.keys():
+    for col_name in state.mapper.columns.keys():  # noqa: SIM118
         attr = state.attrs[col_name]
         hist = attr.history
         if hist.has_changes():
@@ -138,7 +138,7 @@ def build_data(session, centre, row):
 
     data = Data(
         # Data fields
-        name_root=row['name_root'],
+        name=row['name'],
         processed=0,  # Setting processed to 0 flags new data
         tag_index=row.get('tag_index'),  # Illumina only field
         tag1_id=row['tag1_id'],
@@ -349,11 +349,11 @@ def get_centre(session, centre_name):
 
 
 def get_data(session, row):
-    if name_root := row.get('name_root'):
+    if name := row.get('name'):
         return session.scalars(
-            select(Data).where(Data.name_root == name_root)
+            select(Data).where(Data.name == name)
         ).one_or_none()
-    msg = row_message(row, "Missing 'name_root' field in row")
+    msg = row_message(row, "Missing 'name' field in row")
     raise ValueError(msg)
 
 

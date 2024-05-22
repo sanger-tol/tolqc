@@ -7,7 +7,7 @@
 from setuptools import find_packages, setup
 
 NAME = 'app'
-VERSION = '1.1.0'
+VERSION = '1.1.1'
 # To install the library, run the following
 #
 # python setup.py install

@@ -169,8 +169,8 @@ def test_build_data(db_session, row_data):
     assert i_data.sample.specimen.species is p_data.sample.specimen.species
 
 
-def test_fail_mising_name_root(client, api_path):
-    with pytest.raises(ValueError, match=r"Missing 'name_root'"):
+def test_fail_mising_name(client, api_path):
+    with pytest.raises(ValueError, match=r"Missing 'name'"):
         client.post(api_path + '/loader/seq-data', data='{"study_id":"1001"}')
 
 
@@ -180,7 +180,7 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
     assert response.json == {
         'new': [
             {
-                'name_root': 'm64221e_230627_234912',
+                'name': 'm64221e_230627_234912',
                 'specimen': 'bBraLeu2',
                 'species': 'Branta leucopsis',
                 'library_type': 'PacBio - HiFi',
@@ -188,7 +188,7 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
                 'project': 'DTOL_Darwin Tree of Life',
             },
             {
-                'name_root': '47339_3#7',
+                'name': '47339_3#7',
                 'specimen': 'bBraLeu2',
                 'species': 'Branta leucopsis',
                 'library_type': 'Hi-C - Arima v2',
@@ -210,7 +210,7 @@ def test_seq_data_loader_update(client, api_path, row_data):
         'new': [],
         'updated': [
             {
-                'name_root': 'm64221e_230627_234912',
+                'name': 'm64221e_230627_234912',
                 'specimen': 'bBraLeu2',
                 'species': 'Branta leucopsis',
                 'library_type': 'PacBio - HiFi',
@@ -261,7 +261,7 @@ def ndjson_row_data(row_data):
 def row_data():
     return {
         'pacbio': {
-            'name_root': 'm64221e_230627_234912',
+            'name': 'm64221e_230627_234912',
             'study_id': '5901',
             'sample_name': 'DTOL13630432',
             'supplier_name': 'NHMUK014561636',
@@ -309,7 +309,7 @@ def row_data():
             'irods_file': 'demultiplex.bc2050--bc2050.bam',
         },
         'illumina': {
-            'name_root': '47339_3#7',
+            'name': '47339_3#7',
             'study_id': '5901',
             'sample_name': 'DTOL13633579',
             'supplier_name': 'NHMUK014561636',
