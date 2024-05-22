@@ -1,7 +1,7 @@
 """BigInt JSONB and data.name
 
 Revision ID: 7088fcbeadcd
-Revises: b6a23971491c
+Revises: c3457e9954df
 Create Date: 2024-05-21 13:43:08.715450
 
 """
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '7088fcbeadcd'
-down_revision = 'b6a23971491c'
+down_revision = 'c3457e9954df'
 branch_labels = None
 depends_on = None
 
