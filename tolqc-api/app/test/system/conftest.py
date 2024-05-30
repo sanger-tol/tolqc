@@ -99,9 +99,7 @@ def db_session(session_factory):
 @pytest.fixture
 def database_factory_and_session(session_factory):
     def db_factory_for_testing(*_):
-        return DefaultDatabase(
-            session_factory=session_factory, models=models_list()
-        )
+        return DefaultDatabase(session_factory=session_factory, models=models_list())
 
     return db_factory_for_testing, session_factory
 
@@ -120,7 +118,6 @@ def flask_app(database_factory_and_session):
 
 @pytest.fixture()
 def client(flask_app, token):
-
     class TestClient(testing.FlaskClient):
         def open(self, *args, **kwargs):  # noqa: A003
             headers = kwargs.setdefault('headers', Headers())

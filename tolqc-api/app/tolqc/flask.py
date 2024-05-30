@@ -13,6 +13,7 @@ from tol.core import core_data_object
 from tol.sql import create_sql_datasource
 
 import tolqc.assembly_models
+import tolqc.folder_models
 import tolqc.sample_data_models
 import tolqc.system_models
 from tolqc.auth import create_auth_ctx_setter
@@ -24,6 +25,7 @@ from tolqc.reports import reports_blueprint
 def models_list():
     return [
         *tolqc.assembly_models.models_list(),
+        *tolqc.folder_models.models_list(),
         *tolqc.sample_data_models.models_list(),
         *tolqc.system_models.models_list(),
     ]

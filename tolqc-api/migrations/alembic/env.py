@@ -4,9 +4,11 @@ from logging.config import fileConfig
 from alembic import context
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import configure_mappers
 
-import tolqc.sample_data_models
 import tolqc.assembly_models
+import tolqc.folder_models
+import tolqc.sample_data_models
 import tolqc.system_models
 from tolqc.model import Base
 
