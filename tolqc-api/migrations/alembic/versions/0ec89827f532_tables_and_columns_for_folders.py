@@ -36,7 +36,7 @@ def upgrade() -> None:
     op.create_table(
         'folder',
         sa.Column(
-            'folder_id',
+            'folder_ulid',
             sa.String(),
             nullable=False,
         ),
@@ -64,7 +64,7 @@ def upgrade() -> None:
             ['folder_location_id'],
             ['folder_location.folder_location_id'],
         ),
-        sa.PrimaryKeyConstraint('folder_id'),
+        sa.PrimaryKeyConstraint('folder_ulid'),
     )
 
     for table in (
@@ -77,7 +77,7 @@ def upgrade() -> None:
         op.add_column(
             table,
             sa.Column(
-                'folder_id',
+                'folder_ulid',
                 sa.String(),
                 nullable=True,
             ),
@@ -86,8 +86,8 @@ def upgrade() -> None:
             None,
             table,
             'folder',
-            ['folder_id'],
-            ['folder_id'],
+            ['folder_ulid'],
+            ['folder_ulid'],
         )
 
 

@@ -9,7 +9,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import (
-    Mapped,
     declared_attr,
     mapped_column,
     relationship,
@@ -27,9 +26,9 @@ class Folder(Base):
 
     @classmethod
     def get_id_column_name(cls):
-        return 'folder_id'
+        return 'folder_ulid'
 
-    folder_id = mapped_column(String, primary_key=True)
+    folder_ulid = mapped_column(String, primary_key=True)
     folder_location_id = mapped_column(
         String, ForeignKey('folder_location.folder_location_id'), nullable=False
     )
@@ -57,10 +56,12 @@ class HasFolder:
     """Mixin for tables to link to Folder"""
 
     # ULID of Folder row
-    folder_id: Mapped[str] = mapped_column(
-        ForeignKey('folder.folder_id'), nullable=True
+    folder_ulid = mapped_column(
+        String, ForeignKey('folder.folder_ulid'), nullable=True
     )
 
     @declared_attr
-    def folder(self) -> Mapped['Folder']:
-        return relationship('Folder')
+    @classmethod
+    def folder(cls):
+        back_rel_name = cls.__tablename__ + '_folders'
+        return relationship('Folder', backref=back_rel_name)
