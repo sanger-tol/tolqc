@@ -430,7 +430,7 @@ class Species(LogBase):
         return 'species_id'
 
     species_id = mapped_column(String, primary_key=True)
-    hierarchy_name = mapped_column(String, nullable=False, index=True)
+    hierarchy_name = mapped_column(String, nullable=False, unique=True)
     strain = mapped_column(String)
     common_name = mapped_column(String)
     taxon_id = mapped_column(Integer, index=True)
