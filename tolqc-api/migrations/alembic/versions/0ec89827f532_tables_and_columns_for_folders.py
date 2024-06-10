@@ -72,6 +72,7 @@ def upgrade() -> None:
         'contigviz_metrics',
         'genomescope_metrics',
         'merqury_metrics',
+        'pacbio_run_metrics',
         'ploidyplot_metrics',
     ):
         op.add_column(
