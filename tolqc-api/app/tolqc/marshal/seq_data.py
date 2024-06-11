@@ -8,6 +8,7 @@ import re
 from datetime import datetime
 
 from sqlalchemy import and_, inspect, select
+from sqlalchemy.exc import SQLAlchemyError
 
 from tolqc.sample_data_models import (
     Accession,
@@ -85,14 +86,21 @@ def headline_data_fields(data):
             specimen_id = spcmn.specimen_id
             species_id = spcmn.species_id
 
+    lib_type_id = None
+    if lib := data.library:
+        lib_type_id = lib.library_type_id
+
+    proj_desc = 'No assigned project'
+    if proj_list := data.projects:
+        proj_desc = proj_list[0].description
+
     return {
         'name': data.name,
         'specimen': specimen_id,
         'species': species_id,
-        'library_type': data.library.library_type_id,
+        'library_type': lib_type_id,
         'sample': sample_id,
-        # Project will always be present for data loaded from the MLWH
-        'project': data.projects[0].description,
+        'project': proj_desc,
     }
 
 
@@ -125,7 +133,11 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
     # everything to it. If autoflush is on, warnings are generated about some
     # of the attached objects which haven't been added to the Session.
     with session.no_autoflush:
-        data = build_data(session, centre, row)
+        try:
+            data = build_data(session, centre, row)
+        except SQLAlchemyError:
+            session.rollback()
+            raise
         session.add(data)
         session.flush()
 
@@ -133,7 +145,6 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
 
 
 def build_data(session, centre, row):
-    alloc = build_project_allocation(session, row)
     run = build_run(session, row, centre)
 
     data = Data(
@@ -146,9 +157,10 @@ def build_data(session, centre, row):
         lims_qc=row['lims_qc'],
         date=maybe_datetime(row, 'qc_date'),
         # Related objects
-        project_assn=alloc,
         run=run,
     )
+    if alloc := build_project_allocation(session, row):
+        data.project_assn = alloc
     if sample := build_sample(session, row):
         data.sample = sample
     if library := build_library(session, row):
@@ -202,10 +214,13 @@ def build_pacbio_run_metrics(row):
 
 
 def build_project_allocation(session, row):
-    project = session.scalars(
-        select(Project).where(Project.lims_id == row['study_id'])
-    ).one()
-    return [Allocation(project=project)]
+    if study_id := row.get('study_id'):
+        project = session.scalars(
+            select(Project).where(Project.lims_id == study_id)
+        ).one()
+        return [Allocation(project=project)]
+    else:
+        return None
 
 
 # Should this mapping be done on the client side?
