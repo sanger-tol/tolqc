@@ -8,6 +8,7 @@ import re
 from datetime import datetime
 
 from sqlalchemy import and_, inspect, select
+from sqlalchemy.exc import SQLAlchemyError
 
 from tolqc.sample_data_models import (
     Accession,
@@ -134,9 +135,9 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
     with session.no_autoflush:
         try:
             data = build_data(session, centre, row)
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            raise e
+            raise
         session.add(data)
         session.flush()
 
