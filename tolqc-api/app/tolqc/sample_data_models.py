@@ -19,6 +19,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 
 from tolqc.assembly_models import DatasetElement  # noqa: F401
+from tolqc.folder_models import HasFolder
 from tolqc.model import Base, LogBase
 
 
@@ -49,7 +50,7 @@ def models_list():
     ]
 
 
-class Accession(Base):
+class Accession(LogBase):
     __tablename__ = 'accession'
 
     @classmethod
@@ -295,7 +296,7 @@ class Offspring(Base):
     )
 
 
-class PacbioRunMetrics(Base):
+class PacbioRunMetrics(Base, HasFolder):
     __tablename__ = 'pacbio_run_metrics'
 
     @classmethod

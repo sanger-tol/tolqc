@@ -15,6 +15,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 
+from tolqc.folder_models import HasFolder
 from tolqc.model import Base, LogBase
 
 
@@ -240,7 +241,7 @@ class BuscoLineage(Base):
     )
 
 
-class BuscoMetrics(Base):
+class BuscoMetrics(Base, HasFolder):
     __tablename__ = 'busco_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
@@ -269,7 +270,7 @@ class BuscoMetrics(Base):
     )
 
 
-class ContigvizMetrics(Base):
+class ContigvizMetrics(Base, HasFolder):
     __tablename__ = 'contigviz_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
@@ -382,7 +383,7 @@ class DatasetStatusType(Base):
     statuses = relationship('DatasetStatus', back_populates='status_type')
 
 
-class GenomescopeMetrics(LogBase):
+class GenomescopeMetrics(LogBase, HasFolder):
     __tablename__ = 'genomescope_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
@@ -430,7 +431,7 @@ class MarkerscanMetrics(Base):
     )
 
 
-class MerquryMetrics(Base):
+class MerquryMetrics(Base, HasFolder):
     __tablename__ = 'merqury_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
@@ -456,7 +457,7 @@ class MerquryMetrics(Base):
     )
 
 
-class PloidyplotMetrics(Base):
+class PloidyplotMetrics(Base, HasFolder):
     __tablename__ = 'ploidyplot_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
