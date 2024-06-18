@@ -66,6 +66,14 @@ class Assembly(LogBase):
     )
     name = mapped_column(String)
     description = mapped_column(String)
+    bioproject_accession_id = mapped_column(
+        String,
+        ForeignKey('accession.accession_id'),
+    )
+    genome_accession_id = mapped_column(
+        String,
+        ForeignKey('accession.accession_id'),
+    )
 
     dataset = relationship('Dataset', back_populates='assembly')
     component_type = relationship(
@@ -86,10 +94,24 @@ class Assembly(LogBase):
         'ContigvizMetrics',
         back_populates='assembly',
     )
+    mapping_metrics = relationship(
+        'MappingMetrics',
+        back_populates='assembly',
+    )
     merqury_metrics = relationship('MerquryMetrics', back_populates='assembly')
     markerscan_metrics = relationship(
         'MarkerscanMetrics',
         back_populates='assembly',
+    )
+    bioproject_accession = relationship(
+        'Accession',
+        back_populates='bioproject_assemblies',
+        foreign_keys=[bioproject_accession_id],
+    )
+    genome_accession = relationship(
+        'Accession',
+        back_populates='genome_assemblies',
+        foreign_keys=[genome_accession_id],
     )
 
     status = relationship('AssemblyStatus', foreign_keys=[assembly_status_id])
@@ -136,17 +158,17 @@ class AssemblyMetrics(Base):
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
     bases = mapped_column(BigInteger)
-    a = mapped_column(BigInteger)
-    c = mapped_column(BigInteger)
-    g = mapped_column(BigInteger)
-    t = mapped_column(BigInteger)
-    n = mapped_column(BigInteger)
-    cpg = mapped_column(BigInteger)
-    iupac3 = mapped_column(Integer)
-    iupac2 = mapped_column(Integer)
-    ts = mapped_column(Integer)
-    tv = mapped_column(Integer)
-    cpg_ts = mapped_column(Integer)
+    bases_a = mapped_column(BigInteger)
+    bases_c = mapped_column(BigInteger)
+    bases_g = mapped_column(BigInteger)
+    bases_t = mapped_column(BigInteger)
+    bases_n = mapped_column(BigInteger)
+    bases_cpg = mapped_column(BigInteger)
+    bases_iupac3 = mapped_column(BigInteger)
+    bases_iupac2 = mapped_column(BigInteger)
+    bases_ts = mapped_column(BigInteger)
+    bases_tv = mapped_column(BigInteger)
+    bases_cpg_ts = mapped_column(BigInteger)
     contig_n = mapped_column(Integer)
     contig_length = mapped_column(BigInteger)
     contig_n50 = mapped_column(BigInteger)
@@ -154,10 +176,10 @@ class AssemblyMetrics(Base):
     contig_longest = mapped_column(BigInteger)
     contig_shortest = mapped_column(BigInteger)
     contig_length_mean = mapped_column(Float)
-    scaffold_n = mapped_column(Integer)
+    scaffolds = mapped_column(Integer)
     scaffold_n50 = mapped_column(BigInteger)
     scaffold_aun = mapped_column(Float)
-    gap_n = mapped_column(Integer)
+    gaps = mapped_column(Integer)
     gap_n50 = mapped_column(BigInteger)
     assembly = relationship('Assembly', back_populates='assembly_metrics')
 
@@ -167,9 +189,7 @@ class AssemblySource(Base):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
-    source_assembly_id = mapped_column(
-        Integer, ForeignKey('assembly.assembly_id')
-    )
+    source_assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
 
     UniqueConstraint('assembly_id', 'source_assembly_id')
 
@@ -527,5 +547,9 @@ class SoftwareVersion(Base):
     )
     ploidyplot_metrics = relationship(
         'PloidyplotMetrics',
+        back_populates='software_version',
+    )
+    mapping_metrics = relationship(
+        'MappingMetrics',
         back_populates='software_version',
     )
