@@ -216,6 +216,7 @@ def pacbio_data_report_query():
             PacbioRunMetrics.loading_conc.label('loading_concentration'),
             PacbioRunMetrics.binding_kit,
             PacbioRunMetrics.sequencing_kit,
+            PacbioRunMetrics.productive_zmws_num,
             PacbioRunMetrics.p0_num,
             PacbioRunMetrics.p1_num,
             PacbioRunMetrics.p2_num,

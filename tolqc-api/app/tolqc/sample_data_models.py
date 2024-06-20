@@ -137,7 +137,7 @@ class Allocation(Base):
     data = relationship('Data', back_populates='project_assn')
 
 
-class BarcodeMetrics(Base):
+class BarcodeMetrics(Base, HasFolder):
     __tablename__ = 'barcode_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
@@ -163,7 +163,7 @@ class Centre(Base):
     run = relationship('Run', back_populates='centre')
 
 
-class Data(LogBase):
+class Data(LogBase, HasFolder):
     __tablename__ = 'data'
 
     @classmethod
