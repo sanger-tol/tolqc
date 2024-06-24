@@ -187,6 +187,7 @@ def build_files(row):
 
 def build_pacbio_run_metrics(row):
     pbrm = PacbioRunMetrics()
+    have_value = False
     for fld in (
         'movie_minutes',
         'binding_kit',
@@ -225,8 +226,11 @@ def build_pacbio_run_metrics(row):
         'hifi_barcoded_reads',
         'hifi_bases_in_barcoded_reads',
     ):
-        setattr(pbrm, fld, row[fld])
-    return [pbrm]
+        v = row.get(fld)
+        if v is not None:
+            have_value = True
+            setattr(pbrm, fld, v)
+    return [pbrm] if have_value else None
 
 
 def build_project_allocation(session, row):
