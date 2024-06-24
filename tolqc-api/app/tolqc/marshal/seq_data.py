@@ -282,23 +282,24 @@ def build_run(session, row, centre):
         raise ValueError(msg)
     if run := get_by_pk_if_value(session, Run, run_id):
         return run
-    platform = build_platform(session, row)
-    run_metrics = []
-    if platform.name == 'PacBio':
-        run_metrics = build_pacbio_run_metrics(row)
 
-    return Run(
-        run_id=row['run_id'],
+    platform = build_platform(session, row)
+    run = Run(
+        run_id=run_id,
         instrument_name=row['instrument_name'],
         start=maybe_datetime(row, 'run_start'),  # PacBio only field
         complete=maybe_datetime(row, 'run_complete'),
         lims_id=row.get('lims_run_id'),  # PacBio only field
-        element=row.get('well_label'),  # PacBio only field
+        element=row.get('element'),  # PacBio only field
         plex_count=row.get('plex_count'),
         centre=centre,
         platform=platform,
-        pacbio_run_metrics=run_metrics,
     )
+
+    if platform.name == 'PacBio' and (run_metrics := build_pacbio_run_metrics(row)):
+        run.pacbio_run_metrics = run_metrics
+
+    return run
 
 
 def build_sample(session, row):
