@@ -352,7 +352,7 @@ class DatasetElement(Base):
     __tablename__ = 'dataset_element'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
-    data_id = mapped_column(Integer, ForeignKey('data.data_id'))
+    data_id = mapped_column(String, ForeignKey('data.data_id'))
     dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
 
     UniqueConstraint('data_id', 'dataset_id')

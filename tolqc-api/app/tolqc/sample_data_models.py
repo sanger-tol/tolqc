@@ -128,7 +128,7 @@ class Allocation(Base):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     project_id = mapped_column(Integer, ForeignKey('project.project_id'))
-    data_id = mapped_column(Integer, ForeignKey('data.data_id'))
+    data_id = mapped_column(String, ForeignKey('data.data_id'))
     is_primary = mapped_column(Boolean)
 
     UniqueConstraint('project_id', 'data_id')
@@ -141,7 +141,7 @@ class BarcodeMetrics(Base, HasFolder):
     __tablename__ = 'barcode_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
-    data_id = mapped_column(Integer, ForeignKey('data.data_id'))
+    data_id = mapped_column(String, ForeignKey('data.data_id'))
     qc_id = mapped_column(Integer)  # QCDict pass|fail ?
 
     # Is this a foreign key to the species table?
@@ -170,8 +170,8 @@ class Data(LogBase, HasFolder):
     def get_id_column_name(cls):
         return 'data_id'
 
-    data_id = mapped_column(Integer, primary_key=True)
-    name = mapped_column(String, unique=True)
+    data_id = mapped_column(String, primary_key=True)
+    study_id = mapped_column(Integer, ForeignKey('project.study_id'))
     hierarchy_name = mapped_column(String)
     sample_id = mapped_column(String, ForeignKey('sample.sample_id'))
     library_id = mapped_column(String, ForeignKey('library.library_id'))
@@ -217,6 +217,7 @@ class Data(LogBase, HasFolder):
     files = relationship('File', back_populates='data')
     barcode_metrics = relationship('BarcodeMetrics', back_populates='data')
     mapping_metrics = relationship('MappingMetrics', back_populates='data')
+    study_project = relationship('Project', back_populates='study_data')
 
     project_assn = relationship('Allocation', back_populates='data')
     projects = association_proxy('project_assn', 'project')
@@ -229,7 +230,7 @@ class File(Base):
     __tablename__ = 'file'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
-    data_id = mapped_column(Integer, ForeignKey('data.data_id'))
+    data_id = mapped_column(String, ForeignKey('data.data_id'))
     name = mapped_column(String)
     relative_path = mapped_column(String)
     remote_path = mapped_column(String)
@@ -279,7 +280,7 @@ class MappingMetrics(Base, HasFolder):
     __tablename__ = 'mapping_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
-    data_id = mapped_column(Integer, ForeignKey('data.data_id'), nullable=False)
+    data_id = mapped_column(String, ForeignKey('data.data_id'), nullable=False)
     assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
     software_version_id = mapped_column(
         Integer,
@@ -411,7 +412,7 @@ class Project(Base):
     project_id = mapped_column(Integer, primary_key=True)
     hierarchy_name = mapped_column(String)
     description = mapped_column(String)
-    lims_id = mapped_column(Integer, index=True)
+    study_id = mapped_column(Integer, unique=True)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
 
     accession = relationship('Accession', back_populates='projects')
@@ -419,7 +420,7 @@ class Project(Base):
     data = association_proxy('data_assn', 'data')
     species_assn = relationship('Umbrella', back_populates='project')
     species = association_proxy('species_assn', 'species')
-
+    study_data = relationship('Data', back_populates='study_project')
 
 class QCDict(Base):
     __tablename__ = 'qc_dict'
