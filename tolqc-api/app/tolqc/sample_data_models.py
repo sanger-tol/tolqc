@@ -422,6 +422,7 @@ class Project(Base):
     species = association_proxy('species_assn', 'species')
     study_data = relationship('Data', back_populates='study_project')
 
+
 class QCDict(Base):
     __tablename__ = 'qc_dict'
 
