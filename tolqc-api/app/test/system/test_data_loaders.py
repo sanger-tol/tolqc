@@ -321,7 +321,10 @@ def row_data():
             'hifi_low_quality_read_quality_median': None,
             'hifi_barcoded_reads': None,
             'hifi_bases_in_barcoded_reads': None,
-            'remote_path': 'irods:/seq/pacbio/r64221e_20230619_152240/8_H01/demultiplex.bc2050--bc2050.bam',
+            'remote_path': (
+                'irods:/seq/pacbio/r64221e_20230619_152240'
+                '/8_H01/demultiplex.bc2050--bc2050.bam'
+            ),
         },
         'illumina': {
             'data_id': '47339_3#7',
