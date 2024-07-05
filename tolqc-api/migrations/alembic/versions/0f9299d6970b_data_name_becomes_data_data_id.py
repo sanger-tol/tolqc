@@ -97,6 +97,20 @@ def upgrade() -> None:
     for tbl in data_rel_tables:
         op.create_foreign_key(None, tbl, 'data', ['data_id'], ['data_id'])
 
+    # Populate `data.study_id`
+    op.execute(
+        sa.text("""
+            UPDATE data
+            SET study_id = p.study_id
+            FROM allocation AS a
+              , project AS p
+            WHERE data.data_id = a.data_id
+              AND a.project_id = p.project_id
+              AND p.study_id IS NOT NULL
+              AND data.study_id IS NULL
+        """)
+    )
+
     # Patch renamed accession types
     for new_type, old_types in (
         ('Analysis', ['ENA Analysis']),

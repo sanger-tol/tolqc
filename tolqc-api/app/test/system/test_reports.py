@@ -78,6 +78,11 @@ def test_pipeline_data_report(client, api_path):
     assert response.status == '200 OK'
 
 
+def test_mlwh_data_report(client, api_path):
+    response = client.get(api_path + '/report/mlwh-data')
+    assert response.status == '200 OK'
+
+
 def good_param_combinations():
     for param in (
         {'processed': '1'},
@@ -90,11 +95,11 @@ def good_param_combinations():
         {'pipeline': 'Hi-C - Arima v2'},
         {'visibility': 'Always'},
         {'visibility': 'Testing'},
-        {'project_lims_id': '5901'},
+        {'study_id': '5901'},
         # Combinations:
         {'processed': 'null', 'lims_qc': 'fail'},
         {'visibility': 'Always', 'lims_qc': 'pass'},
-        {'project_lims_id': '5901', 'lims_qc': 'fail'},
+        {'study_id': '5901', 'lims_qc': 'fail'},
     ):
         yield {'format': 'NDJSON', **param}
 

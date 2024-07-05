@@ -95,7 +95,7 @@ def headline_data_fields(data):
         proj_desc = proj_list[0].description
 
     return {
-        'name': data.name,
+        'data_id': data.data_id,
         'specimen': specimen_id,
         'species': species_id,
         'library_type': lib_type_id,
@@ -147,7 +147,8 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
 def build_data(session, centre, row):
     data = Data(
         # Data fields
-        name=row.get('name'),
+        data_id=row.get('data_id'),
+        study_id=row.get('study_id'),
         processed=0,  # Setting processed to 0 flags new data
         tag_index=row.get('tag_index'),  # Illumina only field
         tag1_id=row.get('tag1_id'),
@@ -234,7 +235,7 @@ def build_pacbio_run_metrics(row):
 def build_project_allocation(session, row):
     if study_id := row.get('study_id'):
         project = session.scalars(
-            select(Project).where(Project.lims_id == study_id)
+            select(Project).where(Project.study_id == study_id)
         ).one()
         return [Allocation(project=project)]
     else:
@@ -300,7 +301,7 @@ def build_sample(session, row):
             # Beginning of specimen ID looks like a ToL ID
             specimen_acc = accession_if_valid(
                 session,
-                'Bio Sample',
+                'BioSample',
                 row.get('biospecimen_accession'),
             )
             species = build_species(session, row)
@@ -313,7 +314,7 @@ def build_sample(session, row):
 
     sample_acc = accession_if_valid(
         session,
-        'Bio Sample',
+        'BioSample',
         row.get('biosample_accession'),
     )
 
@@ -369,11 +370,9 @@ def get_centre(session, centre_name):
 
 
 def get_data(session, row):
-    if name := row.get('name'):
-        return session.scalars(
-            select(Data).where(Data.name == name)
-        ).one_or_none()
-    msg = row_message(row, "Missing 'name' field in row")
+    if data_id := row.get('data_id'):
+        return session.get(Data, data_id)
+    msg = row_message(row, "Missing 'data_id' field in row")
     raise ValueError(msg)
 
 

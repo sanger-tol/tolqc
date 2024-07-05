@@ -120,13 +120,12 @@ def pipeline_data_report_query():
     query = (
         select(
             Data.data_id,
-            Data.name,
             File.remote_path,
             Species.species_id.label('species'),
             Species.hierarchy_name.label('species_hierarchy'),
             Specimen.specimen_id.label('specimen'),
             Library.library_type_id.label('pipeline'),
-            Project.lims_id.label('project_lims_id'),
+            Data.study_id,
             Data.visibility,
             Data.lims_qc,
             Data.processed,
@@ -137,9 +136,6 @@ def pipeline_data_report_query():
         .outerjoin(Species)
         .join(File)
         .join(Library)
-        .join(Allocation)
-        .join(Project)
-        .where(Project.lims_id != None)  # noqa: E711
         .order_by(Data.data_id.desc())
     )
 
@@ -155,7 +151,7 @@ def pipeline_data_report_query():
     query = add_argument(query, Data.visibility)
     query = add_argument(query, Data.lims_qc)
     query = add_argument(query, Library.library_type_id, name='pipeline')
-    query = add_argument(query, Project.lims_id, name='project_lims_id')
+    query = add_argument(query, Data.study_id)
 
     return query
 
@@ -252,8 +248,8 @@ def pacbio_data_report_query():
 def mlwh_data_report_query():
     query = (
         select(
-            Data.name,
-            Project.lims_id.label('study_id'),
+            Data.data_id,
+            Data.study_id,
             Sample.sample_id.label('sample_name'),
             Specimen.supplied_name.label('supplier_name'),
             Specimen.specimen_id.label('tol_specimen_id'),
@@ -324,16 +320,12 @@ def mlwh_data_report_query():
         .outerjoin(File)
         .outerjoin(Library)
         .outerjoin(PacbioRunMetrics)
-        # Cannot do many-to-many join between Data and Project directly.
-        # Must explicitly go through Allocation:
-        .join(Allocation)
-        .join(Project)
-        .where(Project.lims_id != None)  # noqa: E711
+        .where(Data.study_id != None)  # noqa: E711
         .order_by(
             Data.date.desc(),
         )
     )
-    query = add_argument(query, Project.lims_id, name='study_id')
+    query = add_argument(query, Data.study_id)
     return query
 
 
