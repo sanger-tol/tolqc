@@ -217,7 +217,6 @@ class Data(LogBase, HasFolder):
     files = relationship('File', back_populates='data')
     barcode_metrics = relationship('BarcodeMetrics', back_populates='data')
     mapping_metrics = relationship('MappingMetrics', back_populates='data')
-    study_project = relationship('Project', back_populates='study_data')
 
     project_assn = relationship('Allocation', back_populates='data')
     projects = association_proxy('project_assn', 'project')
@@ -420,7 +419,6 @@ class Project(Base):
     data = association_proxy('data_assn', 'data')
     species_assn = relationship('Umbrella', back_populates='project')
     species = association_proxy('species_assn', 'species')
-    study_data = relationship('Data', back_populates='study_project')
 
 
 class QCDict(Base):
