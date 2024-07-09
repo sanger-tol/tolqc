@@ -295,6 +295,7 @@ def build_sample(session, row):
         return smpl
 
     spcmn = None
+    specimen_acc = None
     if spcmn_id := row.get('tol_specimen_id'):
         spcmn = session.get(Specimen, spcmn_id)
         if not spcmn and re.match(r'[a-z]{1,2}[A-Z][a-z]', spcmn_id):
@@ -317,6 +318,15 @@ def build_sample(session, row):
         'BioSample',
         row.get('biosample_accession'),
     )
+
+    # Avoid trying to create two Accession objects with the same
+    # accession if `biosample_accession` = `biospecimen_accession`
+    if (
+        sample_acc
+        and specimen_acc
+        and sample_acc.accession_id == specimen_acc.accession_id
+    ):
+        sample_acc = specimen_acc
 
     # Create a new Sample
     smpl = Sample(
@@ -394,7 +404,6 @@ def accession_if_valid(session, accn_type, accn_str):
             accession_id=accn_str,
             accession_type_id=accn_type,
         )
-        # session.add(acc_obj)
         return acc_obj
     return None
 
