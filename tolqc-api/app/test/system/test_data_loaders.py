@@ -62,12 +62,12 @@ def test_tz_is_europe_london(db_session):
     Check that the database server is set to the expected time
     zone 'Europe/London'
     """
-    tz, = db_session.execute(text('SHOW timezone')).one()
+    (tz,) = db_session.execute(text('SHOW timezone')).one()
     assert tz == 'Europe/London'
 
 
 def test_valid_accession(db_session):
-    acc_type = 'Bio Sample'
+    acc_type = 'BioSample'
 
     good = 'SAMXX0001'
     assert valid_accession(db_session, acc_type, good)
@@ -95,7 +95,7 @@ def test_build_library(db_session):
         db_session,
         {
             'library_id': lib_id,
-            'pipeline_id_lims': 'Pacbio_IsoSeq',
+            'pipeline_id_lims': 'PacBio - IsoSeq',
         },
     )
     assert isinstance(lib1, Library)
@@ -169,8 +169,8 @@ def test_build_data(db_session, row_data):
     assert i_data.sample.specimen.species is p_data.sample.specimen.species
 
 
-def test_fail_mising_name(client, api_path):
-    with pytest.raises(ValueError, match=r"Missing 'name'"):
+def test_fail_mising_data_id(client, api_path):
+    with pytest.raises(ValueError, match=r"Missing 'data_id'"):
         client.post(api_path + '/loader/seq-data', data='{"study_id":"1001"}')
 
 
@@ -180,7 +180,7 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
     assert response.json == {
         'new': [
             {
-                'name': 'm64221e_230627_234912',
+                'data_id': 'm64221e_230627_234912#2050',
                 'specimen': 'bBraLeu2',
                 'species': 'Branta leucopsis',
                 'library_type': 'PacBio - HiFi',
@@ -188,7 +188,7 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
                 'project': 'DTOL_Darwin Tree of Life',
             },
             {
-                'name': '47339_3#7',
+                'data_id': '47339_3#7',
                 'specimen': 'bBraLeu2',
                 'species': 'Branta leucopsis',
                 'library_type': 'Hi-C - Arima v2',
@@ -210,7 +210,7 @@ def test_seq_data_loader_update(client, api_path, row_data):
         'new': [],
         'updated': [
             {
-                'name': 'm64221e_230627_234912',
+                'data_id': 'm64221e_230627_234912#2050',
                 'specimen': 'bBraLeu2',
                 'species': 'Branta leucopsis',
                 'library_type': 'PacBio - HiFi',
@@ -261,8 +261,8 @@ def ndjson_row_data(row_data):
 def row_data():
     return {
         'pacbio': {
-            'name': 'm64221e_230627_234912',
-            'study_id': '5901',
+            'data_id': 'm64221e_230627_234912#2050',
+            'study_id': 5901,
             'sample_name': 'DTOL13630432',
             'supplier_name': 'NHMUK014561636',
             'tol_specimen_id': 'bBraLeu2',
@@ -273,25 +273,30 @@ def row_data():
             'platform_type': 'PacBio',
             'instrument_model': 'Sequel IIe',
             'instrument_name': 'm64221e',
-            'pipeline_id_lims': 'Pacbio_HiFi',
+            'pipeline_id_lims': 'PacBio - HiFi',
             'run_id': 'm64221e_230627_234912',
             'lims_run_id': 'TRACTION-RUN-642',
-            'well_label': 'H1',
+            'element': 'H1',
             'run_start': '2023-06-19T15:23:28+01:00',
             'run_complete': '2023-06-29T03:57:38+01:00',
+            'plex_count': 4,
             'lims_qc': 'pass',
             'qc_date': '2023-06-30T11:29:00+01:00',
-            'plex_count': 4,
             'tag1_id': 'bc2050',
             'tag2_id': None,
             'library_id': 'DTOL13630432',
             'movie_minutes': 1440,
             'binding_kit': 'Sequel II Binding Kit 3.2',
             'sequencing_kit': 'Sequel II Sequencing Plate 2.0 (4 rxn)',
+            'sequencing_kit_lot_number': '129637',
+            'cell_lot_number': '419848',
             'include_kinetics': 'false',
             'loading_conc': 94.0,
             'control_num_reads': 2367,
             'control_read_length_mean': 88287,
+            'control_concordance_mean': 0.903083,
+            'control_concordance_mode': 0.91,
+            'local_base_rate': 2.72133,
             'polymerase_read_bases': 487169541261,
             'polymerase_num_reads': 5734530,
             'polymerase_read_length_mean': 84954,
@@ -299,18 +304,31 @@ def row_data():
             'insert_length_mean': 15655,
             'insert_length_n50': 20250,
             'unique_molecular_bases': 80659808256,
+            'productive_zmws_num': 8012304,
             'p0_num': 2046474,
             'p1_num': 5736897,
             'p2_num': 231300,
+            'adapter_dimer_percent': 0.0,
+            'short_insert_percent': 0.0,
             'hifi_read_bases': 26909305485,
             'hifi_num_reads': 2458338,
+            'hifi_read_length_mean': 10946,
+            'hifi_read_quality_median': 35,
+            'hifi_number_passes_mean': 14,
+            'hifi_low_quality_read_bases': None,
             'hifi_low_quality_num_reads': None,
-            'irods_path': '/seq/pacbio/r64221e_20230619_152240/8_H01/',
-            'irods_file': 'demultiplex.bc2050--bc2050.bam',
+            'hifi_low_quality_read_length_mean': None,
+            'hifi_low_quality_read_quality_median': None,
+            'hifi_barcoded_reads': None,
+            'hifi_bases_in_barcoded_reads': None,
+            'remote_path': (
+                'irods:/seq/pacbio/r64221e_20230619_152240'
+                '/8_H01/demultiplex.bc2050--bc2050.bam'
+            ),
         },
         'illumina': {
-            'name': '47339_3#7',
-            'study_id': '5901',
+            'data_id': '47339_3#7',
+            'study_id': 5901,
             'sample_name': 'DTOL13633579',
             'supplier_name': 'NHMUK014561636',
             'tol_specimen_id': 'bBraLeu2',
@@ -323,7 +341,6 @@ def row_data():
             'instrument_name': 'NV15',
             'pipeline_id_lims': 'Hi-C - Arima v2',
             'run_id': '47339',
-            'position': '3',
             'tag_index': '7',
             'run_complete': '2023-05-25T05:18:51+01:00',
             'lims_qc': 'pass',
@@ -331,7 +348,6 @@ def row_data():
             'tag1_id': '39',
             'tag2_id': '39',
             'library_id': 'SQPP-21698-M:G5',
-            'irods_path': '/seq/illumina/runs/47/47339/lane3/plex7/',
-            'irods_file': '47339_3#7.cram',
+            'remote_path': 'irods:/seq/illumina/runs/47/47339/lane3/plex7/47339_3#7.cram',
         },
     }

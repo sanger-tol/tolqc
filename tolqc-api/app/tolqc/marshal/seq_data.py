@@ -95,7 +95,7 @@ def headline_data_fields(data):
         proj_desc = proj_list[0].description
 
     return {
-        'name': data.name,
+        'data_id': data.data_id,
         'specimen': specimen_id,
         'species': species_id,
         'library_type': lib_type_id,
@@ -122,7 +122,7 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
     data = get_data(session, row)
     if data:
         # The QC decisions *might* have changed so update these fields
-        data.lims_qc = row['lims_qc']
+        data.lims_qc = row.get('lims_qc')
         data.date = maybe_datetime(row, 'qc_date')
         if session.is_modified(data, include_collections=False):
             return None, data
@@ -145,19 +145,16 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
 
 
 def build_data(session, centre, row):
-    run = build_run(session, row, centre)
-
     data = Data(
         # Data fields
-        name=row['name'],
+        data_id=row.get('data_id'),
+        study_id=row.get('study_id'),
         processed=0,  # Setting processed to 0 flags new data
         tag_index=row.get('tag_index'),  # Illumina only field
-        tag1_id=row['tag1_id'],
-        tag2_id=row['tag2_id'],
-        lims_qc=row['lims_qc'],
+        tag1_id=row.get('tag1_id'),
+        tag2_id=row.get('tag2_id'),
+        lims_qc=row.get('lims_qc'),
         date=maybe_datetime(row, 'qc_date'),
-        # Related objects
-        run=run,
     )
     if alloc := build_project_allocation(session, row):
         data.project_assn = alloc
@@ -167,15 +164,17 @@ def build_data(session, centre, row):
         data.library = library
     if files := build_files(row):
         data.files = files
+    if run := build_run(session, row, centre):
+        data.run = run
 
     return data
 
 
 def build_files(row):
-    path = row['irods_path']
+    path = row.get('irods_path')
     if not path:
         return None
-    file_name = row['irods_file']
+    file_name = row.get('irods_file')
     if not file_name:
         msg = row_message(row, "'irods_path' set but no 'irods_file' field in row")
         raise ValueError(msg)
@@ -187,14 +186,20 @@ def build_files(row):
 
 def build_pacbio_run_metrics(row):
     pbrm = PacbioRunMetrics()
+    have_value = False
     for fld in (
         'movie_minutes',
         'binding_kit',
         'sequencing_kit',
+        'sequencing_kit_lot_number',
+        'cell_lot_number',
         'include_kinetics',
         'loading_conc',
         'control_num_reads',
         'control_read_length_mean',
+        'control_concordance_mean',
+        'control_concordance_mode',
+        'local_base_rate',
         'polymerase_read_bases',
         'polymerase_num_reads',
         'polymerase_read_length_mean',
@@ -202,51 +207,52 @@ def build_pacbio_run_metrics(row):
         'insert_length_mean',
         'insert_length_n50',
         'unique_molecular_bases',
+        'productive_zmws_num',
         'p0_num',
         'p1_num',
         'p2_num',
+        'adapter_dimer_percent',
+        'short_insert_percent',
         'hifi_read_bases',
         'hifi_num_reads',
+        'hifi_read_length_mean',
+        'hifi_read_quality_median',
+        'hifi_number_passes_mean',
+        'hifi_low_quality_read_bases',
         'hifi_low_quality_num_reads',
+        'hifi_low_quality_read_length_mean',
+        'hifi_low_quality_read_quality_median',
+        'hifi_barcoded_reads',
+        'hifi_bases_in_barcoded_reads',
     ):
-        setattr(pbrm, fld, row[fld])
-    return [pbrm]
+        v = row.get(fld)
+        if v is not None:
+            have_value = True
+            setattr(pbrm, fld, v)
+    return [pbrm] if have_value else None
 
 
 def build_project_allocation(session, row):
     if study_id := row.get('study_id'):
         project = session.scalars(
-            select(Project).where(Project.lims_id == study_id)
+            select(Project).where(Project.study_id == study_id)
         ).one()
         return [Allocation(project=project)]
     else:
         return None
 
 
-# Should this mapping be done on the client side?
-PIPELINE_TO_LIBRARY_TYPE = {
-    'PacBio_Ultra_Low_Input': 'PacBio - HiFi (ULI)',
-    'PacBio_Ultra_Low_Input_mplx': 'PacBio - HiFi (ULI)',
-    'Pacbio_HiFi': 'PacBio - HiFi',
-    'Pacbio_HiFi_mplx': 'PacBio - HiFi',
-    'Pacbio_IsoSeq': 'PacBio - IsoSeq',
-    'PacBio_IsoSeq_mplx': 'PacBio - IsoSeq',
-    'Pacbio_Microbial_mplx': 'PacBio - HiFi (Microbial)',
-}
-
-
 def build_library_type(session, row):
-    pipeline_id_lims = row['pipeline_id_lims']
-    if pipeline_id_lims is None:
+    ltid = row.get('pipeline_id_lims')
+    if ltid is None:
         return None
-    ltid = PIPELINE_TO_LIBRARY_TYPE.get(pipeline_id_lims, pipeline_id_lims)
     if lib_type := session.get(LibraryType, ltid):
         return lib_type
     return LibraryType(library_type_id=ltid)
 
 
 def build_library(session, row):
-    lib_id = row['library_id']
+    lib_id = row.get('library_id')
     if not lib_id:
         return None
     if lib := session.get(Library, lib_id):
@@ -256,61 +262,71 @@ def build_library(session, row):
 
 
 def build_run(session, row, centre):
-    run_id = row['run_id']
+    run_id = row.get('run_id')
     if not run_id:
-        msg = row_message(row, "Missing 'run_id' field in row")
-        raise ValueError(msg)
+        return None
     if run := get_by_pk_if_value(session, Run, run_id):
         return run
-    platform = build_platform(session, row)
-    run_metrics = []
-    if platform.name == 'PacBio':
-        run_metrics = build_pacbio_run_metrics(row)
 
-    return Run(
-        run_id=row['run_id'],
-        instrument_name=row['instrument_name'],
+    platform = build_platform(session, row)
+    run = Run(
+        run_id=run_id,
+        instrument_name=row.get('instrument_name'),
         start=maybe_datetime(row, 'run_start'),  # PacBio only field
         complete=maybe_datetime(row, 'run_complete'),
         lims_id=row.get('lims_run_id'),  # PacBio only field
-        element=row.get('well_label'),  # PacBio only field
+        element=row.get('element'),  # PacBio only field
         plex_count=row.get('plex_count'),
         centre=centre,
         platform=platform,
-        pacbio_run_metrics=run_metrics,
     )
+
+    if platform.name == 'PacBio' and (run_metrics := build_pacbio_run_metrics(row)):
+        run.pacbio_run_metrics = run_metrics
+
+    return run
 
 
 def build_sample(session, row):
-    sample_name = row['sample_name']
+    sample_name = row.get('sample_name')
     if not sample_name:
         return None
     if smpl := session.get(Sample, sample_name):
         return smpl
 
     spcmn = None
-    if spcmn_id := row['tol_specimen_id']:
+    specimen_acc = None
+    if spcmn_id := row.get('tol_specimen_id'):
         spcmn = session.get(Specimen, spcmn_id)
         if not spcmn and re.match(r'[a-z]{1,2}[A-Z][a-z]', spcmn_id):
             # Beginning of specimen ID looks like a ToL ID
             specimen_acc = accession_if_valid(
                 session,
-                'Bio Sample',
-                row['biospecimen_accession'],
+                'BioSample',
+                row.get('biospecimen_accession'),
             )
             species = build_species(session, row)
             spcmn = Specimen(
                 specimen_id=spcmn_id,
                 accession=specimen_acc,
-                supplied_name=row['supplier_name'],
+                supplied_name=row.get('supplier_name'),
                 species=species,
             )
 
     sample_acc = accession_if_valid(
         session,
-        'Bio Sample',
-        row['biosample_accession'],
+        'BioSample',
+        row.get('biosample_accession'),
     )
+
+    # Avoid trying to create two Accession objects with the same
+    # accession if `biosample_accession` = `biospecimen_accession`
+    if (
+        sample_acc
+        and specimen_acc
+        and sample_acc.accession_id == specimen_acc.accession_id
+    ):
+        sample_acc = specimen_acc
 
     # Create a new Sample
     smpl = Sample(
@@ -364,11 +380,9 @@ def get_centre(session, centre_name):
 
 
 def get_data(session, row):
-    if name := row.get('name'):
-        return session.scalars(
-            select(Data).where(Data.name == name)
-        ).one_or_none()
-    msg = row_message(row, "Missing 'name' field in row")
+    if data_id := row.get('data_id'):
+        return session.get(Data, data_id)
+    msg = row_message(row, "Missing 'data_id' field in row")
     raise ValueError(msg)
 
 
@@ -390,7 +404,6 @@ def accession_if_valid(session, accn_type, accn_str):
             accession_id=accn_str,
             accession_type_id=accn_type,
         )
-        # session.add(acc_obj)
         return acc_obj
     return None
 

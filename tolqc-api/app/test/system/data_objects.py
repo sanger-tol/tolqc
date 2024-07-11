@@ -32,99 +32,52 @@ def test_data(token: str):
             url='https://www.ncbi.nlm.nih.gov/datasets/genome/{}/',  # noqa: P103
         ),
         AccessionTypeDict(
-            accession_type_id='Bio Project',
+            accession_type_id='BioProject',
             regexp='^PRJ[A-Z]{2}\\d+$',
             url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
         ),
         AccessionTypeDict(
-            accession_type_id='ENA Run',
-            regexp='^ERR\\d+$',
-            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
-        ),
-        AccessionTypeDict(
-            accession_type_id='ENA Experiment',
-            regexp='^ERX\\d+$',
-            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
-        ),
-        AccessionTypeDict(
-            accession_type_id='ToL Specimen ID',
-            regexp='^[a-z]{1,2}[A-Z][a-z]{2}[A-Z][a-z]{2,3}\\d+$',
-        ),
-        AccessionTypeDict(
-            accession_type_id='Bio Sample',
+            accession_type_id='BioSample',
             regexp='^SAM[A-Z]{2}\\d+$',
             url='https://www.ebi.ac.uk/biosamples/samples/{}',  # noqa: P103
         ),
         AccessionTypeDict(
-            accession_type_id='ENA Analysis',
+            accession_type_id='Analysis',
             regexp='^ERZ\\d+$',
             url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
         ),
-        AccessionTypeDict(accession_type_id='SRA Run', regexp='^SRR\\d+$'),
-        AccessionTypeDict(accession_type_id='SRA Experiment', regexp='^SRX\\d+$'),
+        AccessionTypeDict(
+            accession_type_id='Experiment',
+            regexp='^[ES]RX\\d+$',
+            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
+        ),
+        AccessionTypeDict(
+            accession_type_id='Run',
+            regexp='^[ES]RR\\d+$',
+            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
+        ),
+        AccessionTypeDict(
+            accession_type_id='RefSeq Genome Assembly',
+            regexp='^GCF_\\d+\\.\\d+$',
+            url='https://www.ncbi.nlm.nih.gov/datasets/genome/{}/',  # noqa: P103
+        ),
+        AccessionTypeDict(
+            accession_type_id='ToLID',
+            regexp='^[a-z]{1,2}[A-Z][a-z]{2}[A-Z][a-z]{2,3}\\d+$',
+            url='https://id.tol.sanger.ac.uk/api/v2/tol-ids/{}',  # noqa: P103
+        ),
         LibraryType(
             library_type_id='Chromium genome', hierarchy_name='10x', category='genomic_data'
         ),
         LibraryType(
             library_type_id='Haplotagging', hierarchy_name='htag', category='genomic_data'
         ),
-        LibraryType(library_type_id='Hi-C', hierarchy_name='hic', category='genomic_data'),
-        LibraryType(
-            library_type_id='Hi-C - Arima v1', hierarchy_name='hic-arima', category='genomic_data'
-        ),
-        LibraryType(
-            library_type_id='Hi-C - Arima v2',
-            hierarchy_name='hic-arima2',
-            category='genomic_data',
-        ),
-        LibraryType(
-            library_type_id='Hi-C - Dovetail',
-            hierarchy_name='hic-dovetail',
-            category='genomic_data',
-        ),
-        LibraryType(
-            library_type_id='Hi-C - OmniC', hierarchy_name='hic-omic', category='genomic_data'
-        ),
-        LibraryType(
-            library_type_id='Hi-C - Qiagen', hierarchy_name='hic-qiagen', category='genomic_data'
-        ),
         LibraryType(
             library_type_id='HiSeqX PCR free', hierarchy_name='illumina', category='genomic_data'
         ),
         LibraryType(
-            library_type_id='PacBio - HiFi', hierarchy_name='pacbio', category='genomic_data'
-        ),
-        LibraryType(
-            library_type_id='PacBio - HiFi (Microbial)',
-            hierarchy_name='pacbio',
-            category='genomic_data',
-        ),
-        LibraryType(
-            library_type_id='PacBio - HiFi (ULI)',
-            hierarchy_name='pacbio',
-            category='genomic_data',
-        ),
-        LibraryType(
             library_type_id='PacBio - IsoSeq',
             hierarchy_name='pacbio',
-            category='transcriptomic_data',
-        ),
-        LibraryType(
-            library_type_id='RNA PolyA', hierarchy_name='rna-seq', category='transcriptomic_data'
-        ),
-        LibraryType(
-            library_type_id='RNA-seq dUTP eukaryotic',
-            hierarchy_name='rna-seq',
-            category='transcriptomic_data',
-        ),
-        LibraryType(
-            library_type_id='RNA-seq dUTP prokaryotic',
-            hierarchy_name='rna-seq',
-            category='transcriptomic_data',
-        ),
-        LibraryType(
-            library_type_id='Small RNA (miRNA)',
-            hierarchy_name='rna-seq',
             category='transcriptomic_data',
         ),
         LibraryType(
@@ -137,6 +90,86 @@ def test_data(token: str):
         LibraryType(library_type_id='Manual Standard WGS (Plate)'),
         LibraryType(library_type_id='Nextera dual index pre quality controlled'),
         LibraryType(library_type_id='Pacbio_Amplicon'),
+        LibraryType(
+            library_type_id='RNA PolyA',
+            hierarchy_name='rna-seq',
+            category='transcriptomic_data',
+            reporting_category='rnaseq',
+        ),
+        LibraryType(
+            library_type_id='RNA-seq dUTP eukaryotic',
+            hierarchy_name='rna-seq',
+            category='transcriptomic_data',
+            reporting_category='rnaseq',
+        ),
+        LibraryType(
+            library_type_id='RNA-seq dUTP prokaryotic',
+            hierarchy_name='rna-seq',
+            category='transcriptomic_data',
+            reporting_category='rnaseq',
+        ),
+        LibraryType(
+            library_type_id='Small RNA (miRNA)',
+            hierarchy_name='rna-seq',
+            category='transcriptomic_data',
+            reporting_category='rnaseq',
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi',
+            hierarchy_name='pacbio',
+            category='genomic_data',
+            reporting_category='pacbio',
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (Microbial)',
+            hierarchy_name='pacbio',
+            category='genomic_data',
+            reporting_category='pacbio',
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (ULI)',
+            hierarchy_name='pacbio',
+            category='genomic_data',
+            reporting_category='pacbio',
+        ),
+        LibraryType(
+            library_type_id='Hi-C',
+            hierarchy_name='hic',
+            category='genomic_data',
+            reporting_category='hic',
+        ),
+        LibraryType(
+            library_type_id='Hi-C - Arima v1',
+            hierarchy_name='hic-arima',
+            category='genomic_data',
+            reporting_category='hic',
+        ),
+        LibraryType(
+            library_type_id='Hi-C - Arima v2',
+            hierarchy_name='hic-arima2',
+            category='genomic_data',
+            reporting_category='hic',
+        ),
+        LibraryType(
+            library_type_id='Hi-C - Dovetail',
+            hierarchy_name='hic-dovetail',
+            category='genomic_data',
+            reporting_category='hic',
+        ),
+        LibraryType(
+            library_type_id='Hi-C - OmniC',
+            hierarchy_name='hic-omic',
+            category='genomic_data',
+            reporting_category='hic',
+        ),
+        LibraryType(
+            library_type_id='Hi-C - Qiagen',
+            hierarchy_name='hic-qiagen',
+            category='genomic_data',
+            reporting_category='hic',
+        ),
+        LibraryType(library_type_id='PacBio - CLR'),
+        LibraryType(library_type_id='RNA Ribo'),
         Platform(id=1, name='Illumina', model='HiSeq'),
         Platform(id=2, name='Illumina', model='HiSeqX'),
         Platform(id=4, name='Illumina', model='HiSeq 4000'),
@@ -145,29 +178,36 @@ def test_data(token: str):
         Platform(id=7, name='Illumina', model='MiSeq'),
         Platform(id=3, name='PacBio', model='Sequel IIe'),
         Platform(id=8, name='Illumina', model='NovaSeqX'),
+        Platform(id=12, name='PacBio', model='Sequel'),
+        Platform(id=13, name='PacBio', model='RSII'),
+        Platform(id=14, name='PacBio', model='Sequel II'),
         Centre(id=2, name='Wellcome Sanger Institute'),
         QCDict(qc_state='pass'),
         QCDict(qc_state='fail'),
         VisibilityDict(visibility='Always', description='Shown in standard reporting'),
         VisibilityDict(visibility='Testing', description='Sequencing development data'),
         VisibilityDict(visibility='Withdrawn', description='Data has been deleted'),
+        VisibilityDict(visibility='MetadataIssue', description='Metadata has issues'),
+        VisibilityDict(
+            visibility='SampleSwap', description='Data involved in a possible sample swap'
+        ),
         Project(
             project_id=17,
             hierarchy_name='darwin/rnd',
             description='DTOL_Darwin R&D',
-            lims_id=5822,
+            study_id=5822,
         ),
         Project(
             project_id=21,
             hierarchy_name='darwin/{}',  # noqa: P103
             description='DTOL_Darwin Tree of Life',
-            lims_id=5901,
+            study_id=5901,
         ),
         Project(
             project_id=24,
             hierarchy_name='darwin/{}',  # noqa: P103
             description='DTOL_Darwin Tree of Life RNA',
-            lims_id=6327,
+            study_id=6327,
         ),
         Species(
             species_id='Brachiomonas submarina',
@@ -190,8 +230,8 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             data=[
                                 Data(
-                                    data_id=115631,
-                                    name='37939_1#2',
+                                    data_id='37939_1#2',
+                                    study_id=5822,
                                     sample_id='DTOL_RD10244236',
                                     library_id='DN805609I:B3',
                                     run_id='37939',
@@ -202,6 +242,8 @@ def test_data(token: str):
                                     date='2021-05-21T10:35:42+01:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=81186152,
+                                    bases=12056143572,
                                     library=Library(
                                         library_id='DN805609I:B3', library_type_id='Haplotagging'
                                     ),
@@ -215,15 +257,15 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=112380,
-                                            data_id=115631,
+                                            data_id='37939_1#2',
                                             remote_path=(
-                                                '/seq/illumina/runs/37/37939/lane1/plex2'
+                                                'irods:/seq/illumina/runs/37/37939/lane1/plex2'
                                                 '/37939_1#2.cram'
                                             ),
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=115631, project_id=17, data_id=115631)
+                                        Allocation(id=115631, project_id=17, data_id='37939_1#2')
                                     ],
                                 )
                             ],
@@ -233,51 +275,19 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             data=[
                                 Data(
-                                    data_id=117751,
-                                    name='35344_1#1',
+                                    data_id='35344_1#2',
+                                    study_id=5901,
                                     sample_id='DTOL9310949',
                                     library_id='DN683544F:A5',
                                     run_id='35344',
                                     processed=1,
-                                    tag_index='1',
-                                    tag1_id='129',
-                                    date='2020-11-13T11:13:32+00:00',
-                                    lims_qc='pass',
-                                    visibility='Always',
-                                    library=Library(
-                                        library_id='DN683544F:A5',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='35344',
-                                        platform_id=2,
-                                        centre_id=2,
-                                        instrument_name='HX8',
-                                        complete='2020-11-06T10:04:30+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=114488,
-                                            data_id=117751,
-                                            remote_path='/seq/35344/35344_1#1.cram',
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=117751, project_id=21, data_id=117751)
-                                    ],
-                                ),
-                                Data(
-                                    data_id=117752,
-                                    name='35344_1#2',
-                                    sample_id='DTOL9310949',
-                                    library_id='DN683544F:A5',
-                                    run_id='35344',
-                                    processed=None,
                                     tag_index='2',
                                     tag1_id='130',
                                     date='2020-11-13T11:13:32+00:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=3205550,
+                                    bases=484038050,
                                     library=Library(
                                         library_id='DN683544F:A5',
                                         library_type_id='Chromium genome',
@@ -292,60 +302,28 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=114489,
-                                            data_id=117752,
-                                            remote_path='/seq/35344/35344_1#2.cram',
+                                            data_id='35344_1#2',
+                                            remote_path='irods:/seq/35344/35344_1#2.cram',
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=117752, project_id=21, data_id=117752)
+                                        Allocation(id=117752, project_id=21, data_id='35344_1#2')
                                     ],
                                 ),
                                 Data(
-                                    data_id=117753,
-                                    name='35344_1#3',
+                                    data_id='35344_1#4',
+                                    study_id=5901,
                                     sample_id='DTOL9310949',
                                     library_id='DN683544F:A5',
                                     run_id='35344',
-                                    processed=0,
-                                    tag_index='3',
-                                    tag1_id='131',
-                                    date='2020-11-13T11:13:32+00:00',
-                                    lims_qc='pass',
-                                    visibility='Testing',
-                                    library=Library(
-                                        library_id='DN683544F:A5',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='35344',
-                                        platform_id=2,
-                                        centre_id=2,
-                                        instrument_name='HX8',
-                                        complete='2020-11-06T10:04:30+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=114490,
-                                            data_id=117753,
-                                            remote_path='/seq/35344/35344_1#3.cram',
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=117753, project_id=21, data_id=117753)
-                                    ],
-                                ),
-                                Data(
-                                    data_id=117754,
-                                    name='35344_1#4',
-                                    sample_id='DTOL9310949',
-                                    library_id='DN683544F:A5',
-                                    run_id='35344',
-                                    processed=0,
+                                    processed=None,
                                     tag_index='4',
                                     tag1_id='132',
                                     date='2020-11-13T11:13:32+00:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=120600430,
+                                    bases=18210664930,
                                     library=Library(
                                         library_id='DN683544F:A5',
                                         library_type_id='Chromium genome',
@@ -360,12 +338,84 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=114491,
-                                            data_id=117754,
-                                            remote_path='/seq/35344/35344_1#4.cram',
+                                            data_id='35344_1#4',
+                                            remote_path='irods:/seq/35344/35344_1#4.cram',
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=117754, project_id=21, data_id=117754)
+                                        Allocation(id=117754, project_id=21, data_id='35344_1#4')
+                                    ],
+                                ),
+                                Data(
+                                    data_id='35344_1#3',
+                                    study_id=5901,
+                                    sample_id='DTOL9310949',
+                                    library_id='DN683544F:A5',
+                                    run_id='35344',
+                                    processed=0,
+                                    tag_index='3',
+                                    tag1_id='131',
+                                    date='2020-11-13T11:13:32+00:00',
+                                    lims_qc='pass',
+                                    visibility='Testing',
+                                    reads=118915580,
+                                    bases=17956252580,
+                                    library=Library(
+                                        library_id='DN683544F:A5',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    run=Run(
+                                        run_id='35344',
+                                        platform_id=2,
+                                        centre_id=2,
+                                        instrument_name='HX8',
+                                        complete='2020-11-06T10:04:30+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=114490,
+                                            data_id='35344_1#3',
+                                            remote_path='irods:/seq/35344/35344_1#3.cram',
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=117753, project_id=21, data_id='35344_1#3')
+                                    ],
+                                ),
+                                Data(
+                                    data_id='35344_1#1',
+                                    study_id=5901,
+                                    sample_id='DTOL9310949',
+                                    library_id='DN683544F:A5',
+                                    run_id='35344',
+                                    processed=0,
+                                    tag_index='1',
+                                    tag1_id='129',
+                                    date='2020-11-13T11:13:32+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=117883578,
+                                    bases=17800420278,
+                                    library=Library(
+                                        library_id='DN683544F:A5',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    run=Run(
+                                        run_id='35344',
+                                        platform_id=2,
+                                        centre_id=2,
+                                        instrument_name='HX8',
+                                        complete='2020-11-06T10:04:30+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=114488,
+                                            data_id='35344_1#1',
+                                            remote_path='irods:/seq/35344/35344_1#1.cram',
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=117751, project_id=21, data_id='35344_1#1')
                                     ],
                                 ),
                             ],
@@ -375,22 +425,24 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             accession_id='SAMEA7532766',
                             accession=Accession(
-                                accession_id='SAMEA7532766', accession_type_id='Bio Sample'
+                                accession_id='SAMEA7532766', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
-                                    data_id=117960,
-                                    name='35528_4#8',
+                                    data_id='35528_4#8',
+                                    study_id=5901,
                                     sample_id='DTOL9384820',
                                     library_id='DN703060C:H1',
                                     run_id='35528',
-                                    processed=0,
+                                    processed=1,
                                     tag_index='8',
                                     tag1_id='72',
                                     tag2_id='72',
                                     date='2020-11-24T19:23:18+00:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=748759474,
+                                    bases=113062680574,
                                     library=Library(
                                         library_id='DN703060C:H1',
                                         library_type_id='Hi-C - Arima v2',
@@ -405,15 +457,15 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=114697,
-                                            data_id=117960,
+                                            data_id='35528_4#8',
                                             remote_path=(
-                                                '/seq/illumina/runs/35/35528/lane4/plex8'
+                                                'irods:/seq/illumina/runs/35/35528/lane4/plex8'
                                                 '/35528_4#8.cram'
                                             ),
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=117960, project_id=21, data_id=117960)
+                                        Allocation(id=117960, project_id=21, data_id='35528_4#8')
                                     ],
                                 )
                             ],
@@ -423,8 +475,8 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             data=[
                                 Data(
-                                    data_id=124055,
-                                    name='m64089e_210601_133425#1022',
+                                    data_id='m64089e_210601_133425#1022',
+                                    study_id=5901,
                                     sample_id='DTOL9397431',
                                     library_id='DN695911V-H1',
                                     run_id='m64089e_210601_133425',
@@ -433,6 +485,18 @@ def test_data(token: str):
                                     date='2021-06-02T23:04:37+01:00',
                                     lims_qc='fail',
                                     visibility='Always',
+                                    reads=120626,
+                                    bases=1290572095,
+                                    read_length_mean=10698.9545786149,
+                                    read_length_n50=11906,
+                                    bases_a=241970518,
+                                    bases_c=403273112,
+                                    bases_g=403221295,
+                                    bases_t=242107170,
+                                    read_length_longest=42852,
+                                    read_length_shortest=56,
+                                    reads_duplicated=0,
+                                    reads_filtered=0,
                                     library=Library(library_id='DN695911V-H1'),
                                     run=Run(
                                         run_id='m64089e_210601_133425',
@@ -443,6 +507,7 @@ def test_data(token: str):
                                         instrument_name='m64089e',
                                         start='2021-05-28T10:26:51+01:00',
                                         complete='2021-06-02T23:04:37+01:00',
+                                        plex_count=1,
                                         pacbio_run_metrics=[
                                             PacbioRunMetrics(
                                                 run_id='m64089e_210601_133425',
@@ -474,18 +539,77 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=120785,
-                                            data_id=124055,
+                                            data_id='m64089e_210601_133425#1022',
                                             remote_path=(
-                                                '/seq/pacbio/r64089e_20210528_093647/4_D01'
+                                                'irods:/seq/pacbio/r64089e_20210528_093647/4_D01'
                                                 '/demultiplex.bc1022_BAK8B_OA'
                                                 '--bc1022_BAK8B_OA.bam'
                                             ),
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=124055, project_id=21, data_id=124055)
+                                        Allocation(
+                                            id=124055,
+                                            project_id=21,
+                                            data_id='m64089e_210601_133425#1022',
+                                        )
                                     ],
-                                )
+                                ),
+                                Data(
+                                    data_id='m64016_201115_112225#1022',
+                                    study_id=5901,
+                                    sample_id='DTOL9397431',
+                                    library_id='DN703483V',
+                                    run_id='m64016_201115_112225',
+                                    processed=1,
+                                    tag1_id='bc1022_BAK8B_OA',
+                                    visibility='Always',
+                                    reads=881269,
+                                    bases=9026879627,
+                                    read_length_mean=10243.0468188487,
+                                    read_length_n50=11689,
+                                    bases_a=1653086454,
+                                    bases_c=2863188209,
+                                    bases_g=2856726634,
+                                    bases_t=1653878330,
+                                    read_length_longest=39513,
+                                    read_length_shortest=53,
+                                    reads_duplicated=0,
+                                    reads_filtered=1390,
+                                    library=Library(
+                                        library_id='DN703483V', library_type_id='PacBio - HiFi'
+                                    ),
+                                    run=Run(
+                                        run_id='m64016_201115_112225',
+                                        platform_id=14,
+                                        centre_id=2,
+                                        lims_id='78299',
+                                        element='D1',
+                                        instrument_name='m64016',
+                                        complete='2020-11-15T00:00:00+00:00',
+                                        pacbio_run_metrics=[
+                                            PacbioRunMetrics(run_id='m64016_201115_112225')
+                                        ],
+                                    ),
+                                    files=[
+                                        File(
+                                            id=143249,
+                                            data_id='m64016_201115_112225#1022',
+                                            remote_path=(
+                                                'irods:/seq/pacbio/r64016_20201112_100113/4_D01'
+                                                '/demultiplex.bc1022_BAK8B_OA'
+                                                '--bc1022_BAK8B_OA.bam'
+                                            ),
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=147115,
+                                            project_id=21,
+                                            data_id='m64016_201115_112225#1022',
+                                        )
+                                    ],
+                                ),
                             ],
                         ),
                         Sample(
@@ -493,12 +617,12 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             accession_id='SAMEA7532770',
                             accession=Accession(
-                                accession_id='SAMEA7532770', accession_type_id='Bio Sample'
+                                accession_id='SAMEA7532770', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
-                                    data_id=127430,
-                                    name='36703_5#4',
+                                    data_id='36703_5#4',
+                                    study_id=6327,
                                     sample_id='DTOLRNA9465095',
                                     library_id='DN611904M:F3',
                                     run_id='36703',
@@ -509,6 +633,8 @@ def test_data(token: str):
                                     date='2021-03-19T10:56:23+00:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=41616914,
+                                    bases=6284154014,
                                     library=Library(
                                         library_id='DN611904M:F3', library_type_id='RNA PolyA'
                                     ),
@@ -522,19 +648,19 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=123947,
-                                            data_id=127430,
-                                            remote_path='/seq/36703/36703_5#4.cram',
+                                            data_id='36703_5#4',
+                                            remote_path='irods:/seq/36703/36703_5#4.cram',
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=127430, project_id=24, data_id=127430)
+                                        Allocation(id=127430, project_id=24, data_id='36703_5#4')
                                     ],
                                 )
                             ],
                         ),
                     ],
                     accession=Accession(
-                        accession_id='SAMEA7532740', accession_type_id='Bio Sample'
+                        accession_id='SAMEA7532740', accession_type_id='BioSample'
                     ),
                 )
             ],
@@ -561,129 +687,23 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953', accession_type_id='Bio Sample'
+                                accession_id='SAMEA7521953', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
-                                    data_id=118427,
-                                    name='36691_2#5',
+                                    data_id='36691_2#8',
+                                    study_id=5901,
                                     sample_id='DTOL9702654',
                                     library_id='DN771163M:G8',
                                     run_id='36691',
                                     processed=1,
-                                    tag_index='5',
-                                    tag1_id='249',
-                                    date='2021-03-18T12:16:43+00:00',
-                                    lims_qc='pass',
-                                    visibility='Always',
-                                    library=Library(
-                                        library_id='DN771163M:G8',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='36691',
-                                        platform_id=5,
-                                        centre_id=2,
-                                        instrument_name='NV20',
-                                        complete='2021-03-06T05:07:44+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=115164,
-                                            data_id=118427,
-                                            remote_path=(
-                                                '/seq/illumina/runs/36/36691/lane2/plex5'
-                                                '/36691_2#5.cram'
-                                            ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=118427, project_id=21, data_id=118427)
-                                    ],
-                                ),
-                                Data(
-                                    data_id=118428,
-                                    name='36691_2#6',
-                                    sample_id='DTOL9702654',
-                                    library_id='DN771163M:G8',
-                                    run_id='36691',
-                                    tag_index='6',
-                                    tag1_id='250',
-                                    date='2021-03-18T12:16:43+00:00',
-                                    lims_qc='pass',
-                                    visibility='Always',
-                                    library=Library(
-                                        library_id='DN771163M:G8',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='36691',
-                                        platform_id=5,
-                                        centre_id=2,
-                                        instrument_name='NV20',
-                                        complete='2021-03-06T05:07:44+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=115165,
-                                            data_id=118428,
-                                            remote_path=(
-                                                '/seq/illumina/runs/36/36691/lane2/plex6'
-                                                '/36691_2#6.cram'
-                                            ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=118428, project_id=21, data_id=118428)
-                                    ],
-                                ),
-                                Data(
-                                    data_id=118429,
-                                    name='36691_2#7',
-                                    sample_id='DTOL9702654',
-                                    library_id='DN771163M:G8',
-                                    run_id='36691',
-                                    tag_index='7',
-                                    tag1_id='251',
-                                    date='2021-03-18T12:16:43+00:00',
-                                    lims_qc='pass',
-                                    visibility='Always',
-                                    library=Library(
-                                        library_id='DN771163M:G8',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='36691',
-                                        platform_id=5,
-                                        centre_id=2,
-                                        instrument_name='NV20',
-                                        complete='2021-03-06T05:07:44+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=115166,
-                                            data_id=118429,
-                                            remote_path=(
-                                                '/seq/illumina/runs/36/36691/lane2/plex7'
-                                                '/36691_2#7.cram'
-                                            ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=118429, project_id=21, data_id=118429)
-                                    ],
-                                ),
-                                Data(
-                                    data_id=118430,
-                                    name='36691_2#8',
-                                    sample_id='DTOL9702654',
-                                    library_id='DN771163M:G8',
-                                    run_id='36691',
                                     tag_index='8',
                                     tag1_id='252',
                                     date='2021-03-18T12:16:43+00:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=210626924,
+                                    bases=31804665524,
                                     library=Library(
                                         library_id='DN771163M:G8',
                                         library_type_id='Chromium genome',
@@ -698,15 +718,132 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=115167,
-                                            data_id=118430,
+                                            data_id='36691_2#8',
                                             remote_path=(
-                                                '/seq/illumina/runs/36/36691/lane2/plex8'
+                                                'irods:/seq/illumina/runs/36/36691/lane2/plex8'
                                                 '/36691_2#8.cram'
                                             ),
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=118430, project_id=21, data_id=118430)
+                                        Allocation(id=118430, project_id=21, data_id='36691_2#8')
+                                    ],
+                                ),
+                                Data(
+                                    data_id='36691_2#5',
+                                    study_id=5901,
+                                    sample_id='DTOL9702654',
+                                    library_id='DN771163M:G8',
+                                    run_id='36691',
+                                    processed=1,
+                                    tag_index='5',
+                                    tag1_id='249',
+                                    date='2021-03-18T12:16:43+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=195080402,
+                                    bases=29457140702,
+                                    library=Library(
+                                        library_id='DN771163M:G8',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    run=Run(
+                                        run_id='36691',
+                                        platform_id=5,
+                                        centre_id=2,
+                                        instrument_name='NV20',
+                                        complete='2021-03-06T05:07:44+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=115164,
+                                            data_id='36691_2#5',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/36/36691/lane2/plex5'
+                                                '/36691_2#5.cram'
+                                            ),
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=118427, project_id=21, data_id='36691_2#5')
+                                    ],
+                                ),
+                                Data(
+                                    data_id='36691_2#7',
+                                    study_id=5901,
+                                    sample_id='DTOL9702654',
+                                    library_id='DN771163M:G8',
+                                    run_id='36691',
+                                    processed=1,
+                                    tag_index='7',
+                                    tag1_id='251',
+                                    date='2021-03-18T12:16:43+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=183614994,
+                                    bases=27725864094,
+                                    library=Library(
+                                        library_id='DN771163M:G8',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    run=Run(
+                                        run_id='36691',
+                                        platform_id=5,
+                                        centre_id=2,
+                                        instrument_name='NV20',
+                                        complete='2021-03-06T05:07:44+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=115166,
+                                            data_id='36691_2#7',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/36/36691/lane2/plex7'
+                                                '/36691_2#7.cram'
+                                            ),
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=118429, project_id=21, data_id='36691_2#7')
+                                    ],
+                                ),
+                                Data(
+                                    data_id='36691_2#6',
+                                    study_id=5901,
+                                    sample_id='DTOL9702654',
+                                    library_id='DN771163M:G8',
+                                    run_id='36691',
+                                    processed=1,
+                                    tag_index='6',
+                                    tag1_id='250',
+                                    date='2021-03-18T12:16:43+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=206862242,
+                                    bases=31236198542,
+                                    library=Library(
+                                        library_id='DN771163M:G8',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    run=Run(
+                                        run_id='36691',
+                                        platform_id=5,
+                                        centre_id=2,
+                                        instrument_name='NV20',
+                                        complete='2021-03-06T05:07:44+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=115165,
+                                            data_id='36691_2#6',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/36/36691/lane2/plex6'
+                                                '/36691_2#6.cram'
+                                            ),
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=118428, project_id=21, data_id='36691_2#6')
                                     ],
                                 ),
                             ],
@@ -716,21 +853,24 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521954',
                             accession=Accession(
-                                accession_id='SAMEA7521954', accession_type_id='Bio Sample'
+                                accession_id='SAMEA7521954', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
-                                    data_id=121083,
-                                    name='40666_2#2',
+                                    data_id='40666_2#2',
+                                    study_id=5901,
                                     sample_id='DTOL10341656',
                                     library_id='DN826505P:B3',
                                     run_id='40666',
+                                    processed=1,
                                     tag_index='2',
                                     tag1_id='90',
                                     tag2_id='90',
                                     date='2021-09-11T11:11:14+01:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=3345851480,
+                                    bases=505223573480,
                                     library=Library(
                                         library_id='DN826505P:B3',
                                         library_type_id='Hi-C - Arima v2',
@@ -745,15 +885,15 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=117820,
-                                            data_id=121083,
+                                            data_id='40666_2#2',
                                             remote_path=(
-                                                '/seq/illumina/runs/40/40666/lane2/plex2'
+                                                'irods:/seq/illumina/runs/40/40666/lane2/plex2'
                                                 '/40666_2#2.cram'
                                             ),
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=121083, project_id=21, data_id=121083)
+                                        Allocation(id=121083, project_id=21, data_id='40666_2#2')
                                     ],
                                 )
                             ],
@@ -763,19 +903,32 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953', accession_type_id='Bio Sample'
+                                accession_id='SAMEA7521953', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
-                                    data_id=124432,
-                                    name='m64097e_210221_172213#1019',
+                                    data_id='m64097e_210221_172213#1019',
+                                    study_id=5901,
                                     sample_id='DTOL9838614',
                                     library_id='DN765124Q-B1',
                                     run_id='m64097e_210221_172213',
+                                    processed=1,
                                     tag1_id='1019',
                                     date='2021-02-22T23:07:55+00:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=1861770,
+                                    bases=22552841091,
+                                    read_length_mean=12113.655871026,
+                                    read_length_n50=13209,
+                                    bases_a=7343914800,
+                                    bases_c=3936864489,
+                                    bases_g=3932481777,
+                                    bases_t=7339580025,
+                                    read_length_longest=37726,
+                                    read_length_shortest=51,
+                                    reads_duplicated=0,
+                                    reads_filtered=6869,
                                     library=Library(library_id='DN765124Q-B1'),
                                     run=Run(
                                         run_id='m64097e_210221_172213',
@@ -786,6 +939,7 @@ def test_data(token: str):
                                         instrument_name='m64097e',
                                         start='2021-02-18T16:18:11+00:00',
                                         complete='2021-02-22T23:07:55+00:00',
+                                        plex_count=1,
                                         pacbio_run_metrics=[
                                             PacbioRunMetrics(
                                                 run_id='m64097e_210221_172213',
@@ -817,16 +971,20 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=121145,
-                                            data_id=124432,
+                                            data_id='m64097e_210221_172213#1019',
                                             remote_path=(
-                                                '/seq/pacbio/r64097e_20210218_161440/4_D01'
+                                                'irods:/seq/pacbio/r64097e_20210218_161440/4_D01'
                                                 '/demultiplex.bc1019_BAK8B_OA'
                                                 '--bc1019_BAK8B_OA.bam'
                                             ),
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=124432, project_id=21, data_id=124432)
+                                        Allocation(
+                                            id=124432,
+                                            project_id=21,
+                                            data_id='m64097e_210221_172213#1019',
+                                        )
                                     ],
                                 )
                             ],
@@ -836,21 +994,24 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953', accession_type_id='Bio Sample'
+                                accession_id='SAMEA7521953', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
-                                    data_id=127563,
-                                    name='37935_8#13',
+                                    data_id='37935_8#13',
+                                    study_id=6327,
                                     sample_id='DTOLRNA10187174',
                                     library_id='DN612239G:G9',
                                     run_id='37935',
+                                    processed=1,
                                     tag_index='13',
                                     tag1_id='71',
                                     tag2_id='71',
                                     date='2021-05-25T13:45:59+01:00',
                                     lims_qc='pass',
                                     visibility='Always',
+                                    reads=36344960,
+                                    bases=5488088960,
                                     library=Library(
                                         library_id='DN612239G:G9', library_type_id='RNA PolyA'
                                     ),
@@ -864,19 +1025,68 @@ def test_data(token: str):
                                     files=[
                                         File(
                                             id=124080,
-                                            data_id=127563,
-                                            remote_path='/seq/37935/37935_8#13.cram',
+                                            data_id='37935_8#13',
+                                            remote_path='irods:/seq/37935/37935_8#13.cram',
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=127563, project_id=24, data_id=127563)
+                                        Allocation(id=127563, project_id=24, data_id='37935_8#13')
+                                    ],
+                                )
+                            ],
+                        ),
+                        Sample(
+                            sample_id='DTOLRNA14460441',
+                            specimen_id='lpJunEffu1',
+                            accession_id='SAMEA7521957',
+                            accession=Accession(
+                                accession_id='SAMEA7521957', accession_type_id='BioSample'
+                            ),
+                            data=[
+                                Data(
+                                    data_id='48593_1#25',
+                                    study_id=6327,
+                                    sample_id='DTOLRNA14460441',
+                                    library_id='SQPP-7739-H:B9',
+                                    run_id='48593',
+                                    processed=1,
+                                    tag_index='25',
+                                    tag1_id='66',
+                                    tag2_id='66',
+                                    date='2024-03-15T15:52:57+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=52850970,
+                                    bases=7980496470,
+                                    library=Library(
+                                        library_id='SQPP-7739-H:B9', library_type_id='RNA PolyA'
+                                    ),
+                                    run=Run(
+                                        run_id='48593',
+                                        platform_id=8,
+                                        centre_id=2,
+                                        instrument_name='NX1',
+                                        complete='2024-03-08T10:04:27+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=139273,
+                                            data_id='48593_1#25',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/48/48593/lane1/plex25'
+                                                '/48593_1#25.cram'
+                                            ),
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=143140, project_id=24, data_id='48593_1#25')
                                     ],
                                 )
                             ],
                         ),
                     ],
                     accession=Accession(
-                        accession_id='SAMEA7521930', accession_type_id='Bio Sample'
+                        accession_id='SAMEA7521930', accession_type_id='BioSample'
                     ),
                 )
             ],
