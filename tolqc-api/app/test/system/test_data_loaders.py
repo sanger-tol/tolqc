@@ -79,14 +79,9 @@ def test_valid_accession(db_session):
 
 
 def test_build_file():
-    (file1,) = build_files({'irods_path': '/seq/data', 'irods_file': 'd.cram'})
+    (file1,) = build_files({'remote_path': 'irods:/seq/data/d.cram'})
     assert isinstance(file1, File)
-    assert file1.remote_path == 'irods:/seq/data/d.cram'
-    (file2,) = build_files({'irods_path': '/seq/data/', 'irods_file': 'd.cram'})
-    assert file1.remote_path == file2.remote_path
-    assert build_files({'irods_path': None}) is None
-    with pytest.raises(ValueError):
-        build_files({'irods_path': '/seq/data', 'irods_file': None})
+    assert build_files({'remote_path': None}) is None
 
 
 def test_build_library(db_session):
@@ -151,6 +146,7 @@ def test_build_data(db_session, row_data):
     assert p_data.sample.accession.accession_id == 'SAMEA112468058'
     assert p_data.sample.specimen.accession.accession_id == 'SAMEA112468032'
     assert p_data.sample.specimen.species
+    assert isinstance(p_data.files[0], File)
 
     with db_session.no_autoflush:
         i_data = build_data(db_session, centre, row_data['illumina'])
@@ -161,6 +157,7 @@ def test_build_data(db_session, row_data):
     assert i_data.run.platform.name == 'Illumina'
     assert i_data.visibility == 'Always'
     assert len(i_data.projects) == 1
+    assert isinstance(i_data.files[0], File)
 
     # Illumina data object should connect to these same objects as the PacBio
     # data:
