@@ -171,17 +171,9 @@ def build_data(session, centre, row):
 
 
 def build_files(row):
-    path = row.get('irods_path')
-    if not path:
-        return None
-    file_name = row.get('irods_file')
-    if not file_name:
-        msg = row_message(row, "'irods_path' set but no 'irods_file' field in row")
-        raise ValueError(msg)
-
-    rp = 'irods:' + path.rstrip('/') + '/' + file_name
-    file = File(remote_path=rp)
-    return [file]
+    if path := row.get('remote_path'):
+        return [File(remote_path=path)]
+    return None
 
 
 def build_pacbio_run_metrics(row):
