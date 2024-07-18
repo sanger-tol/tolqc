@@ -6,7 +6,7 @@
 
 from setuptools import find_packages, setup
 
-NAME = 'app'
+NAME = 'tolqc-api'
 VERSION = '1.1.1'
 # To install the library, run the following
 #
