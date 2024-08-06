@@ -48,6 +48,7 @@ class FolderLocation(Base):
 
     folder_location_id = mapped_column(String, primary_key=True)
     uri_prefix = mapped_column(String)
+    files_template = mapped_column(JSONB)
 
     folders = relationship('Folder', back_populates='folder_location')
 
