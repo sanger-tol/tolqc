@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
 from sqlalchemy.orm import configure_mappers
 
 import tolqc.schema.assembly_models
