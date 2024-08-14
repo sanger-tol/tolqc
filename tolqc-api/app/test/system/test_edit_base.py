@@ -135,7 +135,7 @@ def test_edits_via_client(client, api_path):
     )
     response = client.get(api_path + '/data/edit_data', query_string=f'filter={filt}')
     assert response.status == '200 OK'
-    changes = list(x['attributes']['changes'] for x in response.json['data'])
+    changes = [x['attributes']['changes'] for x in response.json['data']]
 
     # There should only be one change, containing the old qc value of "pass".
     # If the stringified ID is not turned back into a integer by the server's

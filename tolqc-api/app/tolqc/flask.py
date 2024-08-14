@@ -19,7 +19,7 @@ from tol.sql.session import create_session_factory
 import tolqc.assembly_models
 import tolqc.folder_models
 import tolqc.sample_data_models
-import tolqc.system_models
+import tolqc.system_models  # noqa: F401
 from tolqc.auth import create_auth_ctx_setter
 from tolqc.database import build_database_factory, flask_session, logbase_hook_params
 from tolqc.json import JSONDateTimeProvider
