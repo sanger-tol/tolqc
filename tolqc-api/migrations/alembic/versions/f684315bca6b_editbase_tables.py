@@ -1,8 +1,8 @@
-"""edit_base tables added
+"""EditBase tables
 
-Revision ID: b84b06480ac0
-Revises: 8c7475da7d56
-Create Date: 2024-04-03 15:51:27.495432
+Revision ID: f684315bca6b
+Revises: 7d93cd1a5232
+Create Date: 2024-08-14 11:11:36.284853
 
 """
 
@@ -11,8 +11,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'b84b06480ac0'
-down_revision = '8c7475da7d56'
+revision = 'f684315bca6b'
+down_revision = '7d93cd1a5232'
 branch_labels = None
 depends_on = None
 
@@ -20,6 +20,7 @@ depends_on = None
 def upgrade() -> None:
     # Switch modified_by back to integer and make it a ForeignKey to user.id
     for tbl in (
+        'accession',
         'assembly',
         'assembly_status',
         'data',
@@ -40,20 +41,6 @@ def upgrade() -> None:
             postgresql_using='modified_by::integer',
         )
         op.create_foreign_key(None, tbl, 'user', ['modified_by'], ['id'])
-
-    # Switch to JSONB storage
-    for tbl in (
-        'contigviz_metrics',
-        'genomescope_metrics',
-        'markerscan_metrics',
-    ):
-        op.alter_column(
-            tbl,
-            'results',
-            existing_type=postgresql.JSON(astext_type=sa.Text()),
-            type_=postgresql.JSONB(astext_type=sa.Text()),
-            existing_nullable=True,
-        )
 
     # Create edit_... tables
     op.create_table(
@@ -165,6 +152,24 @@ def upgrade() -> None:
         sa.UniqueConstraint('modified_at', 'specimen_status_id'),
     )
     op.create_table(
+        'edit_accession',
+        sa.Column('edit_id', sa.Integer(), nullable=False),
+        sa.Column('accession_id', sa.String(), nullable=False),
+        sa.Column('changes', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column('modified_at', sa.DateTime(timezone=True), nullable=True),
+        sa.Column('modified_by', sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ['accession_id'],
+            ['accession.accession_id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['modified_by'],
+            ['user.id'],
+        ),
+        sa.PrimaryKeyConstraint('edit_id'),
+        sa.UniqueConstraint('modified_at', 'accession_id'),
+    )
+    op.create_table(
         'edit_genomescope_metrics',
         sa.Column('edit_id', sa.Integer(), nullable=False),
         sa.Column('id', sa.Integer(), nullable=False),
@@ -181,24 +186,6 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint('edit_id'),
         sa.UniqueConstraint('modified_at', 'id'),
-    )
-    op.create_table(
-        'edit_species',
-        sa.Column('edit_id', sa.Integer(), nullable=False),
-        sa.Column('species_id', sa.String(), nullable=False),
-        sa.Column('changes', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column('modified_at', sa.DateTime(timezone=True), nullable=True),
-        sa.Column('modified_by', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ['modified_by'],
-            ['user.id'],
-        ),
-        sa.ForeignKeyConstraint(
-            ['species_id'],
-            ['species.species_id'],
-        ),
-        sa.PrimaryKeyConstraint('edit_id'),
-        sa.UniqueConstraint('modified_at', 'species_id'),
     )
     op.create_table(
         'edit_sample',
@@ -219,9 +206,27 @@ def upgrade() -> None:
         sa.UniqueConstraint('modified_at', 'sample_id'),
     )
     op.create_table(
+        'edit_species',
+        sa.Column('edit_id', sa.Integer(), nullable=False),
+        sa.Column('species_id', sa.String(), nullable=False),
+        sa.Column('changes', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column('modified_at', sa.DateTime(timezone=True), nullable=True),
+        sa.Column('modified_by', sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ['modified_by'],
+            ['user.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['species_id'],
+            ['species.species_id'],
+        ),
+        sa.PrimaryKeyConstraint('edit_id'),
+        sa.UniqueConstraint('modified_at', 'species_id'),
+    )
+    op.create_table(
         'edit_data',
         sa.Column('edit_id', sa.Integer(), nullable=False),
-        sa.Column('data_id', sa.Integer(), nullable=False),
+        sa.Column('data_id', sa.String(), nullable=False),
         sa.Column('changes', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column('modified_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('modified_by', sa.Integer(), nullable=True),
@@ -236,8 +241,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('edit_id'),
         sa.UniqueConstraint('modified_at', 'data_id'),
     )
-
-    op.drop_constraint('user_email_key', 'user', type_='unique')
 
 
 def downgrade() -> None:

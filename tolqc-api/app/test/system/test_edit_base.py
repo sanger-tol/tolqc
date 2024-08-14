@@ -71,7 +71,7 @@ def test_modify_data(logbase_db_session):
     date2 = datetime.fromisoformat('2023-08-21T13:44:04+01:00')
     date3 = datetime.fromisoformat('2023-08-22T10:32:06+01:00')
     dat = Data(
-        name_root='test',
+        data_id='test',
         lims_qc='pass',
         date=date1,
     )
@@ -109,9 +109,8 @@ def test_modify_data(logbase_db_session):
 def test_edits_via_client(client, api_path):
     obj_spec = {
         'type': 'data',
-        'id': '1001',
+        'id': 'data#1001',
         'attributes': {
-            'name_root': 'Test#1',
             'qc': 'pass',
         },
     }
@@ -130,7 +129,7 @@ def test_edits_via_client(client, api_path):
     filt = json.dumps(
         {
             'in_list': {
-                'data_id': [1001],
+                'data_id': ['data#1001'],
             },
         }
     )
