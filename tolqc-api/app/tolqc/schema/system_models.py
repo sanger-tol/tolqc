@@ -9,7 +9,7 @@ from typing import Optional
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 
-from tolqc.model import Base
+from .base import Base
 
 
 class User(Base):

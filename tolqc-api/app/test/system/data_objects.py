@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from tolqc.sample_data_models import (
+from tolqc.schema.sample_data_models import (
     Accession,
     AccessionTypeDict,
     Allocation,
@@ -21,7 +21,7 @@ from tolqc.sample_data_models import (
     Specimen,
     VisibilityDict,
 )
-from tolqc.system_models import Token, User
+from tolqc.schema.system_models import Token, User
 
 
 def test_data(token: str):

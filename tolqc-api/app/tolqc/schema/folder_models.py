@@ -14,7 +14,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from tolqc.model import Base
+from tolqc.schema.base import Base
 
 
 def models_list():

@@ -12,7 +12,7 @@ from sqlalchemy.event import listen
 from tol.api_base2.misc.auth_context import default_ctx_getter
 from tol.sql.database import Database, DefaultDatabase
 
-from tolqc.model import update_logbase_closure
+from tolqc.schema.base import update_logbase_closure
 
 
 __ssn_key = 'TOLQC_FLASK_SESSION'

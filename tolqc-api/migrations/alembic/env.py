@@ -7,11 +7,7 @@ from alembic import context
 from sqlalchemy import create_engine
 from sqlalchemy.orm import configure_mappers
 
-import tolqc.assembly_models
-import tolqc.folder_models
-import tolqc.sample_data_models
-import tolqc.system_models  # noqa: F401
-from tolqc.model import Base
+from tolqc.schema.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

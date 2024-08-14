@@ -16,9 +16,10 @@ from sqlalchemy.orm import configure_mappers, sessionmaker
 
 from tol.sql.database import DefaultDatabase
 
-from tolqc.flask import application, models_list
-from tolqc.model import Base, update_logbase_closure
-from tolqc.system_models import Token, User
+from tolqc.flask import application
+from tolqc.schema import models_list
+from tolqc.schema.base import Base, update_logbase_closure
+from tolqc.schema.system_models import Token, User
 
 from werkzeug.datastructures import Headers
 

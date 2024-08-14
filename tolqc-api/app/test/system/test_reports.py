@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 
 import pytest
 
-from tolqc.sample_data_models import Data, Platform, Run
+from tolqc.schema.sample_data_models import Data, Platform, Run
 
 from .conftest import SKIP_IF_NO_DB_URI_ENV as pytestmark  # noqa: F401, N811
 

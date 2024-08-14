@@ -113,7 +113,7 @@ class LogBase(ModificationBase):
         # Loop through `columns` to avoid looking for changes in collections
         # (i.e. one-to-many relationships)
         changes = {}
-        for col_name in state.mapper.columns.keys():
+        for col_name in state.mapper.columns.keys():  # noqa: SIM118
             hist = state.attrs[col_name].history
             if hist.has_changes():
                 logging.debug(f'{col_name} changed from {hist.deleted} to {hist.added}')

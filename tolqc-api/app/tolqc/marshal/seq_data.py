@@ -10,7 +10,7 @@ from datetime import datetime
 from sqlalchemy import and_, inspect, select
 from sqlalchemy.exc import SQLAlchemyError
 
-from tolqc.sample_data_models import (
+from tolqc.schema.sample_data_models import (
     Accession,
     AccessionTypeDict,
     Allocation,

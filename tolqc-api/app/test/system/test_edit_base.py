@@ -5,8 +5,8 @@
 import json
 from datetime import datetime
 
-from tolqc.model import EditBase
-from tolqc.sample_data_models import Data, Species
+from tolqc.schema.base import EditBase
+from tolqc.schema.sample_data_models import Data, Species
 
 from .conftest import SKIP_IF_NO_DB_URI_ENV as pytestmark  # noqa: F401, N811
 

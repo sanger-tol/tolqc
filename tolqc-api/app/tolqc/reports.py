@@ -12,7 +12,7 @@ from sqlalchemy.orm import Bundle
 
 from tol.api_base2 import custom_blueprint
 
-from tolqc.sample_data_models import (
+from tolqc.schema.sample_data_models import (
     Allocation,
     Data,
     File,
