@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 from sqlalchemy import (
     BigInteger,
     DateTime,
@@ -15,32 +16,8 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 
-from tolqc.folder_models import HasFolder
-from tolqc.model import Base, LogBase
-
-
-def models_list():
-    return [
-        Assembly,
-        AssemblyComponentType,
-        AssemblyMetrics,
-        AssemblySource,
-        AssemblyStatus,
-        AssemblyStatusType,
-        BuscoLineage,
-        BuscoMetrics,
-        ContigvizMetrics,
-        Dataset,
-        DatasetElement,
-        DatasetStatus,
-        DatasetStatusType,
-        GenomescopeMetrics,
-        MarkerscanMetrics,
-        MerquryMetrics,
-        PloidyplotMetrics,
-        ReviewDict,
-        SoftwareVersion,
-    ]
+from tolqc.schema.base import Base, LogBase
+from tolqc.schema.folder_models import HasFolder
 
 
 class Assembly(LogBase):

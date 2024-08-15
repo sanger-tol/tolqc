@@ -1,3 +1,4 @@
+import logging
 import os
 from logging.config import fileConfig
 
@@ -6,11 +7,7 @@ from alembic import context
 from sqlalchemy import create_engine
 from sqlalchemy.orm import configure_mappers
 
-import tolqc.assembly_models
-import tolqc.folder_models
-import tolqc.sample_data_models
-import tolqc.system_models
-from tolqc.model import Base
+from tolqc.schema.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -27,6 +24,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+configure_mappers()  # Required to dynamically create EditBase classes
 target_metadata = [Base.metadata]
 
 # other values from the config, defined by the needs of env.py,
@@ -50,6 +48,17 @@ def run_migrations_online() -> None:
             target_metadata=target_metadata,
             compare_type=True,
         )
+
+        assert target_metadata[0] is Base.metadata
+
+        table_count = 0
+        for meta in target_metadata:
+            for tbl_name in meta.tables.keys():  # noqa: SIM118
+                logging.debug(f"Have table: '{tbl_name}'")
+                table_count += 1
+        if not table_count:
+            msg = f"No tables found in metadata in list: {target_metadata}"
+            raise ValueError(msg)
 
         with context.begin_transaction():
             context.run_migrations()

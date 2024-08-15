@@ -8,7 +8,7 @@ from tol.api_base2.auth import require_auth
 from tol.api_base2.misc.auth_context import CtxGetter, default_ctx_getter
 from tol.sql.session import SessionFactory
 
-from tolqc.system_models import Token, User
+from tolqc.schema.system_models import Token, User
 
 
 require_registered = require_auth(role='registered')

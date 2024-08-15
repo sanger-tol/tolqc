@@ -7,35 +7,28 @@ import os
 
 from flask import Flask, request
 
+from sqlalchemy.event import remove
+
 from tol.api_base2 import data_blueprint, system_blueprint
 from tol.api_base2.auth import basic_auth_inspector
 from tol.core import core_data_object
 from tol.sql import create_sql_datasource
+from tol.sql.session import create_session_factory
 
-import tolqc.assembly_models
-import tolqc.folder_models
-import tolqc.sample_data_models
-import tolqc.system_models
 from tolqc.auth import create_auth_ctx_setter
+from tolqc.database import build_database_factory, flask_session, logbase_hook_params
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
+from tolqc.schema import models_list
 
 
-def models_list():
-    return [
-        *tolqc.assembly_models.models_list(),
-        *tolqc.folder_models.models_list(),
-        *tolqc.sample_data_models.models_list(),
-        *tolqc.system_models.models_list(),
-    ]
-
-
-def application(session_factory=None, database_factory=None):
+def application(session_factory=None):
     """
     The `session_factory` and `database_factory` arguments are used during
     testing.
     """
+
     app = Flask(__name__)
     app.json = JSONDateTimeProvider(app)
     if os.getenv('ECHO_SQL'):
@@ -44,7 +37,11 @@ def application(session_factory=None, database_factory=None):
         logging.getLogger().setLevel(logging.DEBUG)
 
     api_path = os.getenv('TOLQC_API_PATH', os.getenv('API_PATH', '/api/v1'))
+    logging.debug(f'{api_path = }')
+
     db_uri = os.getenv('DB_URI')
+    if not session_factory:
+        session_factory = create_session_factory(db_uri)
 
     auth_ctx_setter = create_auth_ctx_setter(session_factory)
 
@@ -54,16 +51,34 @@ def application(session_factory=None, database_factory=None):
         if token is not None:
             auth_ctx_setter(token)
 
-    ds_args = {}
-    if database_factory:
-        ds_args['database_factory'] = database_factory
+    @app.teardown_request
+    def remove_before_flush_hook(*_):
+        if ssn := flask_session():
+            logging.debug(f'Tearing down {ssn = }')
+
+            # Ensure session cannot be reused after close()
+            ssn.close_resets_only = False
+
+            # Session.close() must be called to avoid SELECT statements
+            # accumulating on server with 'idle in transaction' state.
+            # (Alternative is to use `Session` as a context manager.)
+            ssn.close()
+        if hook_params := logbase_hook_params():
+            logging.debug(f'Removing {hook_params = }')
+            remove(*hook_params)
+
+    models = models_list()
+
+    # session_factory is now a wrapped factory which returns the same Session
+    # instance during each Flask request.
+    database_factory, session_factory = build_database_factory(session_factory, models)
 
     # Tol QC endpoints
     tolqc_ds = create_sql_datasource(
-        models=models_list(),
+        models=models,
         db_uri=db_uri,
         behind_api=True,
-        **ds_args,
+        database_factory=database_factory,
     )
 
     # Data endpoints
@@ -80,16 +95,14 @@ def application(session_factory=None, database_factory=None):
 
     # Reports
     blueprint_reports = reports_blueprint(
-        db_uri=db_uri,
-        session_factory=session_factory,
+        session_factory,
         url_prefix=api_path + '/report',
     )
     app.register_blueprint(blueprint_reports)
 
     # Data loaders
     blueprint_loaders = loaders_blueprint(
-        db_uri=db_uri,
-        session_factory=session_factory,
+        session_factory,
         url_prefix=api_path + '/loader',
     )
     app.register_blueprint(blueprint_loaders)

@@ -18,38 +18,9 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 
-from tolqc.assembly_models import DatasetElement  # noqa: F401
-from tolqc.folder_models import HasFolder
-from tolqc.model import Base, LogBase
-
-
-def models_list():
-    return [
-        Accession,
-        AccessionTypeDict,
-        Allocation,
-        BarcodeMetrics,
-        Centre,
-        Data,
-        File,
-        Library,
-        LibraryType,
-        MappingMetrics,
-        Offspring,
-        PacbioRunMetrics,
-        Platform,
-        Project,
-        QCDict,
-        Run,
-        Sample,
-        Sex,
-        Species,
-        Specimen,
-        SpecimenStatus,
-        SpecimenStatusType,
-        Umbrella,
-        VisibilityDict,
-    ]
+from tolqc.schema.assembly_models import DatasetElement  # noqa: F401
+from tolqc.schema.base import Base, LogBase
+from tolqc.schema.folder_models import HasFolder
 
 
 class Accession(LogBase):

@@ -21,7 +21,7 @@ from tolqc.marshal.seq_data import (
     row_message,
     valid_accession,
 )
-from tolqc.sample_data_models import (
+from tolqc.schema.sample_data_models import (
     Accession,
     Centre,
     Data,
