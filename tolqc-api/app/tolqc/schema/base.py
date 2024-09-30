@@ -4,7 +4,7 @@
 
 import logging
 import os
-from datetime import datetime
+from datetime import date, datetime
 from functools import cache
 
 from caseconverter import pascalcase
@@ -27,8 +27,6 @@ from sqlalchemy.orm import (
 )
 
 from tol.sql import model_base
-
-from tolqc.json import json_dumps
 
 Base = model_base()
 
@@ -117,13 +115,15 @@ class LogBase(ModificationBase):
             hist = state.attrs[col_name].history
             if hist.has_changes():
                 logging.debug(f'{col_name} changed from {hist.deleted} to {hist.added}')
-                changes[col_name] = hist.deleted[0]
+                cv = hist.deleted[0]
+                # Stringify datetime values. `datetime` isa `date`, so we just test for date
+                changes[col_name] = cv.isoformat() if isinstance(cv, date) else cv
         if changes:
             # Record the old values, modification time and user in an
             # `EditBase` object
             edit = self.__edit_class(
                 edit_of=self,
-                changes=json_dumps(changes),
+                changes=changes,
                 modified_at=self.modified_at,
                 modified_by=self.modified_by,
             )
