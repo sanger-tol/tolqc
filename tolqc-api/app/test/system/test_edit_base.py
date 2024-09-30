@@ -56,7 +56,7 @@ def test_modify_species(logbase_db_session):
     assert spkld_edit.modified_at < spkld.modified_at
 
     # Edit contains the original value of the columns
-    assert json.loads(spkld_edit.changes) == {
+    assert spkld_edit.changes == {
         'strain': None,
         'taxon_id': 116150,
     }
@@ -96,7 +96,7 @@ def test_modify_data(logbase_db_session):
     assert hist[0].modified_at > hist[1].modified_at
 
     # Check history entries for date and string are as expected
-    edit2, edit1 = (json.loads(h.changes) for h in hist)
+    edit2, edit1 = (h.changes for h in hist)
     edited_keys = {'date', 'lims_qc'}
     assert edit1.keys() == edited_keys
     assert edit2.keys() == edited_keys
@@ -141,4 +141,4 @@ def test_edits_via_client(client, api_path):
     # If the stringified ID is not turned back into a integer by the server's
     # DefaultDataObjectConverter then the `changes` list will be:
     #   ['{"data_id":1001,"qc":"pass"}', '{"data_id":1001}']
-    assert changes == ['{"qc":"pass"}']
+    assert changes == [{'qc': 'pass'}]
