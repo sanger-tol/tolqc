@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import json
 import logging
 import re
 from datetime import datetime
@@ -10,6 +9,7 @@ from datetime import datetime
 from sqlalchemy import and_, inspect, select
 from sqlalchemy.exc import SQLAlchemyError
 
+from tolqc.marshal.ndjson import must_get_row_value, ndjson_rows_from_stream
 from tolqc.schema.sample_data_models import (
     Accession,
     AccessionTypeDict,
@@ -37,7 +37,7 @@ def load_seq_data_stream(
     centre = get_centre(session, centre_name)
     new_data = []
     upd_data = []
-    for row in ndjson_rows(stream):
+    for row in ndjson_rows_from_stream(stream):
         new, upd = store_seq_data_row(session, centre, row)
         if new:
             new_data.append(headline_data_fields(new))
@@ -47,32 +47,6 @@ def load_seq_data_stream(
         'new': new_data,
         'updated': upd_data,
     }
-
-
-def ndjson_rows(stream):
-    for line in stream:
-        yield parse_ndjson_row(line)
-
-
-def parse_ndjson_row(line):
-    if len(line) > 100_000:
-        # Don't get hung up parsing excessively large strings
-        msg = f'Unexpectedly long line ({len(line):_d} characters) in input'
-        raise ValueError(msg)
-    row = json.loads(line)
-    if type(row) is not dict:  # noqa: E721
-        msg = f'JSON must decode to a dict, not a {type(row)}'
-        raise ValueError(msg)
-    for k, v in row.items():
-        if type(v) in (dict, list):
-            # Don't allow collections to be smuggled in the values
-            msg = 'Values of JSON row must all be scalars'
-            raise ValueError(msg)
-        if type(v) is str:  # noqa: E721
-            # Avoid empty strings
-            stripped = v.strip()
-            row[k] = None if stripped == '' else stripped
-    return row
 
 
 def headline_data_fields(data):
@@ -372,10 +346,8 @@ def get_centre(session, centre_name):
 
 
 def get_data(session, row):
-    if data_id := row.get('data_id'):
-        return session.get(Data, data_id)
-    msg = row_message(row, "Missing 'data_id' field in row")
-    raise ValueError(msg)
+    data_id = must_get_row_value(row, 'data_id')
+    return session.get(Data, data_id)
 
 
 def maybe_datetime(row, field):
@@ -411,15 +383,3 @@ def valid_accession(session, accn_type, accn_str):
         else:
             logging.debug(f"Invalid '{accn_type}': '{accn_str}'")
     return False
-
-
-def row_message(row, msg):
-    return f'{msg}:\n{format_row(row)}'
-
-
-def format_row(row):
-    name_max = max(len(name) for name in row)
-    return ''.join(
-        f"  {name:>{name_max}} = {'' if row[name] is None else row[name]}\n"
-        for name in row
-    )

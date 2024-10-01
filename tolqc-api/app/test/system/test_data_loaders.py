@@ -16,9 +16,6 @@ from tolqc.marshal.seq_data import (
     build_library_type,
     build_sample,
     get_centre,
-    maybe_datetime,
-    parse_ndjson_row,
-    row_message,
     valid_accession,
 )
 from tolqc.schema.sample_data_models import (
@@ -33,28 +30,6 @@ from tolqc.schema.sample_data_models import (
 
 
 from .conftest import SKIP_IF_NO_DB_URI_ENV as pytestmark  # noqa: F401, N811
-
-
-def test_row_message():
-    expected = ''.join(
-        (
-            'Bad row:\n',
-            '        n = 10\n',
-            '  missing = \n',
-            '  present = val\n',
-        )
-    )
-    assert (
-        row_message(
-            {
-                'n': 10,
-                'missing': None,
-                'present': 'val',
-            },
-            'Bad row',
-        )
-        == expected
-    )
 
 
 def test_tz_is_europe_london(db_session):
@@ -223,24 +198,6 @@ def test_seq_data_loader_update(client, api_path, row_data):
             }
         ],
     }
-
-
-def test_maybe_datetime():
-    assert maybe_datetime({}, 'date_x') is None
-    dt_str = '1981-09-19T18:30:00-04:00'
-    dt = maybe_datetime({'date_x': dt_str}, 'date_x')
-    assert dt.isoformat() == dt_str
-
-
-def test_row_parse():
-    too_big = json.dumps({'x': '#' * 100_000})
-    with pytest.raises(ValueError):
-        parse_ndjson_row(too_big)
-    with pytest.raises(ValueError):
-        parse_ndjson_row('["ele"]')
-    with pytest.raises(ValueError):
-        parse_ndjson_row('{"x": ["y"]}')
-    assert parse_ndjson_row('{"x": "  "}') == {'x': None}
 
 
 def to_ndjson(row_dict):

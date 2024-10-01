@@ -203,7 +203,7 @@ class File(Base):
     data_id = mapped_column(String, ForeignKey('data.data_id'))
     name = mapped_column(String)
     relative_path = mapped_column(String)
-    remote_path = mapped_column(String)
+    remote_path = mapped_column(String, unique=True)
     size_bytes = mapped_column(BigInteger)
     md5 = mapped_column(String)
 
