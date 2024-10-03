@@ -1,4 +1,8 @@
-from sqlalchemy import func, select
+# SPDX-FileCopyrightText: 2024 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from tolqc.marshal.ndjson import (
@@ -11,25 +15,32 @@ from tolqc.schema.sample_data_models import Data, File
 
 
 def load_dataset_stream(session, stream):
-    datasets = []
+    datasets = {}
     with session.no_autoflush:
         try:
             for row in ndjson_rows_from_stream(stream):
-                datasets.append(store_dataset_row(session, row))
+                new, xst = store_dataset_row(session, row)
+                if new:
+                    datasets.setdefault('new', []).append(new)
+                if xst:
+                    datasets.setdefault('existing', []).append(xst)
         except SQLAlchemyError:
             session.rollback()
             raise
-    session.flush()
 
-    return {'datasets': datasets}
+    return datasets
 
 
 def store_dataset_row(session, row):
+    # First try fetching Dataset by it's ID
     dataset_id = must_get_row_value(row, 'dataset.id')
     if dsr := dataset_row_by_dataset_id(session, dataset_id):
-        return {'existing': dsr}
+        return None, dsr
+
+    # Get the data_id for each element of the Dataset
     elements = must_get_row_value(row, 'elements')
-    datas = []
+
+    element_data_ids = []
     for ele in elements:
         data_id = ele.get('data.id')
         if not data_id:
@@ -38,19 +49,34 @@ def store_dataset_row(session, row):
                 (data_id,) = session.execute(
                     select(File.data_id).where(File.remote_path == rp)
                 ).one_or_none()
-            if not data_id:
-                msg = row_message(
-                    ele, "No 'data.id' field and no File matching 'remote_path' field"
-                )
+                if not data_id:
+                    msg = row_message(
+                        ele, "No 'data.id' field and no File matching 'remote_path' field"
+                    )
+                    raise ValueError(msg)
+            else:
+                msg = row_message(ele, "No 'data.id' or 'remote_path' field in element")
                 raise ValueError(msg)
-        datas.append(data_id)
-    if dsr := dataset_row_by_data_ids(session, datas):
-        return {'existing': dsr}
+        element_data_ids.append(data_id)
+
+    # Return existing dataset row if we already have it
+    if dsr := dataset_row_by_data_ids(session, element_data_ids):
+        return None, dsr
+
+    # Create a new dataset
+    session.merge(
+        Dataset(
+            dataset_id=dataset_id,
+            data_assn=[DatasetElement(data_id=x) for x in element_data_ids],
+        )
+    )
+    session.flush()
+    return dataset_row_by_dataset_id(session, dataset_id), None
 
 
 def dataset_row_by_dataset_id(session, dataset_id):
     rows = __build_dataset_rows(
-        session, ds_row_data_query().where(Dataset.datset_id == dataset_id)
+        session, dataset_rows_query().where(Dataset.dataset_id == dataset_id)
     )
     return rows[0] if rows else None
 
@@ -60,7 +86,7 @@ def dataset_row_by_data_ids(session, data_id_list):
     ds = None
     for maybe in __build_dataset_rows(
         session,
-        ds_row_data_query().where(
+        dataset_rows_query().where(
             Dataset.dataset_id.in_(
                 select(DatasetElement.dataset_id)
                 .where(DatasetElement.data_id.in_(data_id_list))
@@ -68,7 +94,7 @@ def dataset_row_by_data_ids(session, data_id_list):
             )
         ),
     ):
-        if data_id_set == {x['data.id'] for x in maybe.elements}:
+        if data_id_set == {x['data.id'] for x in maybe['elements']}:
             ds = maybe
             break
 
@@ -77,33 +103,39 @@ def dataset_row_by_data_ids(session, data_id_list):
 
 def __build_dataset_rows(session, query):
     ds_rows = []
+    ds = None
     for row in session.execute(query):
-        dataset_id, data_ids, remote_paths = row
-        elements = [
-            {'data.id': did, 'remote_path': rp}
-            for did, rp in zip(data_ids, remote_paths, strict=True)
-        ]
-        ds_rows.append(
-            {
+        dataset_id, data_id, remote_path = row
+
+        if ds is None or ds['dataset.id'] != dataset_id:
+            # Make a new dataset row
+            ds = {
                 'dataset.id': dataset_id,
-                'elements': elements,
+                'elements': [],
+            }
+            ds_rows.append(ds)
+
+        # Append element to the current dataset
+        ds['elements'].append(
+            {
+                'data.id': data_id,
+                'remote_path': remote_path,
             }
         )
 
-    return ds_rows if ds_rows else None
+    return ds_rows
 
 
-def ds_row_data_query():
+def dataset_rows_query():
     return (
         select(
             Dataset.dataset_id,
-            func.array_agg(Data.data_id).label('data_ids'),
-            func.array_agg(File.remote_path).label('remote_paths'),
+            Data.data_id,
+            File.remote_path,
         )
         .select_from(Dataset)
         .join(DatasetElement)
         .join(Data)
-        .outerjoin(File)
-        .group_by(Dataset.dataset_id)
-        .order_by(DatasetElement.id)
+        .outerjoin(File)  # Do not necessarily have a File
+        .order_by(Dataset.dataset_id, DatasetElement.id)
     )
