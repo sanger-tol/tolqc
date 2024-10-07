@@ -10,23 +10,23 @@ from tolqc.marshal.ndjson import (
     ndjson_rows_from_stream,
     row_message,
 )
-from tolqc.schema.assembly_models import Dataset, DatasetElement
+from tolqc.marshal.status import store_status
+from tolqc.schema.assembly_models import Dataset, DatasetElement, DatasetStatus
 from tolqc.schema.sample_data_models import Data, File
 
 
 def load_dataset_stream(session, stream):
     datasets = {}
-    with session.no_autoflush:
-        try:
-            for row in ndjson_rows_from_stream(stream):
-                new, xst = store_dataset_row(session, row)
-                if new:
-                    datasets.setdefault('new', []).append(new)
-                if xst:
-                    datasets.setdefault('existing', []).append(xst)
-        except SQLAlchemyError:
-            session.rollback()
-            raise
+    try:
+        for row in ndjson_rows_from_stream(stream):
+            new, xst = store_dataset_row(session, row)
+            if new:
+                datasets.setdefault('new', []).append(new)
+            if xst:
+                datasets.setdefault('existing', []).append(xst)
+    except SQLAlchemyError:
+        session.rollback()
+        raise
 
     return datasets
 
@@ -51,7 +51,8 @@ def store_dataset_row(session, row):
                 ).one_or_none()
                 if not data_id:
                     msg = row_message(
-                        ele, "No 'data.id' field and no File matching 'remote_path' field"
+                        ele,
+                        "No 'data.id' field and no File matching 'remote_path' field",
                     )
                     raise ValueError(msg)
             else:
@@ -64,13 +65,19 @@ def store_dataset_row(session, row):
         return None, dsr
 
     # Create a new dataset
-    session.merge(
-        Dataset(
-            dataset_id=dataset_id,
-            data_assn=[DatasetElement(data_id=x) for x in element_data_ids],
-        )
+    ds = Dataset(
+        dataset_id=dataset_id,
+        data_assn=[DatasetElement(data_id=x) for x in element_data_ids],
     )
+    session.add(ds)
     session.flush()
+    store_status(
+        session,
+        'dataset',
+        ds,
+        DatasetStatus,
+        status_name='Pending',
+    )
     return dataset_row_by_dataset_id(session, dataset_id), None
 
 

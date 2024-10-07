@@ -9,6 +9,7 @@ from tol.api_base2 import custom_blueprint
 from tolqc.auth import require_registered
 from tolqc.marshal.dataset import load_dataset_stream
 from tolqc.marshal.seq_data import load_seq_data_stream
+from tolqc.marshal.status import load_status_stream
 
 
 def loaders_blueprint(
@@ -32,6 +33,16 @@ def loaders_blueprint(
     def load_datasets():
         session = session_factory()
         results = load_dataset_stream(session, request.stream)
+        session.commit()
+
+        # Report data loaded and updated
+        return results, 200, {'Content-Type': 'application/json'}
+
+    @ldr.route('/status/<string:table>', methods=['POST'])
+    @require_registered
+    def load_statuses(table):
+        session = session_factory()
+        results = load_status_stream(session, request.stream, table)
         session.commit()
 
         # Report data loaded and updated

@@ -86,7 +86,7 @@ def test_build_library(db_session):
 def test_build_sample_specimen_species(db_session):
     row = {
         'sample_name': 'JTOL1001',
-        'scientific_name': "Tyrnanosaurus rex 'Jurassic Park 1993'",
+        'scientific_name': "Tyranosaurus rex 'Jurassic Park 1993'",
         'supplier_name': 'JRSPK1993',
         'tol_specimen_id': 'rTyrRex1',
         'biospecimen_accession': None,
@@ -97,7 +97,7 @@ def test_build_sample_specimen_species(db_session):
     db_session.add(smpl)
     assert isinstance(smpl, Sample)
     assert (
-        smpl.specimen.species.hierarchy_name == 'Tyrnanosaurus_rex_Jurassic_Park_1993'
+        smpl.specimen.species.hierarchy_name == 'Tyranosaurus_rex_Jurassic_Park_1993'
     )
 
 

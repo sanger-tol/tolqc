@@ -15,7 +15,7 @@ from tolqc.marshal.dataset import (
     load_dataset_stream,
     store_dataset_row,
 )
-from tolqc.schema.assembly_models import Dataset, DatasetElement
+from tolqc.schema.assembly_models import Dataset, DatasetElement, DatasetStatusType
 from tolqc.schema.sample_data_models import Data, File
 
 from .conftest import SKIP_IF_NO_DB_URI_ENV as pytestmark  # noqa: F401, N811
@@ -113,7 +113,13 @@ def test_store_new_dataset_row(session):
     new_dsr, xst_dsr = store_dataset_row(session, dsr)
     assert xst_dsr is None
     logging.debug('New dataset row: ' + json.dumps(new_dsr, indent=2))
-    assert new_dsr['dataset.id'] == 'DSET_NEW'
+    ds_id = new_dsr['dataset.id']
+    assert ds_id == 'DSET_NEW'
+
+    ds = session.get(Dataset, ds_id)
+    status = ds.status
+    assert status is not None
+    assert status.status_type_id == 'Pending'
 
 
 def test_store_rows_ok(session):
@@ -257,6 +263,11 @@ def test_loader_api(client, api_path, session):
 
 def dataset_test_data():
     return [
+        DatasetStatusType(
+            status_type_id='Pending',
+            description='Newly loaded dataset pre-QC',
+            assign_order=1,
+        ),
         Dataset(
             dataset_id='DSET_001',
             data_assn=[
