@@ -35,18 +35,17 @@ def load_seq_data_stream(
     centre_name='Wellcome Sanger Institute',
 ):
     centre = get_centre(session, centre_name)
-    new_data = []
-    upd_data = []
+    rspns = {}
     for row in ndjson_rows_from_stream(stream):
-        new, upd = store_seq_data_row(session, centre, row)
-        if new:
-            new_data.append(headline_data_fields(new))
-        if upd:
-            upd_data.append(updated_data_fields(upd))
-    return {
-        'new': new_data,
-        'updated': upd_data,
-    }
+        label, row = store_seq_data_row(session, centre, row)
+        if row:
+            rspns_row = (
+                updated_data_fields(row)
+                if label == 'updated'
+                else headline_data_fields(row)
+            )
+            rspns.setdefault(label, []).append(rspns_row)
+    return rspns
 
 
 def headline_data_fields(data):
@@ -99,7 +98,7 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
         data.lims_qc = row.get('lims_qc')
         data.date = maybe_datetime(row, 'qc_date')
         if session.is_modified(data, include_collections=False):
-            return None, data
+            return 'updated', data
         else:
             return None, None
 
@@ -115,7 +114,7 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
         session.add(data)
         session.flush()
 
-    return data, None
+    return 'new', data
 
 
 def build_data(session, centre, row):

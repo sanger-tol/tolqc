@@ -19,11 +19,8 @@ def load_dataset_stream(session, stream):
     datasets = {}
     try:
         for row in ndjson_rows_from_stream(stream):
-            new, xst = store_dataset_row(session, row)
-            if new:
-                datasets.setdefault('new', []).append(new)
-            if xst:
-                datasets.setdefault('existing', []).append(xst)
+            label, ds_info = store_dataset_row(session, row)
+            datasets.setdefault(label, []).append(ds_info)
     except SQLAlchemyError:
         session.rollback()
         raise
@@ -35,7 +32,7 @@ def store_dataset_row(session, row):
     # First try fetching Dataset by it's ID
     dataset_id = must_get_row_value(row, 'dataset.id')
     if dsr := dataset_row_by_dataset_id(session, dataset_id):
-        return None, dsr
+        return 'existing', dsr
 
     # Get the data_id for each element of the Dataset
     elements = must_get_row_value(row, 'elements')
@@ -62,7 +59,7 @@ def store_dataset_row(session, row):
 
     # Return existing dataset row if we already have it
     if dsr := dataset_row_by_data_ids(session, element_data_ids):
-        return None, dsr
+        return 'existing', dsr
 
     # Create a new dataset
     ds = Dataset(
@@ -78,7 +75,7 @@ def store_dataset_row(session, row):
         DatasetStatus,
         status_name='Pending',
     )
-    return dataset_row_by_dataset_id(session, dataset_id), None
+    return 'new', dataset_row_by_dataset_id(session, dataset_id)
 
 
 def dataset_row_by_dataset_id(session, dataset_id):

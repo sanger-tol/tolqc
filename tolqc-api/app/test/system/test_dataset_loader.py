@@ -93,8 +93,8 @@ def test_store_exisiting_dataset_row(session):
             },
         ],
     }
-    new_dsr, xst_dsr = store_dataset_row(session, dsr)
-    assert new_dsr is None
+    label, xst_dsr = store_dataset_row(session, dsr)
+    assert label == 'existing'
     assert xst_dsr['dataset.id'] == 'DSET_002'
 
 
@@ -110,8 +110,8 @@ def test_store_new_dataset_row(session):
             },
         ],
     }
-    new_dsr, xst_dsr = store_dataset_row(session, dsr)
-    assert xst_dsr is None
+    label, new_dsr = store_dataset_row(session, dsr)
+    assert label == 'new'
     logging.debug('New dataset row: ' + json.dumps(new_dsr, indent=2))
     ds_id = new_dsr['dataset.id']
     assert ds_id == 'DSET_NEW'

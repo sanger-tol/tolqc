@@ -168,7 +168,6 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
                 'project': 'DTOL_Darwin Tree of Life',
             },
         ],
-        'updated': [],
     }
 
 
@@ -179,7 +178,6 @@ def test_seq_data_loader_update(client, api_path, row_data):
     response = client.post(api_path + '/loader/seq-data', data=to_ndjson(row_data))
     assert response.status == '200 OK'
     assert response.json == {
-        'new': [],
         'updated': [
             {
                 'data_id': 'm64221e_230627_234912#2050',

@@ -21,7 +21,7 @@ from tolqc.schema.sample_data_models import Specimen, SpecimenStatus
 
 
 @cache
-def table_model_status_model(table):
+def model_status_model(table):
     tbl_to_mdl = {
         'assembly': (
             Assembly,
@@ -57,7 +57,7 @@ def load_status_stream(session, stream, table):
 
 
 def store_status_row(session, table, row):
-    model, status_model = table_model_status_model(table)
+    model, status_model = model_status_model(table)
     oid = must_get_row_value(row, table + '.id')
     status_type = must_get_row_value(row, 'status_type.id')
     status_time = row.get('status_time')  # *** Make timezone aware ***
