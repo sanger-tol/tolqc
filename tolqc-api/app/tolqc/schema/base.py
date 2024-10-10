@@ -157,7 +157,7 @@ def update_logbase_closure(user_id):
         creates `EditBase` objects to record edit history of changed objects.
         """
 
-        now = datetime.now(tz=local_tz())
+        now = now_with_local_tz()
 
         for new in session.new:
             if not isinstance(new, LogBase):
@@ -185,6 +185,13 @@ def update_logbase_closure(user_id):
 @event.listens_for(Base, 'mapper_configured', propagate=True)
 def log_edit_class(mapper, cls):
     logging.debug(f"Mapper configured for '{cls.__name__}'")
+
+
+def now_with_local_tz() -> datetime:
+    """
+    Return the current datetime with the local timezone
+    """
+    return datetime.now(tz=local_tz())
 
 
 @cache

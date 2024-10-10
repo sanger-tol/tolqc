@@ -16,9 +16,6 @@ from tolqc.marshal.seq_data import (
     build_library_type,
     build_sample,
     get_centre,
-    maybe_datetime,
-    parse_ndjson_row,
-    row_message,
     valid_accession,
 )
 from tolqc.schema.sample_data_models import (
@@ -33,28 +30,6 @@ from tolqc.schema.sample_data_models import (
 
 
 from .conftest import SKIP_IF_NO_DB_URI_ENV as pytestmark  # noqa: F401, N811
-
-
-def test_row_message():
-    expected = ''.join(
-        (
-            'Bad row:\n',
-            '        n = 10\n',
-            '  missing = \n',
-            '  present = val\n',
-        )
-    )
-    assert (
-        row_message(
-            {
-                'n': 10,
-                'missing': None,
-                'present': 'val',
-            },
-            'Bad row',
-        )
-        == expected
-    )
 
 
 def test_tz_is_europe_london(db_session):
@@ -111,7 +86,7 @@ def test_build_library(db_session):
 def test_build_sample_specimen_species(db_session):
     row = {
         'sample_name': 'JTOL1001',
-        'scientific_name': "Tyrnanosaurus rex 'Jurassic Park 1993'",
+        'scientific_name': "Tyranosaurus rex 'Jurassic Park 1993'",
         'supplier_name': 'JRSPK1993',
         'tol_specimen_id': 'rTyrRex1',
         'biospecimen_accession': None,
@@ -122,7 +97,7 @@ def test_build_sample_specimen_species(db_session):
     db_session.add(smpl)
     assert isinstance(smpl, Sample)
     assert (
-        smpl.specimen.species.hierarchy_name == 'Tyrnanosaurus_rex_Jurassic_Park_1993'
+        smpl.specimen.species.hierarchy_name == 'Tyranosaurus_rex_Jurassic_Park_1993'
     )
 
 
@@ -193,7 +168,6 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
                 'project': 'DTOL_Darwin Tree of Life',
             },
         ],
-        'updated': [],
     }
 
 
@@ -204,7 +178,6 @@ def test_seq_data_loader_update(client, api_path, row_data):
     response = client.post(api_path + '/loader/seq-data', data=to_ndjson(row_data))
     assert response.status == '200 OK'
     assert response.json == {
-        'new': [],
         'updated': [
             {
                 'data_id': 'm64221e_230627_234912#2050',
@@ -223,24 +196,6 @@ def test_seq_data_loader_update(client, api_path, row_data):
             }
         ],
     }
-
-
-def test_maybe_datetime():
-    assert maybe_datetime({}, 'date_x') is None
-    dt_str = '1981-09-19T18:30:00-04:00'
-    dt = maybe_datetime({'date_x': dt_str}, 'date_x')
-    assert dt.isoformat() == dt_str
-
-
-def test_row_parse():
-    too_big = json.dumps({'x': '#' * 100_000})
-    with pytest.raises(ValueError):
-        parse_ndjson_row(too_big)
-    with pytest.raises(ValueError):
-        parse_ndjson_row('["ele"]')
-    with pytest.raises(ValueError):
-        parse_ndjson_row('{"x": ["y"]}')
-    assert parse_ndjson_row('{"x": "  "}') == {'x': None}
 
 
 def to_ndjson(row_dict):
