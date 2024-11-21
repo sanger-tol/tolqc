@@ -125,6 +125,8 @@ def pipeline_data_report_query():
             Data.visibility,
             Data.lims_qc,
             Data.processed,
+            Sample.sample_id.label('sample'),
+            Library.library_id.label('library'),
         )
         .select_from(Data)
         .outerjoin(Sample)
