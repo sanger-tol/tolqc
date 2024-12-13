@@ -123,7 +123,6 @@ def build_data(session, centre, row):
         data_id=row.get('data_id'),
         study_id=row.get('study_id'),
         processed=0,  # Setting processed to 0 flags new data
-        tag_index=row.get('tag_index'),  # Illumina only field
         tag1_id=row.get('tag1_id'),
         tag2_id=row.get('tag2_id'),
         lims_qc=row.get('lims_qc'),

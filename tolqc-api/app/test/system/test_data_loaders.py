@@ -293,7 +293,6 @@ def row_data():
             'instrument_name': 'NV15',
             'pipeline_id_lims': 'Hi-C - Arima v2',
             'run_id': '47339',
-            'tag_index': '7',
             'run_complete': '2023-05-25T05:18:51+01:00',
             'lims_qc': 'pass',
             'qc_date': '2023-06-02T11:23:31+01:00',

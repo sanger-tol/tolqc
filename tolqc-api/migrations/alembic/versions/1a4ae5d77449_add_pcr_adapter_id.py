@@ -7,7 +7,6 @@ Create Date: 2024-12-13 13:22:30.622053
 """
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '1a4ae5d77449'
@@ -33,7 +32,7 @@ def upgrade() -> None:
             sa.Column('pcr_adapter_id', sa.String(), nullable=True),
             insert_after='tag2_id',
         )
-        op.drop_column('data', 'tag_index')
+        data_op.drop_column('tag_index')
 
     for tbl in data_rel_tables:
         op.create_foreign_key(
