@@ -17,6 +17,7 @@ from tolqc.schema.sample_data_models import (
     Data,
     File,
     Library,
+    LibraryType,
     PacbioRunMetrics,
     Platform,
     Project,
@@ -57,6 +58,14 @@ def reports_blueprint(
             session_factory,
             'mlwh_data',
             mlwh_data_report_query,
+        )
+    
+    @rep.route('/illumina-data')
+    def illumina_data():
+        return tolqc_report(
+            session_factory,
+            'illumina_data',
+            illumina_data_report_query,
         )
 
     @rep.errorhandler(BadRequest)
@@ -330,6 +339,80 @@ def mlwh_data_report_query_select():
         File.remote_path,
     )
 
+def illumina_data_report_query():
+    query = (
+        select(
+            ProjectGroupBundle(
+                'group',
+                Project.hierarchy_name,
+                Species.taxon_group,
+            ),
+            LibraryType.hierarchy_name.label('source'),
+            Specimen.specimen_id.label('specimen'),
+            Platform.name.label('platform'),
+            Platform.model,
+            # Sample.sample_id.label('sample'),
+            #RUNID
+            #READ PAIRS
+            #YIELD
+
+            IsoDayBundle('date', Run.start),
+            # Data.lims_qc,
+            Run.lims_id.label('run'),
+            Run.run_id.label('movie_name'),
+            # Run.element.label('well'),
+            # Run.instrument_name.label('instrument'),
+            # Run.plex_count,
+            # PacbioRunMetrics.movie_minutes.label('movie_length'),
+            # Data.tag_index,
+            # Data.tag1_id.label('tag'),
+            Sample.accession_id.label('sample_accession'),
+            Data.accession_id.label('run_accession'),
+            Species.species_id.label('species'),
+            #RUN STATUS
+            #DATE
+            # Data.library_id.label('library'),
+            # Data.reads,
+            # Data.read_length_mean,
+            # Data.read_length_n50,
+            # Data.read_length_longest,
+            # Data.read_length_shortest,
+            # Data.reads_duplicated,
+            # Data.reads_filtered,
+            # Data.bases.label('bases'),
+            # Data.bases_a,
+            # Data.bases_c,
+            # Data.bases_g,
+            # Data.bases_t,
+            # PacbioRunMetrics.loading_conc.label('loading_concentration'),
+            # PacbioRunMetrics.binding_kit,
+            # PacbioRunMetrics.sequencing_kit,
+            # PacbioRunMetrics.productive_zmws_num,
+            # PacbioRunMetrics.p0_num,
+            # PacbioRunMetrics.p1_num,
+            # PacbioRunMetrics.p2_num,
+        )
+        .select_from(Data)
+        .outerjoin(Sample)
+        .outerjoin(Specimen)
+        .outerjoin(Species)
+        .join(Run)
+        .join(Platform)
+        .outerjoin(Library)
+        .outerjoin(LibraryType)
+        # .outerjoin(PacbioRunMetrics)
+        # Cannot do many-to-many join between Data and Project directly.
+        # Must explicitly go through Allocation:
+        .join(Allocation)
+        .join(Project)
+        .where(Platform.name == 'Illumina')
+        .order_by(
+            Data.date.desc(),
+            Specimen.specimen_id,
+        ).limit(5)
+    )
+    query = add_argument(query, Data.study_id)
+    return query
 
 class ProjectGroupBundle(Bundle):
     """
