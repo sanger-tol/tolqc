@@ -152,6 +152,7 @@ class Data(LogBase, HasFolder):
     tag_index = mapped_column(String)
     tag1_id = mapped_column(String)
     tag2_id = mapped_column(String)
+    pcr_adapter_id = mapped_column(String)
     date = mapped_column(DateTime(timezone=True))
     lims_qc = mapped_column(String, ForeignKey('qc_dict.qc_state'))
     auto_qc = mapped_column(String, ForeignKey('qc_dict.qc_state'))
