@@ -33,6 +33,7 @@ def upgrade() -> None:
             sa.Column('pcr_adapter_id', sa.String(), nullable=True),
             insert_after='tag2_id',
         )
+        op.drop_column('data', 'tag_index')
 
     for tbl in data_rel_tables:
         op.create_foreign_key(
