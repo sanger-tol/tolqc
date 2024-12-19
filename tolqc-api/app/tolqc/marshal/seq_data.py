@@ -125,6 +125,7 @@ def build_data(session, centre, row):
         processed=0,  # Setting processed to 0 flags new data
         tag1_id=row.get('tag1_id'),
         tag2_id=row.get('tag2_id'),
+        pcr_adapter_id=row.get('pcr_adapter_id'),
         lims_qc=row.get('lims_qc'),
         date=maybe_datetime(row, 'qc_date'),
     )
