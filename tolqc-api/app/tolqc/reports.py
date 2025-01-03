@@ -61,7 +61,7 @@ def reports_blueprint(
             'mlwh_data',
             mlwh_data_report_query,
         )
-    
+
     @rep.route('/illumina-data')
     def illumina_data():
         return tolqc_report(
@@ -341,6 +341,7 @@ def mlwh_data_report_query_select():
         File.remote_path,
     )
 
+
 def illumina_data_report_query():
     query = (
         select(
@@ -402,6 +403,7 @@ def illumina_data_report_query():
     )
     query = add_argument(query, Data.study_id)
     return query
+
 
 class ProjectGroupBundle(Bundle):
     """
