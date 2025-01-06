@@ -13,10 +13,13 @@ from sqlalchemy.orm import Bundle
 from tol.api_base2 import custom_blueprint
 
 from tolqc.schema.sample_data_models import (
+    Accession,
     Allocation,
     Data,
     File,
     Library,
+    LibraryType,
+    MappingMetrics,
     PacbioRunMetrics,
     Platform,
     Project,
@@ -57,6 +60,14 @@ def reports_blueprint(
             session_factory,
             'mlwh_data',
             mlwh_data_report_query,
+        )
+
+    @rep.route('/illumina-data')
+    def illumina_data():
+        return tolqc_report(
+            session_factory,
+            'illumina_data',
+            illumina_data_report_query,
         )
 
     @rep.errorhandler(BadRequest)
@@ -329,6 +340,69 @@ def mlwh_data_report_query_select():
         PacbioRunMetrics.hifi_bases_in_barcoded_reads,
         File.remote_path,
     )
+
+
+def illumina_data_report_query():
+    query = (
+        select(
+            ProjectGroupBundle(
+                'group',
+                Project.hierarchy_name,
+                Species.taxon_group,
+            ),
+            LibraryType.hierarchy_name.label('source'),
+            Specimen.specimen_id.label('specimen'),
+            Platform.name.label('platform'),
+            Platform.model,
+            Data.data_id.label('run'),
+            Data.reads.label('read_pairs'),
+            Data.bases.label('yield'),
+            MappingMetrics.average_quality.label('avg qual'),
+            Data.read_length_mean.label('avg length'),
+            Sample.accession_id.label('sample_accession'),
+            Data.accession_id.label('run_accession'),
+            Project.accession_id.label('study_accession'),
+            Accession.date_submitted.label('submission_date'),
+            Sample.sample_id.label('sanger_id'),
+            Data.tag1_id.label('tag_sequence'),
+            Data.tag2_id.label('tag2_sequence'),
+            Data.lims_qc.label('npg_qc_status'),
+            IsoDayBundle('date', Run.start),
+            Species.species_id.label('species'),
+            Library.library_type_id.label('pipeline_id_lims'),
+            Data.read_length_n50,
+            Data.read_length_longest,
+            Data.read_length_shortest,
+            Data.reads_duplicated,
+            Data.reads_filtered,
+            Data.bases_a,
+            Data.bases_c,
+            Data.bases_g,
+            Data.bases_t,
+        )
+        .select_from(Data)
+        .outerjoin(Sample)
+        .outerjoin(Specimen)
+        .outerjoin(Species)
+        .join(Run)
+        .join(Platform)
+        .outerjoin(Library)
+        .outerjoin(LibraryType)
+        .outerjoin(MappingMetrics)
+        # Cannot do many-to-many join between Data and Project directly.
+        # Must explicitly go through Allocation:
+        .join(Allocation)
+        .join(Project)
+        # Join accession onto Data
+        .outerjoin(Data.accession)
+        .where(Platform.name == 'Illumina')
+        .order_by(
+            Data.date.desc(),
+            Specimen.specimen_id,
+        )
+    )
+    query = add_argument(query, Data.study_id)
+    return query
 
 
 class ProjectGroupBundle(Bundle):
