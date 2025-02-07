@@ -381,8 +381,8 @@ def illumina_data_report_query():
         .outerjoin(Data.accession)
         .where(Platform.name == 'Illumina')
         .order_by(
-        Data.date.desc(),
-        Specimen.specimen_id,
+            Data.date.desc(),
+            Specimen.specimen_id,
         )
     )
     query = add_argument(query, Data.study_id)
