@@ -13,13 +13,10 @@ from sqlalchemy.orm import Bundle
 from tol.api_base2 import custom_blueprint
 
 from tolqc.schema.sample_data_models import (
-    Accession,
     Allocation,
     Data,
     File,
     Library,
-    LibraryType,
-    MappingMetrics,
     PacbioRunMetrics,
     Platform,
     Project,
@@ -348,31 +345,22 @@ def illumina_data_report_query():
                 Project.hierarchy_name,
                 Species.taxon_group,
             ),
-            LibraryType.hierarchy_name.label('source'),
+            Species.species_id.label('species'),
             Specimen.specimen_id.label('specimen'),
             Platform.name.label('platform'),
             Platform.model,
-            Data.data_id.label('run'),
-            Data.reads.label('read_pairs'),
-            Data.bases.label('yield'),
-            MappingMetrics.average_quality.label('avg qual'),
-            Data.read_length_mean.label('avg length'),
+            Data.data_id.label('data_id'),
+            Data.reads.label('reads'),
+            Data.bases.label('bases'),
+            Data.read_length_mean.label('read_length'),
             Sample.accession_id.label('sample_accession'),
             Data.accession_id.label('run_accession'),
-            Project.accession_id.label('study_accession'),
-            Accession.date_submitted.label('submission_date'),
-            Sample.sample_id.label('sanger_id'),
-            Data.tag1_id.label('tag_sequence'),
-            Data.tag2_id.label('tag2_sequence'),
-            Data.lims_qc.label('npg_qc_status'),
-            IsoDayBundle('date', Run.start),
-            Species.species_id.label('species'),
-            Library.library_type_id.label('pipeline_id_lims'),
-            Data.read_length_n50,
-            Data.read_length_longest,
-            Data.read_length_shortest,
-            Data.reads_duplicated,
-            Data.reads_filtered,
+            Sample.sample_id.label('sample'),
+            Data.tag1_id.label('tag_id'),
+            Data.tag2_id.label('tag2_id'),
+            Data.lims_qc.label('lims_qc'),
+            IsoDayBundle('date', Run.complete),
+            Library.library_type_id.label('pipeline'),
             Data.bases_a,
             Data.bases_c,
             Data.bases_g,
@@ -385,8 +373,6 @@ def illumina_data_report_query():
         .join(Run)
         .join(Platform)
         .outerjoin(Library)
-        .outerjoin(LibraryType)
-        .outerjoin(MappingMetrics)
         # Cannot do many-to-many join between Data and Project directly.
         # Must explicitly go through Allocation:
         .join(Allocation)
@@ -395,8 +381,8 @@ def illumina_data_report_query():
         .outerjoin(Data.accession)
         .where(Platform.name == 'Illumina')
         .order_by(
-            Data.date.desc(),
-            Specimen.specimen_id,
+        Data.date.desc(),
+        Specimen.specimen_id,
         )
     )
     query = add_argument(query, Data.study_id)
