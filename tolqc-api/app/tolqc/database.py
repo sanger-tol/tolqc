@@ -9,7 +9,7 @@ import flask
 
 from sqlalchemy.event import listen
 
-from tol.api_base2.misc.auth_context import default_ctx_getter
+from tol.api_base.misc.auth_context import default_ctx_getter
 from tol.sql.database import Database, DefaultDatabase
 
 from tolqc.schema.base import update_logbase_closure

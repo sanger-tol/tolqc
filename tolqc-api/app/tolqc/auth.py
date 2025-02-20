@@ -4,8 +4,8 @@
 
 from typing import Callable
 
-from tol.api_base2.auth import require_auth
-from tol.api_base2.misc.auth_context import CtxGetter, default_ctx_getter
+from tol.api_base.auth import require_auth
+from tol.api_base.misc.auth_context import CtxGetter, default_ctx_getter
 from tol.sql.session import SessionFactory
 
 from tolqc.schema.system_models import Token, User

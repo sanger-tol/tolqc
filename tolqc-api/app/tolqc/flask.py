@@ -9,8 +9,8 @@ from flask import Flask, request
 
 from sqlalchemy.event import remove
 
-from tol.api_base2 import data_blueprint, system_blueprint
-from tol.api_base2.auth import basic_auth_inspector
+from tol.api_base import data_blueprint, system_blueprint
+from tol.api_base.auth import basic_auth_inspector
 from tol.core import core_data_object
 from tol.sql import create_sql_datasource
 from tol.sql.session import create_session_factory
