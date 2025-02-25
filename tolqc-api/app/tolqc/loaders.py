@@ -4,7 +4,7 @@
 
 from flask import Blueprint, request
 
-from tol.api_base2 import custom_blueprint
+from tol.api_base import custom_blueprint
 
 from tolqc.auth import require_registered
 from tolqc.marshal.dataset import load_dataset_stream

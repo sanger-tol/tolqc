@@ -10,7 +10,7 @@ from flask import Blueprint, request
 from sqlalchemy import select
 from sqlalchemy.orm import Bundle
 
-from tol.api_base2 import custom_blueprint
+from tol.api_base import custom_blueprint
 
 from tolqc.schema.sample_data_models import (
     Allocation,
