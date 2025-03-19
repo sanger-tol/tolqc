@@ -72,6 +72,32 @@ class Accession(LogBase):
         back_populates='umbrella_accession',
     )
 
+    study_submission = relationship(
+        'DataSubmission',
+        primaryjoin='Accession.accession_id == DataSubmission.study_accession_id',
+        back_populates='study_accession',
+    )
+    sample_submission = relationship(
+        'DataSubmission',
+        primaryjoin='Accession.accession_id == DataSubmission.sample_accession_id',
+        back_populates='sample_accession',
+    )
+    experiment_submission = relationship(
+        'DataSubmission',
+        primaryjoin='Accession.accession_id == DataSubmission.experiment_accession_id',
+        back_populates='experiment_accession',
+    )
+    run_submission = relationship(
+        'DataSubmission',
+        primaryjoin='Accession.accession_id == DataSubmission.run_accession_id',
+        back_populates='run_accession',
+    )
+    analysis_submission = relationship(
+        'DataSubmission',
+        primaryjoin='Accession.accession_id == DataSubmission.analysis_accession_id',
+        back_populates='analysis_accession',
+    )
+
 
 class AccessionTypeDict(Base):
     __tablename__ = 'accession_type_dict'
@@ -194,6 +220,65 @@ class Data(LogBase, HasFolder):
 
     dataset_assn = relationship('DatasetElement', back_populates='data')
     datasets = association_proxy('dataset_assn', 'dataset')
+
+
+class DataSubmission(LogBase):
+    __tablename__ = 'data_submission'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'data_id'
+
+    data_id = mapped_column(String, ForeignKey('data.data_id'), primary_key=True)
+
+    study_accession_id = mapped_column(
+        String,
+        ForeignKey('accession.accession_id'),
+    )
+    sample_accession_id = mapped_column(
+        String,
+        ForeignKey('accession.accession_id'),
+    )
+    experiment_accession_id = mapped_column(
+        String,
+        ForeignKey('accession.accession_id'),
+    )
+    run_accession_id = mapped_column(
+        String,
+        ForeignKey('accession.accession_id'),
+    )
+    analysis_accession_id = mapped_column(
+        String,
+        ForeignKey('accession.accession_id'),
+    )
+
+    submission_time = mapped_column(DateTime(timezone=True), index=True)
+
+    study_accession = relationship(
+        'Accession',
+        primaryjoin='DataSubmission.study_accession_id == Accession.accession_id',
+        back_populates='study_submission',
+    )
+    sample_accession = relationship(
+        'Accession',
+        primaryjoin='DataSubmission.sample_accession_id == Accession.accession_id',
+        back_populates='sample_submission',
+    )
+    experiment_accession = relationship(
+        'Accession',
+        primaryjoin='DataSubmission.experiment_accession_id == Accession.accession_id',
+        back_populates='experiment_submission',
+    )
+    run_accession = relationship(
+        'Accession',
+        primaryjoin='DataSubmission.run_accession_id == Accession.accession_id',
+        back_populates='run_submission',
+    )
+    analysis_accession = relationship(
+        'Accession',
+        primaryjoin='DataSubmission.analysis_accession_id == Accession.accession_id',
+        back_populates='analysis_submission',
+    )
 
 
 class File(Base):

@@ -262,8 +262,9 @@ def build_sample(session, row):
     specimen_acc = None
     if spcmn_id := row.get('tol_specimen_id'):
         spcmn = session.get(Specimen, spcmn_id)
-        if not spcmn and re.match(r'[a-z]{1,2}[A-Z][a-z]', spcmn_id):
-            # Beginning of specimen ID looks like a ToL ID
+        if not spcmn and re.match(r'[a-z]{1,2}([A-Z][a-z]|SAN\d+$)', spcmn_id):
+            # Beginning of specimen ID looks like a ToL ID;
+            # or is a WOSPI ID, e.g. "ttSAN90000012"
             specimen_acc = accession_if_valid(
                 session,
                 'BioSample',
