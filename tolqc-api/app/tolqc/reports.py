@@ -23,6 +23,7 @@ from tolqc.schema.sample_data_models import (
     Run,
     Sample,
     Species,
+    Location,
     Specimen,
 )
 
@@ -126,7 +127,7 @@ def pipeline_data_report_query():
             Data.data_id,
             File.remote_path,
             Species.species_id.label('species'),
-            Species.hierarchy_name.label('species_hierarchy'),
+            Location.path.label('location'),
             Specimen.specimen_id.label('specimen'),
             Library.library_type_id.label('pipeline'),
             Data.study_id,
@@ -140,6 +141,7 @@ def pipeline_data_report_query():
         .outerjoin(Sample)
         .outerjoin(Specimen)
         .outerjoin(Species)
+        .outerjoin(Location)
         .join(File)
         .join(Library)
         .order_by(Data.data_id.desc())

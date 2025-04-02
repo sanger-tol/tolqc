@@ -91,13 +91,14 @@ def test_build_sample_specimen_species(db_session):
         'tol_specimen_id': 'rTyrRex1',
         'biospecimen_accession': None,
         'biosample_accession': None,
-        'taxon_id': None,
+        'taxon_id': 19931993,
     }
     smpl = build_sample(db_session, row)
     db_session.add(smpl)
     assert isinstance(smpl, Sample)
     assert (
-        smpl.specimen.species.hierarchy_name == 'Tyranosaurus_rex_Jurassic_Park_1993'
+        smpl.specimen.species.location.path
+        == 'f/0/a/2/0/1/Tyranosaurus_rex_Jurassic_Park_1993'
     )
 
 

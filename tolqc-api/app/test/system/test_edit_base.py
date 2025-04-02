@@ -18,7 +18,6 @@ def test_modify_species(logbase_db_session):
     """
     spkld = Species(
         species_id='Pararge aegeria',
-        hierarchy_name='Pararge_aegeria',
         strain=None,
         common_name='speckled wood',
         taxon_id=116150,

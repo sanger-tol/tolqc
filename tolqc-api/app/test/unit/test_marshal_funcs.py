@@ -13,7 +13,7 @@ from tolqc.marshal.ndjson import (
     parse_ndjson_row,
     row_message,
 )
-from tolqc.marshal.seq_data import maybe_datetime
+from tolqc.marshal.seq_data import build_location, maybe_datetime
 
 
 def test_row_message():
@@ -93,3 +93,15 @@ def test_cleanup_string_whitespace():
     assert cleanup_string_whitespace(' x ') == 'x'
     assert cleanup_string_whitespace(' ') is None
     assert cleanup_string_whitespace('\t\n') is None
+
+
+def test_build_location():
+    assert (
+        build_location(
+            {
+                'scientific_name': 'Vulpes vulpes',
+                'taxon_id': 9627,
+            }
+        ).path
+        == '2/e/9/7/6/a/Vulpes_vulpes'
+    )
