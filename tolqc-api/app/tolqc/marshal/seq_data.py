@@ -317,15 +317,17 @@ def build_species(session, row):
 
     return Species(
         species_id=sci_name,
-        location=build_location(row['taxon_id'], sci_name),
+        location=build_location(row),
         taxon_id=row['taxon_id'],
     )
 
 
-def build_location(hash_me, sci_name):
-    if hash_me and sci_name:
+def build_location(row):
+    sci_name = row['scientific_name']
+    taxon_id = row['taxon_id']
+    if sci_name and taxon_id:
         dir_name = re.sub(r'\W+', '_', sci_name).strip('_')
-        hash_prefix = md5(str(hash_me).encode()).hexdigest()[:6]  # noqa: S324
+        hash_prefix = md5(str(taxon_id).encode()).hexdigest()[:6]  # noqa: S324
         return Location(path='/'.join((*hash_prefix, dir_name)))
 
     return None

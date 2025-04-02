@@ -96,4 +96,12 @@ def test_cleanup_string_whitespace():
 
 
 def test_build_location():
-    assert build_location(9627, 'Vulpes vulpes').path == '2/e/9/7/6/a/Vulpes_vulpes'
+    assert (
+        build_location(
+            {
+                'scientific_name': 'Vulpes vulpes',
+                'taxon_id': 9627,
+            }
+        ).path
+        == '2/e/9/7/6/a/Vulpes_vulpes'
+    )
