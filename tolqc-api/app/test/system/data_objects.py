@@ -6,6 +6,7 @@ from tolqc.schema.sample_data_models import (
     Accession,
     AccessionTypeDict,
     Allocation,
+    CategoryDict,
     Centre,
     Data,
     File,
@@ -66,6 +67,12 @@ def test_data(token: str):
             accession_type_id='ToLID',
             regexp='^[a-z]{1,2}[A-Z][a-z]{2}[A-Z][a-z]{2,3}\\d+$',
             url='https://id.tol.sanger.ac.uk/api/v2/tol-ids/{}',  # noqa: P103
+        ),
+        CategoryDict(
+            category='genomic_data',
+        ),
+        CategoryDict(
+            category='transcriptomic_data',
         ),
         LibraryType(
             library_type_id='Chromium genome',

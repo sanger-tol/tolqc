@@ -180,7 +180,7 @@ class Data(LogBase, HasFolder):
 
     data_id = mapped_column(String, primary_key=True)
     study_id = mapped_column(Integer, ForeignKey('project.study_id'))
-    category = mapped_column(String, index=True)
+    category = mapped_column(String, ForeignKey('category_dict.category'))
     sample_id = mapped_column(String, ForeignKey('sample.sample_id'))
     library_id = mapped_column(String, ForeignKey('library.library_id'))
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
@@ -578,7 +578,6 @@ class Species(LogBase):
     species_id = mapped_column(String, primary_key=True)
     location_id = mapped_column(Integer, ForeignKey('location.location_id'))
     tolid_prefix = mapped_column(String, unique=True)
-    strain = mapped_column(String)
     common_name = mapped_column(String)
     taxon_id = mapped_column(Integer, index=True)
     taxon_family = mapped_column(String)
@@ -621,6 +620,8 @@ class Specimen(LogBase):
         ForeignKey('specimen_status.specimen_status_id'),
     )
     species_id = mapped_column(String, ForeignKey('species.species_id'))
+    epithet = mapped_column(String, index=True)
+    taxon_id = mapped_column(Integer, index=True)
     lims_id = mapped_column(Integer)
     supplied_name = mapped_column(String)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))

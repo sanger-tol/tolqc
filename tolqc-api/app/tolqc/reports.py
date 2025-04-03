@@ -17,13 +17,13 @@ from tolqc.schema.sample_data_models import (
     Data,
     File,
     Library,
+    Location,
     PacbioRunMetrics,
     Platform,
     Project,
     Run,
     Sample,
     Species,
-    Location,
     Specimen,
 )
 
@@ -103,7 +103,7 @@ def tolqc_report(session_factory, report_name, build_query):
     out_formatter, mime_type = fmt_mime
 
     # Suggested filename for web browsers
-    today = datetime.date.today().isoformat()
+    today = datetime.date.today().isoformat()  # noqa: DTZ011
     filename = f'{report_name}_{today}.{req_fmt}'
     headers = {
         'Content-Type': mime_type,
@@ -128,8 +128,17 @@ def pipeline_data_report_query():
             File.remote_path,
             Species.species_id.label('species'),
             Location.path.label('location'),
+            Data.category,
             Specimen.specimen_id.label('specimen'),
             Library.library_type_id.label('pipeline'),
+            Data.tag1_id,
+            Data.tag2_id,
+            Data.pcr_adapter_id.label('pcr_adapter_id'),
+            Data.accession_id.label('run_accession'),
+            Sample.accession_id.label('biosample_accession'),
+            Specimen.accession_id.label('biospecimen_accession'),
+            Species.data_accession_id.label('data_bioproject'),
+            Species.umbrella_accession_id.label('umbrella_bioproject'),
             Data.study_id,
             Data.visibility,
             Data.lims_qc,
