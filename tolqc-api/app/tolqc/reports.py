@@ -24,7 +24,6 @@ from tolqc.schema.sample_data_models import (
     Run,
     Sample,
     Species,
-    Location,
     Specimen,
 )
 
