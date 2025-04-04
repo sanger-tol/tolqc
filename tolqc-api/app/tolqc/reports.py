@@ -127,6 +127,7 @@ def pipeline_data_report_query():
             Data.data_id,
             File.remote_path,
             Species.species_id.label('species'),
+            LastPathElementBundle('species_dir', Location.path),
             Location.path.label('location'),
             Data.category,
             Specimen.specimen_id.label('specimen'),
@@ -398,6 +399,19 @@ def illumina_data_report_query():
     )
     query = add_argument(query, Data.study_id)
     return query
+
+
+class LastPathElementBundle(Bundle):
+    """Return the last element of the path"""
+
+    def create_row_processor(self, query, getters, _):
+        (get_path,) = getters
+
+        def processor(row):
+            path = get_path(row)
+            return path.split('/')[-1] if path else None
+
+        return processor
 
 
 class ProjectGroupBundle(Bundle):
