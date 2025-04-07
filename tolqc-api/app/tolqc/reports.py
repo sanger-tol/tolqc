@@ -17,6 +17,7 @@ from tolqc.schema.sample_data_models import (
     Data,
     File,
     Library,
+    Location,
     PacbioRunMetrics,
     Platform,
     Project,
@@ -102,7 +103,7 @@ def tolqc_report(session_factory, report_name, build_query):
     out_formatter, mime_type = fmt_mime
 
     # Suggested filename for web browsers
-    today = datetime.date.today().isoformat()
+    today = datetime.date.today().isoformat()  # noqa: DTZ011
     filename = f'{report_name}_{today}.{req_fmt}'
     headers = {
         'Content-Type': mime_type,
@@ -126,9 +127,19 @@ def pipeline_data_report_query():
             Data.data_id,
             File.remote_path,
             Species.species_id.label('species'),
-            Species.hierarchy_name.label('species_hierarchy'),
+            LastPathElementBundle('species_dir', Location.path),
+            Location.path.label('location'),
+            Data.category,
             Specimen.specimen_id.label('specimen'),
             Library.library_type_id.label('pipeline'),
+            Data.tag1_id,
+            Data.tag2_id,
+            Data.pcr_adapter_id.label('pcr_adapter_id'),
+            Data.accession_id.label('run_accession'),
+            Sample.accession_id.label('biosample_accession'),
+            Specimen.accession_id.label('biospecimen_accession'),
+            Species.data_accession_id.label('data_bioproject'),
+            Species.umbrella_accession_id.label('umbrella_bioproject'),
             Data.study_id,
             Data.visibility,
             Data.lims_qc,
@@ -140,6 +151,7 @@ def pipeline_data_report_query():
         .outerjoin(Sample)
         .outerjoin(Specimen)
         .outerjoin(Species)
+        .outerjoin(Location)
         .join(File)
         .join(Library)
         .order_by(Data.data_id.desc())
@@ -387,6 +399,19 @@ def illumina_data_report_query():
     )
     query = add_argument(query, Data.study_id)
     return query
+
+
+class LastPathElementBundle(Bundle):
+    """Return the last element of the path"""
+
+    def create_row_processor(self, query, getters, _):
+        (get_path,) = getters
+
+        def processor(row):
+            path = get_path(row)
+            return path.split('/')[-1] if path else None
+
+        return processor
 
 
 class ProjectGroupBundle(Bundle):

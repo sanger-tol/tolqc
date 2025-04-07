@@ -5,6 +5,7 @@
 import logging
 import re
 from datetime import datetime
+from hashlib import md5
 
 from sqlalchemy import and_, inspect, select
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,6 +20,7 @@ from tolqc.schema.sample_data_models import (
     File,
     Library,
     LibraryType,
+    Location,
     PacbioRunMetrics,
     Platform,
     Project,
@@ -134,6 +136,8 @@ def build_data(session, centre, row):
         data.sample = sample
     if library := build_library(session, row):
         data.library = library
+        if lib_type := library.library_type:
+            data.category = lib_type.default_category
     if files := build_files(row):
         data.files = files
     if run := build_run(session, row, centre):
@@ -276,6 +280,7 @@ def build_sample(session, row):
                 accession=specimen_acc,
                 supplied_name=row.get('supplier_name'),
                 species=species,
+                location=species.location or build_location(row['taxon_id'], spcmn_id),
             )
 
     sample_acc = accession_if_valid(
@@ -310,12 +315,20 @@ def build_species(session, row):
     if species := session.get(Species, sci_name):
         return species
 
-    hn = re.sub(r'\W+', '_', sci_name).strip('_')
     return Species(
         species_id=sci_name,
-        hierarchy_name=hn,
+        location=build_location(row['taxon_id'], sci_name),
         taxon_id=row['taxon_id'],
     )
+
+
+def build_location(hash_me, sci_name):
+    if hash_me and sci_name:
+        dir_name = re.sub(r'\W+', '_', sci_name).strip('_')
+        hash_prefix = md5(str(hash_me).encode()).hexdigest()[:6]  # noqa: S324
+        return Location(path='/'.join((*hash_prefix, dir_name)))
+
+    return None
 
 
 def build_platform(session, row):

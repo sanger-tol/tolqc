@@ -18,10 +18,8 @@ def test_modify_species(logbase_db_session):
     """
     spkld = Species(
         species_id='Pararge aegeria',
-        hierarchy_name='Pararge_aegeria',
-        strain=None,
-        common_name='speckled wood',
-        taxon_id=116150,
+        common_name='specked wood',
+        taxon_id=348721,
         taxon_family='Nymphalidae',
         taxon_order='Lepidoptera',
         taxon_phylum='Arthropoda',
@@ -37,9 +35,9 @@ def test_modify_species(logbase_db_session):
     assert isinstance(first_save, datetime)
     assert spkld.modified_by is not None
 
-    # Change to the "tircis" subspecies
-    spkld.strain = 'tircis'
-    spkld.taxon_id = 348721
+    # Fix common name and taxon_id
+    spkld.common_name = 'speckled wood'
+    spkld.taxon_id = 116150
     logbase_db_session.flush()
 
     # The edit should now appear in the history
@@ -57,8 +55,8 @@ def test_modify_species(logbase_db_session):
 
     # Edit contains the original value of the columns
     assert spkld_edit.changes == {
-        'strain': None,
-        'taxon_id': 116150,
+        'common_name': 'specked wood',
+        'taxon_id': 348721,
     }
 
 

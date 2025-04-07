@@ -150,6 +150,17 @@ class BarcodeMetrics(Base, HasFolder):
     data = relationship('Data', back_populates='barcode_metrics')
 
 
+class CategoryDict(Base):
+    __tablename__ = 'category_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'category'
+
+    category = mapped_column(String, primary_key=True)
+    description = mapped_column(String)
+
+
 class Centre(Base):
     __tablename__ = 'centre'
 
@@ -169,7 +180,7 @@ class Data(LogBase, HasFolder):
 
     data_id = mapped_column(String, primary_key=True)
     study_id = mapped_column(Integer, ForeignKey('project.study_id'))
-    hierarchy_name = mapped_column(String)
+    category = mapped_column(String, ForeignKey('category_dict.category'))
     sample_id = mapped_column(String, ForeignKey('sample.sample_id'))
     library_id = mapped_column(String, ForeignKey('library.library_id'))
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
@@ -322,13 +333,27 @@ class LibraryType(Base):
 
     library_type_id = mapped_column(String, primary_key=True)
     hierarchy_name = mapped_column(String)
-    category = mapped_column(String)
+    default_category = mapped_column(String)
     reporting_category = mapped_column(String)
     kit = mapped_column(String)
     enzymes = mapped_column(String)
     cut_sites = mapped_column(String)
 
     library = relationship('Library', back_populates='library_type')
+
+
+class Location(Base):
+    __tablename__ = 'location'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'location_id'
+
+    location_id = mapped_column(Integer, primary_key=True)
+    path = mapped_column(String, index=True)
+
+    species = relationship('Species', back_populates='location')
+    specimen = relationship('Specimen', back_populates='location')
 
 
 class MappingMetrics(Base, HasFolder):
@@ -551,9 +576,8 @@ class Species(LogBase):
         return 'species_id'
 
     species_id = mapped_column(String, primary_key=True)
-    hierarchy_name = mapped_column(String, nullable=False, unique=True)
+    location_id = mapped_column(Integer, ForeignKey('location.location_id'))
     tolid_prefix = mapped_column(String, unique=True)
-    strain = mapped_column(String)
     common_name = mapped_column(String)
     taxon_id = mapped_column(Integer, index=True)
     taxon_family = mapped_column(String)
@@ -577,6 +601,7 @@ class Species(LogBase):
         back_populates='umbrella_species',
     )
 
+    location = relationship('Location', back_populates='species')
     project_assn = relationship('Umbrella', back_populates='species')
     projects = association_proxy('project_assn', 'project')
 
@@ -589,12 +614,14 @@ class Specimen(LogBase):
         return 'specimen_id'
 
     specimen_id = mapped_column(String, primary_key=True)
-    hierarchy_name = mapped_column(String)
+    location_id = mapped_column(Integer, ForeignKey('location.location_id'))
     specimen_status_id = mapped_column(
         Integer,
         ForeignKey('specimen_status.specimen_status_id'),
     )
     species_id = mapped_column(String, ForeignKey('species.species_id'))
+    epithet = mapped_column(String, index=True)
+    taxon_id = mapped_column(Integer, index=True)
     lims_id = mapped_column(Integer)
     supplied_name = mapped_column(String)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
@@ -613,6 +640,8 @@ class Specimen(LogBase):
         primaryjoin='Specimen.specimen_id == SpecimenStatus.specimen_id',
         back_populates='specimen',
     )
+
+    location = relationship('Location', back_populates='specimen')
 
     parent_assn = relationship(
         'Offspring',

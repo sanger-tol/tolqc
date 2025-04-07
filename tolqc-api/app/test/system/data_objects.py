@@ -6,11 +6,13 @@ from tolqc.schema.sample_data_models import (
     Accession,
     AccessionTypeDict,
     Allocation,
+    CategoryDict,
     Centre,
     Data,
     File,
     Library,
     LibraryType,
+    Location,
     PacbioRunMetrics,
     Platform,
     Project,
@@ -66,22 +68,36 @@ def test_data(token: str):
             regexp='^[a-z]{1,2}[A-Z][a-z]{2}[A-Z][a-z]{2,3}\\d+$',
             url='https://id.tol.sanger.ac.uk/api/v2/tol-ids/{}',  # noqa: P103
         ),
-        LibraryType(
-            library_type_id='Chromium genome', hierarchy_name='10x', category='genomic_data'
+        CategoryDict(
+            category='genomic_data',
+        ),
+        CategoryDict(
+            category='transcriptomic_data',
         ),
         LibraryType(
-            library_type_id='Haplotagging', hierarchy_name='htag', category='genomic_data'
+            library_type_id='Chromium genome',
+            hierarchy_name='10x',
+            default_category='genomic_data',
         ),
         LibraryType(
-            library_type_id='HiSeqX PCR free', hierarchy_name='illumina', category='genomic_data'
+            library_type_id='Haplotagging',
+            hierarchy_name='htag',
+            default_category='genomic_data',
+        ),
+        LibraryType(
+            library_type_id='HiSeqX PCR free',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
         ),
         LibraryType(
             library_type_id='PacBio - IsoSeq',
             hierarchy_name='pacbio',
-            category='transcriptomic_data',
+            default_category='transcriptomic_data',
         ),
         LibraryType(
-            library_type_id='Standard', hierarchy_name='illumina', category='genomic_data'
+            library_type_id='Standard',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
         ),
         LibraryType(library_type_id='Custom'),
         LibraryType(library_type_id='No PCR (Plate)'),
@@ -93,79 +109,79 @@ def test_data(token: str):
         LibraryType(
             library_type_id='RNA PolyA',
             hierarchy_name='rna-seq',
-            category='transcriptomic_data',
+            default_category='transcriptomic_data',
             reporting_category='rnaseq',
         ),
         LibraryType(
             library_type_id='RNA-seq dUTP eukaryotic',
             hierarchy_name='rna-seq',
-            category='transcriptomic_data',
+            default_category='transcriptomic_data',
             reporting_category='rnaseq',
         ),
         LibraryType(
             library_type_id='RNA-seq dUTP prokaryotic',
             hierarchy_name='rna-seq',
-            category='transcriptomic_data',
+            default_category='transcriptomic_data',
             reporting_category='rnaseq',
         ),
         LibraryType(
             library_type_id='Small RNA (miRNA)',
             hierarchy_name='rna-seq',
-            category='transcriptomic_data',
+            default_category='transcriptomic_data',
             reporting_category='rnaseq',
         ),
         LibraryType(
             library_type_id='PacBio - HiFi',
             hierarchy_name='pacbio',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='pacbio',
         ),
         LibraryType(
             library_type_id='PacBio - HiFi (Microbial)',
             hierarchy_name='pacbio',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='pacbio',
         ),
         LibraryType(
             library_type_id='PacBio - HiFi (ULI)',
             hierarchy_name='pacbio',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='pacbio',
         ),
         LibraryType(
             library_type_id='Hi-C',
             hierarchy_name='hic',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='hic',
         ),
         LibraryType(
             library_type_id='Hi-C - Arima v1',
             hierarchy_name='hic-arima',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='hic',
         ),
         LibraryType(
             library_type_id='Hi-C - Arima v2',
             hierarchy_name='hic-arima2',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='hic',
         ),
         LibraryType(
             library_type_id='Hi-C - Dovetail',
             hierarchy_name='hic-dovetail',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='hic',
         ),
         LibraryType(
             library_type_id='Hi-C - OmniC',
             hierarchy_name='hic-omic',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='hic',
         ),
         LibraryType(
             library_type_id='Hi-C - Qiagen',
             hierarchy_name='hic-qiagen',
-            category='genomic_data',
+            default_category='genomic_data',
             reporting_category='hic',
         ),
         LibraryType(library_type_id='PacBio - CLR'),
@@ -189,7 +205,8 @@ def test_data(token: str):
         VisibilityDict(visibility='Withdrawn', description='Data has been deleted'),
         VisibilityDict(visibility='MetadataIssue', description='Metadata has issues'),
         VisibilityDict(
-            visibility='SampleSwap', description='Data involved in a possible sample swap'
+            visibility='SampleSwap',
+            description='Data involved in a possible sample swap',
         ),
         Project(
             project_id=17,
@@ -211,7 +228,7 @@ def test_data(token: str):
         ),
         Species(
             species_id='Brachiomonas submarina',
-            hierarchy_name='Brachiomonas_submarina',
+            location=Location(location_id=77, path='6/c/c/f/1/b/Brachiomonas_submarina'),
             taxon_id=327064,
             taxon_family='Chlamydomonadaceae',
             taxon_order='Chlamydomonadales',
@@ -222,6 +239,7 @@ def test_data(token: str):
             specimens=[
                 Specimen(
                     specimen_id='ucBraSubp1',
+                    location_id=77,
                     species_id='Brachiomonas submarina',
                     accession_id='SAMEA7532740',
                     samples=[
@@ -244,7 +262,8 @@ def test_data(token: str):
                                     reads=81186152,
                                     bases=12056143572,
                                     library=Library(
-                                        library_id='DN805609I:B3', library_type_id='Haplotagging'
+                                        library_id='DN805609I:B3',
+                                        library_type_id='Haplotagging',
                                     ),
                                     run=Run(
                                         run_id='37939',
@@ -264,7 +283,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=115631, project_id=17, data_id='37939_1#2')
+                                        Allocation(
+                                            id=115631,
+                                            project_id=17,
+                                            data_id='37939_1#2',
+                                        )
                                     ],
                                 )
                             ],
@@ -305,7 +328,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=117752, project_id=21, data_id='35344_1#2')
+                                        Allocation(
+                                            id=117752,
+                                            project_id=21,
+                                            data_id='35344_1#2',
+                                        )
                                     ],
                                 ),
                                 Data(
@@ -340,7 +367,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=117754, project_id=21, data_id='35344_1#4')
+                                        Allocation(
+                                            id=117754,
+                                            project_id=21,
+                                            data_id='35344_1#4',
+                                        )
                                     ],
                                 ),
                                 Data(
@@ -375,7 +406,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=117753, project_id=21, data_id='35344_1#3')
+                                        Allocation(
+                                            id=117753,
+                                            project_id=21,
+                                            data_id='35344_1#3',
+                                        )
                                     ],
                                 ),
                                 Data(
@@ -410,7 +445,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=117751, project_id=21, data_id='35344_1#1')
+                                        Allocation(
+                                            id=117751,
+                                            project_id=21,
+                                            data_id='35344_1#1',
+                                        )
                                     ],
                                 ),
                             ],
@@ -420,7 +459,8 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             accession_id='SAMEA7532766',
                             accession=Accession(
-                                accession_id='SAMEA7532766', accession_type_id='BioSample'
+                                accession_id='SAMEA7532766',
+                                accession_type_id='BioSample',
                             ),
                             data=[
                                 Data(
@@ -459,7 +499,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=117960, project_id=21, data_id='35528_4#8')
+                                        Allocation(
+                                            id=117960,
+                                            project_id=21,
+                                            data_id='35528_4#8',
+                                        )
                                     ],
                                 )
                             ],
@@ -572,7 +616,8 @@ def test_data(token: str):
                                     reads_duplicated=0,
                                     reads_filtered=1390,
                                     library=Library(
-                                        library_id='DN703483V', library_type_id='PacBio - HiFi'
+                                        library_id='DN703483V',
+                                        library_type_id='PacBio - HiFi',
                                     ),
                                     run=Run(
                                         run_id='m64016_201115_112225',
@@ -583,7 +628,9 @@ def test_data(token: str):
                                         instrument_name='m64016',
                                         complete='2020-11-15T00:00:00+00:00',
                                         pacbio_run_metrics=[
-                                            PacbioRunMetrics(run_id='m64016_201115_112225')
+                                            PacbioRunMetrics(
+                                                run_id='m64016_201115_112225'
+                                            )
                                         ],
                                     ),
                                     files=[
@@ -612,7 +659,8 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             accession_id='SAMEA7532770',
                             accession=Accession(
-                                accession_id='SAMEA7532770', accession_type_id='BioSample'
+                                accession_id='SAMEA7532770',
+                                accession_type_id='BioSample',
                             ),
                             data=[
                                 Data(
@@ -630,7 +678,8 @@ def test_data(token: str):
                                     reads=41616914,
                                     bases=6284154014,
                                     library=Library(
-                                        library_id='DN611904M:F3', library_type_id='RNA PolyA'
+                                        library_id='DN611904M:F3',
+                                        library_type_id='RNA PolyA',
                                     ),
                                     run=Run(
                                         run_id='36703',
@@ -647,7 +696,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=127430, project_id=24, data_id='36703_5#4')
+                                        Allocation(
+                                            id=127430,
+                                            project_id=24,
+                                            data_id='36703_5#4',
+                                        )
                                     ],
                                 )
                             ],
@@ -661,7 +714,7 @@ def test_data(token: str):
         ),
         Species(
             species_id='Juncus effusus',
-            hierarchy_name='Juncus_effusus',
+            location=Location(location_id=78, path='e/1/3/d/d/0/Juncus_effusus'),
             common_name='common rush',
             taxon_id=13579,
             taxon_family='Juncaceae',
@@ -673,6 +726,7 @@ def test_data(token: str):
             specimens=[
                 Specimen(
                     specimen_id='lpJunEffu1',
+                    location_id=78,
                     species_id='Juncus effusus',
                     accession_id='SAMEA7521930',
                     samples=[
@@ -681,7 +735,8 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953', accession_type_id='BioSample'
+                                accession_id='SAMEA7521953',
+                                accession_type_id='BioSample',
                             ),
                             data=[
                                 Data(
@@ -719,7 +774,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=118430, project_id=21, data_id='36691_2#8')
+                                        Allocation(
+                                            id=118430,
+                                            project_id=21,
+                                            data_id='36691_2#8',
+                                        )
                                     ],
                                 ),
                                 Data(
@@ -757,7 +816,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=118427, project_id=21, data_id='36691_2#5')
+                                        Allocation(
+                                            id=118427,
+                                            project_id=21,
+                                            data_id='36691_2#5',
+                                        )
                                     ],
                                 ),
                                 Data(
@@ -795,7 +858,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=118429, project_id=21, data_id='36691_2#7')
+                                        Allocation(
+                                            id=118429,
+                                            project_id=21,
+                                            data_id='36691_2#7',
+                                        )
                                     ],
                                 ),
                                 Data(
@@ -833,7 +900,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=118428, project_id=21, data_id='36691_2#6')
+                                        Allocation(
+                                            id=118428,
+                                            project_id=21,
+                                            data_id='36691_2#6',
+                                        )
                                     ],
                                 ),
                             ],
@@ -843,7 +914,8 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521954',
                             accession=Accession(
-                                accession_id='SAMEA7521954', accession_type_id='BioSample'
+                                accession_id='SAMEA7521954',
+                                accession_type_id='BioSample',
                             ),
                             data=[
                                 Data(
@@ -882,7 +954,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=121083, project_id=21, data_id='40666_2#2')
+                                        Allocation(
+                                            id=121083,
+                                            project_id=21,
+                                            data_id='40666_2#2',
+                                        )
                                     ],
                                 )
                             ],
@@ -892,7 +968,8 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953', accession_type_id='BioSample'
+                                accession_id='SAMEA7521953',
+                                accession_type_id='BioSample',
                             ),
                             data=[
                                 Data(
@@ -984,7 +1061,8 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953', accession_type_id='BioSample'
+                                accession_id='SAMEA7521953',
+                                accession_type_id='BioSample',
                             ),
                             data=[
                                 Data(
@@ -1002,7 +1080,8 @@ def test_data(token: str):
                                     reads=36344960,
                                     bases=5488088960,
                                     library=Library(
-                                        library_id='DN612239G:G9', library_type_id='RNA PolyA'
+                                        library_id='DN612239G:G9',
+                                        library_type_id='RNA PolyA',
                                     ),
                                     run=Run(
                                         run_id='37935',
@@ -1019,7 +1098,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=127563, project_id=24, data_id='37935_8#13')
+                                        Allocation(
+                                            id=127563,
+                                            project_id=24,
+                                            data_id='37935_8#13',
+                                        )
                                     ],
                                 )
                             ],
@@ -1029,7 +1112,8 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521957',
                             accession=Accession(
-                                accession_id='SAMEA7521957', accession_type_id='BioSample'
+                                accession_id='SAMEA7521957',
+                                accession_type_id='BioSample',
                             ),
                             data=[
                                 Data(
@@ -1047,7 +1131,8 @@ def test_data(token: str):
                                     reads=52850970,
                                     bases=7980496470,
                                     library=Library(
-                                        library_id='SQPP-7739-H:B9', library_type_id='RNA PolyA'
+                                        library_id='SQPP-7739-H:B9',
+                                        library_type_id='RNA PolyA',
                                     ),
                                     run=Run(
                                         run_id='48593',
@@ -1067,7 +1152,11 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(id=143140, project_id=24, data_id='48593_1#25')
+                                        Allocation(
+                                            id=143140,
+                                            project_id=24,
+                                            data_id='48593_1#25',
+                                        )
                                     ],
                                 )
                             ],
@@ -1085,9 +1174,5 @@ def test_data(token: str):
             name='lol',
             registered=True,
         ),
-        Token(
-            id=200,
-            token=token,
-            user_id=100
-        ),
+        Token(id=200, token=token, user_id=100),
     ]
