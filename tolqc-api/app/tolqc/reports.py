@@ -7,11 +7,12 @@ import json
 
 from flask import Blueprint, request
 
-from sqlalchemy import select
+from sqlalchemy import inspect, select
 from sqlalchemy.orm import Bundle
 
 from tol.api_base import custom_blueprint
 
+from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
     Allocation,
     Data,
@@ -32,9 +33,12 @@ from werkzeug.exceptions import BadRequest
 
 def reports_blueprint(
     session_factory,
+    models,
     url_prefix: str = '/report',
 ) -> Blueprint:
     rep = custom_blueprint(name='reports', url_prefix=url_prefix)
+
+    table_to_model = {x.__tablename__: x for x in models}
 
     @rep.route('/pacbio-data')
     def pacbio_run_data():
@@ -68,6 +72,18 @@ def reports_blueprint(
             illumina_data_report_query,
         )
 
+    @rep.route('/data')
+    def all_data():
+        return tolqc_report(
+            session_factory,
+            'all_data',
+            data_query,
+        )
+
+    @rep.route('/folder/<folder_table>')
+    def folder_data(folder_table):
+        return folder_report(session_factory, table_to_model, folder_table)
+
     @rep.errorhandler(BadRequest)
     def handle_bad_request(e):
         return {'error': e.description}, 400
@@ -93,6 +109,10 @@ FORMATTERS = {
 
 
 def tolqc_report(session_factory, report_name, build_query):
+    return tolqc_report_itr(session_factory, report_name, build_query())
+
+
+def tolqc_report_itr(session_factory, report_name, query):
     # File format if requested; defaults to TSV
     req_fmt = request.args.get('format', 'tsv').lower()
     fmt_mime = FORMATTERS.get(req_fmt)
@@ -114,11 +134,14 @@ def tolqc_report(session_factory, report_name, build_query):
     # session.close() to avoid SELECT statements accumulating on server
     # with 'idle in transaction' state.
     with session_factory() as session:
-        query = build_query()
         row_itr = session.execute(query)
 
     # Streams formatted data from the SQL query to the client
     return out_formatter(row_itr, query), 200, headers
+
+
+def data_query():
+    return select(Data.data_id)
 
 
 def pipeline_data_report_query():
@@ -399,6 +422,37 @@ def illumina_data_report_query():
     )
     query = add_argument(query, Data.study_id)
     return query
+
+
+def folder_report(session_factory, table_to_model, folder_table):
+    model = table_to_model.get(folder_table)
+    if not model:
+        msg = f'No such table {folder_table!r}'
+        raise BadRequest(msg)
+
+    tbl_select = []
+    ignore = {'folder_ulid', 'modified_at', 'modified_by'}
+    for col in inspect(model).columns:
+        if col.name not in ignore:
+            if col.type.python_type == datetime.datetime:
+                tbl_select.append(IsoDateTimeBundle(col.name, col))
+            else:
+                tbl_select.append(col)
+
+    query = (
+        select(
+            *tbl_select,
+            Folder.image_file_list,
+            Folder.other_file_list,
+            Folder.files_total_bytes,
+            FolderLocation.uri_prefix,
+        )
+        .select_from(model)
+        .outerjoin(Folder)
+        .outerjoin(FolderLocation)
+    )
+
+    return tolqc_report_itr(session_factory, f'{folder_table}_folders', query)
 
 
 class LastPathElementBundle(Bundle):
