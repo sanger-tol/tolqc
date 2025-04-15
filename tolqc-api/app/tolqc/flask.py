@@ -96,6 +96,7 @@ def application(session_factory=None):
     # Reports
     blueprint_reports = reports_blueprint(
         session_factory,
+        models,
         url_prefix=api_path + '/report',
     )
     app.register_blueprint(blueprint_reports)
