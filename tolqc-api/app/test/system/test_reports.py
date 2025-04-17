@@ -83,6 +83,11 @@ def test_mlwh_data_report(client, api_path):
     assert response.status == '200 OK'
 
 
+def test_folder_report(client, api_path):
+    response = client.get(api_path + '/report/folder/genomescope_metrics')
+    assert response.status == '200 OK'
+
+
 def good_param_combinations():
     for param in (
         {'processed': '1'},
