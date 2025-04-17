@@ -72,21 +72,17 @@ def reports_blueprint(
             illumina_data_report_query(),
         )
 
-    @rep.route('/species-data')
-    def all_data():
-        return tolqc_report(
-            session_factory,
-            'species_data',
-            species_data_report_query(),
-        )
+    # @rep.route('/species-data')
+    # def all_data():
+    #     return tolqc_report(
+    #         session_factory,
+    #         'species_data',
+    #         species_data_report_query(),
+    #     )
 
     @rep.route('/folder/<folder_table>')
     def folder_data(folder_table):
         return folder_report(session_factory, table_to_model, folder_table)
-
-    @rep.errorhandler(BadRequest)
-    def handle_bad_request(e):
-        return {'error': e.description}, 400
 
     return rep
 
@@ -213,6 +209,16 @@ def add_argument(query, column, name=None, lookup=None):
             raise BadRequest(msg) from None
 
     return query.where(column == val)
+
+
+def add_indexed_arguments(query, model):
+    """Add arguments for any indexed columns in the table"""
+    for col in inspect(model).columns:
+
+        # *** Misses indexed columns ***
+        if col.primary_key or col.foreign_keys:
+            query = add_argument(query, col)
+    return query
 
 
 def pacbio_data_report_query():
@@ -438,17 +444,47 @@ def folder_report(session_factory, table_to_model, folder_table):
     query = (
         select(
             *tbl_select,
-            Folder.image_file_list,
-            Folder.other_file_list,
-            Folder.files_total_bytes,
-            FolderLocation.uri_prefix,
+            FolderBundle(
+                'image_file_list',
+                FolderLocation.uri_prefix,
+                Folder.folder_ulid,
+                Folder.image_file_list,
+            ),
+            FolderBundle(
+                'other_file_list',
+                FolderLocation.uri_prefix,
+                Folder.folder_ulid,
+                Folder.other_file_list,
+            ),
         )
         .select_from(model)
         .outerjoin(Folder)
         .outerjoin(FolderLocation)
     )
 
+    query = add_indexed_arguments(query, model)
+
     return tolqc_report(session_factory, f'{folder_table}_folders', query)
+
+
+class FolderBundle(Bundle):
+    """Format each element of"""
+
+    def create_row_processor(self, query, getters, _):
+        get_prefix, get_folder_ulid, get_file_list = getters
+
+        def processor(row):
+            prefix = get_prefix(row)
+            folder_ulid = get_folder_ulid(row)
+            file_list = get_file_list(row)
+            if file_list:
+                for f in file_list:
+                    if file := f.get('file'):
+                        f['file'] = '/'.join((prefix, folder_ulid, file))
+
+            return file_list
+
+        return processor
 
 
 class LastPathElementBundle(Bundle):
