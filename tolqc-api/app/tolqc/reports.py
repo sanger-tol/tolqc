@@ -45,7 +45,7 @@ def reports_blueprint(
         return tolqc_report(
             session_factory,
             'pacbio_data',
-            pacbio_data_report_query,
+            pacbio_data_report_query(),
         )
 
     @rep.route('/pipeline-data')
@@ -53,7 +53,7 @@ def reports_blueprint(
         return tolqc_report(
             session_factory,
             'pipeline_data',
-            pipeline_data_report_query,
+            pipeline_data_report_query(),
         )
 
     @rep.route('/mlwh-data')
@@ -61,7 +61,7 @@ def reports_blueprint(
         return tolqc_report(
             session_factory,
             'mlwh_data',
-            mlwh_data_report_query,
+            mlwh_data_report_query(),
         )
 
     @rep.route('/illumina-data')
@@ -69,15 +69,15 @@ def reports_blueprint(
         return tolqc_report(
             session_factory,
             'illumina_data',
-            illumina_data_report_query,
+            illumina_data_report_query(),
         )
 
-    @rep.route('/data')
+    @rep.route('/species-data')
     def all_data():
         return tolqc_report(
             session_factory,
-            'all_data',
-            data_query,
+            'species_data',
+            species_data_report_query(),
         )
 
     @rep.route('/folder/<folder_table>')
@@ -108,11 +108,7 @@ FORMATTERS = {
 }
 
 
-def tolqc_report(session_factory, report_name, build_query):
-    return tolqc_report_itr(session_factory, report_name, build_query())
-
-
-def tolqc_report_itr(session_factory, report_name, query):
+def tolqc_report(session_factory, report_name, query):
     # File format if requested; defaults to TSV
     req_fmt = request.args.get('format', 'tsv').lower()
     fmt_mime = FORMATTERS.get(req_fmt)
@@ -452,7 +448,7 @@ def folder_report(session_factory, table_to_model, folder_table):
         .outerjoin(FolderLocation)
     )
 
-    return tolqc_report_itr(session_factory, f'{folder_table}_folders', query)
+    return tolqc_report(session_factory, f'{folder_table}_folders', query)
 
 
 class LastPathElementBundle(Bundle):
