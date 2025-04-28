@@ -119,24 +119,25 @@ def application(session_factory=None):
     )
 
     @app.errorhandler(BadRequest)
-    def handle_bad_request(e):
-        return propagate_data_source_error(e, 400)
+    def handle_bad_request(exptn):
+        return propagate_data_source_error(exptn, 400)
 
     @app.errorhandler(DBAPIError)
-    def handle_db_api_error(e):
-        return propagate_data_source_error(e, 500)
-
-    def propagate_data_source_error(e, code):
-        """Return an error which will be interpreted as a DataSourceError by the client"""
-        error_class = e.__class__.__name__
-        logging.warning(f'{error_class} - {e}')
-        return {
-            'errors': [
-                {
-                    'title': error_class,
-                    'detail': str(e),
-                }
-            ]
-        }, code
+    def handle_db_api_error(exptn):
+        return propagate_data_source_error(exptn, 500)
 
     return app
+
+
+def propagate_data_source_error(exptn: Exception, code: int):
+    """Return an error which will be interpreted as a DataSourceError by the client"""
+    error_class = exptn.__class__.__name__
+    logging.warning(f'{error_class} - {exptn}')
+    return {
+        'errors': [
+            {
+                'title': error_class,
+                'detail': str(exptn),
+            }
+        ]
+    }, code
