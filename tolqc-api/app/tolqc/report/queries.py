@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
 from sqlalchemy import select
 
 from tolqc.report.bundles import (
