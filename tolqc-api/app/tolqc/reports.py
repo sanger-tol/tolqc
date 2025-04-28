@@ -7,26 +7,23 @@ import json
 
 from flask import Blueprint, request
 
-from sqlalchemy import inspect, select
+from sqlalchemy import Column, inspect, select
 from sqlalchemy.orm import Bundle
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.sql.elements import Label
 
 from tol.api_base import custom_blueprint
 
-from tolqc.schema.folder_models import Folder, FolderLocation
-from tolqc.schema.sample_data_models import (
-    Allocation,
-    Data,
-    File,
-    Library,
-    Location,
-    PacbioRunMetrics,
-    Platform,
-    Project,
-    Run,
-    Sample,
-    Species,
-    Specimen,
+from tolqc.report.bundles import FolderBundle, IsoDateTimeBundle
+from tolqc.report.queries import (
+    illumina_data_report_query,
+    mlwh_data_report_query,
+    pacbio_data_report_query,
+    pipeline_data_report_query,
+    species_data_report_query,
 )
+from tolqc.schema.folder_models import Folder, FolderLocation
+
 
 from werkzeug.exceptions import BadRequest
 
@@ -38,51 +35,15 @@ def reports_blueprint(
 ) -> Blueprint:
     rep = custom_blueprint(name='reports', url_prefix=url_prefix)
 
-    table_to_model = {x.__tablename__: x for x in models}
+    rep_eng = ReportEngine(session_factory=session_factory, model_list=models)
 
-    @rep.route('/pacbio-data')
-    def pacbio_run_data():
-        return tolqc_report(
-            session_factory,
-            'pacbio_data',
-            pacbio_data_report_query(),
-        )
-
-    @rep.route('/pipeline-data')
-    def pipeline_data():
-        return tolqc_report(
-            session_factory,
-            'pipeline_data',
-            pipeline_data_report_query(),
-        )
-
-    @rep.route('/mlwh-data')
-    def mlwh_data():
-        return tolqc_report(
-            session_factory,
-            'mlwh_data',
-            mlwh_data_report_query(),
-        )
-
-    @rep.route('/illumina-data')
-    def illumina_data():
-        return tolqc_report(
-            session_factory,
-            'illumina_data',
-            illumina_data_report_query(),
-        )
-
-    # @rep.route('/species-data')
-    # def all_data():
-    #     return tolqc_report(
-    #         session_factory,
-    #         'species_data',
-    #         species_data_report_query(),
-    #     )
+    @rep.route('/<report_path>')
+    def pacbio_run_data(report_path):
+        return rep_eng.report(report_path)
 
     @rep.route('/folder/<folder_table>')
     def folder_data(folder_table):
-        return folder_report(session_factory, table_to_model, folder_table)
+        return rep_eng.folder_report(folder_table)
 
     return rep
 
@@ -98,458 +59,164 @@ def ndjson_rows(row_itr, _):
         yield json.dumps(row._asdict(), separators=(',', ':')) + '\n'
 
 
-FORMATTERS = {
-    'ndjson': (ndjson_rows, 'application/x-ndjson'),
-    'tsv': (tsv_rows, 'text/tab-separated-values'),
-}
+class ReportEngine:
+    def __init__(self, session_factory=None, model_list=None):
+        self.session_factory = session_factory
+        self.model_list = model_list
+        self.table_to_model = {x.__tablename__: x for x in model_list}
+        self.indexed_columns = {}
 
-
-def tolqc_report(session_factory, report_name, query):
-    # File format if requested; defaults to TSV
-    req_fmt = request.args.get('format', 'tsv').lower()
-    fmt_mime = FORMATTERS.get(req_fmt)
-    if not fmt_mime:
-        valid = tuple(FORMATTERS)
-        msg = f'format parameter must be one of: {valid}'
-        raise BadRequest(msg)
-    out_formatter, mime_type = fmt_mime
-
-    # Suggested filename for web browsers
-    today = datetime.date.today().isoformat()  # noqa: DTZ011
-    filename = f'{report_name}_{today}.{req_fmt}'
-    headers = {
-        'Content-Type': mime_type,
-        'Content-Disposition': f'attachment; filename="{filename}"',
+    FORMATTERS = {
+        'ndjson': (ndjson_rows, 'application/x-ndjson'),
+        'tsv': (tsv_rows, 'text/tab-separated-values'),
     }
 
-    # Must either (as here) use session as a context manager or call
-    # session.close() to avoid SELECT statements accumulating on server
-    # with 'idle in transaction' state.
-    with session_factory() as session:
-        row_itr = session.execute(query)
+    QUERY_FUNCS = {
+        'pacbio-data': pacbio_data_report_query,
+        'pipeline-data': pipeline_data_report_query,
+        'mlwh-data': mlwh_data_report_query,
+        'illumina-data': illumina_data_report_query,
+        'species-data': species_data_report_query,
+    }
 
-    # Streams formatted data from the SQL query to the client
-    return out_formatter(row_itr, query), 200, headers
+    def do_report(self, report_name, query):
+        # File format if requested; defaults to TSV
+        req_args = request.args.copy()
+        req_fmt = req_args.pop('format', 'tsv').lower()
+        fmt_mime = self.FORMATTERS.get(req_fmt)
+        if not fmt_mime:
+            valid = tuple(self.FORMATTERS)
+            msg = f'format parameter must be one of: {valid}'
+            raise BadRequest(msg)
+        out_formatter, mime_type = fmt_mime
 
+        # Suggested filename for web browsers
+        today = datetime.date.today().isoformat()  # noqa: DTZ011
+        filename = f'{report_name}_{today}.{req_fmt}'
+        headers = {
+            'Content-Type': mime_type,
+            'Content-Disposition': f'attachment; filename="{filename}"',
+        }
 
-def data_query():
-    return select(Data.data_id)
+        # Must either (as here) use session as a context manager or call
+        # session.close() to avoid SELECT statements accumulating on server
+        # with 'idle in transaction' state.
+        with self.session_factory() as session:
+            query = self.add_arguments(session, req_args, query)
+            row_itr = session.execute(query)
 
+        # Streams formatted data from the SQL query to the client
+        return out_formatter(row_itr, query), 200, headers
 
-def pipeline_data_report_query():
-    query = (
-        select(
-            Data.data_id,
-            File.remote_path,
-            Species.species_id.label('species'),
-            LastPathElementBundle('species_dir', Location.path),
-            Location.path.label('location'),
-            Data.category,
-            Specimen.specimen_id.label('specimen'),
-            Library.library_type_id.label('pipeline'),
-            Data.tag1_id,
-            Data.tag2_id,
-            Data.pcr_adapter_id.label('pcr_adapter_id'),
-            Data.accession_id.label('run_accession'),
-            Sample.accession_id.label('biosample_accession'),
-            Specimen.accession_id.label('biospecimen_accession'),
-            Species.data_accession_id.label('data_bioproject'),
-            Species.umbrella_accession_id.label('umbrella_bioproject'),
-            Data.study_id,
-            Data.visibility,
-            Data.lims_qc,
-            Data.processed,
-            Sample.sample_id.label('sample'),
-            Library.library_id.label('library'),
+    def report(self, report_path):
+        query_gen = self.QUERY_FUNCS.get(report_path)
+        if not query_gen:
+            msg = f"No such query '{report_path}'"
+            raise BadRequest(msg)
+
+        report_name = report_path.replace('-', '_')
+        return self.do_report(report_name, query_gen())
+
+    def folder_report(self, folder_table):
+        model = self.table_to_model.get(folder_table)
+        if not model:
+            msg = f'No such table {folder_table!r}'
+            raise BadRequest(msg)
+
+        tbl_select = []
+        ignore = {'folder_ulid', 'modified_at', 'modified_by'}
+        for col in inspect(model).columns:
+            if col.name not in ignore:
+                if col.type.python_type == datetime.datetime:
+                    tbl_select.append(IsoDateTimeBundle(col.name, col))
+                else:
+                    tbl_select.append(col)
+
+        query = (
+            select(
+                *tbl_select,
+                FolderBundle(
+                    'image_file_list',
+                    FolderLocation.uri_prefix,
+                    Folder.folder_ulid,
+                    Folder.image_file_list,
+                ),
+                FolderBundle(
+                    'other_file_list',
+                    FolderLocation.uri_prefix,
+                    Folder.folder_ulid,
+                    Folder.other_file_list,
+                ),
+            )
+            .select_from(model)
+            .outerjoin(Folder)
+            .outerjoin(FolderLocation)
         )
-        .select_from(Data)
-        .outerjoin(Sample)
-        .outerjoin(Specimen)
-        .outerjoin(Species)
-        .outerjoin(Location)
-        .join(File)
-        .join(Library)
-        .order_by(Data.data_id.desc())
-    )
 
-    query = add_argument(
-        query,
-        Data.processed,
-        lookup={
-            'null': None,
-            '0': 0,
-            '1': 1,
-        },
-    )
-    query = add_argument(query, Data.visibility)
-    query = add_argument(query, Data.lims_qc)
-    query = add_argument(query, Library.library_type_id, name='pipeline')
-    query = add_argument(query, Data.study_id)
+        return self.do_report(f'{folder_table}_folders', query)
 
-    return query
+    def add_arguments(self, session, req_args, query):
+        """
+        All remaining request arguments are treated as report column names to
+        be selected on.
+        """
 
+        query_cols = {x['name']: x['expr'] for x in query.column_descriptions}
+        insp = inspect(session.connection())
 
-def add_argument(query, column, name=None, lookup=None):
-    if not name:
-        name = column.name
+        for arg, val in req_args.items():
+            # Guard against being passed excessively long param values
+            val = None if val.lower() == 'null' else val[:256]
 
-    arg = request.args.get(name)
-    if not arg:
+            # Is the column in the report?
+            expr = query_cols.get(arg)
+            if expr is None:
+                msg = f"No such column '{arg}' in report"
+                raise BadRequest(msg)
+
+            # Check that there's only one column in the expression
+            columns = self.columns_from_expr(expr)
+            if len(columns) == 1:
+                sel_col = columns[0]
+            else:
+                msg = (
+                    f"Cannot select on report column '{arg}'"
+                    f' which contains {len(columns)} columns'
+                )
+                raise BadRequest(msg)
+
+            # Check that the column is indexed
+            if not self.is_indexed_column(insp, sel_col):
+                msg = f"Cannot select on unindexed column '{sel_col.name}'"
+                raise BadRequest(msg)
+
+            query = query.where(sel_col == val)
+
         return query
 
-    # Guard against being passed excessively long param values
-    val = arg[:256]
+    def is_indexed_column(self, insp, column) -> bool:
+        if column.primary_key or column.foreign_keys:
+            return True
 
-    if lookup:
-        try:
-            val = lookup[arg]
-        except KeyError:
-            valid = tuple(lookup)
-            msg = f"'{name}' parameter must be one of: {valid}"
-            raise BadRequest(msg) from None
+        # Column may be
+        table_name = column.table.name
+        idx_dict = self.indexed_columns.get(table_name)
+        if not idx_dict:
+            self.indexed_columns = idx_dict = {}
+            for idx in insp.get_indexes(table_name):
+                idx_cols = idx['column_names']
+                if len(idx_cols) == 1:
+                    idx_dict[idx_cols[0]] = True
 
-    return query.where(column == val)
+        return idx_dict.get(column.name, False)
 
-
-def add_indexed_arguments(query, model):
-    """Add arguments for any indexed columns in the table"""
-    for col in inspect(model).columns:
-
-        # *** Misses indexed columns ***
-        if col.primary_key or col.foreign_keys:
-            query = add_argument(query, col)
-    return query
-
-
-def pacbio_data_report_query():
-    return (
-        select(
-            ProjectGroupBundle(
-                'group',
-                Project.hierarchy_name,
-                Species.taxon_group,
-            ),
-            Species.species_id.label('species'),
-            Specimen.specimen_id.label('specimen'),
-            Sample.sample_id.label('sample'),
-            Library.library_type_id.label('pipeline'),
-            Platform.name.label('platform'),
-            Platform.model,
-            IsoDayBundle('date', Run.start),
-            Data.lims_qc,
-            Run.lims_id.label('run'),
-            Run.run_id.label('movie_name'),
-            Run.element.label('well'),
-            Run.instrument_name.label('instrument'),
-            Run.plex_count,
-            PacbioRunMetrics.movie_minutes.label('movie_length'),
-            Data.tag1_id.label('tag'),
-            Sample.accession_id.label('sample_accession'),
-            Data.accession_id.label('run_accession'),
-            Data.library_id.label('library'),
-            Data.reads,
-            Data.read_length_mean,
-            Data.read_length_n50,
-            Data.read_length_longest,
-            Data.read_length_shortest,
-            Data.reads_duplicated,
-            Data.reads_filtered,
-            Data.bases.label('bases'),
-            Data.bases_a,
-            Data.bases_c,
-            Data.bases_g,
-            Data.bases_t,
-            PacbioRunMetrics.loading_conc.label('loading_concentration'),
-            PacbioRunMetrics.binding_kit,
-            PacbioRunMetrics.sequencing_kit,
-            PacbioRunMetrics.productive_zmws_num,
-            PacbioRunMetrics.p0_num,
-            PacbioRunMetrics.p1_num,
-            PacbioRunMetrics.p2_num,
-        )
-        .select_from(Data)
-        .outerjoin(Sample)
-        .outerjoin(Specimen)
-        .outerjoin(Species)
-        .join(Run)
-        .join(Platform)
-        .outerjoin(Library)
-        .outerjoin(PacbioRunMetrics)
-        # Cannot do many-to-many join between Data and Project directly.
-        # Must explicitly go through Allocation:
-        .join(Allocation)
-        .join(Project)
-        .where(Platform.name == 'PacBio')
-        .order_by(
-            Data.date.desc(),
-            Specimen.specimen_id,
-        )
-    )
-
-
-def mlwh_data_report_query():
-    query = (
-        mlwh_data_report_query_select()
-        .select_from(Data)
-        .outerjoin(Sample)
-        .outerjoin(Specimen)
-        .outerjoin(Species)
-        .join(Run)
-        .join(Platform)
-        .outerjoin(File)
-        .outerjoin(Library)
-        .outerjoin(PacbioRunMetrics)
-        .where(Data.study_id != None)  # noqa: E711
-        .order_by(
-            Data.date.desc(),
-        )
-    )
-    query = add_argument(query, Data.study_id)
-    return query
-
-
-def mlwh_data_report_query_select():
-    return select(
-        Data.data_id,
-        Data.study_id,
-        Sample.sample_id.label('sample_name'),
-        Specimen.supplied_name.label('supplier_name'),
-        Specimen.specimen_id.label('tol_specimen_id'),
-        Sample.accession_id.label('biosample_accession'),
-        Specimen.accession_id.label('biospecimen_accession'),
-        Species.species_id.label('scientific_name'),
-        Species.taxon_id,
-        Platform.name.label('platform_type'),
-        Platform.model.label('instrument_model'),
-        Run.instrument_name,
-        Library.library_type_id.label('pipeline_id_lims'),
-        Run.run_id,
-        Run.lims_id.label('lims_run_id'),
-        Run.element,
-        IsoDateTimeBundle('run_start', Run.start),
-        IsoDateTimeBundle('run_complete', Run.complete),
-        Run.plex_count,
-        Data.lims_qc,
-        IsoDateTimeBundle('qc_date', Data.date),
-        Data.tag1_id,
-        Data.tag2_id,
-        Library.library_id,
-        PacbioRunMetrics.movie_minutes,
-        PacbioRunMetrics.binding_kit,
-        PacbioRunMetrics.sequencing_kit,
-        PacbioRunMetrics.sequencing_kit_lot_number,
-        PacbioRunMetrics.cell_lot_number,
-        PacbioRunMetrics.include_kinetics,
-        PacbioRunMetrics.loading_conc,
-        PacbioRunMetrics.control_num_reads,
-        PacbioRunMetrics.control_read_length_mean,
-        PacbioRunMetrics.control_concordance_mean,
-        PacbioRunMetrics.control_concordance_mode,
-        PacbioRunMetrics.local_base_rate,
-        PacbioRunMetrics.polymerase_read_bases,
-        PacbioRunMetrics.polymerase_num_reads,
-        PacbioRunMetrics.polymerase_read_length_mean,
-        PacbioRunMetrics.polymerase_read_length_n50,
-        PacbioRunMetrics.insert_length_mean,
-        PacbioRunMetrics.insert_length_n50,
-        PacbioRunMetrics.unique_molecular_bases,
-        PacbioRunMetrics.productive_zmws_num,
-        PacbioRunMetrics.p0_num,
-        PacbioRunMetrics.p1_num,
-        PacbioRunMetrics.p2_num,
-        PacbioRunMetrics.adapter_dimer_percent,
-        PacbioRunMetrics.short_insert_percent,
-        PacbioRunMetrics.hifi_read_bases,
-        PacbioRunMetrics.hifi_num_reads,
-        PacbioRunMetrics.hifi_read_length_mean,
-        PacbioRunMetrics.hifi_read_quality_median,
-        PacbioRunMetrics.hifi_number_passes_mean,
-        PacbioRunMetrics.hifi_low_quality_read_bases,
-        PacbioRunMetrics.hifi_low_quality_num_reads,
-        PacbioRunMetrics.hifi_low_quality_read_length_mean,
-        PacbioRunMetrics.hifi_low_quality_read_quality_median,
-        PacbioRunMetrics.hifi_barcoded_reads,
-        PacbioRunMetrics.hifi_bases_in_barcoded_reads,
-        File.remote_path,
-    )
-
-
-def illumina_data_report_query():
-    query = (
-        select(
-            ProjectGroupBundle(
-                'group',
-                Project.hierarchy_name,
-                Species.taxon_group,
-            ),
-            Species.species_id.label('species'),
-            Specimen.specimen_id.label('specimen'),
-            Platform.name.label('platform'),
-            Platform.model,
-            Data.data_id.label('data_id'),
-            Data.reads.label('reads'),
-            Data.bases.label('bases'),
-            Data.read_length_mean.label('read_length'),
-            Sample.accession_id.label('sample_accession'),
-            Data.accession_id.label('run_accession'),
-            Sample.sample_id.label('sample'),
-            Data.tag1_id.label('tag_id'),
-            Data.tag2_id.label('tag2_id'),
-            Data.lims_qc.label('lims_qc'),
-            IsoDayBundle('date', Run.complete),
-            Library.library_type_id.label('pipeline'),
-            Data.bases_a,
-            Data.bases_c,
-            Data.bases_g,
-            Data.bases_t,
-        )
-        .select_from(Data)
-        .outerjoin(Sample)
-        .outerjoin(Specimen)
-        .outerjoin(Species)
-        .join(Run)
-        .join(Platform)
-        .outerjoin(Library)
-        # Cannot do many-to-many join between Data and Project directly.
-        # Must explicitly go through Allocation:
-        .join(Allocation)
-        .join(Project)
-        # Join accession onto Data
-        .outerjoin(Data.accession)
-        .where(Platform.name == 'Illumina')
-        .order_by(
-            Data.date.desc(),
-            Specimen.specimen_id,
-        )
-    )
-    query = add_argument(query, Data.study_id)
-    return query
-
-
-def folder_report(session_factory, table_to_model, folder_table):
-    model = table_to_model.get(folder_table)
-    if not model:
-        msg = f'No such table {folder_table!r}'
-        raise BadRequest(msg)
-
-    tbl_select = []
-    ignore = {'folder_ulid', 'modified_at', 'modified_by'}
-    for col in inspect(model).columns:
-        if col.name not in ignore:
-            if col.type.python_type == datetime.datetime:
-                tbl_select.append(IsoDateTimeBundle(col.name, col))
-            else:
-                tbl_select.append(col)
-
-    query = (
-        select(
-            *tbl_select,
-            FolderBundle(
-                'image_file_list',
-                FolderLocation.uri_prefix,
-                Folder.folder_ulid,
-                Folder.image_file_list,
-            ),
-            FolderBundle(
-                'other_file_list',
-                FolderLocation.uri_prefix,
-                Folder.folder_ulid,
-                Folder.other_file_list,
-            ),
-        )
-        .select_from(model)
-        .outerjoin(Folder)
-        .outerjoin(FolderLocation)
-    )
-
-    query = add_indexed_arguments(query, model)
-
-    return tolqc_report(session_factory, f'{folder_table}_folders', query)
-
-
-class FolderBundle(Bundle):
-    """Format each element of"""
-
-    def create_row_processor(self, query, getters, _):
-        get_prefix, get_folder_ulid, get_file_list = getters
-
-        def processor(row):
-            prefix = get_prefix(row)
-            folder_ulid = get_folder_ulid(row)
-            file_list = get_file_list(row)
-            if file_list:
-                for f in file_list:
-                    if file := f.get('file'):
-                        f['file'] = '/'.join((prefix, folder_ulid, file))
-
-            return file_list
-
-        return processor
-
-
-class LastPathElementBundle(Bundle):
-    """Return the last element of the path"""
-
-    def create_row_processor(self, query, getters, _):
-        (get_path,) = getters
-
-        def processor(row):
-            path = get_path(row)
-            return path.split('/')[-1] if path else None
-
-        return processor
-
-
-class ProjectGroupBundle(Bundle):
-    """
-    Combine the "proj" and "taxon_group" columns if the "proj" column
-    contains "{}", else returns the "proj" itself.
-    e.g. ("darwin/{}", "birds") becomes "darwin/birds"
-    """  # noqa: P102
-
-    def create_row_processor(self, query, getters, _):
-        get_proj, get_taxon_group = getters
-
-        def processor(row):
-            proj = get_proj(row)
-            taxon_group = get_taxon_group(row)
-            group = None
-            if proj is not None:
-                if '{}' in proj and taxon_group is not None:  # noqa: P103
-                    group = proj.format(taxon_group)
-                else:
-                    group = proj
-            return group
-
-        return processor
-
-
-class IsoDayBundle(Bundle):
-    """
-    Returns just the day portion of a datetime column
-    in ISO 8601 format, if it contains a value.
-    """
-
-    def create_row_processor(self, query, getters, _):
-        (get_datetime,) = getters
-
-        def processor(row):
-            dt = get_datetime(row)
-            return dt.date().isoformat() if dt else None
-
-        return processor
-
-
-class IsoDateTimeBundle(Bundle):
-    """
-    Returns datetime column in ISO 8601 format, if it contains a value.
-    """
-
-    def create_row_processor(self, query, getters, _):
-        (get_datetime,) = getters
-
-        def processor(row):
-            dt = get_datetime(row)
-            return dt.isoformat() if dt else None
-
-        return processor
+    def columns_from_expr(self, expr) -> tuple[Column | InstrumentedAttribute]:
+        if isinstance(expr, Bundle):
+            return tuple(expr.columns)
+        elif isinstance(expr, Label):
+            return tuple(expr.base_columns)
+        elif isinstance(expr, Column | InstrumentedAttribute):
+            return (expr,)
+        else:
+            msg = f'Do not know how to get columns from: {expr!r} {expr.name}\n{dir(expr)}'
+            raise ValueError(msg)

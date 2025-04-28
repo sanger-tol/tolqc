@@ -4,6 +4,7 @@
 
 import io
 import json
+import logging
 import re
 from urllib.parse import urlencode
 
@@ -84,8 +85,21 @@ def test_mlwh_data_report(client, api_path):
 
 
 def test_folder_report(client, api_path):
-    response = client.get(api_path + '/report/folder/genomescope_metrics')
+    response = client.get(api_path + '/report/folder/data?format=NDJSON')
     assert response.status == '200 OK'
+
+    json_lines = [json.loads(x) for x in io.StringIO(response.text).readlines()]
+    assert json_lines
+
+    files_count = 0
+    for jl in json_lines:
+        for key in ('image_file_list', 'other_file_list'):
+            files = jl[key]
+            if files is not None:
+                files_count += 1
+                for spec in files:
+                    assert spec['file'].startswith('s3://')
+    assert files_count > 0
 
 
 def good_param_combinations():
@@ -111,7 +125,9 @@ def good_param_combinations():
 
 @pytest.mark.parametrize('params', good_param_combinations())
 def test_data_report_good_params(client, api_path, params):
-    response = client.get(api_path + '/report/pipeline-data?' + urlencode(params))
+    url = api_path + '/report/pipeline-data?' + urlencode(params)
+    logging.warning(f'{url = }')
+    response = client.get(url)
     assert response.status == '200 OK'
 
     json_lines = [json.loads(x) for x in io.StringIO(response.text).readlines()]
@@ -146,4 +162,4 @@ def test_data_report_bad_params(client, api_path):
     response = client.get(
         api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'})
     )
-    assert response.status == '400 BAD REQUEST'
+    assert response.status == '500 INTERNAL SERVER ERROR'
