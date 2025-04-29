@@ -9,12 +9,14 @@ from tolqc.report.bundles import (
     IsoDayBundle,
     LastPathElementBundle,
     ProjectGroupBundle,
+    StarPathBundle,
 )
 from tolqc.schema.sample_data_models import (
     Allocation,
     Data,
     File,
     Library,
+    LibraryType,
     Location,
     PacbioRunMetrics,
     Platform,
@@ -26,35 +28,6 @@ from tolqc.schema.sample_data_models import (
 )
 
 
-def species_data_report_query():
-    query = (
-        select(
-            Species.species_id,
-            Species.tolid_prefix,
-            Species.common_name,
-            Species.taxon_id,
-            Species.taxon_family,
-            Species.taxon_order,
-            Species.taxon_phylum,
-            Species.taxon_group,
-            Species.data_accession_id.label('bioproject_data'),
-            Species.umbrella_accession_id.label('bioproject_umbrella'),
-            Specimen.epithet,
-            Specimen.taxon_id.label('epithet_taxon_id'),
-            Data.data_id,
-            Data.category,
-        )
-        .select_from(Species)
-        .outerjoin(Specimen)
-        .outerjoin(Sample)
-        .outerjoin(Data)
-        .order_by(
-            Species.species_id,
-        )
-    )
-    return query
-
-
 def pipeline_data_report_query():
     query = (
         select(
@@ -62,9 +35,17 @@ def pipeline_data_report_query():
             File.remote_path,
             Species.species_id.label('species'),
             LastPathElementBundle('species_dir', Location.path),
-            Location.path.label('location'),
+            Location.path.label('location_root'),
             Data.category,
             Specimen.specimen_id.label('specimen'),
+            LibraryType.hierarchy_name.label('lib_type_dir'),
+            StarPathBundle(
+                'location',
+                Location.path,
+                Data.category,
+                Specimen.specimen_id,
+                LibraryType.hierarchy_name,
+            ),
             Library.library_type_id.label('pipeline'),
             Data.tag1_id,
             Data.tag2_id,
@@ -84,10 +65,11 @@ def pipeline_data_report_query():
         .select_from(Data)
         .outerjoin(Sample)
         .outerjoin(Specimen)
+        .outerjoin(Location)  # Important to join to Location from Speciemn not Species
         .outerjoin(Species)
-        .outerjoin(Location)
         .join(File)
         .join(Library)
+        .join(LibraryType)
         .order_by(Data.data_id.desc())
     )
 

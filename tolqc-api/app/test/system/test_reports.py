@@ -111,9 +111,7 @@ def test_report_engine_indexes(report_engine):
         # Indexed column
         assert report_engine.is_indexed_column(session, Data.processed) is True
         # No index
-        assert (
-            report_engine.is_indexed_column(session, Data.read_length_longest) is False
-        )
+        assert report_engine.is_indexed_column(session, Data.bases) is False
 
 
 def test_folder_report(client, api_path):
