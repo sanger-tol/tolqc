@@ -20,7 +20,6 @@ from tolqc.report.queries import (
     mlwh_data_report_query,
     pacbio_data_report_query,
     pipeline_data_report_query,
-    species_data_report_query,
 )
 from tolqc.schema.folder_models import Folder, FolderLocation, HasFolder
 
@@ -76,7 +75,6 @@ class ReportEngine:
         'pipeline-data': pipeline_data_report_query,
         'mlwh-data': mlwh_data_report_query,
         'illumina-data': illumina_data_report_query,
-        'species-data': species_data_report_query,
     }
 
     def do_report(self, report_name, query):
@@ -215,12 +213,12 @@ class ReportEngine:
         return idx_dict.get(column.name, False)
 
     def columns_from_expr(self, expr) -> tuple[Column | InstrumentedAttribute]:
-        if isinstance(expr, Bundle):
-            return tuple(expr.columns)
+        if isinstance(expr, Column | InstrumentedAttribute):
+            return (expr,)
         elif isinstance(expr, Label):
             return tuple(expr.base_columns)
-        elif isinstance(expr, Column | InstrumentedAttribute):
-            return (expr,)
+        elif isinstance(expr, Bundle):
+            err = f"Cannot select on Bundle column '{expr.name}'"
         else:
-            msg = f"Do not know how to get columns from '{expr.name}': {expr!r}"
-            raise ValueError(msg)
+            err = f"Do not know how to get columns from '{expr.name}': {expr!r}"
+        raise BadRequest(err)

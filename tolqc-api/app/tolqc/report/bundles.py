@@ -38,6 +38,23 @@ class LastPathElementBundle(Bundle):
         return processor
 
 
+class StarPathBundle(Bundle):
+    """
+    Provided that the first element is not null, return all elements joined as
+    a path, with `*` replacing any values which are null.
+    """
+
+    def create_row_processor(self, query, getters, _):
+        def processor(row):
+            elements = tuple(g(row) for g in getters)
+            if elements[0] is None:
+                return None
+            else:
+                return '/'.join('*' if x is None else x for x in elements)
+
+        return processor
+
+
 class ProjectGroupBundle(Bundle):
     """
     Combine the "proj" and "taxon_group" columns if the "proj" column
