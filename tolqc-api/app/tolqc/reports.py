@@ -22,7 +22,7 @@ from tolqc.report.queries import (
     pipeline_data_report_query,
     species_data_report_query,
 )
-from tolqc.schema.folder_models import Folder, FolderLocation
+from tolqc.schema.folder_models import Folder, FolderLocation, HasFolder
 
 
 from werkzeug.exceptions import BadRequest
@@ -35,7 +35,7 @@ def reports_blueprint(
 ) -> Blueprint:
     rep = custom_blueprint(name='reports', url_prefix=url_prefix)
 
-    rep_eng = ReportEngine(session_factory=session_factory, model_list=models)
+    rep_eng = ReportEngine(session_factory=session_factory, models=models)
 
     @rep.route('/<report_path>')
     def pacbio_run_data(report_path):
@@ -60,10 +60,10 @@ def ndjson_rows(row_itr, _):
 
 
 class ReportEngine:
-    def __init__(self, session_factory=None, model_list=None):
+    def __init__(self, session_factory=None, models=None):
         self.session_factory = session_factory
-        self.model_list = model_list
-        self.table_to_model = {x.__tablename__: x for x in model_list}
+        self.models = models
+        self.table_to_model = {x.__tablename__: x for x in models}
         self.indexed_columns = {}
 
     FORMATTERS = {
@@ -111,7 +111,7 @@ class ReportEngine:
     def report(self, report_path):
         query_gen = self.QUERY_FUNCS.get(report_path)
         if not query_gen:
-            msg = f"No such query '{report_path}'"
+            msg = f"No such report '{report_path}'"
             raise BadRequest(msg)
 
         report_name = report_path.replace('-', '_')
@@ -121,6 +121,10 @@ class ReportEngine:
         model = self.table_to_model.get(folder_table)
         if not model:
             msg = f'No such table {folder_table!r}'
+            raise BadRequest(msg)
+
+        if not issubclass(model, HasFolder):
+            msg = f'Table {folder_table!r} is not a folder table'
             raise BadRequest(msg)
 
         tbl_select = []
@@ -162,7 +166,6 @@ class ReportEngine:
         """
 
         query_cols = {x['name']: x['expr'] for x in query.column_descriptions}
-        insp = inspect(session.connection())
 
         for arg, val in req_args.items():
             # Guard against being passed excessively long param values
@@ -186,7 +189,7 @@ class ReportEngine:
                 raise BadRequest(msg)
 
             # Check that the column is indexed
-            if not self.is_indexed_column(insp, sel_col):
+            if not self.is_indexed_column(session, sel_col):
                 msg = f"Cannot select on unindexed column '{sel_col.name}'"
                 raise BadRequest(msg)
 
@@ -194,14 +197,15 @@ class ReportEngine:
 
         return query
 
-    def is_indexed_column(self, insp, column) -> bool:
+    def is_indexed_column(self, session, column) -> bool:
         if column.primary_key or column.foreign_keys:
             return True
 
-        # Column may be
+        # Column may have a non primary or foreign key index
         table_name = column.table.name
         idx_dict = self.indexed_columns.get(table_name)
         if not idx_dict:
+            insp = inspect(session.connection())
             self.indexed_columns = idx_dict = {}
             for idx in insp.get_indexes(table_name):
                 idx_cols = idx['column_names']
@@ -218,5 +222,5 @@ class ReportEngine:
         elif isinstance(expr, Column | InstrumentedAttribute):
             return (expr,)
         else:
-            msg = f'Do not know how to get columns from: {expr!r} {expr.name}\n{dir(expr)}'
+            msg = f"Do not know how to get columns from '{expr.name}': {expr!r}"
             raise ValueError(msg)
