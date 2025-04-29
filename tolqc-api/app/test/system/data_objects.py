@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
     Accession,
     AccessionTypeDict,
@@ -19,6 +20,7 @@ from tolqc.schema.sample_data_models import (
     QCDict,
     Run,
     Sample,
+    Sex,
     Species,
     Specimen,
     VisibilityDict,
@@ -68,21 +70,41 @@ def test_data(token: str):
             regexp='^[a-z]{1,2}[A-Z][a-z]{2}[A-Z][a-z]{2,3}\\d+$',
             url='https://id.tol.sanger.ac.uk/api/v2/tol-ids/{}',  # noqa: P103
         ),
-        CategoryDict(
-            category='genomic_data',
+        AccessionTypeDict(accession_type_id='Placeholder', regexp='^(Request|Pending)$'),
+        AccessionTypeDict(
+            accession_type_id='BioSpecimen',
+            regexp='^SAM[A-Z]{2}\\d+$',
+            url='https://www.ebi.ac.uk/biosamples/samples/{}',  # noqa: P103
         ),
-        CategoryDict(
-            category='transcriptomic_data',
+        AccessionTypeDict(
+            accession_type_id='BioProject - Species Data',
+            regexp='^PRJ[A-Z]{2}\\d+$',
+            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
         ),
+        AccessionTypeDict(
+            accession_type_id='BioProject - Species Umbrella',
+            regexp='^PRJ[A-Z]{2}\\d+$',
+            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
+        ),
+        AccessionTypeDict(
+            accession_type_id='BioProject - Project Umbrella',
+            regexp='^PRJ[A-Z]{2}\\d+$',
+            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
+        ),
+        AccessionTypeDict(
+            accession_type_id='Sample',
+            regexp='^[ES]RS\\d+$',
+            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
+        ),
+        CategoryDict(category='transcriptomic_data'),
+        CategoryDict(category='genomic_data'),
         LibraryType(
             library_type_id='Chromium genome',
             hierarchy_name='10x',
             default_category='genomic_data',
         ),
         LibraryType(
-            library_type_id='Haplotagging',
-            hierarchy_name='htag',
-            default_category='genomic_data',
+            library_type_id='Haplotagging', hierarchy_name='htag', default_category='genomic_data'
         ),
         LibraryType(
             library_type_id='HiSeqX PCR free',
@@ -95,12 +117,9 @@ def test_data(token: str):
             default_category='transcriptomic_data',
         ),
         LibraryType(
-            library_type_id='Standard',
-            hierarchy_name='illumina',
-            default_category='genomic_data',
+            library_type_id='Standard', hierarchy_name='illumina', default_category='genomic_data'
         ),
         LibraryType(library_type_id='Custom'),
-        LibraryType(library_type_id='No PCR (Plate)'),
         LibraryType(library_type_id='qPCR only'),
         LibraryType(library_type_id='Pre-quality controlled'),
         LibraryType(library_type_id='Manual Standard WGS (Plate)'),
@@ -154,38 +173,128 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='hic',
         ),
+        LibraryType(library_type_id='PacBio - CLR'),
+        LibraryType(library_type_id='RNA Ribo'),
+        LibraryType(
+            library_type_id='PacBio - HiFi (PiMmS)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+        ),
+        LibraryType(
+            library_type_id='ATAC-seq', hierarchy_name='atac-seq', default_category='genomic_data'
+        ),
         LibraryType(
             library_type_id='Hi-C - Arima v1',
             hierarchy_name='hic-arima',
             default_category='genomic_data',
             reporting_category='hic',
+            kit='Arima v1',
+            enzymes='HinfI,DpnII',
+            cut_sites='^GATC,G^ANTC',
         ),
         LibraryType(
             library_type_id='Hi-C - Arima v2',
             hierarchy_name='hic-arima2',
             default_category='genomic_data',
             reporting_category='hic',
+            kit='Arima v2',
+            enzymes='HinfI,DpnII,DdeI,MseI',
+            cut_sites='^GATC,G^ANTC,C^TNAG,T^TAA',
         ),
         LibraryType(
             library_type_id='Hi-C - Dovetail',
             hierarchy_name='hic-dovetail',
             default_category='genomic_data',
             reporting_category='hic',
+            kit='Dovetail - Hi-C',
+            enzymes='DpnII',
+            cut_sites='^GATC',
         ),
         LibraryType(
             library_type_id='Hi-C - OmniC',
             hierarchy_name='hic-omic',
             default_category='genomic_data',
             reporting_category='hic',
+            kit='Dovetail - Omni-C',
         ),
         LibraryType(
             library_type_id='Hi-C - Qiagen',
             hierarchy_name='hic-qiagen',
             default_category='genomic_data',
             reporting_category='hic',
+            kit='Qiagen',
+            enzymes='DpnII',
+            cut_sites='^GATC',
         ),
-        LibraryType(library_type_id='PacBio - CLR'),
-        LibraryType(library_type_id='RNA Ribo'),
+        LibraryType(
+            library_type_id='Hi-C - DNAzoo (Csp6I,MseI)',
+            hierarchy_name='hic-dnazoo',
+            default_category='genomic_data',
+            reporting_category='hic',
+            kit='DNAzoo',
+            enzymes='Csp6I,MseI',
+            cut_sites='G^TAC,T^TAA',
+        ),
+        LibraryType(
+            library_type_id='Hi-C - DNAzoo (MboI,MseI)',
+            hierarchy_name='hic-dnazoo',
+            default_category='genomic_data',
+            reporting_category='hic',
+            kit='DNAzoo',
+            enzymes='MboI,MseI',
+            cut_sites='^GATC,T^TAA',
+        ),
+        LibraryType(
+            library_type_id='Chicago - Dovetail',
+            hierarchy_name='chicago',
+            default_category='genomic_data',
+            kit='Dovetail',
+        ),
+        LibraryType(
+            library_type_id='BioNano - DLE1',
+            hierarchy_name='bionano',
+            default_category='genomic_data',
+            reporting_category='bionano',
+            enzymes='DLE1',
+        ),
+        LibraryType(
+            library_type_id='BioNano - BssSI',
+            hierarchy_name='bionano',
+            default_category='genomic_data',
+            reporting_category='bionano',
+            enzymes='BssSI',
+        ),
+        LibraryType(
+            library_type_id='BioNano - BspQI',
+            hierarchy_name='bionano',
+            default_category='genomic_data',
+            reporting_category='bionano',
+            enzymes='BspQI',
+        ),
+        LibraryType(
+            library_type_id='Hi-C - Phase',
+            hierarchy_name='hic-phase',
+            default_category='genomic_data',
+            reporting_category='hic',
+            kit='Phase',
+        ),
+        LibraryType(
+            library_type_id='Hi-C - Homebrew',
+            hierarchy_name='hic-homebrew',
+            default_category='genomic_data',
+            reporting_category='hic',
+        ),
+        LibraryType(
+            library_type_id='No PCR (Plate)',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
+        ),
+        LibraryType(
+            library_type_id='Long range',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
+        ),
         Platform(id=1, name='Illumina', model='HiSeq'),
         Platform(id=2, name='Illumina', model='HiSeqX'),
         Platform(id=4, name='Illumina', model='HiSeq 4000'),
@@ -197,17 +306,142 @@ def test_data(token: str):
         Platform(id=12, name='PacBio', model='Sequel'),
         Platform(id=13, name='PacBio', model='RSII'),
         Platform(id=14, name='PacBio', model='Sequel II'),
+        Platform(id=15, name='Illumina'),
+        Platform(id=16, name='Illumina', model='HiSeq 2500'),
+        Platform(id=17, name='Illumina', model='NovaSeq 6000'),
+        Platform(id=18, name='Illumina', model='HiSeq 2000'),
+        Platform(id=19, name='Illumina', model='NextSeq 500'),
+        Platform(id=20, name='BioNano', model='Saphyr'),
+        Platform(id=21, name='BioNano', model='Irys'),
         Centre(id=2, name='Wellcome Sanger Institute'),
+        FolderLocation(
+            folder_location_id='pacbio_run_s3',
+            uri_prefix='s3://tolqc-dev/pacbio_run',
+            files_template={
+                'image_file_patterns': [
+                    {'caption': 'Base yield density', 'pattern': 'base_yield_plot\\.png'},
+                    {'caption': 'Barcode quality distribution', 'pattern': 'bq_histogram\\.png'},
+                    {
+                        'caption': 'Read quality distribution',
+                        'pattern': 'ccs_accuracy_hist\\.png',
+                    },
+                    {
+                        'caption': 'Read length distribution (all)',
+                        'pattern': 'ccs_all_readlength_hist_plot\\.png',
+                    },
+                    {
+                        'caption': 'HiFi yield by read length',
+                        'pattern': 'ccs_hifi_read_length_yield_plot\\.png',
+                    },
+                    {'caption': 'Number of passes', 'pattern': 'ccs_npasses_hist\\.png'},
+                    {
+                        'caption': 'HiFi read length distribution',
+                        'pattern': 'ccs_readlength_hist_plot\\.png',
+                    },
+                    {'caption': 'Control concordance', 'pattern': 'concordance_plot\\.png'},
+                    {
+                        'caption': 'Insert read length density',
+                        'pattern': 'hexbin_length_plot\\.png',
+                    },
+                    {'caption': 'CpG methylation in reads', 'pattern': 'm5c_detections\\.png'},
+                    {
+                        'caption': 'CpG methylation in reads histogram',
+                        'pattern': 'm5c_detections_hist\\.png',
+                    },
+                    {'caption': 'Number of reads per barcode', 'pattern': 'nreads\\.png'},
+                    {
+                        'caption': 'Number of reads per barcode histogram',
+                        'pattern': 'nreads_histogram\\.png',
+                    },
+                    {'caption': 'Loading evaluation', 'pattern': 'raw_read_length_plot\\.png'},
+                    {'caption': 'Polymerase read length', 'pattern': 'readLenDist0\\.png'},
+                    {
+                        'caption': 'Control polymerase read length',
+                        'pattern': 'readlength_plot\\.png',
+                    },
+                    {
+                        'caption': 'Mean readlength histogram',
+                        'pattern': 'readlength_histogram\\.png',
+                    },
+                    {
+                        'caption': 'Accuracy versus read length density',
+                        'pattern': 'readlength_qv_hist2d\\.hexbin\\.png',
+                    },
+                ]
+            },
+        ),
+        FolderLocation(
+            folder_location_id='illumina_data_s3',
+            uri_prefix='s3://tolqc-dev/illumina_data',
+            files_template={
+                'image_file_patterns': [
+                    {
+                        'caption': '{library_type} G|C Content',
+                        'pattern': '.+_F0xB00-gc-content\\.png',
+                    },
+                    {
+                        'caption': '{library_type} A|C|G|T Content Per Cycle',
+                        'pattern': '.+_F0xB00-acgt-cycles\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Per Cycle (Overlaid)',
+                        'pattern': '.+_F0xB00-quals\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Per Cycle (Split)',
+                        'pattern': '.+_F0xB00-quals2\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Frequencies, Per Cycle Heat Map',
+                        'pattern': '.+_F0xB00-quals-hm\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Frequencies, Separate Curve Per Cycle',
+                        'pattern': '.+_F0xB00-quals3\\.png',
+                    },
+                ]
+            },
+        ),
+        FolderLocation(
+            folder_location_id='genomescope_s3',
+            uri_prefix='s3://tolqc-dev/genomescope',
+            files_template={
+                'image_file_patterns': [
+                    {'caption': 'Genomescope 2.0 linear plot', 'pattern': '.*linear_plot\\.png'},
+                    {'caption': 'Genomescope 2.0 log plot', 'pattern': '.*log_plot\\.png'},
+                    {
+                        'caption': 'Genomescope 2.0 transformed linear plot',
+                        'pattern': '.*transformed_linear_plot\\.png',
+                    },
+                    {
+                        'caption': 'Genomescope 2.0 transformed log plot',
+                        'pattern': '.*transformed_log_plot\\.png',
+                    },
+                ],
+                'other_file_patterns': [
+                    {'caption': 'Kmer counts histogram data', 'pattern': '.*\\.hist\\.txt'}
+                ],
+            },
+        ),
         QCDict(qc_state='pass'),
         QCDict(qc_state='fail'),
+        Sex(sex_id='M', description='Male'),
+        Sex(sex_id='F', description='Female'),
+        Sex(sex_id='M?', description='Male (uncertain)'),
+        Sex(sex_id='F?', description='Female (uncertain)'),
+        Sex(sex_id='H', description='Hermaphrodite'),
+        Sex(sex_id='H/M', description='Hermaphrodite, monoecious'),
+        Sex(sex_id='NA', description='Not applicable'),
+        Sex(sex_id='U', description='Unknown'),
         VisibilityDict(visibility='Always', description='Shown in standard reporting'),
         VisibilityDict(visibility='Testing', description='Sequencing development data'),
         VisibilityDict(visibility='Withdrawn', description='Data has been deleted'),
         VisibilityDict(visibility='MetadataIssue', description='Metadata has issues'),
         VisibilityDict(
-            visibility='SampleSwap',
-            description='Data involved in a possible sample swap',
+            visibility='SampleSwap', description='Data involved in a possible sample swap'
         ),
+        VisibilityDict(visibility='Fail', description='Failed - do not import'),
+        VisibilityDict(visibility='Legacy', description='Legacy data - do not display'),
         Project(
             project_id=17,
             hierarchy_name='darwin/rnd',
@@ -228,7 +462,8 @@ def test_data(token: str):
         ),
         Species(
             species_id='Brachiomonas submarina',
-            location=Location(location_id=77, path='6/c/c/f/1/b/Brachiomonas_submarina'),
+            location_id=3113,
+            tolid_prefix='ucBraSubm',
             taxon_id=327064,
             taxon_family='Chlamydomonadaceae',
             taxon_order='Chlamydomonadales',
@@ -239,7 +474,7 @@ def test_data(token: str):
             specimens=[
                 Specimen(
                     specimen_id='ucBraSubp1',
-                    location_id=77,
+                    location_id=3113,
                     species_id='Brachiomonas submarina',
                     accession_id='SAMEA7532740',
                     samples=[
@@ -250,9 +485,10 @@ def test_data(token: str):
                                 Data(
                                     data_id='37939_1#2',
                                     study_id=5822,
+                                    category='genomic_data',
                                     sample_id='DTOL_RD10244236',
                                     library_id='DN805609I:B3',
-                                    run_id='37939',
+                                    run_id='37939_1',
                                     processed=0,
                                     tag1_id='18',
                                     tag2_id='18',
@@ -261,14 +497,15 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=81186152,
                                     bases=12056143572,
+                                    folder_ulid='01J8GSEF3JDHWEVBP5EWYD9QC8',
                                     library=Library(
-                                        library_id='DN805609I:B3',
-                                        library_type_id='Haplotagging',
+                                        library_id='DN805609I:B3', library_type_id='Haplotagging'
                                     ),
                                     run=Run(
-                                        run_id='37939',
+                                        run_id='37939_1',
                                         platform_id=5,
                                         centre_id=2,
+                                        element='1',
                                         instrument_name='NV22',
                                         complete='2021-05-14T11:44:28+01:00',
                                     ),
@@ -283,12 +520,39 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=115631,
-                                            project_id=17,
-                                            data_id='37939_1#2',
-                                        )
+                                        Allocation(id=115631, project_id=17, data_id='37939_1#2')
                                     ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GSEF3JDHWEVBP5EWYD9QC8',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '37939_1#2_F0xB00-quals3.png',
+                                                'caption': 'Haplotagging Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '37939_1#2_F0xB00-quals-hm.png',
+                                                'caption': 'Haplotagging Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '37939_1#2_F0xB00-quals.png',
+                                                'caption': 'Haplotagging Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '37939_1#2_F0xB00-acgt-cycles.png',
+                                                'caption': 'Haplotagging A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '37939_1#2_F0xB00-quals2.png',
+                                                'caption': 'Haplotagging Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '37939_1#2_F0xB00-gc-content.png',
+                                                'caption': 'Haplotagging G|C Content',
+                                            },
+                                        ],
+                                        files_total_bytes=155892,
+                                    ),
                                 )
                             ],
                         ),
@@ -297,143 +561,29 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             data=[
                                 Data(
-                                    data_id='35344_1#2',
-                                    study_id=5901,
-                                    sample_id='DTOL9310949',
-                                    library_id='DN683544F:A5',
-                                    run_id='35344',
-                                    processed=1,
-                                    tag1_id='130',
-                                    date='2020-11-13T11:13:32+00:00',
-                                    lims_qc='pass',
-                                    visibility='Always',
-                                    reads=3205550,
-                                    bases=484038050,
-                                    library=Library(
-                                        library_id='DN683544F:A5',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='35344',
-                                        platform_id=2,
-                                        centre_id=2,
-                                        instrument_name='HX8',
-                                        complete='2020-11-06T10:04:30+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=114489,
-                                            data_id='35344_1#2',
-                                            remote_path='irods:/seq/35344/35344_1#2.cram',
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=117752,
-                                            project_id=21,
-                                            data_id='35344_1#2',
-                                        )
-                                    ],
-                                ),
-                                Data(
-                                    data_id='35344_1#4',
-                                    study_id=5901,
-                                    sample_id='DTOL9310949',
-                                    library_id='DN683544F:A5',
-                                    run_id='35344',
-                                    processed=None,
-                                    tag1_id='132',
-                                    date='2020-11-13T11:13:32+00:00',
-                                    lims_qc='pass',
-                                    visibility='Always',
-                                    reads=120600430,
-                                    bases=18210664930,
-                                    library=Library(
-                                        library_id='DN683544F:A5',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='35344',
-                                        platform_id=2,
-                                        centre_id=2,
-                                        instrument_name='HX8',
-                                        complete='2020-11-06T10:04:30+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=114491,
-                                            data_id='35344_1#4',
-                                            remote_path='irods:/seq/35344/35344_1#4.cram',
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=117754,
-                                            project_id=21,
-                                            data_id='35344_1#4',
-                                        )
-                                    ],
-                                ),
-                                Data(
-                                    data_id='35344_1#3',
-                                    study_id=5901,
-                                    sample_id='DTOL9310949',
-                                    library_id='DN683544F:A5',
-                                    run_id='35344',
-                                    processed=0,
-                                    tag1_id='131',
-                                    date='2020-11-13T11:13:32+00:00',
-                                    lims_qc='pass',
-                                    visibility='Testing',
-                                    reads=118915580,
-                                    bases=17956252580,
-                                    library=Library(
-                                        library_id='DN683544F:A5',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='35344',
-                                        platform_id=2,
-                                        centre_id=2,
-                                        instrument_name='HX8',
-                                        complete='2020-11-06T10:04:30+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=114490,
-                                            data_id='35344_1#3',
-                                            remote_path='irods:/seq/35344/35344_1#3.cram',
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=117753,
-                                            project_id=21,
-                                            data_id='35344_1#3',
-                                        )
-                                    ],
-                                ),
-                                Data(
                                     data_id='35344_1#1',
                                     study_id=5901,
+                                    category='genomic_data',
                                     sample_id='DTOL9310949',
                                     library_id='DN683544F:A5',
-                                    run_id='35344',
-                                    processed=0,
+                                    run_id='35344_1',
+                                    processed=1,
                                     tag1_id='129',
                                     date='2020-11-13T11:13:32+00:00',
                                     lims_qc='pass',
                                     visibility='Always',
                                     reads=117883578,
                                     bases=17800420278,
+                                    folder_ulid='01J8GNT7RDJNSEPWTKHG8QSHSB',
                                     library=Library(
                                         library_id='DN683544F:A5',
                                         library_type_id='Chromium genome',
                                     ),
                                     run=Run(
-                                        run_id='35344',
+                                        run_id='35344_1',
                                         platform_id=2,
                                         centre_id=2,
+                                        element='1',
                                         instrument_name='HX8',
                                         complete='2020-11-06T10:04:30+00:00',
                                     ),
@@ -445,12 +595,245 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=117751,
-                                            project_id=21,
-                                            data_id='35344_1#1',
+                                        Allocation(id=117751, project_id=21, data_id='35344_1#1')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GNT7RDJNSEPWTKHG8QSHSB',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '35344_1#1_F0xB00-acgt-cycles.png',
+                                                'caption': 'Chromium genome A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#1_F0xB00-quals3.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#1_F0xB00-quals2.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#1_F0xB00-gc-content.png',
+                                                'caption': 'Chromium genome G|C Content',
+                                            },
+                                            {
+                                                'file': '35344_1#1_F0xB00-quals-hm.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#1_F0xB00-quals.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=193479,
+                                    ),
+                                ),
+                                Data(
+                                    data_id='35344_1#2',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL9310949',
+                                    library_id='DN683544F:A5',
+                                    run_id='35344_1',
+                                    processed=None,
+                                    tag1_id='130',
+                                    date='2020-11-13T11:13:32+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=3205550,
+                                    bases=484038050,
+                                    folder_ulid='01J8GNT901PKS6AZBX0QPJEP95',
+                                    library=Library(
+                                        library_id='DN683544F:A5',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    run=Run(
+                                        run_id='35344_1',
+                                        platform_id=2,
+                                        centre_id=2,
+                                        element='1',
+                                        instrument_name='HX8',
+                                        complete='2020-11-06T10:04:30+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=114489,
+                                            data_id='35344_1#2',
+                                            remote_path='irods:/seq/35344/35344_1#2.cram',
                                         )
                                     ],
+                                    project_assn=[
+                                        Allocation(id=117752, project_id=21, data_id='35344_1#2')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GNT901PKS6AZBX0QPJEP95',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '35344_1#2_F0xB00-quals2.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#2_F0xB00-quals.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#2_F0xB00-gc-content.png',
+                                                'caption': 'Chromium genome G|C Content',
+                                            },
+                                            {
+                                                'file': '35344_1#2_F0xB00-quals-hm.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#2_F0xB00-quals3.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#2_F0xB00-acgt-cycles.png',
+                                                'caption': 'Chromium genome A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=191188,
+                                    ),
+                                ),
+                                Data(
+                                    data_id='35344_1#4',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL9310949',
+                                    library_id='DN683544F:A5',
+                                    run_id='35344_1',
+                                    processed=0,
+                                    tag1_id='132',
+                                    date='2020-11-13T11:13:32+00:00',
+                                    lims_qc='pass',
+                                    visibility='Testing',
+                                    reads=118915580,
+                                    bases=17956252580,
+                                    library=Library(
+                                        library_id='DN683544F:A5',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    run=Run(
+                                        run_id='35344_1',
+                                        platform_id=2,
+                                        centre_id=2,
+                                        element='1',
+                                        instrument_name='HX8',
+                                        complete='2020-11-06T10:04:30+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=114491,
+                                            data_id='35344_1#4',
+                                            remote_path='irods:/seq/35344/35344_1#4.cram',
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=117754, project_id=21, data_id='35344_1#4')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GNTBMMYVA2RJZKYZCHZAAM',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '35344_1#4_F0xB00-quals-hm.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#4_F0xB00-quals2.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#4_F0xB00-quals3.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#4_F0xB00-acgt-cycles.png',
+                                                'caption': 'Chromium genome A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#4_F0xB00-quals.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#4_F0xB00-gc-content.png',
+                                                'caption': 'Chromium genome G|C Content',
+                                            },
+                                        ],
+                                        files_total_bytes=194264,
+                                    ),
+                                ),
+                                Data(
+                                    data_id='35344_1#3',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL9310949',
+                                    library_id='DN683544F:A5',
+                                    run_id='35344_1',
+                                    processed=0,
+                                    tag1_id='131',
+                                    date='2020-11-13T11:13:32+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=118915580,
+                                    bases=17956252580,
+                                    folder_ulid='01J8GNTAE04KEY675Z4WX8KDK4',
+                                    library=Library(
+                                        library_id='DN683544F:A5',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    run=Run(
+                                        run_id='35344_1',
+                                        platform_id=2,
+                                        centre_id=2,
+                                        element='1',
+                                        instrument_name='HX8',
+                                        complete='2020-11-06T10:04:30+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=114490,
+                                            data_id='35344_1#3',
+                                            remote_path='irods:/seq/35344/35344_1#3.cram',
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=117753, project_id=21, data_id='35344_1#3')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GNTAE04KEY675Z4WX8KDK4',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '35344_1#3_F0xB00-quals-hm.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#3_F0xB00-quals3.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#3_F0xB00-quals.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#3_F0xB00-acgt-cycles.png',
+                                                'caption': 'Chromium genome A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#3_F0xB00-quals2.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35344_1#3_F0xB00-gc-content.png',
+                                                'caption': 'Chromium genome G|C Content',
+                                            },
+                                        ],
+                                        files_total_bytes=193887,
+                                    ),
                                 ),
                             ],
                         ),
@@ -459,16 +842,16 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             accession_id='SAMEA7532766',
                             accession=Accession(
-                                accession_id='SAMEA7532766',
-                                accession_type_id='BioSample',
+                                accession_id='SAMEA7532766', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
                                     data_id='35528_4#8',
                                     study_id=5901,
+                                    category='genomic_data',
                                     sample_id='DTOL9384820',
                                     library_id='DN703060C:H1',
-                                    run_id='35528',
+                                    run_id='35528_4',
                                     processed=1,
                                     tag1_id='72',
                                     tag2_id='72',
@@ -477,14 +860,16 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=748759474,
                                     bases=113062680574,
+                                    folder_ulid='01J8GP34MFJNAHCBM0X20TA8VF',
                                     library=Library(
                                         library_id='DN703060C:H1',
                                         library_type_id='Hi-C - Arima v2',
                                     ),
                                     run=Run(
-                                        run_id='35528',
+                                        run_id='35528_4',
                                         platform_id=5,
                                         centre_id=2,
+                                        element='4',
                                         instrument_name='NV16',
                                         complete='2020-11-19T08:24:02+00:00',
                                     ),
@@ -499,12 +884,39 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=117960,
-                                            project_id=21,
-                                            data_id='35528_4#8',
-                                        )
+                                        Allocation(id=117960, project_id=21, data_id='35528_4#8')
                                     ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GP34MFJNAHCBM0X20TA8VF',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '35528_4#8_F0xB00-quals3.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35528_4#8_F0xB00-quals-hm.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35528_4#8_F0xB00-acgt-cycles.png',
+                                                'caption': 'Hi-C - Arima v2 A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35528_4#8_F0xB00-quals.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '35528_4#8_F0xB00-gc-content.png',
+                                                'caption': 'Hi-C - Arima v2 G|C Content',
+                                            },
+                                            {
+                                                'file': '35528_4#8_F0xB00-quals2.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=157201,
+                                    ),
                                 )
                             ],
                         ),
@@ -515,12 +927,12 @@ def test_data(token: str):
                                 Data(
                                     data_id='m64089e_210601_133425#1022',
                                     study_id=5901,
+                                    category='genomic_data',
                                     sample_id='DTOL9397431',
                                     library_id='DN695911V-H1',
                                     run_id='m64089e_210601_133425',
                                     processed=None,
                                     tag1_id='1022',
-                                    pcr_adapter_id='TruSeq_i7s_UDI001--TruSeq_i5s_UDI001',
                                     date='2021-06-02T23:04:37+01:00',
                                     lims_qc='fail',
                                     visibility='Always',
@@ -536,7 +948,9 @@ def test_data(token: str):
                                     read_length_shortest=56,
                                     reads_duplicated=0,
                                     reads_filtered=0,
-                                    library=Library(library_id='DN695911V-H1'),
+                                    library=Library(
+                                        library_id='DN695911V-H1', library_type_id='PacBio - HiFi'
+                                    ),
                                     run=Run(
                                         run_id='m64089e_210601_133425',
                                         platform_id=3,
@@ -555,10 +969,15 @@ def test_data(token: str):
                                                 sequencing_kit=(
                                                     'Sequel II Sequencing Plate 2.0 (4 rxn)'
                                                 ),
+                                                sequencing_kit_lot_number='019994',
+                                                cell_lot_number='416626',
                                                 include_kinetics='true',
                                                 loading_conc=70.0,
                                                 control_num_reads=8197,
                                                 control_read_length_mean=27617.0,
+                                                control_concordance_mean=0.86696,
+                                                control_concordance_mode=0.89,
+                                                local_base_rate=2.32624,
                                                 polymerase_read_bases=28215924595,
                                                 polymerase_num_reads=622368,
                                                 polymerase_read_length_mean=45336.0,
@@ -566,12 +985,65 @@ def test_data(token: str):
                                                 insert_length_mean=12667.0,
                                                 insert_length_n50=14750,
                                                 unique_molecular_bases=7474866688,
+                                                productive_zmws_num=8006474,
                                                 p0_num=7376744,
                                                 p1_num=630565,
                                                 p2_num=7362,
+                                                adapter_dimer_percent=0.0,
+                                                short_insert_percent=0.0,
                                                 hifi_read_bases=1295136871,
                                                 hifi_num_reads=120696,
+                                                hifi_read_length_mean=10730,
+                                                hifi_read_quality_median=35,
+                                                hifi_number_passes_mean=13.0,
+                                                hifi_low_quality_read_bases=187949502,
                                                 hifi_low_quality_num_reads=16141,
+                                                hifi_low_quality_read_length_mean=11644,
+                                                hifi_low_quality_read_quality_median=16,
+                                                folder_ulid='01J8G8XQ7SPGXVJX1QYHNZ1PSV',
+                                                folder=Folder(
+                                                    folder_ulid='01J8G8XQ7SPGXVJX1QYHNZ1PSV',
+                                                    folder_location_id='pacbio_run_s3',
+                                                    image_file_list=[
+                                                        {
+                                                            'file': 'readlength_qv_hist2d.hexbin.png',  # noqa: E501
+                                                            'caption': 'Accuracy versus read length density',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'ccs_npasses_hist.png',
+                                                            'caption': 'Number of passes',
+                                                        },
+                                                        {
+                                                            'file': 'ccs_accuracy_hist.png',
+                                                            'caption': 'Read quality distribution',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'readlength_plot.png',
+                                                            'caption': 'Control polymerase read length',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'raw_read_length_plot.png',
+                                                            'caption': 'Loading evaluation',
+                                                        },
+                                                        {
+                                                            'file': 'concordance_plot.png',
+                                                            'caption': 'Control concordance',
+                                                        },
+                                                        {
+                                                            'file': 'readLenDist0.png',
+                                                            'caption': 'Polymerase read length',
+                                                        },
+                                                        {
+                                                            'file': 'base_yield_plot.png',
+                                                            'caption': 'Base yield density',
+                                                        },
+                                                        {
+                                                            'file': 'hexbin_length_plot.png',
+                                                            'caption': 'Insert read length density',  # noqa: E501
+                                                        },
+                                                    ],
+                                                    files_total_bytes=3299923,
+                                                ),
                                             )
                                         ],
                                     ),
@@ -597,6 +1069,7 @@ def test_data(token: str):
                                 Data(
                                     data_id='m64016_201115_112225#1022',
                                     study_id=5901,
+                                    category='genomic_data',
                                     sample_id='DTOL9397431',
                                     library_id='DN703483V',
                                     run_id='m64016_201115_112225',
@@ -616,8 +1089,7 @@ def test_data(token: str):
                                     reads_duplicated=0,
                                     reads_filtered=1390,
                                     library=Library(
-                                        library_id='DN703483V',
-                                        library_type_id='PacBio - HiFi',
+                                        library_id='DN703483V', library_type_id='PacBio - HiFi'
                                     ),
                                     run=Run(
                                         run_id='m64016_201115_112225',
@@ -628,9 +1100,7 @@ def test_data(token: str):
                                         instrument_name='m64016',
                                         complete='2020-11-15T00:00:00+00:00',
                                         pacbio_run_metrics=[
-                                            PacbioRunMetrics(
-                                                run_id='m64016_201115_112225'
-                                            )
+                                            PacbioRunMetrics(run_id='m64016_201115_112225')
                                         ],
                                     ),
                                     files=[
@@ -659,17 +1129,17 @@ def test_data(token: str):
                             specimen_id='ucBraSubp1',
                             accession_id='SAMEA7532770',
                             accession=Accession(
-                                accession_id='SAMEA7532770',
-                                accession_type_id='BioSample',
+                                accession_id='SAMEA7532770', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
                                     data_id='36703_5#4',
                                     study_id=6327,
+                                    category='transcriptomic_data',
                                     sample_id='DTOLRNA9465095',
                                     library_id='DN611904M:F3',
-                                    run_id='36703',
-                                    processed=None,
+                                    run_id='36703_5',
+                                    processed=1,
                                     tag1_id='22',
                                     tag2_id='22',
                                     date='2021-03-19T10:56:23+00:00',
@@ -677,14 +1147,15 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=41616914,
                                     bases=6284154014,
+                                    folder_ulid='01J8GQ6KCY1QQ32TSMP7KRRT3Z',
                                     library=Library(
-                                        library_id='DN611904M:F3',
-                                        library_type_id='RNA PolyA',
+                                        library_id='DN611904M:F3', library_type_id='RNA PolyA'
                                     ),
                                     run=Run(
-                                        run_id='36703',
+                                        run_id='36703_5',
                                         platform_id=4,
                                         centre_id=2,
+                                        element='5',
                                         instrument_name='HF1',
                                         complete='2021-03-08T10:31:06+00:00',
                                     ),
@@ -696,12 +1167,117 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=127430,
-                                            project_id=24,
-                                            data_id='36703_5#4',
+                                        Allocation(id=127430, project_id=24, data_id='36703_5#4')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GQ6KCY1QQ32TSMP7KRRT3Z',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '36703_5#4_F0xB00-quals-hm.png',
+                                                'caption': 'RNA PolyA Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36703_5#4_F0xB00-quals.png',
+                                                'caption': 'RNA PolyA Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36703_5#4_F0xB00-quals3.png',
+                                                'caption': 'RNA PolyA Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36703_5#4_F0xB00-quals2.png',
+                                                'caption': 'RNA PolyA Quality Per Cycle (Split)',
+                                            },
+                                            {
+                                                'file': '36703_5#4_F0xB00-acgt-cycles.png',
+                                                'caption': 'RNA PolyA A|C|G|T Content Per Cycle',
+                                            },
+                                            {
+                                                'file': '36703_5#4_F0xB00-gc-content.png',
+                                                'caption': 'RNA PolyA G|C Content',
+                                            },
+                                        ],
+                                        files_total_bytes=193250,
+                                    ),
+                                )
+                            ],
+                        ),
+                        Sample(
+                            sample_id='DTOL_RD9912264',
+                            specimen_id='ucBraSubp1',
+                            data=[
+                                Data(
+                                    data_id='36857#13',
+                                    study_id=5822,
+                                    category='genomic_data',
+                                    sample_id='DTOL_RD9912264',
+                                    library_id='NT1659733A',
+                                    run_id='36857',
+                                    processed=1,
+                                    tag1_id='4332',
+                                    tag2_id='4356',
+                                    date='2021-03-22T09:42:03+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=27966966,
+                                    bases=4153094451,
+                                    folder_ulid='01J8GQ93RN80BXDY4WTYJZYB24',
+                                    library=Library(
+                                        library_id='NT1659733A', library_type_id='Haplotagging'
+                                    ),
+                                    run=Run(
+                                        run_id='36857',
+                                        platform_id=5,
+                                        centre_id=2,
+                                        element='1',
+                                        instrument_name='NV20',
+                                        complete='2021-03-14T15:59:21+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=112358,
+                                            data_id='36857#13',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/36/36857/plex13'
+                                                '/36857#13.cram'
+                                            ),
                                         )
                                     ],
+                                    project_assn=[
+                                        Allocation(id=115609, project_id=17, data_id='36857#13')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GQ93RN80BXDY4WTYJZYB24',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '36857#13_F0xB00-quals3.png',
+                                                'caption': 'Pre-quality controlled Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36857#13_F0xB00-quals.png',
+                                                'caption': 'Pre-quality controlled Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36857#13_F0xB00-quals-hm.png',
+                                                'caption': 'Pre-quality controlled Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36857#13_F0xB00-acgt-cycles.png',
+                                                'caption': 'Pre-quality controlled A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36857#13_F0xB00-quals2.png',
+                                                'caption': 'Pre-quality controlled Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36857#13_F0xB00-gc-content.png',
+                                                'caption': 'Pre-quality controlled G|C Content',
+                                            },
+                                        ],
+                                        files_total_bytes=154047,
+                                    ),
                                 )
                             ],
                         ),
@@ -709,12 +1285,134 @@ def test_data(token: str):
                     accession=Accession(
                         accession_id='SAMEA7532740', accession_type_id='BioSample'
                     ),
-                )
+                    location=Location(
+                        location_id=3113, path='6/c/c/f/1/b/Brachiomonas_submarina'
+                    ),
+                ),
+                Specimen(
+                    specimen_id='ucBraSubm3',
+                    location_id=3113,
+                    species_id='Brachiomonas submarina',
+                    supplied_name='SubSam_7066',
+                    accession_id='SAMEA12753558',
+                    samples=[
+                        Sample(
+                            sample_id='DTOL14909592',
+                            specimen_id='ucBraSubm3',
+                            accession_id='SAMEA12753689',
+                            accession=Accession(
+                                accession_id='SAMEA12753689', accession_type_id='BioSample'
+                            ),
+                            data=[
+                                Data(
+                                    data_id='m84309_250205_121831_s4#2076',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL14909592',
+                                    library_id='DTOL14909592',
+                                    run_id='m84309_250205_121831_s4',
+                                    processed=1,
+                                    tag1_id='bc2076',
+                                    date='2025-02-07T12:04:12+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=6782153,
+                                    bases=58162339677,
+                                    read_length_mean=8575.79291959353,
+                                    read_length_n50=8557,
+                                    bases_a=15495489894,
+                                    bases_c=13309833484,
+                                    bases_g=13834851558,
+                                    bases_t=15522164741,
+                                    read_length_longest=30129,
+                                    read_length_shortest=62,
+                                    reads_duplicated=494675,
+                                    reads_filtered=0,
+                                    library=Library(
+                                        library_id='DTOL14909592',
+                                        library_type_id='PacBio - HiFi (ULI)',
+                                    ),
+                                    run=Run(
+                                        run_id='m84309_250205_121831_s4',
+                                        platform_id=6,
+                                        centre_id=2,
+                                        lims_id='TRACTION-RUN-1755',
+                                        element='D1.1',
+                                        instrument_name='m84309',
+                                        start='2025-02-05T10:35:22+00:00',
+                                        complete='2025-02-06T17:14:49+00:00',
+                                        plex_count=1,
+                                        pacbio_run_metrics=[
+                                            PacbioRunMetrics(
+                                                run_id='m84309_250205_121831_s4',
+                                                movie_minutes=1440,
+                                                binding_kit='Revio polymerase kit',
+                                                sequencing_kit='Revio sequencing plate',
+                                                sequencing_kit_lot_number='037237',
+                                                cell_lot_number='1000004187',
+                                                include_kinetics='false',
+                                                loading_conc=109.0,
+                                                control_num_reads=6191,
+                                                control_read_length_mean=61753.0,
+                                                control_concordance_mean=0.909936,
+                                                control_concordance_mode=0.93,
+                                                local_base_rate=2.0455,
+                                                polymerase_read_bases=1012134761938,
+                                                polymerase_num_reads=16628028,
+                                                polymerase_read_length_mean=60869.0,
+                                                polymerase_read_length_n50=127750,
+                                                insert_length_mean=11646.0,
+                                                insert_length_n50=12250,
+                                                unique_molecular_bases=171822858240,
+                                                productive_zmws_num=25165824,
+                                                p0_num=8471527,
+                                                p1_num=16634219,
+                                                p2_num=60078,
+                                                hifi_read_bases=62957031005,
+                                                hifi_num_reads=7302257,
+                                                hifi_read_length_mean=8621,
+                                                hifi_read_quality_median=39,
+                                                hifi_number_passes_mean=12.0,
+                                                hifi_barcoded_reads=7284734,
+                                                hifi_bases_in_barcoded_reads=62808083286,
+                                            )
+                                        ],
+                                    ),
+                                    files=[
+                                        File(
+                                            id=148709,
+                                            data_id='m84309_250205_121831_s4#2076',
+                                            remote_path=(
+                                                'irods:/seq/pacbio/r84309_20250205_103258/1_D01'
+                                                '/m84309_250205_121831_s4.hifi_reads.bc2076.bam'
+                                            ),
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=152554,
+                                            project_id=21,
+                                            data_id='m84309_250205_121831_s4#2076',
+                                        )
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                    accession=Accession(
+                        accession_id='SAMEA12753558', accession_type_id='BioSample'
+                    ),
+                    location=Location(
+                        location_id=3113, path='6/c/c/f/1/b/Brachiomonas_submarina'
+                    ),
+                ),
             ],
+            location=Location(location_id=3113, path='6/c/c/f/1/b/Brachiomonas_submarina'),
         ),
         Species(
             species_id='Juncus effusus',
-            location=Location(location_id=78, path='e/1/3/d/d/0/Juncus_effusus'),
+            location_id=299,
+            tolid_prefix='lpJunEffu',
             common_name='common rush',
             taxon_id=13579,
             taxon_family='Juncaceae',
@@ -726,7 +1424,7 @@ def test_data(token: str):
             specimens=[
                 Specimen(
                     specimen_id='lpJunEffu1',
-                    location_id=78,
+                    location_id=299,
                     species_id='Juncus effusus',
                     accession_id='SAMEA7521930',
                     samples=[
@@ -735,58 +1433,17 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953',
-                                accession_type_id='BioSample',
+                                accession_id='SAMEA7521953', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
-                                    data_id='36691_2#8',
-                                    study_id=5901,
-                                    sample_id='DTOL9702654',
-                                    library_id='DN771163M:G8',
-                                    run_id='36691',
-                                    processed=1,
-                                    tag1_id='252',
-                                    date='2021-03-18T12:16:43+00:00',
-                                    lims_qc='pass',
-                                    visibility='Always',
-                                    reads=210626924,
-                                    bases=31804665524,
-                                    library=Library(
-                                        library_id='DN771163M:G8',
-                                        library_type_id='Chromium genome',
-                                    ),
-                                    run=Run(
-                                        run_id='36691',
-                                        platform_id=5,
-                                        centre_id=2,
-                                        instrument_name='NV20',
-                                        complete='2021-03-06T05:07:44+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=115167,
-                                            data_id='36691_2#8',
-                                            remote_path=(
-                                                'irods:/seq/illumina/runs/36/36691/lane2/plex8'
-                                                '/36691_2#8.cram'
-                                            ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=118430,
-                                            project_id=21,
-                                            data_id='36691_2#8',
-                                        )
-                                    ],
-                                ),
-                                Data(
                                     data_id='36691_2#5',
                                     study_id=5901,
+                                    category='genomic_data',
                                     sample_id='DTOL9702654',
                                     library_id='DN771163M:G8',
-                                    run_id='36691',
+                                    accession_id='ERR8097169',
+                                    run_id='36691_2',
                                     processed=1,
                                     tag1_id='249',
                                     date='2021-03-18T12:16:43+00:00',
@@ -794,14 +1451,22 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=195080402,
                                     bases=29457140702,
+                                    folder_ulid='01J8GQ31A3VN2XMDY7PP7XMFSV',
                                     library=Library(
                                         library_id='DN771163M:G8',
                                         library_type_id='Chromium genome',
                                     ),
+                                    accession=Accession(
+                                        accession_id='ERR8097169',
+                                        accession_type_id='Run',
+                                        secondary='ERX7663261',
+                                        date_submitted='2022-01-24T00:00:00+00:00',
+                                    ),
                                     run=Run(
-                                        run_id='36691',
+                                        run_id='36691_2',
                                         platform_id=5,
                                         centre_id=2,
+                                        element='2',
                                         instrument_name='NV20',
                                         complete='2021-03-06T05:07:44+00:00',
                                     ),
@@ -816,61 +1481,48 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=118427,
-                                            project_id=21,
-                                            data_id='36691_2#5',
-                                        )
+                                        Allocation(id=118427, project_id=21, data_id='36691_2#5')
                                     ],
-                                ),
-                                Data(
-                                    data_id='36691_2#7',
-                                    study_id=5901,
-                                    sample_id='DTOL9702654',
-                                    library_id='DN771163M:G8',
-                                    run_id='36691',
-                                    processed=1,
-                                    tag1_id='251',
-                                    date='2021-03-18T12:16:43+00:00',
-                                    lims_qc='pass',
-                                    visibility='Always',
-                                    reads=183614994,
-                                    bases=27725864094,
-                                    library=Library(
-                                        library_id='DN771163M:G8',
-                                        library_type_id='Chromium genome',
+                                    folder=Folder(
+                                        folder_ulid='01J8GQ31A3VN2XMDY7PP7XMFSV',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '36691_2#5_F0xB00-quals2.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#5_F0xB00-quals-hm.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#5_F0xB00-gc-content.png',
+                                                'caption': 'Chromium genome G|C Content',
+                                            },
+                                            {
+                                                'file': '36691_2#5_F0xB00-quals3.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#5_F0xB00-acgt-cycles.png',
+                                                'caption': 'Chromium genome A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#5_F0xB00-quals.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=167913,
                                     ),
-                                    run=Run(
-                                        run_id='36691',
-                                        platform_id=5,
-                                        centre_id=2,
-                                        instrument_name='NV20',
-                                        complete='2021-03-06T05:07:44+00:00',
-                                    ),
-                                    files=[
-                                        File(
-                                            id=115166,
-                                            data_id='36691_2#7',
-                                            remote_path=(
-                                                'irods:/seq/illumina/runs/36/36691/lane2/plex7'
-                                                '/36691_2#7.cram'
-                                            ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=118429,
-                                            project_id=21,
-                                            data_id='36691_2#7',
-                                        )
-                                    ],
                                 ),
                                 Data(
                                     data_id='36691_2#6',
                                     study_id=5901,
+                                    category='genomic_data',
                                     sample_id='DTOL9702654',
                                     library_id='DN771163M:G8',
-                                    run_id='36691',
+                                    accession_id='ERR8097170',
+                                    run_id='36691_2',
                                     processed=1,
                                     tag1_id='250',
                                     date='2021-03-18T12:16:43+00:00',
@@ -878,14 +1530,22 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=206862242,
                                     bases=31236198542,
+                                    folder_ulid='01J8GQ32MZ3YKMTSPGRS5HWCD1',
                                     library=Library(
                                         library_id='DN771163M:G8',
                                         library_type_id='Chromium genome',
                                     ),
+                                    accession=Accession(
+                                        accession_id='ERR8097170',
+                                        accession_type_id='Run',
+                                        secondary='ERX7663262',
+                                        date_submitted='2022-01-24T00:00:00+00:00',
+                                    ),
                                     run=Run(
-                                        run_id='36691',
+                                        run_id='36691_2',
                                         platform_id=5,
                                         centre_id=2,
+                                        element='2',
                                         instrument_name='NV20',
                                         complete='2021-03-06T05:07:44+00:00',
                                     ),
@@ -900,12 +1560,197 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=118428,
-                                            project_id=21,
-                                            data_id='36691_2#6',
+                                        Allocation(id=118428, project_id=21, data_id='36691_2#6')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GQ32MZ3YKMTSPGRS5HWCD1',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '36691_2#6_F0xB00-quals.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#6_F0xB00-quals2.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#6_F0xB00-quals3.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#6_F0xB00-gc-content.png',
+                                                'caption': 'Chromium genome G|C Content',
+                                            },
+                                            {
+                                                'file': '36691_2#6_F0xB00-acgt-cycles.png',
+                                                'caption': 'Chromium genome A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#6_F0xB00-quals-hm.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=156979,
+                                    ),
+                                ),
+                                Data(
+                                    data_id='36691_2#8',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL9702654',
+                                    library_id='DN771163M:G8',
+                                    accession_id='ERR8097172',
+                                    run_id='36691_2',
+                                    processed=1,
+                                    tag1_id='252',
+                                    date='2021-03-18T12:16:43+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=210626924,
+                                    bases=31804665524,
+                                    folder_ulid='01J8GQ356P8AEKKAPW0VD2PJKD',
+                                    library=Library(
+                                        library_id='DN771163M:G8',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    accession=Accession(
+                                        accession_id='ERR8097172',
+                                        accession_type_id='Run',
+                                        secondary='ERX7663264',
+                                        date_submitted='2022-01-24T00:00:00+00:00',
+                                    ),
+                                    run=Run(
+                                        run_id='36691_2',
+                                        platform_id=5,
+                                        centre_id=2,
+                                        element='2',
+                                        instrument_name='NV20',
+                                        complete='2021-03-06T05:07:44+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=115167,
+                                            data_id='36691_2#8',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/36/36691/lane2/plex8'
+                                                '/36691_2#8.cram'
+                                            ),
                                         )
                                     ],
+                                    project_assn=[
+                                        Allocation(id=118430, project_id=21, data_id='36691_2#8')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GQ356P8AEKKAPW0VD2PJKD',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '36691_2#8_F0xB00-quals2.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#8_F0xB00-acgt-cycles.png',
+                                                'caption': 'Chromium genome A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#8_F0xB00-quals3.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#8_F0xB00-quals.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#8_F0xB00-gc-content.png',
+                                                'caption': 'Chromium genome G|C Content',
+                                            },
+                                            {
+                                                'file': '36691_2#8_F0xB00-quals-hm.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=150719,
+                                    ),
+                                ),
+                                Data(
+                                    data_id='36691_2#7',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL9702654',
+                                    library_id='DN771163M:G8',
+                                    accession_id='ERR8097171',
+                                    run_id='36691_2',
+                                    processed=1,
+                                    tag1_id='251',
+                                    date='2021-03-18T12:16:43+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=183614994,
+                                    bases=27725864094,
+                                    folder_ulid='01J8GQ33XK1D5AVJN9XCP7YQ84',
+                                    library=Library(
+                                        library_id='DN771163M:G8',
+                                        library_type_id='Chromium genome',
+                                    ),
+                                    accession=Accession(
+                                        accession_id='ERR8097171',
+                                        accession_type_id='Run',
+                                        secondary='ERX7663263',
+                                        date_submitted='2022-01-24T00:00:00+00:00',
+                                    ),
+                                    run=Run(
+                                        run_id='36691_2',
+                                        platform_id=5,
+                                        centre_id=2,
+                                        element='2',
+                                        instrument_name='NV20',
+                                        complete='2021-03-06T05:07:44+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=115166,
+                                            data_id='36691_2#7',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/36/36691/lane2/plex7'
+                                                '/36691_2#7.cram'
+                                            ),
+                                        )
+                                    ],
+                                    project_assn=[
+                                        Allocation(id=118429, project_id=21, data_id='36691_2#7')
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GQ33XK1D5AVJN9XCP7YQ84',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '36691_2#7_F0xB00-acgt-cycles.png',
+                                                'caption': 'Chromium genome A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#7_F0xB00-gc-content.png',
+                                                'caption': 'Chromium genome G|C Content',
+                                            },
+                                            {
+                                                'file': '36691_2#7_F0xB00-quals2.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#7_F0xB00-quals3.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#7_F0xB00-quals-hm.png',
+                                                'caption': 'Chromium genome Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '36691_2#7_F0xB00-quals.png',
+                                                'caption': 'Chromium genome Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=164863,
+                                    ),
                                 ),
                             ],
                         ),
@@ -914,16 +1759,17 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521954',
                             accession=Accession(
-                                accession_id='SAMEA7521954',
-                                accession_type_id='BioSample',
+                                accession_id='SAMEA7521954', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
                                     data_id='40666_2#2',
                                     study_id=5901,
+                                    category='genomic_data',
                                     sample_id='DTOL10341656',
                                     library_id='DN826505P:B3',
-                                    run_id='40666',
+                                    accession_id='ERR8097174',
+                                    run_id='40666_2',
                                     processed=1,
                                     tag1_id='90',
                                     tag2_id='90',
@@ -932,14 +1778,22 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=3345851480,
                                     bases=505223573480,
+                                    folder_ulid='01J8GVRDZR9KA1EXWZM48W09MZ',
                                     library=Library(
                                         library_id='DN826505P:B3',
                                         library_type_id='Hi-C - Arima v2',
                                     ),
+                                    accession=Accession(
+                                        accession_id='ERR8097174',
+                                        accession_type_id='Run',
+                                        secondary='ERX7663266',
+                                        date_submitted='2022-01-24T00:00:00+00:00',
+                                    ),
                                     run=Run(
-                                        run_id='40666',
+                                        run_id='40666_2',
                                         platform_id=5,
                                         centre_id=2,
+                                        element='2',
                                         instrument_name='NV11',
                                         complete='2021-09-05T07:44:37+01:00',
                                     ),
@@ -954,12 +1808,39 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=121083,
-                                            project_id=21,
-                                            data_id='40666_2#2',
-                                        )
+                                        Allocation(id=121083, project_id=21, data_id='40666_2#2')
                                     ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GVRDZR9KA1EXWZM48W09MZ',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '40666_2#2_F0xB00-acgt-cycles.png',
+                                                'caption': 'Hi-C - Arima v2 A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '40666_2#2_F0xB00-quals3.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '40666_2#2_F0xB00-quals-hm.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '40666_2#2_F0xB00-quals2.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '40666_2#2_F0xB00-gc-content.png',
+                                                'caption': 'Hi-C - Arima v2 G|C Content',
+                                            },
+                                            {
+                                                'file': '40666_2#2_F0xB00-quals.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=155088,
+                                    ),
                                 )
                             ],
                         ),
@@ -968,19 +1849,19 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953',
-                                accession_type_id='BioSample',
+                                accession_id='SAMEA7521953', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
                                     data_id='m64097e_210221_172213#1019',
                                     study_id=5901,
+                                    category='genomic_data',
                                     sample_id='DTOL9838614',
                                     library_id='DN765124Q-B1',
+                                    accession_id='ERR8282830',
                                     run_id='m64097e_210221_172213',
                                     processed=1,
                                     tag1_id='1019',
-                                    pcr_adapter_id='TruSeq_i7_UDP008--TruSeq_i5_UDP008',
                                     date='2021-02-22T23:07:55+00:00',
                                     lims_qc='pass',
                                     visibility='Always',
@@ -996,7 +1877,15 @@ def test_data(token: str):
                                     read_length_shortest=51,
                                     reads_duplicated=0,
                                     reads_filtered=6869,
-                                    library=Library(library_id='DN765124Q-B1'),
+                                    library=Library(
+                                        library_id='DN765124Q-B1', library_type_id='PacBio - HiFi'
+                                    ),
+                                    accession=Accession(
+                                        accession_id='ERR8282830',
+                                        accession_type_id='Run',
+                                        secondary='ERX7850261',
+                                        date_submitted='2022-02-02T00:00:00+00:00',
+                                    ),
                                     run=Run(
                                         run_id='m64097e_210221_172213',
                                         platform_id=3,
@@ -1015,10 +1904,15 @@ def test_data(token: str):
                                                 sequencing_kit=(
                                                     'Sequel II Sequencing Plate 2.0 (4 rxn)'
                                                 ),
+                                                sequencing_kit_lot_number='018779',
+                                                cell_lot_number='416347',
                                                 include_kinetics='true',
                                                 loading_conc=45.0,
                                                 control_num_reads=3200,
                                                 control_read_length_mean=51271.0,
+                                                control_concordance_mean=0.85524,
+                                                control_concordance_mode=0.89,
+                                                local_base_rate=2.03257,
                                                 polymerase_read_bases=329209363529,
                                                 polymerase_num_reads=4556774,
                                                 polymerase_read_length_mean=72246.0,
@@ -1026,12 +1920,21 @@ def test_data(token: str):
                                                 insert_length_mean=13239.0,
                                                 insert_length_n50=15638,
                                                 unique_molecular_bases=57195683840,
+                                                productive_zmws_num=8011471,
                                                 p0_num=3352198,
                                                 p1_num=4559996,
                                                 p2_num=102477,
+                                                adapter_dimer_percent=0.0,
+                                                short_insert_percent=0.01,
                                                 hifi_read_bases=22632028638,
                                                 hifi_num_reads=1863309,
+                                                hifi_read_length_mean=12146,
+                                                hifi_read_quality_median=32,
+                                                hifi_number_passes_mean=11.0,
+                                                hifi_low_quality_read_bases=4628882121,
                                                 hifi_low_quality_num_reads=345974,
+                                                hifi_low_quality_read_length_mean=13379,
+                                                hifi_low_quality_read_quality_median=16,
                                             )
                                         ],
                                     ),
@@ -1061,16 +1964,17 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521953',
                             accession=Accession(
-                                accession_id='SAMEA7521953',
-                                accession_type_id='BioSample',
+                                accession_id='SAMEA7521953', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
                                     data_id='37935_8#13',
                                     study_id=6327,
+                                    category='transcriptomic_data',
                                     sample_id='DTOLRNA10187174',
                                     library_id='DN612239G:G9',
-                                    run_id='37935',
+                                    accession_id='ERR8097173',
+                                    run_id='37935_8',
                                     processed=1,
                                     tag1_id='71',
                                     tag2_id='71',
@@ -1079,14 +1983,21 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=36344960,
                                     bases=5488088960,
+                                    folder_ulid='01J8GSDTKDZYAX2X2F8K7WD045',
                                     library=Library(
-                                        library_id='DN612239G:G9',
-                                        library_type_id='RNA PolyA',
+                                        library_id='DN612239G:G9', library_type_id='RNA PolyA'
+                                    ),
+                                    accession=Accession(
+                                        accession_id='ERR8097173',
+                                        accession_type_id='Run',
+                                        secondary='ERX7663265',
+                                        date_submitted='2022-01-24T00:00:00+00:00',
                                     ),
                                     run=Run(
-                                        run_id='37935',
+                                        run_id='37935_8',
                                         platform_id=4,
                                         centre_id=2,
+                                        element='8',
                                         instrument_name='HF2',
                                         complete='2021-05-16T21:08:02+01:00',
                                     ),
@@ -1098,12 +2009,39 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=127563,
-                                            project_id=24,
-                                            data_id='37935_8#13',
-                                        )
+                                        Allocation(id=127563, project_id=24, data_id='37935_8#13')
                                     ],
+                                    folder=Folder(
+                                        folder_ulid='01J8GSDTKDZYAX2X2F8K7WD045',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '37935_8#13_F0xB00-quals3.png',
+                                                'caption': 'RNA PolyA Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '37935_8#13_F0xB00-quals2.png',
+                                                'caption': 'RNA PolyA Quality Per Cycle (Split)',
+                                            },
+                                            {
+                                                'file': '37935_8#13_F0xB00-acgt-cycles.png',
+                                                'caption': 'RNA PolyA A|C|G|T Content Per Cycle',
+                                            },
+                                            {
+                                                'file': '37935_8#13_F0xB00-quals-hm.png',
+                                                'caption': 'RNA PolyA Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '37935_8#13_F0xB00-gc-content.png',
+                                                'caption': 'RNA PolyA G|C Content',
+                                            },
+                                            {
+                                                'file': '37935_8#13_F0xB00-quals.png',
+                                                'caption': 'RNA PolyA Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=191605,
+                                    ),
                                 )
                             ],
                         ),
@@ -1112,16 +2050,17 @@ def test_data(token: str):
                             specimen_id='lpJunEffu1',
                             accession_id='SAMEA7521957',
                             accession=Accession(
-                                accession_id='SAMEA7521957',
-                                accession_type_id='BioSample',
+                                accession_id='SAMEA7521957', accession_type_id='BioSample'
                             ),
                             data=[
                                 Data(
                                     data_id='48593_1#25',
                                     study_id=6327,
+                                    category='transcriptomic_data',
                                     sample_id='DTOLRNA14460441',
                                     library_id='SQPP-7739-H:B9',
-                                    run_id='48593',
+                                    accession_id='ERR12765103',
+                                    run_id='48593_1',
                                     processed=1,
                                     tag1_id='66',
                                     tag2_id='66',
@@ -1130,14 +2069,21 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=52850970,
                                     bases=7980496470,
+                                    folder_ulid='01J8HAZJY0CG2BHX6Q7TSA54DA',
                                     library=Library(
-                                        library_id='SQPP-7739-H:B9',
-                                        library_type_id='RNA PolyA',
+                                        library_id='SQPP-7739-H:B9', library_type_id='RNA PolyA'
+                                    ),
+                                    accession=Accession(
+                                        accession_id='ERR12765103',
+                                        accession_type_id='Run',
+                                        secondary='ERX12138201',
+                                        date_submitted='2024-03-18T00:00:00+00:00',
                                     ),
                                     run=Run(
-                                        run_id='48593',
+                                        run_id='48593_1',
                                         platform_id=8,
                                         centre_id=2,
+                                        element='1',
                                         instrument_name='NX1',
                                         complete='2024-03-08T10:04:27+00:00',
                                     ),
@@ -1152,12 +2098,39 @@ def test_data(token: str):
                                         )
                                     ],
                                     project_assn=[
-                                        Allocation(
-                                            id=143140,
-                                            project_id=24,
-                                            data_id='48593_1#25',
-                                        )
+                                        Allocation(id=143140, project_id=24, data_id='48593_1#25')
                                     ],
+                                    folder=Folder(
+                                        folder_ulid='01J8HAZJY0CG2BHX6Q7TSA54DA',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '48593_1#25_F0xB00-quals3.png',
+                                                'caption': 'RNA PolyA Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '48593_1#25_F0xB00-quals.png',
+                                                'caption': 'RNA PolyA Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '48593_1#25_F0xB00-acgt-cycles.png',
+                                                'caption': 'RNA PolyA A|C|G|T Content Per Cycle',
+                                            },
+                                            {
+                                                'file': '48593_1#25_F0xB00-quals-hm.png',
+                                                'caption': 'RNA PolyA Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '48593_1#25_F0xB00-quals2.png',
+                                                'caption': 'RNA PolyA Quality Per Cycle (Split)',
+                                            },
+                                            {
+                                                'file': '48593_1#25_F0xB00-gc-content.png',
+                                                'caption': 'RNA PolyA G|C Content',
+                                            },
+                                        ],
+                                        files_total_bytes=148603,
+                                    ),
                                 )
                             ],
                         ),
@@ -1165,8 +2138,10 @@ def test_data(token: str):
                     accession=Accession(
                         accession_id='SAMEA7521930', accession_type_id='BioSample'
                     ),
+                    location=Location(location_id=299, path='e/1/3/d/d/0/Juncus_effusus'),
                 )
             ],
+            location=Location(location_id=299, path='e/1/3/d/d/0/Juncus_effusus'),
         ),
         User(
             id=100,

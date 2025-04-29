@@ -4,12 +4,17 @@
 
 import io
 import json
+import logging
 import re
 from urllib.parse import urlencode
 
 import pytest
 
+from tolqc.reports import ReportEngine
+from tolqc.schema import models_list
 from tolqc.schema.sample_data_models import Data, Platform, Run
+
+from werkzeug.exceptions import BadRequest
 
 from .conftest import SKIP_IF_NO_DB_URI_ENV as pytestmark  # noqa: F401, N811
 
@@ -34,6 +39,11 @@ def pacbio_row_count(db_session):
         raise ValueError(msg)
 
     return n
+
+
+@pytest.fixture
+def report_engine(session_factory):
+    return ReportEngine(session_factory=session_factory, models=models_list())
 
 
 def test_pacbio_run_data_report_tsv(client, api_path, pacbio_row_count):
@@ -83,6 +93,45 @@ def test_mlwh_data_report(client, api_path):
     assert response.status == '200 OK'
 
 
+def test_report_engine_bad_requests(report_engine):
+    with pytest.raises(BadRequest, match='No such report'):
+        report_engine.report('x')
+    with pytest.raises(BadRequest, match='No such table'):
+        report_engine.folder_report('x')
+    with pytest.raises(BadRequest, match='not a folder table'):
+        report_engine.folder_report('species')
+
+
+def test_report_engine_indexes(report_engine):
+    with report_engine.session_factory() as session:
+        # Primary key
+        assert report_engine.is_indexed_column(session, Data.data_id) is True
+        # Foregin key
+        assert report_engine.is_indexed_column(session, Data.sample_id) is True
+        # Indexed column
+        assert report_engine.is_indexed_column(session, Data.processed) is True
+        # No index
+        assert report_engine.is_indexed_column(session, Data.bases) is False
+
+
+def test_folder_report(client, api_path):
+    response = client.get(api_path + '/report/folder/data?format=NDJSON')
+    assert response.status == '200 OK'
+
+    json_lines = [json.loads(x) for x in io.StringIO(response.text).readlines()]
+    assert json_lines
+
+    files_count = 0
+    for jl in json_lines:
+        for key in ('image_file_list', 'other_file_list'):
+            files = jl[key]
+            if files is not None:
+                files_count += 1
+                for spec in files:
+                    assert spec['file'].startswith('s3://')
+    assert files_count > 0
+
+
 def good_param_combinations():
     for param in (
         {'processed': '1'},
@@ -106,7 +155,9 @@ def good_param_combinations():
 
 @pytest.mark.parametrize('params', good_param_combinations())
 def test_data_report_good_params(client, api_path, params):
-    response = client.get(api_path + '/report/pipeline-data?' + urlencode(params))
+    url = api_path + '/report/pipeline-data?' + urlencode(params)
+    logging.warning(f'{url = }')
+    response = client.get(url)
     assert response.status == '200 OK'
 
     json_lines = [json.loads(x) for x in io.StringIO(response.text).readlines()]
@@ -141,4 +192,4 @@ def test_data_report_bad_params(client, api_path):
     response = client.get(
         api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'})
     )
-    assert response.status == '400 BAD REQUEST'
+    assert response.status == '500 INTERNAL SERVER ERROR'

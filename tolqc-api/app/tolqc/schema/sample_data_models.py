@@ -171,6 +171,17 @@ class Centre(Base):
     run = relationship('Run', back_populates='centre')
 
 
+class ChemistryDict(Base):
+    __tablename__ = 'chemistry_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'chemistry'
+
+    chemistry = mapped_column(String, primary_key=True)
+    description = mapped_column(String)
+
+
 class Data(LogBase, HasFolder):
     __tablename__ = 'data'
 
@@ -185,7 +196,7 @@ class Data(LogBase, HasFolder):
     library_id = mapped_column(String, ForeignKey('library.library_id'))
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
     run_id = mapped_column(String, ForeignKey('run.run_id'))
-    processed = mapped_column(Integer)
+    processed = mapped_column(Integer, index=True)
     tag1_id = mapped_column(String)
     tag2_id = mapped_column(String)
     pcr_adapter_id = mapped_column(String)
@@ -530,6 +541,7 @@ class Run(Base):
     start = mapped_column(DateTime(timezone=True))
     complete = mapped_column(DateTime(timezone=True))
     plex_count = mapped_column(Integer)
+    chemistry = mapped_column(String, ForeignKey('chemistry_dict.chemistry'))
 
     data = relationship('Data', back_populates='run')
     platform = relationship('Platform', back_populates='run')

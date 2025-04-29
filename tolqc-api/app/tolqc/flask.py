@@ -8,6 +8,7 @@ import os
 from flask import Flask, request
 
 from sqlalchemy.event import remove
+from sqlalchemy.exc import DBAPIError
 
 from tol.api_base import data_blueprint, system_blueprint
 from tol.api_base.auth import basic_auth_inspector
@@ -21,6 +22,8 @@ from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
 from tolqc.schema import models_list
+
+from werkzeug.exceptions import BadRequest
 
 
 def application(session_factory=None):
@@ -96,6 +99,7 @@ def application(session_factory=None):
     # Reports
     blueprint_reports = reports_blueprint(
         session_factory,
+        models,
         url_prefix=api_path + '/report',
     )
     app.register_blueprint(blueprint_reports)
@@ -114,4 +118,26 @@ def application(session_factory=None):
         url_prefix=api_path + '/system',
     )
 
+    @app.errorhandler(BadRequest)
+    def handle_bad_request(exptn):
+        return propagate_data_source_error(exptn, 400)
+
+    @app.errorhandler(DBAPIError)
+    def handle_db_api_error(exptn):
+        return propagate_data_source_error(exptn, 500)
+
     return app
+
+
+def propagate_data_source_error(exptn: Exception, code: int):
+    """Return an error which will be interpreted as a DataSourceError by the client"""
+    error_class = exptn.__class__.__name__
+    logging.warning(f'{error_class} - {exptn}')
+    return {
+        'errors': [
+            {
+                'title': error_class,
+                'detail': str(exptn),
+            }
+        ]
+    }, code
