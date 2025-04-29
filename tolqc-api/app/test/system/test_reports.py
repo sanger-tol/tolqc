@@ -10,7 +10,11 @@ from urllib.parse import urlencode
 
 import pytest
 
+from tolqc.reports import ReportEngine
+from tolqc.schema import models_list
 from tolqc.schema.sample_data_models import Data, Platform, Run
+
+from werkzeug.exceptions import BadRequest
 
 from .conftest import SKIP_IF_NO_DB_URI_ENV as pytestmark  # noqa: F401, N811
 
@@ -35,6 +39,11 @@ def pacbio_row_count(db_session):
         raise ValueError(msg)
 
     return n
+
+
+@pytest.fixture
+def report_engine(session_factory):
+    return ReportEngine(session_factory=session_factory, models=models_list())
 
 
 def test_pacbio_run_data_report_tsv(client, api_path, pacbio_row_count):
@@ -82,6 +91,29 @@ def test_pipeline_data_report(client, api_path):
 def test_mlwh_data_report(client, api_path):
     response = client.get(api_path + '/report/mlwh-data')
     assert response.status == '200 OK'
+
+
+def test_report_engine_bad_requests(report_engine):
+    with pytest.raises(BadRequest, match='No such report'):
+        report_engine.report('x')
+    with pytest.raises(BadRequest, match='No such table'):
+        report_engine.folder_report('x')
+    with pytest.raises(BadRequest, match='not a folder table'):
+        report_engine.folder_report('species')
+
+
+def test_report_engine_indexes(report_engine):
+    with report_engine.session_factory() as session:
+        # Primary key
+        assert report_engine.is_indexed_column(session, Data.data_id) is True
+        # Foregin key
+        assert report_engine.is_indexed_column(session, Data.sample_id) is True
+        # Indexed column
+        assert report_engine.is_indexed_column(session, Data.processed) is True
+        # No index
+        assert (
+            report_engine.is_indexed_column(session, Data.read_length_longest) is False
+        )
 
 
 def test_folder_report(client, api_path):
