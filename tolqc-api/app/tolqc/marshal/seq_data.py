@@ -6,6 +6,7 @@ import logging
 import re
 from datetime import datetime
 from hashlib import md5
+from pathlib import Path
 
 from sqlalchemy import and_, inspect, select
 from sqlalchemy.exc import SQLAlchemyError
@@ -127,6 +128,7 @@ def build_data(session, centre, row):
         processed=0,  # Setting processed to 0 flags new data
         tag1_id=row.get('tag1_id'),
         tag2_id=row.get('tag2_id'),
+        pcr_adapter_id=row.get('pcr_adapter_id'),
         lims_qc=row.get('lims_qc'),
         date=maybe_datetime(row, 'qc_date'),
     )
@@ -148,7 +150,17 @@ def build_data(session, centre, row):
 
 def build_files(row):
     if path := row.get('remote_path'):
-        return [File(remote_path=path)]
+        fp = Path(path)
+        file_type = None
+        if m := re.search(r'\.(\w+)(\.gz)?$', path, re.IGNORECASE):
+            file_type = m.group(1).upper()
+        return [
+            File(
+                name=fp.name,
+                remote_path=path,
+                file_type=file_type,
+            )
+        ]
     return None
 
 
