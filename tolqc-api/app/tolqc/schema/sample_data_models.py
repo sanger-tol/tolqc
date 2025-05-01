@@ -308,7 +308,7 @@ class File(Base):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     data_id = mapped_column(String, ForeignKey('data.data_id'))
-    name = mapped_column(String)
+    name = mapped_column(String, index=True)
     relative_path = mapped_column(String)
     remote_path = mapped_column(String, index=True)
     size_bytes = mapped_column(BigInteger)
@@ -320,6 +320,10 @@ class File(Base):
 
 class FileTypeDict(Base):
     __tablename__ = 'file_type_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'file_type'
 
     file_type = mapped_column(String, primary_key=True)
     description = mapped_column(String)

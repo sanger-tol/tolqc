@@ -188,7 +188,7 @@ class ReportEngine:
 
             # Check that the column is indexed
             if not self.is_indexed_column(session, sel_col):
-                msg = f"Cannot select on unindexed column '{sel_col.name}'"
+                msg = f"Cannot select on unindexed column '{sel_col.table.name}.{sel_col.name}'"
                 raise BadRequest(msg)
 
             query = query.where(sel_col == val)
