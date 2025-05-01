@@ -56,7 +56,15 @@ def test_valid_accession(db_session):
 def test_build_file():
     (file1,) = build_files({'remote_path': 'irods:/seq/data/d.cram'})
     assert isinstance(file1, File)
+    assert file1.name == 'd.cram'
+    assert file1.file_type == 'CRAM'
+
     assert build_files({'remote_path': None}) is None
+
+    (file2,) = build_files({'remote_path': 'irods:/seq/data/x.bnx.gz'})
+    assert isinstance(file2, File)
+    assert file2.name == 'x.bnx.gz'
+    assert file2.file_type == 'BNX'
 
 
 def test_build_library(db_session):
@@ -156,7 +164,7 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
                 'data_id': 'm64221e_230627_234912#2050',
                 'specimen': 'bBraLeu2',
                 'species': 'Branta leucopsis',
-                'library_type': 'PacBio - HiFi',
+                'library_type': 'PacBio - HiFi (PiMmS)',
                 'sample': 'DTOL13630432',
                 'project': 'DTOL_Darwin Tree of Life',
             },
@@ -184,7 +192,7 @@ def test_seq_data_loader_update(client, api_path, row_data):
                 'data_id': 'm64221e_230627_234912#2050',
                 'specimen': 'bBraLeu2',
                 'species': 'Branta leucopsis',
-                'library_type': 'PacBio - HiFi',
+                'library_type': 'PacBio - HiFi (PiMmS)',
                 'sample': 'DTOL13630432',
                 'project': 'DTOL_Darwin Tree of Life',
                 'changes': {
@@ -226,7 +234,7 @@ def row_data():
             'platform_type': 'PacBio',
             'instrument_model': 'Sequel IIe',
             'instrument_name': 'm64221e',
-            'pipeline_id_lims': 'PacBio - HiFi',
+            'pipeline_id_lims': 'PacBio - HiFi (PiMmS)',
             'run_id': 'm64221e_230627_234912',
             'lims_run_id': 'TRACTION-RUN-642',
             'element': 'H1',
@@ -237,6 +245,7 @@ def row_data():
             'qc_date': '2023-06-30T11:29:00+01:00',
             'tag1_id': 'bc2050',
             'tag2_id': None,
+            'pcr_adapter_id': 'TruSeq_i7s_UDI001--TruSeq_i5s_UDI001',
             'library_id': 'DTOL13630432',
             'movie_minutes': 1440,
             'binding_kit': 'Sequel II Binding Kit 3.2',

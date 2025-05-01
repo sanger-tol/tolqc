@@ -313,8 +313,16 @@ class File(Base):
     remote_path = mapped_column(String, index=True)
     size_bytes = mapped_column(BigInteger)
     md5 = mapped_column(String)
+    file_type = mapped_column(String, ForeignKey('file_type_dict.file_type'))
 
     data = relationship('Data', back_populates='files')
+
+
+class FileTypeDict(Base):
+    __tablename__ = 'file_type_dict'
+
+    file_type = mapped_column(String, primary_key=True)
+    description = mapped_column(String)
 
 
 class Library(Base):

@@ -11,6 +11,7 @@ from tolqc.schema.sample_data_models import (
     Centre,
     Data,
     File,
+    FileTypeDict,
     Library,
     LibraryType,
     Location,
@@ -98,6 +99,8 @@ def test_data(token: str):
         ),
         CategoryDict(category='transcriptomic_data'),
         CategoryDict(category='genomic_data'),
+        FileTypeDict(file_type='BAM'),
+        FileTypeDict(file_type='CRAM'),
         LibraryType(
             library_type_id='Chromium genome',
             hierarchy_name='10x',
