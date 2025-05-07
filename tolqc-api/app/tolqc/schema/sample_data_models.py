@@ -18,7 +18,6 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 
-from tolqc.schema.assembly_models import DatasetElement  # noqa: F401
 from tolqc.schema.base import Base, LogBase
 from tolqc.schema.folder_models import HasFolder
 
@@ -72,30 +71,57 @@ class Accession(LogBase):
         back_populates='umbrella_accession',
     )
 
-    study_submission = relationship(
+    study_submissions = relationship(
         'DataSubmission',
         primaryjoin='Accession.accession_id == DataSubmission.study_accession_id',
         back_populates='study_accession',
     )
-    sample_submission = relationship(
+    sample_submissions = relationship(
         'DataSubmission',
         primaryjoin='Accession.accession_id == DataSubmission.sample_accession_id',
         back_populates='sample_accession',
     )
-    experiment_submission = relationship(
+    experiment_submissions = relationship(
         'DataSubmission',
         primaryjoin='Accession.accession_id == DataSubmission.experiment_accession_id',
         back_populates='experiment_accession',
     )
-    run_submission = relationship(
+    run_submissions = relationship(
         'DataSubmission',
         primaryjoin='Accession.accession_id == DataSubmission.run_accession_id',
         back_populates='run_accession',
     )
-    analysis_submission = relationship(
+    analysis_submissions = relationship(
         'DataSubmission',
         primaryjoin='Accession.accession_id == DataSubmission.analysis_accession_id',
         back_populates='analysis_accession',
+    )
+
+    biosample_metagenomes = relationship(
+        'Metagenome',
+        primaryjoin='Accession.accession_id == Metagenome.biosample_accession_id',
+        back_populates='biosample_accession',
+    )
+    bioproject_metagenomes = relationship(
+        'Metagenome',
+        primaryjoin='Accession.accession_id == Metagenome.bioproject_accession_id',
+        back_populates='bioproject_accession',
+    )
+    assembly_metagenomes = relationship(
+        'Metagenome',
+        primaryjoin='Accession.accession_id == Metagenome.assembly_accession_id',
+        back_populates='assembly_accession',
+    )
+
+    biosample_metagenome_bins = relationship(
+        'MetagenomeBin',
+        primaryjoin='Accession.accession_id == MetagenomeBin.biosample_accession_id',
+        back_populates='biosample_accession',
+    )
+    assembly_metagenome_bins = relationship(
+        'MetagenomeBin',
+        primaryjoin='Accession.accession_id == MetagenomeBin.assembly_accession_id',
+        back_populates='assembly_accession',
     )
 
 
@@ -279,27 +305,27 @@ class DataSubmission(LogBase):
     study_accession = relationship(
         'Accession',
         primaryjoin='DataSubmission.study_accession_id == Accession.accession_id',
-        back_populates='study_submission',
+        back_populates='study_submissions',
     )
     sample_accession = relationship(
         'Accession',
         primaryjoin='DataSubmission.sample_accession_id == Accession.accession_id',
-        back_populates='sample_submission',
+        back_populates='sample_submissions',
     )
     experiment_accession = relationship(
         'Accession',
         primaryjoin='DataSubmission.experiment_accession_id == Accession.accession_id',
-        back_populates='experiment_submission',
+        back_populates='experiment_submissions',
     )
     run_accession = relationship(
         'Accession',
         primaryjoin='DataSubmission.run_accession_id == Accession.accession_id',
-        back_populates='run_submission',
+        back_populates='run_submissions',
     )
     analysis_accession = relationship(
         'Accession',
         primaryjoin='DataSubmission.analysis_accession_id == Accession.accession_id',
-        back_populates='analysis_submission',
+        back_populates='analysis_submissions',
     )
 
 
@@ -628,6 +654,8 @@ class Species(LogBase):
     location = relationship('Location', back_populates='species')
     project_assn = relationship('Umbrella', back_populates='species')
     projects = association_proxy('project_assn', 'project')
+    metagenomes = relationship('Metagenome', back_populates='species')
+    metagenome_bins = relationship('MetagenomeBin', back_populates='species')
 
 
 class Specimen(LogBase):
