@@ -68,7 +68,7 @@ class Metagenome(LogBase):
         ForeignKey('software_version.software_version_id'),
     )
 
-    bins = relationship('MetagenomeBin', back_populates="metagenome")
+    bins = relationship('MetagenomeBin', back_populates='metagenome')
 
     biosample_accession = relationship(
         'Accession',
@@ -101,7 +101,6 @@ class Metagenome(LogBase):
         'SoftwareVersion',
         back_populates='metagenomes',
     )
-
 
 
 class MetagenomeBin(LogBase):
@@ -150,7 +149,7 @@ class MetagenomeBin(LogBase):
         ForeignKey('software_version.software_version_id'),
     )
 
-    metagenome = relationship('Metagenome', back_populates="bins")
+    metagenome = relationship('Metagenome', back_populates='bins')
 
     biosample_accession = relationship(
         'Accession',
@@ -178,7 +177,6 @@ class MetagenomeBin(LogBase):
         'SoftwareVersion',
         back_populates='metagenome_bins',
     )
-
 
 
 class MetagenomeBinStatus(LogBase):
