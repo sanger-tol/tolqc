@@ -532,3 +532,12 @@ class SoftwareVersion(Base):
         'MappingMetrics',
         back_populates='software_version',
     )
+
+    metagenomes = relationship(
+        'Metagenome',
+        back_populates='software_version',
+    )
+    metagenome_bins = relationship(
+        'MetagenomeBin',
+        back_populates='software_version',
+    )

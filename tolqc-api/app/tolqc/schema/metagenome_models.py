@@ -64,7 +64,7 @@ class Metagenome(LogBase):
     coverage = mapped_column(Integer)
     version = mapped_column(Integer)
     software_version_id = mapped_column(
-        String,
+        Integer,
         ForeignKey('software_version.software_version_id'),
     )
 
@@ -94,6 +94,12 @@ class Metagenome(LogBase):
     )
 
     dataset = relationship('Dataset', back_populates='metagenomes')
+
+    software_version = relationship(
+        'SoftwareVersion',
+        back_populates='metagenomes',
+    )
+
 
 
 class MetagenomeBin(LogBase):
@@ -134,7 +140,10 @@ class MetagenomeBin(LogBase):
     has_23s = mapped_column(Boolean)
     has_16s = mapped_column(Boolean)
     has_5s = mapped_column(Boolean)
-    software_version_id = mapped_column(String)
+    software_version_id = mapped_column(
+        Integer,
+        ForeignKey('software_version.software_version_id'),
+    )
 
     biosample_accession = relationship(
         'Accession',
@@ -157,6 +166,12 @@ class MetagenomeBin(LogBase):
         primaryjoin='MetagenomeBin.metagenome_bin_id == MetagenomeBinStatus.metagenome_bin_id',
         back_populates='metagenome_bin',
     )
+
+    software_version = relationship(
+        'SoftwareVersion',
+        back_populates='metagenome_bins',
+    )
+
 
 
 class MetagenomeBinStatus(LogBase):
@@ -228,3 +243,28 @@ class MetagenomeStatusType(Base):
 
     bin_statuses = relationship('MetagenomeBinStatus', back_populates='status_type')
     statuses = relationship('MetagenomeStatus', back_populates='status_type')
+
+
+class TaxonRequest(LogBase):
+    __tablename__ = 'taxon_request'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'species_id'
+
+    species_id = mapped_column(String, primary_key=True)
+    request_status = mapped_column(
+        String, ForeignKey('taxon_request_status_dict.request_status')
+    )
+    taxon_id = mapped_column(Integer, index=True)
+
+
+class TaxonRequestStatusDict(Base):
+    __tablename__ = 'taxon_request_status_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'request_status'
+
+    request_status = mapped_column(String, primary_key=True)
+    description = mapped_column(String)
