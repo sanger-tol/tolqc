@@ -68,6 +68,8 @@ class Metagenome(LogBase):
         ForeignKey('software_version.software_version_id'),
     )
 
+    bins = relationship('MetagenomeBin', back_populates="metagenome")
+
     biosample_accession = relationship(
         'Accession',
         primaryjoin='Metagenome.biosample_accession_id == Accession.accession_id',
@@ -140,10 +142,15 @@ class MetagenomeBin(LogBase):
     has_23s = mapped_column(Boolean)
     has_16s = mapped_column(Boolean)
     has_5s = mapped_column(Boolean)
+    n_23s = mapped_column(Integer)
+    n_16s = mapped_column(Integer)
+    n_5s = mapped_column(Integer)
     software_version_id = mapped_column(
         Integer,
         ForeignKey('software_version.software_version_id'),
     )
+
+    metagenome = relationship('Metagenome', back_populates="bins")
 
     biosample_accession = relationship(
         'Accession',
