@@ -64,7 +64,7 @@ def upgrade() -> None:
         ),
         sa.ForeignKeyConstraint(
             ['host_specimen_id'],
-            ['metagenome.metagenome_id'],
+            ['specimen.specimen_id'],
         ),
         sa.ForeignKeyConstraint(
             ['modified_by'],

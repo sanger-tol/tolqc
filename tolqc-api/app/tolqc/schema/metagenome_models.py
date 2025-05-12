@@ -48,7 +48,7 @@ class Metagenome(LogBase):
     )
     host_specimen_id = mapped_column(
         String,
-        ForeignKey('metagenome.metagenome_id'),
+        ForeignKey('specimen.specimen_id'),
     )
     biosample_accession_id = mapped_column(
         String,
