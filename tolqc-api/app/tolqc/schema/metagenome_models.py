@@ -96,6 +96,7 @@ class Metagenome(LogBase):
     )
 
     dataset = relationship('Dataset', back_populates='metagenomes')
+    host_specimen = relationship('Specimen', back_populates='metagenomes')
 
     software_version = relationship(
         'SoftwareVersion',

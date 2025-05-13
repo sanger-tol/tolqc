@@ -709,6 +709,9 @@ class Specimen(LogBase):
     )
     parents = association_proxy('offspring_assn', 'parent')
 
+    metagenomes = relationship('Metagenome', back_populates='host_specimen')
+
+
 
 class SpecimenStatus(LogBase):
     __tablename__ = 'specimen_status'

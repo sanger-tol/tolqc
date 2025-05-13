@@ -17,6 +17,7 @@ from tol.api_base import custom_blueprint
 from tolqc.report.bundles import FolderBundle, IsoDateTimeBundle
 from tolqc.report.queries import (
     illumina_data_report_query,
+    metagenome_report_query,
     mlwh_data_report_query,
     pacbio_data_report_query,
     pipeline_data_report_query,
@@ -75,6 +76,7 @@ class ReportEngine:
         'pipeline-data': pipeline_data_report_query,
         'mlwh-data': mlwh_data_report_query,
         'illumina-data': illumina_data_report_query,
+        'metagenome': metagenome_report_query,
     }
 
     def do_report(self, report_name, query):

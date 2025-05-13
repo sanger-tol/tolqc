@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from sqlalchemy import select
+from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
     IsoDateTimeBundle,
@@ -26,10 +27,11 @@ from tolqc.schema.sample_data_models import (
     Species,
     Specimen,
 )
+from tolqc.schema.metagenome_models import Metagenome, MetagenomeStatus
 
 
 def pipeline_data_report_query():
-    query = (
+    return (
         select(
             Data.data_id,
             File.remote_path,
@@ -89,8 +91,6 @@ def pipeline_data_report_query():
         .join(LibraryType)
         .order_by(Data.data_id.desc())
     )
-
-    return query
 
 
 def pacbio_data_report_query():
@@ -160,7 +160,7 @@ def pacbio_data_report_query():
 
 
 def mlwh_data_report_query():
-    query = (
+    return (
         mlwh_data_report_query_select()
         .select_from(Data)
         .outerjoin(Sample)
@@ -176,8 +176,6 @@ def mlwh_data_report_query():
             Data.date.desc(),
         )
     )
-
-    return query
 
 
 def mlwh_data_report_query_select():
@@ -247,7 +245,7 @@ def mlwh_data_report_query_select():
 
 
 def illumina_data_report_query():
-    query = (
+    return (
         select(
             ProjectGroupBundle(
                 'group',
@@ -295,4 +293,29 @@ def illumina_data_report_query():
         )
     )
 
-    return query
+
+def metagenome_report_query():
+    host_species = aliased(Species)
+
+    return (
+        select(
+            Metagenome.metagenome_id,
+            Specimen.specimen_id.label('host_specimen'),
+            Specimen.accession_id.label('host_biospecimen'),
+            host_species.species_id.label('host_species'),
+            host_species.taxon_id.label('host_taxon_id'),
+            Species.species_id.label('taxon_name'),
+            Species.taxon_id,
+            Metagenome.biosample_accession_id.label('biosample'),
+            Metagenome.bioproject_accession_id.label('bioproject'),
+            Metagenome.assembly_accession_id.label('assembly_accession'),
+            Metagenome.coverage,
+            Metagenome.version,
+            MetagenomeStatus.status_type_id.label('status'),
+        )
+        .select_from(Metagenome)
+        .outerjoin(Metagenome.species)
+        .outerjoin(Metagenome.host_specimen)
+        .outerjoin(host_species, Specimen.species)
+        .outerjoin(Metagenome.status)
+    )
