@@ -712,7 +712,6 @@ class Specimen(LogBase):
     metagenomes = relationship('Metagenome', back_populates='host_specimen')
 
 
-
 class SpecimenStatus(LogBase):
     __tablename__ = 'specimen_status'
 
