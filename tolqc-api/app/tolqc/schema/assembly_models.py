@@ -324,6 +324,8 @@ class Dataset(LogBase):
     data_assn = relationship('DatasetElement', back_populates='dataset')
     data = association_proxy('data_assn', 'data')
 
+    metagenomes = relationship('Metagenome', back_populates='dataset')
+
 
 class DatasetElement(Base):
     __tablename__ = 'dataset_element'
@@ -528,5 +530,14 @@ class SoftwareVersion(Base):
     )
     mapping_metrics = relationship(
         'MappingMetrics',
+        back_populates='software_version',
+    )
+
+    metagenomes = relationship(
+        'Metagenome',
+        back_populates='software_version',
+    )
+    metagenome_bins = relationship(
+        'MetagenomeBin',
         back_populates='software_version',
     )

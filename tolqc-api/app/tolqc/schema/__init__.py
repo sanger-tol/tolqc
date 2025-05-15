@@ -6,6 +6,7 @@ from sqlalchemy.orm import configure_mappers
 
 import tolqc.schema.assembly_models
 import tolqc.schema.folder_models
+import tolqc.schema.metagenome_models
 import tolqc.schema.sample_data_models  # noqa: F401
 from tolqc.schema.base import Base
 from tolqc.schema.system_models import Token

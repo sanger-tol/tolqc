@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
     IsoDateTimeBundle,
@@ -10,6 +11,12 @@ from tolqc.report.bundles import (
     LastPathElementBundle,
     ProjectGroupBundle,
     StarPathBundle,
+)
+from tolqc.schema.metagenome_models import (
+    Metagenome,
+    MetagenomeBin,
+    MetagenomeBinStatus,
+    MetagenomeStatus,
 )
 from tolqc.schema.sample_data_models import (
     Allocation,
@@ -29,7 +36,7 @@ from tolqc.schema.sample_data_models import (
 
 
 def pipeline_data_report_query():
-    query = (
+    return (
         select(
             Data.data_id,
             File.remote_path,
@@ -89,8 +96,6 @@ def pipeline_data_report_query():
         .join(LibraryType)
         .order_by(Data.data_id.desc())
     )
-
-    return query
 
 
 def pacbio_data_report_query():
@@ -160,7 +165,7 @@ def pacbio_data_report_query():
 
 
 def mlwh_data_report_query():
-    query = (
+    return (
         mlwh_data_report_query_select()
         .select_from(Data)
         .outerjoin(Sample)
@@ -176,8 +181,6 @@ def mlwh_data_report_query():
             Data.date.desc(),
         )
     )
-
-    return query
 
 
 def mlwh_data_report_query_select():
@@ -247,7 +250,7 @@ def mlwh_data_report_query_select():
 
 
 def illumina_data_report_query():
-    query = (
+    return (
         select(
             ProjectGroupBundle(
                 'group',
@@ -295,4 +298,84 @@ def illumina_data_report_query():
         )
     )
 
-    return query
+
+def metagenome_report_query():
+    # Construct CTE that counts bin types
+    bin_counts = (
+        select(
+            MetagenomeBin.metagenome_id,
+            func.count().filter(MetagenomeBin.bin_type == 'MAG').label('mag_count'),
+            func.count().filter(MetagenomeBin.bin_type == 'BIN').label('bin_count'),
+        )
+        .group_by(MetagenomeBin.metagenome_id)
+        .cte('bin_counts')
+    )
+
+    # We join into the species table via both the metagenome and host
+    # specimen, so we need an alias for it.
+    host_species = aliased(Species)
+
+    return (
+        select(
+            Metagenome.metagenome_id.label('metagenome'),
+            Specimen.specimen_id.label('host_specimen'),
+            MetagenomeStatus.status_type_id.label('status'),
+            Specimen.accession_id.label('host_biospecimen_accn'),
+            host_species.species_id.label('host_species'),
+            host_species.taxon_id.label('host_taxon_id'),
+            Species.species_id.label('taxon_name'),
+            Species.taxon_id,
+            Metagenome.biosample_accession_id.label('biosample_accn'),
+            Metagenome.bioproject_accession_id.label('bioproject'),
+            Metagenome.assembly_accession_id.label('assembly_accn'),
+            bin_counts.c.mag_count,
+            bin_counts.c.bin_count,
+            Metagenome.coverage,
+            Metagenome.version,
+        )
+        .select_from(Metagenome)
+        .outerjoin(Metagenome.species)
+        .outerjoin(Metagenome.host_specimen)
+        .outerjoin(host_species, Specimen.species)
+        .outerjoin(Metagenome.status)
+        .outerjoin(bin_counts)
+        .order_by(Metagenome.metagenome_id)
+    )
+
+
+def metagenome_bin_report_query():
+    return (
+        select(
+            MetagenomeBin.metagenome_bin_id.label('metagenome_bin'),
+            Metagenome.metagenome_id.label('metagenome'),
+            Specimen.specimen_id.label('host_specimen'),
+            MetagenomeBinStatus.status_type_id.label('status'),
+            Species.species_id.label('taxon_name'),
+            Species.taxon_id,
+            MetagenomeBin.biosample_accession_id.label('biosample_accn'),
+            MetagenomeBin.assembly_accession_id.label('assembly_accn'),
+            MetagenomeBin.gtdb_taxonomy,
+            MetagenomeBin.bin_type,
+            MetagenomeBin.length,
+            MetagenomeBin.contigs,
+            MetagenomeBin.circular_contigs,
+            MetagenomeBin.completeness,
+            MetagenomeBin.contamination,
+            MetagenomeBin.mean_coverage,
+            MetagenomeBin.ssu_count,
+            MetagenomeBin.trna_total,
+            MetagenomeBin.trna_unique,
+            MetagenomeBin.has_23s,
+            MetagenomeBin.has_16s,
+            MetagenomeBin.has_5s,
+            MetagenomeBin.n_23s,
+            MetagenomeBin.n_16s,
+            MetagenomeBin.n_5s,
+        )
+        .select_from(MetagenomeBin)
+        .outerjoin(Species)
+        .outerjoin(MetagenomeBin.metagenome)
+        .outerjoin(Metagenome.host_specimen)
+        .outerjoin(MetagenomeBin.status)
+        .order_by(MetagenomeBin.metagenome_bin_id)
+    )

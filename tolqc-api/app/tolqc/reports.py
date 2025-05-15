@@ -17,6 +17,8 @@ from tol.api_base import custom_blueprint
 from tolqc.report.bundles import FolderBundle, IsoDateTimeBundle
 from tolqc.report.queries import (
     illumina_data_report_query,
+    metagenome_bin_report_query,
+    metagenome_report_query,
     mlwh_data_report_query,
     pacbio_data_report_query,
     pipeline_data_report_query,
@@ -71,10 +73,12 @@ class ReportEngine:
     }
 
     QUERY_FUNCS = {
+        'illumina-data': illumina_data_report_query,
+        'metagenome': metagenome_report_query,
+        'metagenome-bin': metagenome_bin_report_query,
+        'mlwh-data': mlwh_data_report_query,
         'pacbio-data': pacbio_data_report_query,
         'pipeline-data': pipeline_data_report_query,
-        'mlwh-data': mlwh_data_report_query,
-        'illumina-data': illumina_data_report_query,
     }
 
     def do_report(self, report_name, query):
@@ -188,7 +192,7 @@ class ReportEngine:
 
             # Check that the column is indexed
             if not self.is_indexed_column(session, sel_col):
-                msg = f"Cannot select on unindexed column '{sel_col.name}'"
+                msg = f"Cannot select on unindexed column '{sel_col.table.name}.{sel_col.name}'"
                 raise BadRequest(msg)
 
             query = query.where(sel_col == val)
