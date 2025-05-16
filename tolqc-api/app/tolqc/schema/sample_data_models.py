@@ -273,8 +273,6 @@ class Data(LogBase, HasFolder):
     datasets = association_proxy('dataset_assn', 'dataset')
 
 
-
-
 class DataSubmission(LogBase):
     __tablename__ = 'data_submission'
 
@@ -762,7 +760,7 @@ class SpecimenStatusType(Base):
 class TiaraMetrics(LogBase):
     __tablename__ = 'tiara_metrics'
 
-    id = mapped_column(Integer, primary_key=True)
+    id = mapped_column(Integer, primary_key=True)  # noqa: A003
     data_id = mapped_column(String, ForeignKey('data.data_id'))
     division = mapped_column(String, index=True)
     reads = mapped_column(BigInteger)

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import func, select
+from sqlalchemy import Float, func, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
@@ -90,7 +90,7 @@ def pipeline_data_report_query():
         .outerjoin(Sample)
         .outerjoin(Specimen)
         .outerjoin(Location)  # Important to join to Location from Speciemn not Species
-        .outerjoin(Species)
+        .outerjoin(Specimen.species)
         .join(File)
         .join(Library)
         .join(LibraryType)
@@ -129,10 +129,18 @@ def pacbio_data_report_query():
             Data.read_length_n50,
             Data.read_length_longest,
             Data.read_length_shortest,
-            Data.reads_duplicated,
-            Data.reads_discarded,
-            Data.reads_trimmed,
-            Data.bases_removed,
+            func.round(100 * Data.reads_duplicated / Data.reads, 4)
+            .cast(Float)
+            .label('reads_duplicated_pct'),
+            func.round(100 * Data.reads_discarded / Data.reads, 4)
+            .cast(Float)
+            .label('reads_discarded_pct'),
+            func.round(100 * Data.reads_trimmed / Data.reads, 4)
+            .cast(Float)
+            .label('reads_trimmed_pct'),
+            func.round(100 * Data.bases_removed / Data.bases, 4)
+            .cast(Float)
+            .label('bases_removed_pct'),
             Data.bases,
             Data.bases_a,
             Data.bases_c,
