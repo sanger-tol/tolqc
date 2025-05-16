@@ -950,7 +950,9 @@ def test_data(token: str):
                                     read_length_longest=42852,
                                     read_length_shortest=56,
                                     reads_duplicated=0,
-                                    reads_filtered=0,
+                                    reads_discarded=60,
+                                    reads_trimmed=114,
+                                    bases_removed=427249,
                                     library=Library(
                                         library_id='DN695911V-H1', library_type_id='PacBio - HiFi'
                                     ),
@@ -1090,7 +1092,9 @@ def test_data(token: str):
                                     read_length_longest=39513,
                                     read_length_shortest=53,
                                     reads_duplicated=0,
-                                    reads_filtered=1390,
+                                    reads_discarded=200,
+                                    reads_trimmed=1652,
+                                    bases_removed=1850523,
                                     library=Library(
                                         library_id='DN703483V', library_type_id='PacBio - HiFi'
                                     ),
@@ -1330,7 +1334,9 @@ def test_data(token: str):
                                     read_length_longest=30129,
                                     read_length_shortest=62,
                                     reads_duplicated=494675,
-                                    reads_filtered=0,
+                                    reads_discarded=14187,
+                                    reads_trimmed=767,
+                                    bases_removed=128899080,
                                     library=Library(
                                         library_id='DTOL14909592',
                                         library_type_id='PacBio - HiFi (ULI)',
@@ -1879,7 +1885,9 @@ def test_data(token: str):
                                     read_length_longest=37726,
                                     read_length_shortest=51,
                                     reads_duplicated=0,
-                                    reads_filtered=6869,
+                                    reads_discarded=369,
+                                    reads_trimmed=12744,
+                                    bases_removed=6409521,
                                     library=Library(
                                         library_id='DN765124Q-B1', library_type_id='PacBio - HiFi'
                                     ),
