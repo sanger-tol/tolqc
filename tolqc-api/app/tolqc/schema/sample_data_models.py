@@ -757,15 +757,17 @@ class SpecimenStatusType(Base):
     statuses = relationship('SpecimenStatus', back_populates='status_type')
 
 
-class TiaraMetrics(LogBase):
+class TiaraMetrics(Base):
     __tablename__ = 'tiara_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     data_id = mapped_column(String, ForeignKey('data.data_id'))
-    division = mapped_column(String, index=True)
+    division = mapped_column(String)
     reads = mapped_column(BigInteger)
     bases = mapped_column(BigInteger)
     read_length_n50 = mapped_column(Integer)
+
+    UniqueConstraint('division', 'data_id')
 
     data = relationship('Data', back_populates='tiara_metrics')
 

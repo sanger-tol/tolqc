@@ -53,21 +53,24 @@ def upgrade() -> None:
         sa.Column('reads', sa.BigInteger(), nullable=True),
         sa.Column('bases', sa.BigInteger(), nullable=True),
         sa.Column('read_length_n50', sa.Integer(), nullable=True),
-        sa.Column('modified_at', sa.DateTime(timezone=True), nullable=True),
-        sa.Column('modified_by', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(
             ['data_id'],
             ['data.data_id'],
         ),
-        sa.ForeignKeyConstraint(
-            ['modified_by'],
-            ['user.id'],
-        ),
         sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('division', 'data_id'),
     )
-    op.create_index(
-        op.f('ix_tiara_metrics_division'), 'tiara_metrics', ['division'], unique=False
-    )
+
+    # UniqeContraints which were missed in previous alembic migrations
+    for table, col1, col2 in (
+        ('allocation', 'project_id', 'data_id'),
+        ('assembly_source', 'assembly_id', 'source_assembly_id'),
+        ('dataset_element', 'data_id', 'dataset_id'),
+        ('offspring', 'specimen_id', 'offspring_specimen_id'),
+        ('software_version', 'name', 'version'),
+        ('umbrella', 'project_id', 'species_id'),
+    ):
+        op.create_index(f'{table}_{col1}_{col2}_key', table, [col1, col2], unique=True)
 
 
 def downgrade() -> None:
