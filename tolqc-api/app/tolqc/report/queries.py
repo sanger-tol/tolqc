@@ -2,12 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import func, select
+from sqlalchemy import Float, func, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
-    IsoDateTimeBundle,
-    IsoDayBundle,
     LastPathElementBundle,
     ProjectGroupBundle,
     StarPathBundle,
@@ -90,7 +88,7 @@ def pipeline_data_report_query():
         .outerjoin(Sample)
         .outerjoin(Specimen)
         .outerjoin(Location)  # Important to join to Location from Speciemn not Species
-        .outerjoin(Species)
+        .outerjoin(Specimen.species)
         .join(File)
         .join(Library)
         .join(LibraryType)
@@ -112,7 +110,7 @@ def pacbio_data_report_query():
             Library.library_type_id.label('pipeline'),
             Platform.name.label('platform'),
             Platform.model,
-            IsoDayBundle('date', Run.start),
+            iso_date_col('date', Run.start),
             Data.lims_qc,
             Run.lims_id.label('run'),
             Run.run_id.label('movie_name'),
@@ -129,9 +127,11 @@ def pacbio_data_report_query():
             Data.read_length_n50,
             Data.read_length_longest,
             Data.read_length_shortest,
-            Data.reads_duplicated,
-            Data.reads_filtered,
-            Data.bases.label('bases'),
+            percent_col('reads_duplicated_pct', Data.reads_duplicated, Data.reads),
+            percent_col('reads_discarded_pct', Data.reads_discarded, Data.reads),
+            percent_col('reads_trimmed_pct', Data.reads_trimmed, Data.reads),
+            percent_col('bases_removed_pct', Data.bases_removed, Data.bases),
+            Data.bases,
             Data.bases_a,
             Data.bases_c,
             Data.bases_g,
@@ -201,11 +201,11 @@ def mlwh_data_report_query_select():
         Run.run_id,
         Run.lims_id.label('lims_run_id'),
         Run.element,
-        IsoDateTimeBundle('run_start', Run.start),
-        IsoDateTimeBundle('run_complete', Run.complete),
+        iso_datetime_col('run_start', Run.start),
+        iso_datetime_col('run_complete', Run.complete),
         Run.plex_count,
         Data.lims_qc,
-        IsoDateTimeBundle('qc_date', Data.date),
+        iso_datetime_col('qc_date', Data.date),
         Data.tag1_id,
         Data.tag2_id,
         Library.library_id,
@@ -271,7 +271,7 @@ def illumina_data_report_query():
             Data.tag1_id.label('tag_id'),
             Data.tag2_id.label('tag2_id'),
             Data.lims_qc.label('lims_qc'),
-            IsoDayBundle('date', Run.complete),
+            iso_date_col('date', Run.complete),
             Library.library_type_id.label('pipeline'),
             Data.bases_a,
             Data.bases_c,
@@ -379,3 +379,28 @@ def metagenome_bin_report_query():
         .outerjoin(MetagenomeBin.status)
         .order_by(MetagenomeBin.metagenome_bin_id)
     )
+
+
+def percent_col(label_txt, nominator, divisor, decimal_places=4):
+    """
+    Builds SQL for returning a column in %
+    """
+    return (
+        func.round(100 * nominator / divisor, decimal_places)
+        .cast(Float)
+        .label(label_txt)
+    )
+
+
+def iso_datetime_col(label_txt, column):
+    """
+    Builds SQL for returning an ISO 8601 datetime string
+    """
+    return func.to_char(column, 'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM').label(label_txt)
+
+
+def iso_date_col(label_txt, column):
+    """
+    Builds SQL for returning an ISO 8601 date string
+    """
+    return func.to_char(column, 'YYYY-MM-DD').label(label_txt)

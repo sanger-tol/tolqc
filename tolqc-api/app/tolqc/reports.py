@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import datetime
-import json
 
 from flask import Blueprint, request
 
@@ -14,6 +13,7 @@ from sqlalchemy.sql.elements import Label
 
 from tol.api_base import custom_blueprint
 
+from tolqc.json import json_dumps
 from tolqc.report.bundles import FolderBundle, IsoDateTimeBundle
 from tolqc.report.queries import (
     illumina_data_report_query,
@@ -57,7 +57,7 @@ def tsv_rows(row_itr, query):
 
 def ndjson_rows(row_itr, _):
     for row in row_itr:
-        yield json.dumps(row._asdict(), separators=(',', ':')) + '\n'
+        yield json_dumps(row._asdict()) + '\n'
 
 
 class ReportEngine:
