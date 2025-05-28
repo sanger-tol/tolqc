@@ -7,7 +7,6 @@ from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
     LastPathElementBundle,
-    ProjectGroupBundle,
     StarPathBundle,
 )
 from tolqc.schema.metagenome_models import (
@@ -17,7 +16,6 @@ from tolqc.schema.metagenome_models import (
     MetagenomeStatus,
 )
 from tolqc.schema.sample_data_models import (
-    Allocation,
     Data,
     File,
     Library,
@@ -25,7 +23,6 @@ from tolqc.schema.sample_data_models import (
     Location,
     PacbioRunMetrics,
     Platform,
-    Project,
     Run,
     Sample,
     Species,
@@ -40,6 +37,7 @@ def pipeline_data_report_query():
             File.remote_path,
             Species.species_id.label('species'),
             LastPathElementBundle('species_dir', Location.path),
+            Species.tolid_prefix,
             Location.path.label('location_root'),
             Data.category,
             Specimen.specimen_id.label('specimen'),
@@ -99,11 +97,6 @@ def pipeline_data_report_query():
 def pacbio_data_report_query():
     return (
         select(
-            ProjectGroupBundle(
-                'group',
-                Project.hierarchy_name,
-                Species.taxon_group,
-            ),
             Species.species_id.label('species'),
             Specimen.specimen_id.label('specimen'),
             Sample.sample_id.label('sample'),
@@ -152,10 +145,6 @@ def pacbio_data_report_query():
         .join(Platform)
         .outerjoin(Library)
         .outerjoin(PacbioRunMetrics)
-        # Cannot do many-to-many join between Data and Project directly.
-        # Must explicitly go through Allocation:
-        .join(Allocation)
-        .join(Project)
         .where(Platform.name == 'PacBio')
         .order_by(
             Data.date.desc(),
@@ -252,11 +241,6 @@ def mlwh_data_report_query_select():
 def illumina_data_report_query():
     return (
         select(
-            ProjectGroupBundle(
-                'group',
-                Project.hierarchy_name,
-                Species.taxon_group,
-            ),
             Species.species_id.label('species'),
             Specimen.specimen_id.label('specimen'),
             Platform.name.label('platform'),
@@ -285,12 +269,6 @@ def illumina_data_report_query():
         .join(Run)
         .join(Platform)
         .outerjoin(Library)
-        # Cannot do many-to-many join between Data and Project directly.
-        # Must explicitly go through Allocation:
-        .join(Allocation)
-        .join(Project)
-        # Join accession onto Data
-        .outerjoin(Data.accession)
         .where(Platform.name == 'Illumina')
         .order_by(
             Data.date.desc(),

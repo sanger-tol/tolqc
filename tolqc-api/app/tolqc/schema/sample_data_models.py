@@ -17,6 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.sql import expression
 
 from tolqc.schema.base import Base, LogBase
 from tolqc.schema.folder_models import HasFolder
@@ -45,6 +46,7 @@ class Accession(LogBase):
         back_populates='accessions',
     )
     projects = relationship('Project', back_populates='accession')
+    studies = relationship('Study', back_populates='accession')
     specimens = relationship('Specimen', back_populates='accession')
     samples = relationship('Sample', back_populates='accession')
     data = relationship('Data', back_populates='accession')
@@ -216,7 +218,7 @@ class Data(LogBase, HasFolder):
         return 'data_id'
 
     data_id = mapped_column(String, primary_key=True)
-    study_id = mapped_column(Integer, ForeignKey('project.study_id'))
+    study_id = mapped_column(Integer, ForeignKey('study.study_id'))
     category = mapped_column(String, ForeignKey('category_dict.category'))
     sample_id = mapped_column(String, ForeignKey('sample.sample_id'))
     library_id = mapped_column(String, ForeignKey('library.library_id'))
@@ -265,6 +267,7 @@ class Data(LogBase, HasFolder):
     barcode_metrics = relationship('BarcodeMetrics', back_populates='data')
     mapping_metrics = relationship('MappingMetrics', back_populates='data')
     tiara_metrics = relationship('TiaraMetrics', back_populates='data')
+    study = relationship('Study', back_populates='data')
 
     project_assn = relationship('Allocation', back_populates='data')
     projects = association_proxy('project_assn', 'project')
@@ -534,7 +537,7 @@ class Platform(Base):
     run = relationship('Run', back_populates='platform')
 
 
-class Project(Base):
+class Project(LogBase):
     __tablename__ = 'project'
 
     @classmethod
@@ -544,7 +547,6 @@ class Project(Base):
     project_id = mapped_column(Integer, primary_key=True)
     hierarchy_name = mapped_column(String)
     description = mapped_column(String)
-    study_id = mapped_column(Integer, unique=True)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
 
     accession = relationship('Accession', back_populates='projects')
@@ -755,6 +757,22 @@ class SpecimenStatusType(Base):
     assign_order = mapped_column(Integer)
 
     statuses = relationship('SpecimenStatus', back_populates='status_type')
+
+
+class Study(LogBase):
+    __tablename__ = 'study'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'study_id'
+
+    study_id = mapped_column(Integer, primary_key=True)
+    name = mapped_column(String)
+    auto_sync = mapped_column(Boolean, server_default=expression.true(), nullable=False)
+    accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
+
+    accession = relationship('Accession', back_populates='studies')
+    data = relationship('Data', back_populates='study')
 
 
 class TiaraMetrics(Base):

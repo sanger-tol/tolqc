@@ -1,12 +1,10 @@
-# SPDX-FileCopyrightText: 2024 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2025 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
-
 from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
     Accession,
     AccessionTypeDict,
-    Allocation,
     CategoryDict,
     Centre,
     Data,
@@ -17,13 +15,13 @@ from tolqc.schema.sample_data_models import (
     Location,
     PacbioRunMetrics,
     Platform,
-    Project,
     QCDict,
     Run,
     Sample,
     Sex,
     Species,
     Specimen,
+    Study,
     VisibilityDict,
 )
 from tolqc.schema.system_models import Token, User
@@ -99,8 +97,7 @@ def test_data(token: str):
         ),
         CategoryDict(category='transcriptomic_data'),
         CategoryDict(category='genomic_data'),
-        FileTypeDict(file_type='BAM'),
-        FileTypeDict(file_type='CRAM'),
+        CategoryDict(category='resequencing_data'),
         LibraryType(
             library_type_id='Chromium genome',
             hierarchy_name='10x',
@@ -127,7 +124,6 @@ def test_data(token: str):
         LibraryType(library_type_id='Pre-quality controlled'),
         LibraryType(library_type_id='Manual Standard WGS (Plate)'),
         LibraryType(library_type_id='Nextera dual index pre quality controlled'),
-        LibraryType(library_type_id='Pacbio_Amplicon'),
         LibraryType(
             library_type_id='RNA PolyA',
             hierarchy_name='rna-seq',
@@ -176,8 +172,6 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='hic',
         ),
-        LibraryType(library_type_id='PacBio - CLR'),
-        LibraryType(library_type_id='RNA Ribo'),
         LibraryType(
             library_type_id='PacBio - HiFi (PiMmS)',
             hierarchy_name='pacbio',
@@ -213,13 +207,6 @@ def test_data(token: str):
             kit='Dovetail - Hi-C',
             enzymes='DpnII',
             cut_sites='^GATC',
-        ),
-        LibraryType(
-            library_type_id='Hi-C - OmniC',
-            hierarchy_name='hic-omic',
-            default_category='genomic_data',
-            reporting_category='hic',
-            kit='Dovetail - Omni-C',
         ),
         LibraryType(
             library_type_id='Hi-C - Qiagen',
@@ -298,6 +285,16 @@ def test_data(token: str):
             hierarchy_name='illumina',
             default_category='genomic_data',
         ),
+        LibraryType(library_type_id='RNA Ribo', hierarchy_name='rna-seq'),
+        LibraryType(library_type_id='Pacbio_Amplicon', hierarchy_name='pacbio'),
+        LibraryType(library_type_id='PacBio - CLR', hierarchy_name='pacbio'),
+        LibraryType(
+            library_type_id='Hi-C - OmniC',
+            hierarchy_name='hic-omnic',
+            default_category='genomic_data',
+            reporting_category='hic',
+            kit='Dovetail - Omni-C',
+        ),
         Platform(id=1, name='Illumina', model='HiSeq'),
         Platform(id=2, name='Illumina', model='HiSeqX'),
         Platform(id=4, name='Illumina', model='HiSeq 4000'),
@@ -317,6 +314,14 @@ def test_data(token: str):
         Platform(id=20, name='BioNano', model='Saphyr'),
         Platform(id=21, name='BioNano', model='Irys'),
         Centre(id=2, name='Wellcome Sanger Institute'),
+        Centre(id=3, name='Baylor College of Medicine'),
+        Centre(id=4, name='Pacific Biosciences'),
+        Centre(id=5, name='Arima Genomics'),
+        Centre(id=6, name='University of Cambridge'),
+        FileTypeDict(file_type='BAM', description='Binary Alignment Map'),
+        FileTypeDict(file_type='CRAM', description='Compressed Reference-oriented Alignment Map'),
+        FileTypeDict(file_type='BNX', description='BioNano BNX'),
+        FileTypeDict(file_type='CMAP', description='BioNano CMAP'),
         FolderLocation(
             folder_location_id='pacbio_run_s3',
             uri_prefix='s3://tolqc-dev/pacbio_run',
@@ -426,6 +431,83 @@ def test_data(token: str):
                 ],
             },
         ),
+        FolderLocation(
+            folder_location_id='genomescope_test_s3',
+            uri_prefix='s3://tolqc-dev/test/genomescope',
+            files_template={
+                'image_file_patterns': [
+                    {'caption': 'Genomescope 2.0 linear plot', 'pattern': '.*linear_plot\\.png'},
+                    {'caption': 'Genomescope 2.0 log plot', 'pattern': '.*log_plot\\.png'},
+                    {
+                        'caption': 'Genomescope 2.0 transformed linear plot',
+                        'pattern': '.*transformed_linear_plot\\.png',
+                    },
+                    {
+                        'caption': 'Genomescope 2.0 transformed log plot',
+                        'pattern': '.*transformed_log_plot\\.png',
+                    },
+                ],
+                'other_file_patterns': [
+                    {'caption': 'Kmer counts histogram data', 'pattern': '.*\\.hist\\.txt'}
+                ],
+            },
+        ),
+        FolderLocation(
+            folder_location_id='pacbio_test_s3',
+            uri_prefix='s3://tolqc-dev/test/pacbio_run',
+            files_template={
+                'image_file_patterns': [
+                    {'caption': 'Base yield density', 'pattern': 'base_yield_plot\\.png'},
+                    {'caption': 'Barcode quality distribution', 'pattern': 'bq_histogram\\.png'},
+                    {
+                        'caption': 'Read quality distribution',
+                        'pattern': 'ccs_accuracy_hist\\.png',
+                    },
+                    {
+                        'caption': 'Read length distribution (all)',
+                        'pattern': 'ccs_all_readlength_hist_plot\\.png',
+                    },
+                    {
+                        'caption': 'HiFi yield by read length',
+                        'pattern': 'ccs_hifi_read_length_yield_plot\\.png',
+                    },
+                    {'caption': 'Number of passes', 'pattern': 'ccs_npasses_hist\\.png'},
+                    {
+                        'caption': 'HiFi read length distribution',
+                        'pattern': 'ccs_readlength_hist_plot\\.png',
+                    },
+                    {'caption': 'Control concordance', 'pattern': 'concordance_plot\\.png'},
+                    {
+                        'caption': 'Insert read length density',
+                        'pattern': 'hexbin_length_plot\\.png',
+                    },
+                    {'caption': 'CpG methylation in reads', 'pattern': 'm5c_detections\\.png'},
+                    {
+                        'caption': 'CpG methylation in reads histogram',
+                        'pattern': 'm5c_detections_hist\\.png',
+                    },
+                    {'caption': 'Number of reads per barcode', 'pattern': 'nreads\\.png'},
+                    {
+                        'caption': 'Number of reads per barcode histogram',
+                        'pattern': 'nreads_histogram\\.png',
+                    },
+                    {'caption': 'Loading evaluation', 'pattern': 'raw_read_length_plot\\.png'},
+                    {'caption': 'Polymerase read length', 'pattern': 'readLenDist0\\.png'},
+                    {
+                        'caption': 'Control polymerase read length',
+                        'pattern': 'readlength_plot\\.png',
+                    },
+                    {
+                        'caption': 'Mean readlength histogram',
+                        'pattern': 'readlength_histogram\\.png',
+                    },
+                    {
+                        'caption': 'Accuracy versus read length density',
+                        'pattern': 'readlength_qv_hist2d\\.hexbin\\.png',
+                    },
+                ]
+            },
+        ),
         QCDict(qc_state='pass'),
         QCDict(qc_state='fail'),
         Sex(sex_id='M', description='Male'),
@@ -445,24 +527,9 @@ def test_data(token: str):
         ),
         VisibilityDict(visibility='Fail', description='Failed - do not import'),
         VisibilityDict(visibility='Legacy', description='Legacy data - do not display'),
-        Project(
-            project_id=17,
-            hierarchy_name='darwin/rnd',
-            description='DTOL_Darwin R&D',
-            study_id=5822,
-        ),
-        Project(
-            project_id=21,
-            hierarchy_name='darwin/{}',  # noqa: P103
-            description='DTOL_Darwin Tree of Life',
-            study_id=5901,
-        ),
-        Project(
-            project_id=24,
-            hierarchy_name='darwin/{}',  # noqa: P103
-            description='DTOL_Darwin Tree of Life RNA',
-            study_id=6327,
-        ),
+        Study(study_id=5822, name='DTOL_Darwin R&D', auto_sync=True),
+        Study(study_id=5901, name='DTOL_Darwin Tree of Life', auto_sync=True),
+        Study(study_id=6327, name='DTOL_Darwin Tree of Life RNA', auto_sync=True),
         Species(
             species_id='Brachiomonas submarina',
             location_id=3113,
@@ -516,14 +583,13 @@ def test_data(token: str):
                                         File(
                                             id=112380,
                                             data_id='37939_1#2',
+                                            name='37939_1#2.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/37/37939/lane1/plex2'
                                                 '/37939_1#2.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=115631, project_id=17, data_id='37939_1#2')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GSEF3JDHWEVBP5EWYD9QC8',
@@ -594,11 +660,10 @@ def test_data(token: str):
                                         File(
                                             id=114488,
                                             data_id='35344_1#1',
+                                            name='35344_1#1.cram',
                                             remote_path='irods:/seq/35344/35344_1#1.cram',
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=117751, project_id=21, data_id='35344_1#1')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNT7RDJNSEPWTKHG8QSHSB',
@@ -663,11 +728,10 @@ def test_data(token: str):
                                         File(
                                             id=114489,
                                             data_id='35344_1#2',
+                                            name='35344_1#2.cram',
                                             remote_path='irods:/seq/35344/35344_1#2.cram',
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=117752, project_id=21, data_id='35344_1#2')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNT901PKS6AZBX0QPJEP95',
@@ -731,11 +795,10 @@ def test_data(token: str):
                                         File(
                                             id=114491,
                                             data_id='35344_1#4',
+                                            name='35344_1#4.cram',
                                             remote_path='irods:/seq/35344/35344_1#4.cram',
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=117754, project_id=21, data_id='35344_1#4')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNTBMMYVA2RJZKYZCHZAAM',
@@ -800,11 +863,10 @@ def test_data(token: str):
                                         File(
                                             id=114490,
                                             data_id='35344_1#3',
+                                            name='35344_1#3.cram',
                                             remote_path='irods:/seq/35344/35344_1#3.cram',
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=117753, project_id=21, data_id='35344_1#3')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNTAE04KEY675Z4WX8KDK4',
@@ -880,14 +942,13 @@ def test_data(token: str):
                                         File(
                                             id=114697,
                                             data_id='35528_4#8',
+                                            name='35528_4#8.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/35/35528/lane4/plex8'
                                                 '/35528_4#8.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=117960, project_id=21, data_id='35528_4#8')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GP34MFJNAHCBM0X20TA8VF',
@@ -1056,18 +1117,15 @@ def test_data(token: str):
                                         File(
                                             id=120785,
                                             data_id='m64089e_210601_133425#1022',
+                                            name=(
+                                                'demultiplex.bc1022_BAK8B_OA--bc1022_BAK8B_OA.bam'
+                                            ),
                                             remote_path=(
                                                 'irods:/seq/pacbio/r64089e_20210528_093647/4_D01'
                                                 '/demultiplex.bc1022_BAK8B_OA'
                                                 '--bc1022_BAK8B_OA.bam'
                                             ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=124055,
-                                            project_id=21,
-                                            data_id='m64089e_210601_133425#1022',
+                                            file_type='BAM',
                                         )
                                     ],
                                 ),
@@ -1114,18 +1172,15 @@ def test_data(token: str):
                                         File(
                                             id=143249,
                                             data_id='m64016_201115_112225#1022',
+                                            name=(
+                                                'demultiplex.bc1022_BAK8B_OA--bc1022_BAK8B_OA.bam'
+                                            ),
                                             remote_path=(
                                                 'irods:/seq/pacbio/r64016_20201112_100113/4_D01'
                                                 '/demultiplex.bc1022_BAK8B_OA'
                                                 '--bc1022_BAK8B_OA.bam'
                                             ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=147115,
-                                            project_id=21,
-                                            data_id='m64016_201115_112225#1022',
+                                            file_type='BAM',
                                         )
                                     ],
                                 ),
@@ -1170,11 +1225,10 @@ def test_data(token: str):
                                         File(
                                             id=123947,
                                             data_id='36703_5#4',
+                                            name='36703_5#4.cram',
                                             remote_path='irods:/seq/36703/36703_5#4.cram',
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=127430, project_id=24, data_id='36703_5#4')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ6KCY1QQ32TSMP7KRRT3Z',
@@ -1245,14 +1299,13 @@ def test_data(token: str):
                                         File(
                                             id=112358,
                                             data_id='36857#13',
+                                            name='36857#13.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/36/36857/plex13'
                                                 '/36857#13.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=115609, project_id=17, data_id='36857#13')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ93RN80BXDY4WTYJZYB24',
@@ -1391,17 +1444,12 @@ def test_data(token: str):
                                         File(
                                             id=148709,
                                             data_id='m84309_250205_121831_s4#2076',
+                                            name='m84309_250205_121831_s4.hifi_reads.bc2076.bam',
                                             remote_path=(
                                                 'irods:/seq/pacbio/r84309_20250205_103258/1_D01'
                                                 '/m84309_250205_121831_s4.hifi_reads.bc2076.bam'
                                             ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=152554,
-                                            project_id=21,
-                                            data_id='m84309_250205_121831_s4#2076',
+                                            file_type='BAM',
                                         )
                                     ],
                                 )
@@ -1483,14 +1531,13 @@ def test_data(token: str):
                                         File(
                                             id=115164,
                                             data_id='36691_2#5',
+                                            name='36691_2#5.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/36/36691/lane2/plex5'
                                                 '/36691_2#5.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=118427, project_id=21, data_id='36691_2#5')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ31A3VN2XMDY7PP7XMFSV',
@@ -1562,14 +1609,13 @@ def test_data(token: str):
                                         File(
                                             id=115165,
                                             data_id='36691_2#6',
+                                            name='36691_2#6.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/36/36691/lane2/plex6'
                                                 '/36691_2#6.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=118428, project_id=21, data_id='36691_2#6')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ32MZ3YKMTSPGRS5HWCD1',
@@ -1641,14 +1687,13 @@ def test_data(token: str):
                                         File(
                                             id=115167,
                                             data_id='36691_2#8',
+                                            name='36691_2#8.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/36/36691/lane2/plex8'
                                                 '/36691_2#8.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=118430, project_id=21, data_id='36691_2#8')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ356P8AEKKAPW0VD2PJKD',
@@ -1720,14 +1765,13 @@ def test_data(token: str):
                                         File(
                                             id=115166,
                                             data_id='36691_2#7',
+                                            name='36691_2#7.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/36/36691/lane2/plex7'
                                                 '/36691_2#7.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=118429, project_id=21, data_id='36691_2#7')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ33XK1D5AVJN9XCP7YQ84',
@@ -1810,14 +1854,13 @@ def test_data(token: str):
                                         File(
                                             id=117820,
                                             data_id='40666_2#2',
+                                            name='40666_2#2.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/40/40666/lane2/plex2'
                                                 '/40666_2#2.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=121083, project_id=21, data_id='40666_2#2')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GVRDZR9KA1EXWZM48W09MZ',
@@ -1953,18 +1996,15 @@ def test_data(token: str):
                                         File(
                                             id=121145,
                                             data_id='m64097e_210221_172213#1019',
+                                            name=(
+                                                'demultiplex.bc1019_BAK8B_OA--bc1019_BAK8B_OA.bam'
+                                            ),
                                             remote_path=(
                                                 'irods:/seq/pacbio/r64097e_20210218_161440/4_D01'
                                                 '/demultiplex.bc1019_BAK8B_OA'
                                                 '--bc1019_BAK8B_OA.bam'
                                             ),
-                                        )
-                                    ],
-                                    project_assn=[
-                                        Allocation(
-                                            id=124432,
-                                            project_id=21,
-                                            data_id='m64097e_210221_172213#1019',
+                                            file_type='BAM',
                                         )
                                     ],
                                 )
@@ -2016,11 +2056,10 @@ def test_data(token: str):
                                         File(
                                             id=124080,
                                             data_id='37935_8#13',
+                                            name='37935_8#13.cram',
                                             remote_path='irods:/seq/37935/37935_8#13.cram',
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=127563, project_id=24, data_id='37935_8#13')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GSDTKDZYAX2X2F8K7WD045',
@@ -2102,14 +2141,13 @@ def test_data(token: str):
                                         File(
                                             id=139273,
                                             data_id='48593_1#25',
+                                            name='48593_1#25.cram',
                                             remote_path=(
                                                 'irods:/seq/illumina/runs/48/48593/lane1/plex25'
                                                 '/48593_1#25.cram'
                                             ),
+                                            file_type='CRAM',
                                         )
-                                    ],
-                                    project_assn=[
-                                        Allocation(id=143140, project_id=24, data_id='48593_1#25')
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8HAZJY0CG2BHX6Q7TSA54DA',
@@ -2154,11 +2192,6 @@ def test_data(token: str):
             ],
             location=Location(location_id=299, path='e/1/3/d/d/0/Juncus_effusus'),
         ),
-        User(
-            id=100,
-            email='skdsjdkj',
-            name='lol',
-            registered=True,
-        ),
+        User(id=100, email='test@nowhere.ac.uk', name='test-user', registered=True),
         Token(id=200, token=token, user_id=100),
     ]
