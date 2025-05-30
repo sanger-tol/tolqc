@@ -18,8 +18,8 @@ from tolqc.marshal.seq_data import (
     get_centre,
     valid_accession,
 )
+from tolqc.schema.accession_models import Accession
 from tolqc.schema.sample_data_models import (
-    Accession,
     Centre,
     Data,
     File,

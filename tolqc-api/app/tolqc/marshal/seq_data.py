@@ -12,9 +12,8 @@ from sqlalchemy import and_, inspect, select
 from sqlalchemy.exc import SQLAlchemyError
 
 from tolqc.marshal.ndjson import must_get_row_value, ndjson_rows_from_stream
+from tolqc.schema.accession_models import Accession, AccessionTypeDict
 from tolqc.schema.sample_data_models import (
-    Accession,
-    AccessionTypeDict,
     Centre,
     Data,
     File,

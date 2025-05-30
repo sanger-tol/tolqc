@@ -4,6 +4,7 @@
 
 from sqlalchemy.orm import configure_mappers
 
+import tolqc.schema.accession_models
 import tolqc.schema.assembly_models
 import tolqc.schema.folder_models
 import tolqc.schema.metagenome_models

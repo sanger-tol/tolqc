@@ -2,9 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import re
-from functools import cached_property
-
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -21,131 +18,6 @@ from sqlalchemy.sql import expression
 
 from tolqc.schema.base import Base, LogBase
 from tolqc.schema.folder_models import HasFolder
-
-
-class Accession(LogBase):
-    __tablename__ = 'accession'
-
-    @classmethod
-    def get_id_column_name(cls):
-        return 'accession_id'
-
-    accession_id = mapped_column(String, primary_key=True)
-    accession_type_id = mapped_column(
-        String,
-        ForeignKey('accession_type_dict.accession_type_id'),
-    )
-    secondary = mapped_column(String)
-    submission = mapped_column(String)
-    date_submitted = mapped_column(DateTime(timezone=True))
-    title = mapped_column(String)
-    description = mapped_column(String)
-
-    accession_type = relationship(
-        'AccessionTypeDict',
-        back_populates='accessions',
-    )
-    projects = relationship('Project', back_populates='accession')
-    studies = relationship('Study', back_populates='accession')
-    specimens = relationship('Specimen', back_populates='accession')
-    samples = relationship('Sample', back_populates='accession')
-    data = relationship('Data', back_populates='accession')
-
-    bioproject_assemblies = relationship(
-        'Assembly',
-        primaryjoin='Accession.accession_id == Assembly.bioproject_accession_id',
-        back_populates='bioproject_accession',
-    )
-    genome_assemblies = relationship(
-        'Assembly',
-        primaryjoin='Accession.accession_id == Assembly.genome_accession_id',
-        back_populates='genome_accession',
-    )
-
-    data_species = relationship(
-        'Species',
-        primaryjoin='Accession.accession_id == Species.data_accession_id',
-        back_populates='data_accession',
-    )
-    umbrella_species = relationship(
-        'Species',
-        primaryjoin='Accession.accession_id == Species.umbrella_accession_id',
-        back_populates='umbrella_accession',
-    )
-
-    study_submissions = relationship(
-        'DataSubmission',
-        primaryjoin='Accession.accession_id == DataSubmission.study_accession_id',
-        back_populates='study_accession',
-    )
-    sample_submissions = relationship(
-        'DataSubmission',
-        primaryjoin='Accession.accession_id == DataSubmission.sample_accession_id',
-        back_populates='sample_accession',
-    )
-    experiment_submissions = relationship(
-        'DataSubmission',
-        primaryjoin='Accession.accession_id == DataSubmission.experiment_accession_id',
-        back_populates='experiment_accession',
-    )
-    run_submissions = relationship(
-        'DataSubmission',
-        primaryjoin='Accession.accession_id == DataSubmission.run_accession_id',
-        back_populates='run_accession',
-    )
-    analysis_submissions = relationship(
-        'DataSubmission',
-        primaryjoin='Accession.accession_id == DataSubmission.analysis_accession_id',
-        back_populates='analysis_accession',
-    )
-
-    biosample_metagenomes = relationship(
-        'Metagenome',
-        primaryjoin='Accession.accession_id == Metagenome.biosample_accession_id',
-        back_populates='biosample_accession',
-    )
-    bioproject_metagenomes = relationship(
-        'Metagenome',
-        primaryjoin='Accession.accession_id == Metagenome.bioproject_accession_id',
-        back_populates='bioproject_accession',
-    )
-    assembly_metagenomes = relationship(
-        'Metagenome',
-        primaryjoin='Accession.accession_id == Metagenome.assembly_accession_id',
-        back_populates='assembly_accession',
-    )
-
-    biosample_metagenome_bins = relationship(
-        'MetagenomeBin',
-        primaryjoin='Accession.accession_id == MetagenomeBin.biosample_accession_id',
-        back_populates='biosample_accession',
-    )
-    assembly_metagenome_bins = relationship(
-        'MetagenomeBin',
-        primaryjoin='Accession.accession_id == MetagenomeBin.assembly_accession_id',
-        back_populates='assembly_accession',
-    )
-
-
-class AccessionTypeDict(Base):
-    __tablename__ = 'accession_type_dict'
-
-    @classmethod
-    def get_id_column_name(cls):
-        return 'accession_type_id'
-
-    accession_type_id = mapped_column(String, primary_key=True)
-    regexp = mapped_column(String)
-    url = mapped_column(String)
-
-    accessions = relationship('Accession', back_populates='accession_type')
-
-    @cached_property
-    def compiled_regexp(self):
-        return re.compile(self.regexp)
-
-    def valid_accession(self, accn):
-        return bool(self.compiled_regexp.search(accn))
 
 
 class Allocation(Base):
@@ -552,8 +424,6 @@ class Project(LogBase):
     accession = relationship('Accession', back_populates='projects')
     data_assn = relationship('Allocation', back_populates='project')
     data = association_proxy('data_assn', 'data')
-    species_assn = relationship('Umbrella', back_populates='project')
-    species = association_proxy('species_assn', 'species')
 
 
 class QCDict(Base):
@@ -657,8 +527,6 @@ class Species(LogBase):
     )
 
     location = relationship('Location', back_populates='species')
-    project_assn = relationship('Umbrella', back_populates='species')
-    projects = association_proxy('project_assn', 'project')
     metagenomes = relationship('Metagenome', back_populates='species')
     metagenome_bins = relationship('MetagenomeBin', back_populates='species')
 
@@ -788,19 +656,6 @@ class TiaraMetrics(Base):
     UniqueConstraint('division', 'data_id')
 
     data = relationship('Data', back_populates='tiara_metrics')
-
-
-class Umbrella(Base):
-    __tablename__ = 'umbrella'
-
-    id = mapped_column(Integer, primary_key=True)  # noqa: A003
-    project_id = mapped_column(Integer, ForeignKey('project.project_id'))
-    species_id = mapped_column(String, ForeignKey('species.species_id'))
-
-    UniqueConstraint('project_id', 'species_id')
-
-    project = relationship('Project', back_populates='species_assn')
-    species = relationship('Species', back_populates='project_assn')
 
 
 class VisibilityDict(Base):

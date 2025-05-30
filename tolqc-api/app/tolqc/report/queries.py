@@ -38,6 +38,7 @@ def pipeline_data_report_query():
             Species.species_id.label('species'),
             LastPathElementBundle('species_dir', Location.path),
             Species.tolid_prefix,
+            Species.taxon_id,
             Location.path.label('location_root'),
             Data.category,
             Specimen.specimen_id.label('specimen'),
