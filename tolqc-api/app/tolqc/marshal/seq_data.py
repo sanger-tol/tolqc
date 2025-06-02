@@ -12,10 +12,8 @@ from sqlalchemy import and_, inspect, select
 from sqlalchemy.exc import SQLAlchemyError
 
 from tolqc.marshal.ndjson import must_get_row_value, ndjson_rows_from_stream
+from tolqc.schema.accession_models import Accession, AccessionTypeDict
 from tolqc.schema.sample_data_models import (
-    Accession,
-    AccessionTypeDict,
-    Allocation,
     Centre,
     Data,
     File,
@@ -24,7 +22,6 @@ from tolqc.schema.sample_data_models import (
     Location,
     PacbioRunMetrics,
     Platform,
-    Project,
     Run,
     Sample,
     Species,
@@ -66,9 +63,9 @@ def headline_data_fields(data):
     if lib := data.library:
         lib_type_id = lib.library_type_id
 
-    proj_desc = 'No assigned project'
-    if proj_list := data.projects:
-        proj_desc = proj_list[0].description
+    study_desc = 'No study'
+    if study := data.study:
+        study_desc = study.name
 
     return {
         'data_id': data.data_id,
@@ -76,7 +73,7 @@ def headline_data_fields(data):
         'species': species_id,
         'library_type': lib_type_id,
         'sample': sample_id,
-        'project': proj_desc,
+        'study': study_desc,
     }
 
 
@@ -132,8 +129,6 @@ def build_data(session, centre, row):
         lims_qc=row.get('lims_qc'),
         date=maybe_datetime(row, 'qc_date'),
     )
-    if alloc := build_project_allocation(session, row):
-        data.project_assn = alloc
     if sample := build_sample(session, row):
         data.sample = sample
     if library := build_library(session, row):
@@ -210,16 +205,6 @@ def build_pacbio_run_metrics(row):
             have_value = True
             setattr(pbrm, fld, v)
     return [pbrm] if have_value else None
-
-
-def build_project_allocation(session, row):
-    if study_id := row.get('study_id'):
-        project = session.scalars(
-            select(Project).where(Project.study_id == study_id)
-        ).one()
-        return [Allocation(project=project)]
-    else:
-        return None
 
 
 def build_library_type(session, row):

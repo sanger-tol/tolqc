@@ -18,8 +18,8 @@ from tolqc.marshal.seq_data import (
     get_centre,
     valid_accession,
 )
+from tolqc.schema.accession_models import Accession
 from tolqc.schema.sample_data_models import (
-    Accession,
     Centre,
     Data,
     File,
@@ -123,7 +123,7 @@ def test_build_data(db_session, row_data):
     assert p_data.run.plex_count == 4
     assert p_data.run.platform.name == 'PacBio'
     assert p_data.visibility == 'Always'
-    assert len(p_data.projects) == 1
+    assert p_data.study
     assert p_data.sample.accession
     assert p_data.sample.specimen.accession
     assert p_data.run.pacbio_run_metrics
@@ -140,7 +140,7 @@ def test_build_data(db_session, row_data):
     assert isinstance(i_data, Data)
     assert i_data.run.platform.name == 'Illumina'
     assert i_data.visibility == 'Always'
-    assert len(i_data.projects) == 1
+    assert i_data.study
     assert isinstance(i_data.files[0], File)
 
     # Illumina data object should connect to these same objects as the PacBio
@@ -166,7 +166,7 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
                 'species': 'Branta leucopsis',
                 'library_type': 'PacBio - HiFi (PiMmS)',
                 'sample': 'DTOL13630432',
-                'project': 'DTOL_Darwin Tree of Life',
+                'study': 'DTOL_Darwin Tree of Life',
             },
             {
                 'data_id': '47339_3#7',
@@ -174,7 +174,7 @@ def test_seq_data_loader(client, api_path, ndjson_row_data):
                 'species': 'Branta leucopsis',
                 'library_type': 'Hi-C - Arima v2',
                 'sample': 'DTOL13633579',
-                'project': 'DTOL_Darwin Tree of Life',
+                'study': 'DTOL_Darwin Tree of Life',
             },
         ],
     }
@@ -194,7 +194,7 @@ def test_seq_data_loader_update(client, api_path, row_data):
                 'species': 'Branta leucopsis',
                 'library_type': 'PacBio - HiFi (PiMmS)',
                 'sample': 'DTOL13630432',
-                'project': 'DTOL_Darwin Tree of Life',
+                'study': 'DTOL_Darwin Tree of Life',
                 'changes': {
                     'lims_qc': ['pass', 'fail'],
                     'date': [
