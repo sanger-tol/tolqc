@@ -13,7 +13,8 @@ from tolqc.marshal.ndjson import (
     parse_ndjson_row,
     row_message,
 )
-from tolqc.marshal.seq_data import build_location, maybe_datetime
+from tolqc.marshal.seq_data import build_location, build_sample, maybe_datetime
+from tolqc.schema.sample_data_models import Species
 
 
 def test_row_message():
@@ -97,3 +98,27 @@ def test_cleanup_string_whitespace():
 
 def test_build_location():
     assert build_location(9627, 'Vulpes vulpes').path == '2/e/9/7/6/a/Vulpes_vulpes'
+
+
+def test_build_wospi_location():
+    class MockSession:
+        def __init__(self):
+            self.data = {
+                (Species, 'unidentified'): Species(
+                    species_id='unidentified',
+                    taxon_id=32644,
+                ),
+            }
+
+        def get(self, cls, name):
+            return self.data.get((cls, name))
+
+    session = MockSession()
+    row = {
+        'sample_name': 'JaronRG15423711',
+        'tol_specimen_id': 'idSAN96000277',
+        'scientific_name': 'unidentified',
+        'taxon_id': 32644,
+    }
+    smpl = build_sample(session, row)
+    assert smpl.specimen.location.path == '1/a/4/c/5/5/idSAN96000277'
