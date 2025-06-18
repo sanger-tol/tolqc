@@ -277,7 +277,7 @@ def build_sample(session, row):
                 accession=specimen_acc,
                 supplied_name=row.get('supplier_name'),
                 species=species,
-                location=species.location or build_location(row['taxon_id'], spcmn_id),
+                location=species.location or build_location(spcmn_id, spcmn_id),
             )
 
     sample_acc = accession_if_valid(
