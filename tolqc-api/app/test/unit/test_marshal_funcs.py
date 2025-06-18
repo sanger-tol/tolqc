@@ -13,7 +13,7 @@ from tolqc.marshal.ndjson import (
     parse_ndjson_row,
     row_message,
 )
-from tolqc.marshal.seq_data import build_location, maybe_datetime, build_sample
+from tolqc.marshal.seq_data import build_location, build_sample, maybe_datetime
 from tolqc.schema.sample_data_models import Species
 
 
