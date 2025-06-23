@@ -63,9 +63,9 @@ class Metagenome(LogBase):
     )
     coverage = mapped_column(Integer)
     version = mapped_column(Integer)
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
 
     bins = relationship('MetagenomeBin', back_populates='metagenome')
@@ -98,8 +98,8 @@ class Metagenome(LogBase):
     dataset = relationship('Dataset', back_populates='metagenomes')
     host_specimen = relationship('Specimen', back_populates='metagenomes')
 
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='metagenomes',
     )
 
@@ -145,9 +145,9 @@ class MetagenomeBin(LogBase):
     n_23s = mapped_column(Integer)
     n_16s = mapped_column(Integer)
     n_5s = mapped_column(Integer)
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
 
     metagenome = relationship('Metagenome', back_populates='bins')
@@ -174,8 +174,8 @@ class MetagenomeBin(LogBase):
         back_populates='metagenome_bin',
     )
 
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='metagenome_bins',
     )
 

@@ -28,11 +28,10 @@ class Assembly(LogBase):
         return 'assembly_id'
 
     assembly_id = mapped_column(Integer, primary_key=True)
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
-    dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
     component_type_id = mapped_column(
         String,
         ForeignKey('assembly_component_type.component_type_id'),
@@ -41,7 +40,11 @@ class Assembly(LogBase):
         Integer,
         ForeignKey('assembly_status.assembly_status_id'),
     )
-    name = mapped_column(String)
+    specimen_id = mapped_column(
+        String,
+        ForeignKey('specimen.specimen_id'),
+    )
+    name = mapped_column(String, index=True)
     description = mapped_column(String)
     bioproject_accession_id = mapped_column(
         String,
@@ -52,13 +55,17 @@ class Assembly(LogBase):
         ForeignKey('accession.accession_id'),
     )
 
-    dataset = relationship('Dataset', back_populates='assembly')
+    specimen = relationship('Specimen', back_populates='assemblies')
+
+    dataset_assn = relationship('AssemblyDataset', back_populates='assembly')
+    datasets = association_proxy('dataset_assn', 'dataset')
+
     component_type = relationship(
         'AssemblyComponentType',
         back_populates='assemblies',
     )
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='assemblies',
     )
 
@@ -127,6 +134,17 @@ class AssemblyComponentType(Base):
     description = mapped_column(String)
 
     assemblies = relationship('Assembly', back_populates='component_type')
+
+
+class AssemblyDataset(Base):
+    __tablename__ = 'assembly_dataset'
+
+    id = mapped_column(Integer, primary_key=True)  # noqa: A003
+    assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
+    dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
+
+    assembly = relationship('Assembly', back_populates='dataset_assn')
+    dataset = relationship('Dataset', back_populates='assembly_assn')
 
 
 class AssemblyMetrics(Base):
@@ -251,9 +269,9 @@ class BuscoMetrics(Base, HasFolder):
     count = mapped_column(Integer)
     busco_lineage_id = mapped_column(Integer, ForeignKey('busco_lineage.id'))
     summary = mapped_column(String)
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
 
     assembly = relationship('Assembly', back_populates='busco_metrics')
@@ -261,8 +279,8 @@ class BuscoMetrics(Base, HasFolder):
         'BuscoLineage',
         back_populates='busco_metrics',
     )
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='busco_metrics',
     )
 
@@ -272,15 +290,15 @@ class ContigvizMetrics(Base, HasFolder):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
     results = mapped_column(JSONB)
 
     assembly = relationship('Assembly', back_populates='contigviz_metrics')
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='contigviz_metrics',
     )
 
@@ -293,6 +311,7 @@ class Dataset(LogBase):
         return 'dataset_id'
 
     dataset_id = mapped_column(String, primary_key=True)
+    name = mapped_column(String, index=True)
     dataset_status_id = mapped_column(
         Integer,
         ForeignKey('dataset_status.dataset_status_id'),
@@ -303,7 +322,8 @@ class Dataset(LogBase):
     read_length_mean = mapped_column(Float)
     read_length_n50 = mapped_column(BigInteger)
 
-    assembly = relationship('Assembly', back_populates='dataset')
+    assembly_assn = relationship('AssemblyDataset', back_populates='dataset')
+    assemblies = association_proxy('assembly_assn', 'assembly')
     genomescope_metrics = relationship(
         'GenomescopeMetrics',
         back_populates='dataset',
@@ -387,9 +407,9 @@ class GenomescopeMetrics(LogBase, HasFolder):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
     review_id = mapped_column(String, ForeignKey('review_dict.review_id'))
     kmer = mapped_column(Integer)
@@ -406,8 +426,8 @@ class GenomescopeMetrics(LogBase, HasFolder):
     results = mapped_column(JSONB)
 
     dataset = relationship('Dataset', back_populates='genomescope_metrics')
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='genomescope_metrics',
     )
 
@@ -417,15 +437,15 @@ class MarkerscanMetrics(Base):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
     results = mapped_column(JSONB)
 
     assembly = relationship('Assembly', back_populates='markerscan_metrics')
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='markerscan_metrics',
     )
 
@@ -443,17 +463,95 @@ class MerquryMetrics(Base, HasFolder):
     qv_primary = mapped_column(Float)
     qv_alternate = mapped_column(Float)
     qv_all = mapped_column(Float)
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
 
     assembly = relationship('Assembly', back_populates='merqury_metrics')
     dataset = relationship('Dataset', back_populates='merqury_metrics')
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='merqury_metrics',
     )
+
+
+class Pipeline(Base):
+    __tablename__ = 'pipeline'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'pipeline_id'
+
+    pipeline_id = mapped_column(Integer, primary_key=True)
+    name = mapped_column(String)
+
+    software_version_assn = relationship(
+        'PipelineStep',
+        back_populates='pipeline',
+        order_by='PipelineStep.pipeline_step_id',
+    )
+    software_versions = association_proxy('software_version_assn', 'software_version')
+
+    assemblies = relationship(
+        'Assembly',
+        back_populates='pipeline',
+    )
+    busco_metrics = relationship(
+        'BuscoMetrics',
+        back_populates='pipeline',
+    )
+    contigviz_metrics = relationship(
+        'ContigvizMetrics',
+        back_populates='pipeline',
+    )
+    genomescope_metrics = relationship(
+        'GenomescopeMetrics',
+        back_populates='pipeline',
+    )
+    markerscan_metrics = relationship(
+        'MarkerscanMetrics',
+        back_populates='pipeline',
+    )
+    merqury_metrics = relationship(
+        'MerquryMetrics',
+        back_populates='pipeline',
+    )
+    ploidyplot_metrics = relationship(
+        'PloidyplotMetrics',
+        back_populates='pipeline',
+    )
+    mapping_metrics = relationship(
+        'MappingMetrics',
+        back_populates='pipeline',
+    )
+
+    metagenomes = relationship(
+        'Metagenome',
+        back_populates='pipeline',
+    )
+    metagenome_bins = relationship(
+        'MetagenomeBin',
+        back_populates='pipeline',
+    )
+
+
+class PipelineStep(Base):
+    __tablename__ = 'pipeline_step'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'pipeline_step_id'
+
+    pipeline_step_id = mapped_column(Integer, primary_key=True)
+    pipeline_id = mapped_column(Integer, ForeignKey('pipeline.pipeline_id'))
+    software_version_id = mapped_column(
+        Integer, ForeignKey('software_version.software_version_id')
+    )
+    command = mapped_column(String)
+
+    pipeline = relationship('Pipeline', back_populates='software_version_assn')
+    software_version = relationship('SoftwareVersion', back_populates='pipeline_assn')
 
 
 class PloidyplotMetrics(Base, HasFolder):
@@ -466,14 +564,14 @@ class PloidyplotMetrics(Base, HasFolder):
     n = mapped_column(Float)
     partition = mapped_column(String)
     trim_threshold = mapped_column(Integer)
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
 
     dataset = relationship('Dataset', back_populates='ploidyplot_metrics')
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='ploidyplot_metrics',
     )
 
@@ -497,47 +595,10 @@ class SoftwareVersion(Base):
         return 'software_version_id'
 
     software_version_id = mapped_column(Integer, primary_key=True)
-    name = mapped_column(String)
-    version = mapped_column(String)
-    cmd = mapped_column(String)
+    package_name = mapped_column(String, nullable=False)
+    version = mapped_column(String, nullable=False)
 
-    UniqueConstraint('name', 'version')
+    UniqueConstraint('package_name', 'version')
 
-    assemblies = relationship('Assembly', back_populates='software_version')
-    busco_metrics = relationship(
-        'BuscoMetrics',
-        back_populates='software_version',
-    )
-    contigviz_metrics = relationship(
-        'ContigvizMetrics',
-        back_populates='software_version',
-    )
-    genomescope_metrics = relationship(
-        'GenomescopeMetrics',
-        back_populates='software_version',
-    )
-    markerscan_metrics = relationship(
-        'MarkerscanMetrics',
-        back_populates='software_version',
-    )
-    merqury_metrics = relationship(
-        'MerquryMetrics',
-        back_populates='software_version',
-    )
-    ploidyplot_metrics = relationship(
-        'PloidyplotMetrics',
-        back_populates='software_version',
-    )
-    mapping_metrics = relationship(
-        'MappingMetrics',
-        back_populates='software_version',
-    )
-
-    metagenomes = relationship(
-        'Metagenome',
-        back_populates='software_version',
-    )
-    metagenome_bins = relationship(
-        'MetagenomeBin',
-        back_populates='software_version',
-    )
+    pipeline_assn = relationship('PipelineStep', back_populates='software_version')
+    pipelines = association_proxy('pipeline_assn', 'pipeline')
