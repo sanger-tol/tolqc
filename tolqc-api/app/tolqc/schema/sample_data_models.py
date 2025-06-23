@@ -592,12 +592,12 @@ class Specimen(LogBase):
         'Specimen',
         primaryjoin='Specimen.cobiont_specimen_id == Specimen.specimen_id',
         back_populates='cobionts',
+        remote_side=[specimen_id],
     )
     cobionts = relationship(
         'Specimen',
         primaryjoin='Specimen.specimen_id == Specimen.cobiont_specimen_id',
         back_populates='cobiont_of',
-        remote_side=[specimen_id],
     )
 
 
