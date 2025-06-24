@@ -289,9 +289,9 @@ class MappingMetrics(Base, HasFolder):
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     data_id = mapped_column(String, ForeignKey('data.data_id'), nullable=False)
     assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
-    software_version_id = mapped_column(
+    pipeline_id = mapped_column(
         Integer,
-        ForeignKey('software_version.software_version_id'),
+        ForeignKey('pipeline.pipeline_id'),
     )
 
     # From parsing Illumina samtools stats file generated on mapped bam by
@@ -324,8 +324,8 @@ class MappingMetrics(Base, HasFolder):
 
     data = relationship('Data', back_populates='mapping_metrics')
     assembly = relationship('Assembly', back_populates='mapping_metrics')
-    software_version = relationship(
-        'SoftwareVersion',
+    pipeline = relationship(
+        'Pipeline',
         back_populates='mapping_metrics',
     )
 
@@ -548,11 +548,14 @@ class Specimen(LogBase):
     epithet = mapped_column(String, index=True)
     taxon_id = mapped_column(Integer, index=True)
     lims_id = mapped_column(Integer)
-    supplied_name = mapped_column(String)
+    supplied_name = mapped_column(String, index=True)
+    sts_specimen = mapped_column(String, index=True)
+    category = mapped_column(String, ForeignKey('specimen_category_dict.category'))
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
     sex_id = mapped_column(String, ForeignKey('sex.sex_id'))
     ploidy = mapped_column(String)
     karyotype = mapped_column(String)
+    cobiont_specimen_id = mapped_column(String, ForeignKey('specimen.specimen_id'))
 
     species = relationship('Species', back_populates='specimens')
     samples = relationship('Sample', back_populates='specimen')
@@ -582,7 +585,31 @@ class Specimen(LogBase):
     )
     parents = association_proxy('offspring_assn', 'parent')
 
+    assemblies = relationship('Assembly', back_populates='specimen')
     metagenomes = relationship('Metagenome', back_populates='host_specimen')
+
+    cobiont_of = relationship(
+        'Specimen',
+        primaryjoin='Specimen.cobiont_specimen_id == Specimen.specimen_id',
+        back_populates='cobionts',
+        remote_side=[specimen_id],
+    )
+    cobionts = relationship(
+        'Specimen',
+        primaryjoin='Specimen.specimen_id == Specimen.cobiont_specimen_id',
+        back_populates='cobiont_of',
+    )
+
+
+class SpecimenCategoryDict(Base):
+    __tablename__ = 'specimen_category_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'specimen_id'
+
+    category = mapped_column(String, primary_key=True)
+    description = mapped_column(String)
 
 
 class SpecimenStatus(LogBase):
