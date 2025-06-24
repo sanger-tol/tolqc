@@ -109,6 +109,7 @@ def upgrade() -> None:
         )
         batch_op.add_column(
             sa.Column('cobiont_specimen_id', sa.String(), nullable=True),
+            insert_after='karyotype',
         )
     op.create_foreign_key(
         None,
