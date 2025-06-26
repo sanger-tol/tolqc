@@ -64,6 +64,7 @@ def store_dataset_row(session, row):
     # Create a new dataset
     ds = Dataset(
         dataset_id=dataset_id,
+        name=row.get('name'),
         data_assn=[DatasetElement(data_id=x) for x in element_data_ids],
     )
     session.add(ds)
@@ -109,12 +110,13 @@ def __build_dataset_rows(session, query):
     ds_rows = []
     ds = None
     for row in session.execute(query):
-        dataset_id, data_id, remote_path = row
+        dataset_id, name, data_id, remote_path = row
 
         if ds is None or ds['dataset.id'] != dataset_id:
             # Make a new dataset row
             ds = {
                 'dataset.id': dataset_id,
+                'name': name,
                 'elements': [],
             }
             ds_rows.append(ds)
@@ -134,6 +136,7 @@ def dataset_rows_query():
     return (
         select(
             Dataset.dataset_id,
+            Dataset.name,
             Data.data_id,
             File.remote_path,
         )

@@ -34,8 +34,9 @@ def session(db_session):
 def test_fetch_dataset(session):
     dsid = 'DSET_001'
     dsr = dataset_row_by_dataset_id(session, dsid)
-    logging.debug('Found: ' + json.dumps(dsr, indent=2))
+    logging.debug('Found: ' + json.dumps(dsr, indent=2))  # noqa: LOG015
     assert dsr['dataset.id'] == dsid
+    assert dsr['name'] == 'First test dataset'
     assert len(dsr['elements']) == 4
 
 
@@ -49,7 +50,7 @@ def test_fetch_dataset_by_data_ids(session):
             '46916_2#2',
         ],
     )
-    logging.debug('Found: ' + json.dumps(dsr, indent=2))
+    logging.debug('Found: ' + json.dumps(dsr, indent=2))  # noqa: LOG015
     assert dsr['dataset.id'] == 'DSET_001'
     assert len(dsr['elements']) == 4
 
@@ -61,7 +62,7 @@ def test_fetch_dataset_by_data_ids(session):
             '46916_2#2',
         ],
     )
-    logging.debug('Found: ' + json.dumps(dsr, indent=2))
+    logging.debug('Found: ' + json.dumps(dsr, indent=2))  # noqa: LOG015
     assert dsr['dataset.id'] == 'DSET_002'
     assert len(dsr['elements']) == 3
 
@@ -101,6 +102,7 @@ def test_store_exisiting_dataset_row(session):
 def test_store_new_dataset_row(session):
     dsr = {
         'dataset.id': 'DSET_NEW',
+        'name': 'New test dataset',
         'elements': [
             {
                 'data.id': 'DATA_11#2025',
@@ -112,9 +114,10 @@ def test_store_new_dataset_row(session):
     }
     label, new_dsr = store_dataset_row(session, dsr)
     assert label == 'new'
-    logging.debug('New dataset row: ' + json.dumps(new_dsr, indent=2))
+    logging.debug('New dataset row: ' + json.dumps(new_dsr, indent=2))  # noqa: LOG015
     ds_id = new_dsr['dataset.id']
     assert ds_id == 'DSET_NEW'
+    assert new_dsr.get('name') == 'New test dataset'
 
     ds = session.get(Dataset, ds_id)
     status = ds.status
@@ -142,10 +145,11 @@ def test_store_rows_ok(session):
         )
     ]
     res = load_dataset_stream(session, row_data)
-    logging.debug(f'Result: {res}')
+    logging.debug(f'Result: {res}')  # noqa: LOG015
     assert res.get('new') == [
         {
             'dataset.id': 'DSET_NEW_01',
+            'name': None,
             'elements': [
                 {
                     'data.id': 'DATA_11#2025',
@@ -161,6 +165,7 @@ def test_store_rows_ok(session):
     assert res.get('existing') == [
         {
             'dataset.id': 'DSET_001',
+            'name': 'First test dataset',
             'elements': [
                 {
                     'data.id': 'DATA_22#2039',
@@ -227,6 +232,7 @@ def test_loader_api(client, api_path, session):
         json.dumps(
             {
                 'dataset.id': 'DSET_API_01',
+                'name': None,
                 'elements': [
                     {
                         'data.id': 'DATA_11#2025',
@@ -246,6 +252,7 @@ def test_loader_api(client, api_path, session):
         'new': [
             {
                 'dataset.id': 'DSET_API_01',
+                'name': None,
                 'elements': [
                     {
                         'data.id': 'DATA_11#2025',
@@ -270,6 +277,7 @@ def dataset_test_data():
         ),
         Dataset(
             dataset_id='DSET_001',
+            name='First test dataset',
             data_assn=[
                 DatasetElement(
                     data_id='DATA_22#2039',
@@ -328,6 +336,7 @@ def dataset_test_data():
         ),
         Dataset(
             dataset_id='DSET_002',
+            name='Second test dataset',
             data_assn=[
                 # DatasetElement(data_id='DATA_22#2039', dataset_id='DSET_002'),
                 # DatasetElement(data_id='DATA_11#2025', dataset_id='DSET_002'),
