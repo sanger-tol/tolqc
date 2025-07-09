@@ -89,8 +89,8 @@ def pipeline_data_report_query():
         .outerjoin(Location)  # Important to join to Location from Speciemn not Species
         .outerjoin(Specimen.species)
         .join(File)
-        .join(Library)
-        .join(LibraryType)
+        .outerjoin(Library)
+        .outerjoin(LibraryType)
         .order_by(Data.data_id.desc())
     )
 
