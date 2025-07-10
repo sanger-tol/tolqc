@@ -167,6 +167,7 @@ def mlwh_data_report_query():
         .outerjoin(Library)
         .outerjoin(PacbioRunMetrics)
         .where(Data.study_id != None)  # noqa: E711
+        .where(Platform.name.in_(('Illumina', 'PacBio')))
         .order_by(
             Data.date.desc(),
         )
