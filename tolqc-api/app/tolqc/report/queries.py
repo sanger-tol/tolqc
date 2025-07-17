@@ -361,6 +361,55 @@ def metagenome_bin_report_query():
     )
 
 
+def work_illumina_data_folders():
+    """
+    For listing values for work required to attach plot-bamstats images to
+    Illumina data table rows.  Usually run with a where condition added to
+    select for folder_ulid is null.
+    """
+
+    return (
+        select(
+            Data.data_id,
+            File.remote_path,
+            Data.folder_ulid,
+            Library.library_type_id.label('library_type'),
+            File.file_type,
+        )
+        .select_from(Data)
+        .join(Run)
+        .join(Platform)
+        .join(File)
+        .join(Library)
+        .order_by(Data.data_id, File.remote_path)
+        .where(Platform.name == 'Illumina')
+        .where(File.remote_path != None)  # noqa: E711
+    )
+
+
+def work_pacbio_run_metrics_folders():
+    """
+    For listing values for work required to attach PacBio run data images to
+    pacbio_run_metrics table rows.  Usually run with a where condition added
+    to select for folder_ulid is null.
+    """
+
+    return (
+        select(
+            Data.data_id,
+            File.remote_path,
+            PacbioRunMetrics.folder_ulid,
+            File.file_type,
+        )
+        .select_from(Data)
+        .join(Run)
+        .join(PacbioRunMetrics)
+        .outerjoin(File)
+        .where(File.remote_path != None)  # noqa: E711
+        .order_by(Data.data_id, File.remote_path)
+    )
+
+
 def percent_col(label_txt, nominator, divisor, decimal_places=4):
     """
     Builds SQL for returning a column in %
