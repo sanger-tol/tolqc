@@ -371,6 +371,9 @@ def work_illumina_data_folders():
     return (
         select(
             Data.data_id,
+            Data.lims_qc,
+            Data.reads,
+            Data.bases,
             File.remote_path,
             Data.folder_ulid,
             Library.library_type_id.label('library_type'),
@@ -396,17 +399,26 @@ def work_pacbio_run_metrics_folders():
 
     return (
         select(
-            Data.data_id,
-            File.remote_path,
+            Run.run_id,
             PacbioRunMetrics.folder_ulid,
-            File.file_type,
+            Platform.model,
+            func.max(Data.date).label("date"),
+            func.array_agg(File.remote_path).label('remote_path_list'),
+            func.array_agg(File.file_type).label('file_type_list'),
         )
         .select_from(Data)
         .join(Run)
         .join(PacbioRunMetrics)
-        .outerjoin(File)
+        .join(Platform)
+        .join(File)
         .where(File.remote_path != None)  # noqa: E711
-        .order_by(Data.data_id, File.remote_path)
+        .group_by(
+            Run.run_id,
+            PacbioRunMetrics.folder_ulid,
+            Platform.model,
+            File.remote_path,
+        )
+        .order_by(Run.run_id)
     )
 
 
