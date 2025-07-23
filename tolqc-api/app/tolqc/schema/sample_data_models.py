@@ -606,7 +606,7 @@ class SpecimenCategoryDict(Base):
 
     @classmethod
     def get_id_column_name(cls):
-        return 'specimen_id'
+        return 'category'
 
     category = mapped_column(String, primary_key=True)
     description = mapped_column(String)

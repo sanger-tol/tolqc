@@ -364,7 +364,7 @@ def metagenome_bin_report_query():
 def work_illumina_data_folders():
     """
     For listing values for work required to attach plot-bamstats images to
-    Illumina data table rows.  Usually run with a where condition added to
+    Illumina `data` table rows.  Usually run with a where condition added to
     select for folder_ulid is null.
     """
 
@@ -395,8 +395,8 @@ def work_illumina_data_folders():
 def work_pacbio_run_metrics_folders():
     """
     For listing values for work required to attach PacBio run data images to
-    pacbio_run_metrics table rows.  Usually run with a where condition added
-    to select for folder_ulid is null.
+    `pacbio_run_metrics` table rows.  Usually run with a where condition
+    added to select for folder_ulid is null.
     """
 
     return (
