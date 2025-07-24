@@ -28,6 +28,7 @@ from tolqc.schema.sample_data_models import (
     Species,
     Specimen,
 )
+from tolqc.schema.system_models import Metadata
 
 
 def pipeline_data_report_query():
@@ -416,6 +417,8 @@ def work_pacbio_run_metrics_folders():
         .join(Platform)
         .join(Data)
         .join(File)
+        .join(Metadata, Metadata.name == 'pacbio.reports.zip.earliest')
+        .where(Run.complete > Metadata.timestamp_value)
         .where(File.remote_path != None)  # noqa: E711
         .order_by(Run.run_id, Data.data_id, File.remote_path)
     )
