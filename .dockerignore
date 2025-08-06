@@ -21,5 +21,9 @@
 !/openfaas-core/
 
 # definitely ignore a load of detritus
-**/venv/
+**/.venv
 **/.virtualenv/
+**/venv/
+**/__pycache__
+*.egg-info
+*.pyc
