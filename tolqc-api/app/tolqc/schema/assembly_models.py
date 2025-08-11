@@ -329,8 +329,8 @@ class Dataset(LogBase):
         back_populates='dataset',
     )
     merqury_metrics = relationship('MerquryMetrics', back_populates='dataset')
-    ploidyplot_metrics = relationship(
-        'PloidyplotMetrics',
+    smudgeplot_metrics = relationship(
+        'SmudgeplotMetrics',
         back_populates='dataset',
     )
 
@@ -457,11 +457,11 @@ class MerquryMetrics(Base, HasFolder):
     assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
     dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
     kmer = mapped_column(String)
-    complete_primary = mapped_column(Integer)
-    complete_alternate = mapped_column(Integer)
+    complete_asm1 = mapped_column(Integer)
+    complete_asm2 = mapped_column(Integer)
     complete_all = mapped_column(Integer)
-    qv_primary = mapped_column(Float)
-    qv_alternate = mapped_column(Float)
+    qv_asm1 = mapped_column(Float)
+    qv_asm2 = mapped_column(Float)
     qv_all = mapped_column(Float)
     pipeline_id = mapped_column(
         Integer,
@@ -517,8 +517,8 @@ class Pipeline(Base):
         'MerquryMetrics',
         back_populates='pipeline',
     )
-    ploidyplot_metrics = relationship(
-        'PloidyplotMetrics',
+    smudgeplot_metrics = relationship(
+        'SmudgeplotMetrics',
         back_populates='pipeline',
     )
     mapping_metrics = relationship(
@@ -554,11 +554,23 @@ class PipelineStep(Base):
     software_version = relationship('SoftwareVersion', back_populates='pipeline_assn')
 
 
-class PloidyplotMetrics(Base, HasFolder):
-    __tablename__ = 'ploidyplot_metrics'
+class ReviewDict(Base):
+    __tablename__ = 'review_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'review_id'
+
+    review_id = mapped_column(String, primary_key=True)
+    description = mapped_column(String)
+
+
+class SmudgeplotMetrics(Base, HasFolder):
+    __tablename__ = 'smudgeplot_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
+    review_id = mapped_column(String, ForeignKey('review_dict.review_id'))
     kmer = mapped_column(Integer)
     ploidy = mapped_column(Integer)
     n = mapped_column(Float)
@@ -569,22 +581,11 @@ class PloidyplotMetrics(Base, HasFolder):
         ForeignKey('pipeline.pipeline_id'),
     )
 
-    dataset = relationship('Dataset', back_populates='ploidyplot_metrics')
+    dataset = relationship('Dataset', back_populates='smudgeplot_metrics')
     pipeline = relationship(
         'Pipeline',
-        back_populates='ploidyplot_metrics',
+        back_populates='smudgeplot_metrics',
     )
-
-
-class ReviewDict(Base):
-    __tablename__ = 'review_dict'
-
-    @classmethod
-    def get_id_column_name(cls):
-        return 'review_id'
-
-    review_id = mapped_column(String, primary_key=True)
-    description = mapped_column(String)
 
 
 class SoftwareVersion(Base):

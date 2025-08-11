@@ -28,7 +28,6 @@ from tolqc.schema.sample_data_models import (
     Species,
     Specimen,
 )
-from tolqc.schema.system_models import Metadata
 
 
 def pipeline_data_report_query():
@@ -359,68 +358,6 @@ def metagenome_bin_report_query():
         .outerjoin(Metagenome.host_specimen)
         .outerjoin(MetagenomeBin.status)
         .order_by(MetagenomeBin.metagenome_bin_id)
-    )
-
-
-def work_illumina_data_folders():
-    """
-    For listing values for work required to attach plot-bamstats images to
-    Illumina `data` table rows.  Usually run with a where condition added to
-    select for folder_ulid is null.
-    """
-
-    return (
-        select(
-            Data.data_id,
-            Data.lims_qc,
-            Data.reads,
-            Data.bases,
-            Data.folder_ulid,
-            File.remote_path,
-            File.size_bytes,
-            File.md5,
-            File.file_type,
-            Library.library_type_id.label('library_type'),
-        )
-        .select_from(Data)
-        .join(Run)
-        .join(Platform)
-        .join(File)
-        .join(Library)
-        .order_by(Data.data_id, File.remote_path)
-        .where(Platform.name == 'Illumina')
-        .where(File.remote_path != None)  # noqa: E711
-    )
-
-
-def work_pacbio_run_metrics_folders():
-    """
-    For listing values for work required to attach PacBio run data images to
-    `pacbio_run_metrics` table rows.  Usually run with a where condition
-    added to select for folder_ulid is null.
-    """
-
-    return (
-        select(
-            Run.run_id,
-            PacbioRunMetrics.folder_ulid,
-            Platform.model,
-            Run.complete,
-            File.id.label('file_id'),
-            File.remote_path,
-            File.size_bytes,
-            File.md5,
-            File.file_type,
-        )
-        .select_from(Run)
-        .join(PacbioRunMetrics)
-        .join(Platform)
-        .join(Data)
-        .join(File)
-        .join(Metadata, Metadata.name == 'pacbio.reports.zip.earliest')
-        .where(Run.complete > Metadata.timestamp_value)
-        .where(File.remote_path != None)  # noqa: E711
-        .order_by(Run.run_id, Data.data_id, File.remote_path)
     )
 
 
