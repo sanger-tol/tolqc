@@ -24,7 +24,7 @@ class Allocation(Base):
     __tablename__ = 'allocation'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
-    project_id = mapped_column(Integer, ForeignKey('project.project_id'))
+    project_id = mapped_column(String, ForeignKey('project.project_id'))
     data_id = mapped_column(String, ForeignKey('data.data_id'))
     is_primary = mapped_column(Boolean)
 
@@ -416,8 +416,8 @@ class Project(LogBase):
     def get_id_column_name(cls):
         return 'project_id'
 
-    project_id = mapped_column(Integer, primary_key=True)
-    hierarchy_name = mapped_column(String)
+    project_id = mapped_column(String, primary_key=True)
+    name = mapped_column(String)
     description = mapped_column(String)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
 
@@ -606,7 +606,7 @@ class SpecimenCategoryDict(Base):
 
     @classmethod
     def get_id_column_name(cls):
-        return 'specimen_id'
+        return 'category'
 
     category = mapped_column(String, primary_key=True)
     description = mapped_column(String)

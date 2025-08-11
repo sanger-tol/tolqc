@@ -6,6 +6,7 @@ import re
 from functools import cached_property
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     ForeignKey,
     Integer,
@@ -14,6 +15,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.sql import expression
 
 from tolqc.schema.base import Base, LogBase
 
@@ -38,6 +40,7 @@ class Accession(LogBase):
     description = mapped_column(String)
     alias = mapped_column(String)
     submitter_id = mapped_column(String, ForeignKey('submitter_dict.submitter_id'))
+    is_deleted = mapped_column(Boolean, server_default=expression.false(), nullable=False)
 
     accession_type = relationship(
         'AccessionTypeDict',
