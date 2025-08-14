@@ -410,7 +410,7 @@ def specimen_status_report_query():
             Specimen.specimen_id.label('specimen'),
             Specimen.sts_specimen,
             SpecimenStatus.status_type_id.label('specimen_status'),
-            array_distinct_non_null('projects', Project.name),
+            array_distinct_non_null('projects', Project.project_id),
             Species.species_id.label('species'),
             Species.common_name,
             Species.taxon_id,
