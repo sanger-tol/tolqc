@@ -22,6 +22,7 @@ from tolqc.report.queries import (
     mlwh_data_report_query,
     pacbio_data_report_query,
     pipeline_data_report_query,
+    specimen_status_report_query,
 )
 from tolqc.schema.folder_models import Folder, FolderLocation, HasFolder
 
@@ -79,6 +80,7 @@ class ReportEngine:
         'mlwh-data': mlwh_data_report_query,
         'pacbio-data': pacbio_data_report_query,
         'pipeline-data': pipeline_data_report_query,
+        'specimen-status': specimen_status_report_query,
     }
 
     def do_report(self, report_name, query):

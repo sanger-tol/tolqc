@@ -424,6 +424,7 @@ class Project(LogBase):
     accession = relationship('Accession', back_populates='projects')
     data_assn = relationship('Allocation', back_populates='project')
     data = association_proxy('data_assn', 'data')
+    default_studies = relationship('Study', back_populates='default_project')
 
 
 class QCDict(Base):
@@ -667,9 +668,11 @@ class Study(LogBase):
     name = mapped_column(String)
     auto_sync = mapped_column(Boolean, server_default=expression.true(), nullable=False)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
+    default_project_id = mapped_column(String, ForeignKey('project.project_id'))
 
     accession = relationship('Accession', back_populates='studies')
     data = relationship('Data', back_populates='study')
+    default_project = relationship('Project', back_populates='default_studies')
 
 
 class TiaraMetrics(Base):

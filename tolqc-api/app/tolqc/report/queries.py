@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import Float, func, select
+from sqlalchemy import Float, distinct, func, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
@@ -16,6 +16,7 @@ from tolqc.schema.metagenome_models import (
     MetagenomeStatus,
 )
 from tolqc.schema.sample_data_models import (
+    Allocation,
     Data,
     File,
     Library,
@@ -23,10 +24,12 @@ from tolqc.schema.sample_data_models import (
     Location,
     PacbioRunMetrics,
     Platform,
+    Project,
     Run,
     Sample,
     Species,
     Specimen,
+    SpecimenStatus,
 )
 
 
@@ -359,6 +362,115 @@ def metagenome_bin_report_query():
         .outerjoin(MetagenomeBin.status)
         .order_by(MetagenomeBin.metagenome_bin_id)
     )
+
+
+def specimen_status_report_query():
+    species_data_type = (
+        select(
+            Species.species_id,
+            Library.library_type_id.label('pipeline'),
+            Specimen.specimen_id,
+        )
+        .join(Specimen)
+        .join(Sample)
+        .join(Data)
+        .join(Library)
+        .group_by(
+            Species.species_id,
+            Library.library_type_id,
+            Specimen.specimen_id,
+        )
+        .order_by(
+            Species.species_id,
+            Library.library_type_id,
+            Specimen.specimen_id,
+        )
+        .cte('species_data_type')
+    )
+
+    specimen_pipeline = (
+        select(
+            species_data_type.c.species_id,
+            func.jsonb_agg(
+                func.jsonb_build_object(
+                    'pipeline',
+                    species_data_type.c.pipeline,
+                    'specimen_id',
+                    species_data_type.c.specimen_id,
+                )
+            ).label('species_pipelines'),
+        )
+        .select_from(species_data_type)
+        .group_by(species_data_type.c.species_id)
+        .cte('specimen_pipeline')
+    )
+
+    return (
+        select(
+            Specimen.specimen_id.label('specimen'),
+            Specimen.sts_specimen,
+            SpecimenStatus.status_type_id.label('specimen_status'),
+            array_distinct_non_null('projects', Project.name),
+            Species.species_id.label('species'),
+            Species.common_name,
+            Species.taxon_id,
+            Specimen.epithet,
+            Specimen.taxon_id.label('specimen_taxon_id'),
+            Specimen.sts_priority,
+            Specimen.sex_id.label('sex'),
+            Species.genome_size,
+            Species.family_taxon_id,
+            Species.taxon_family,
+            Species.taxon_order,
+            Species.taxon_phylum,
+            Species.taxon_group,
+            Specimen.accession_id.label('biospecimen'),
+            Species.umbrella_accession_id.label('umbrella_bioproject'),
+            Species.data_accession_id.label('data_bioproject'),
+            specimen_pipeline.c.species_pipelines,
+        )
+        .select_from(Specimen)
+        .outerjoin(Species)
+        .outerjoin(Specimen.status)
+        .outerjoin(Sample)
+        .outerjoin(Specimen.sex)
+        .outerjoin(Data)
+        .outerjoin(Allocation)
+        .outerjoin(Project)
+        .outerjoin(specimen_pipeline)
+        .group_by(
+            Specimen.specimen_id,
+            Species.species_id,
+            SpecimenStatus.status_type_id,
+            Species.common_name,
+            Species.taxon_id,
+            Specimen.epithet,
+            Specimen.taxon_id,
+            Specimen.sex_id,
+            Species.genome_size,
+            Species.taxon_family,
+            Species.family_taxon_id,
+            Species.taxon_order,
+            Species.taxon_phylum,
+            Species.taxon_group,
+            Specimen.sts_priority,
+            Specimen.accession_id,
+            Species.umbrella_accession_id,
+            Species.data_accession_id,
+            specimen_pipeline.c.species_pipelines,
+        )
+        .order_by(
+            Specimen.specimen_id,
+        )
+    )
+
+
+def array_distinct_non_null(label_txt, column):
+    """
+    Builds SQL for returning an array aggregate column of non-null distinct
+    values
+    """
+    return func.array_remove(func.array_agg(distinct(column)), None).label(label_txt)
 
 
 def percent_col(label_txt, nominator, divisor, decimal_places=4):

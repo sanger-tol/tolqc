@@ -100,6 +100,16 @@ def upgrade() -> None:
         ['specimen_id'],
     )
 
+    # Default project for studies
+    op.add_column('study', sa.Column('default_project_id', sa.String(), nullable=True))
+    op.create_foreign_key(
+        None,
+        'study',
+        'project',
+        ['default_project_id'],
+        ['project_id'],
+    )
+
 
 def downgrade() -> None:
     pass
