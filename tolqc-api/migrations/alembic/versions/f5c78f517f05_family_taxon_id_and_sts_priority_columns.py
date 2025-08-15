@@ -87,13 +87,6 @@ def upgrade() -> None:
     )
     op.create_foreign_key(
         None,
-        'metagenome',
-        'specimen',
-        ['host_specimen_id'],
-        ['specimen_id'],
-    )
-    op.create_foreign_key(
-        None,
         'specimen',
         'specimen',
         ['cobiont_specimen_id'],
