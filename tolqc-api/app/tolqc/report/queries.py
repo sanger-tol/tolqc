@@ -398,7 +398,7 @@ def specimen_status_report_query():
                     'specimen_id',
                     species_data_type.c.specimen_id,
                 )
-            ).label('species_pipelines'),
+            ).label('species_data'),
         )
         .select_from(species_data_type)
         .group_by(species_data_type.c.species_id)
@@ -427,7 +427,7 @@ def specimen_status_report_query():
             Specimen.accession_id.label('biospecimen'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Species.data_accession_id.label('data_bioproject'),
-            specimen_pipeline.c.species_pipelines,
+            specimen_pipeline.c.species_data,
         )
         .select_from(Specimen)
         .outerjoin(Species)
@@ -457,7 +457,7 @@ def specimen_status_report_query():
             Specimen.accession_id,
             Species.umbrella_accession_id,
             Species.data_accession_id,
-            specimen_pipeline.c.species_pipelines,
+            specimen_pipeline.c.species_data,
         )
         .order_by(
             Specimen.specimen_id,
