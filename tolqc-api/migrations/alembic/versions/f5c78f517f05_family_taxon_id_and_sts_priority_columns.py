@@ -94,7 +94,14 @@ def upgrade() -> None:
     )
 
     # Default project for studies
-    op.add_column('study', sa.Column('default_project_id', sa.String(), nullable=True))
+    study_rel_tables = 'data', 'edit_study'
+    for tbl in study_rel_tables:
+        op.drop_constraint(f'{tbl}_study_id_fkey', tbl)
+    with op.batch_alter_table('study', recreate='always') as batch_op:
+        batch_op.add_column(
+            sa.Column('default_project_id', sa.String(), nullable=True),
+            insert_after='auto_sync',
+        )
     op.create_foreign_key(
         None,
         'study',
@@ -102,6 +109,14 @@ def upgrade() -> None:
         ['default_project_id'],
         ['project_id'],
     )
+    for tbl in study_rel_tables:
+        op.create_foreign_key(
+            None,
+            tbl,
+            'study',
+            ['study_id'],
+            ['study_id'],
+        )
 
 
 def downgrade() -> None:
