@@ -424,6 +424,7 @@ class Project(LogBase):
     accession = relationship('Accession', back_populates='projects')
     data_assn = relationship('Allocation', back_populates='project')
     data = association_proxy('data_assn', 'data')
+    default_studies = relationship('Study', back_populates='default_project')
 
 
 class QCDict(Base):
@@ -505,6 +506,7 @@ class Species(LogBase):
     tolid_prefix = mapped_column(String, unique=True)
     common_name = mapped_column(String)
     taxon_id = mapped_column(Integer, index=True)
+    family_taxon_id = mapped_column(Integer, index=True)
     taxon_family = mapped_column(String)
     taxon_order = mapped_column(String)
     taxon_phylum = mapped_column(String)
@@ -550,6 +552,7 @@ class Specimen(LogBase):
     lims_id = mapped_column(Integer)
     supplied_name = mapped_column(String, index=True)
     sts_specimen = mapped_column(String, index=True)
+    sts_priority = mapped_column(Integer, index=True)
     category = mapped_column(String, ForeignKey('specimen_category_dict.category'))
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
     sex_id = mapped_column(String, ForeignKey('sex.sex_id'))
@@ -665,9 +668,11 @@ class Study(LogBase):
     name = mapped_column(String)
     auto_sync = mapped_column(Boolean, server_default=expression.true(), nullable=False)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
+    default_project_id = mapped_column(String, ForeignKey('project.project_id'))
 
     accession = relationship('Accession', back_populates='studies')
     data = relationship('Data', back_populates='study')
+    default_project = relationship('Project', back_populates='default_studies')
 
 
 class TiaraMetrics(Base):
