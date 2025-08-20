@@ -375,6 +375,7 @@ def specimen_status_report_query():
         .join(Sample)
         .join(Data)
         .join(Library)
+        .where(Species.species_id != 'unidentified')
         .group_by(
             Species.species_id,
             Library.library_type_id,
@@ -386,6 +387,23 @@ def specimen_status_report_query():
             Specimen.specimen_id,
         )
         .cte('species_data_type')
+    )
+
+    wospi_data_type = (
+        select(
+            Library.library_type_id.label('pipeline'),
+            Specimen.specimen_id,
+        )
+        .select_from(Specimen)
+        .join(Sample)
+        .join(Data)
+        .join(Library)
+        .where(Specimen.species_id == 'unidentified')
+        .order_by(
+            Library.library_type_id,
+            Specimen.specimen_id,
+        )
+        .cte('wospi_data_type')
     )
 
     specimen_pipeline = (
@@ -404,6 +422,37 @@ def specimen_status_report_query():
         .group_by(species_data_type.c.species_id)
         .cte('specimen_pipeline')
     )
+
+    wospi_pipeline = (
+        select(
+            wospi_data_type.c.specimen_id,
+            func.jsonb_agg(
+                func.jsonb_build_object(
+                    'pipeline',
+                    wospi_data_type.c.pipeline,
+                    'specimen_id',
+                    wospi_data_type.c.specimen_id,
+                )
+            ).label('specimen_data'),
+        )
+        .select_from(wospi_data_type)
+        .group_by(wospi_data_type.c.specimen_id)
+        .cte('wospi_pipeline')
+    )
+
+    if False:
+        return (
+            select(
+                Specimen.specimen_id.label('specimen'),
+                wospi_pipeline.c.specimen_data,
+            )
+            .select_from(Specimen)
+            .outerjoin(Species)
+            .outerjoin(
+                wospi_pipeline,
+                Specimen.specimen_id == wospi_pipeline.c.specimen_id,
+            )
+        )
 
     return (
         select(
@@ -427,7 +476,10 @@ def specimen_status_report_query():
             Specimen.accession_id.label('biospecimen'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Species.data_accession_id.label('data_bioproject'),
-            specimen_pipeline.c.species_data,
+            func.coalesce(
+                specimen_pipeline.c.species_data,
+                wospi_pipeline.c.specimen_data,
+            ).label('species_data'),
         )
         .select_from(Specimen)
         .outerjoin(Species)
@@ -438,6 +490,10 @@ def specimen_status_report_query():
         .outerjoin(Allocation)
         .outerjoin(Project)
         .outerjoin(specimen_pipeline)
+        .outerjoin(
+            wospi_pipeline,
+            Specimen.specimen_id == wospi_pipeline.c.specimen_id,
+        )
         .group_by(
             Specimen.specimen_id,
             Species.species_id,
@@ -458,6 +514,7 @@ def specimen_status_report_query():
             Species.umbrella_accession_id,
             Species.data_accession_id,
             specimen_pipeline.c.species_data,
+            wospi_pipeline.c.specimen_data,
         )
         .order_by(
             Specimen.specimen_id,
