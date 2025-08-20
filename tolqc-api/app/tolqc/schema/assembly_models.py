@@ -565,17 +565,17 @@ class ReviewDict(Base):
     description = mapped_column(String)
 
 
-class SmudgeplotMetrics(Base, HasFolder):
+class SmudgeplotMetrics(LogBase, HasFolder):
     __tablename__ = 'smudgeplot_metrics'
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
     review_id = mapped_column(String, ForeignKey('review_dict.review_id'))
-    kmer = mapped_column(Integer)
-    ploidy = mapped_column(Integer)
-    n = mapped_column(Float)
-    partition = mapped_column(String)
-    trim_threshold = mapped_column(Integer)
+    interpretation = mapped_column(String)
+    haploid_coverage = mapped_column(Float)
+    error_fraction = mapped_column(Float)
+    top_smudges = mapped_column(JSONB)
+    results = mapped_column(JSONB)
     pipeline_id = mapped_column(
         Integer,
         ForeignKey('pipeline.pipeline_id'),
