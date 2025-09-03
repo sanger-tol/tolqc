@@ -184,7 +184,7 @@ def update_logbase_closure(user_id):
 
 @event.listens_for(Base, 'mapper_configured', propagate=True)
 def log_edit_class(mapper, cls):
-    logging.debug(f"Mapper configured for '{cls.__name__}'")
+    logging.debug(f"Mapper configured for '{cls.__name__}'")  # noqa: LOG015
 
 
 def now_with_local_tz() -> datetime:

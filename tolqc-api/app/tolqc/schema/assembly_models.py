@@ -570,8 +570,9 @@ class SmudgeplotMetrics(LogBase, HasFolder):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
-    review_id = mapped_column(String, ForeignKey('review_dict.review_id'))
-    interpretation = mapped_column(String)
+    interpretation = mapped_column(
+        String, ForeignKey('smudgeplot_interpretation_dict.interpretation')
+    )
     haploid_coverage = mapped_column(Float)
     error_fraction = mapped_column(Float)
     top_smudges = mapped_column(JSONB)
@@ -586,6 +587,17 @@ class SmudgeplotMetrics(LogBase, HasFolder):
         'Pipeline',
         back_populates='smudgeplot_metrics',
     )
+
+
+class SmudgeplotInterpretationDict(Base):
+    __tablename__ = 'smudgeplot_interpretation_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'interpretation'
+
+    interpretation = mapped_column(String, primary_key=True)
+    description = mapped_column(String)
 
 
 class SoftwareVersion(Base):
