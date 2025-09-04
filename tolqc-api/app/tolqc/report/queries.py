@@ -370,6 +370,8 @@ def specimen_status_report_query():
             Species.species_id,
             Library.library_type_id.label('pipeline'),
             Specimen.specimen_id,
+            func.sum(Data.reads).label('reads'),
+            func.sum(Data.bases).label('bases'),
         )
         .join(Specimen)
         .join(Sample)
@@ -393,12 +395,18 @@ def specimen_status_report_query():
         select(
             Library.library_type_id.label('pipeline'),
             Specimen.specimen_id,
+            func.sum(Data.reads).label('reads'),
+            func.sum(Data.bases).label('bases'),
         )
         .select_from(Specimen)
         .join(Sample)
         .join(Data)
         .join(Library)
         .where(Specimen.species_id == 'unidentified')
+        .group_by(
+            Library.library_type_id,
+            Specimen.specimen_id,
+        )
         .order_by(
             Library.library_type_id,
             Specimen.specimen_id,
@@ -415,6 +423,10 @@ def specimen_status_report_query():
                     species_data_type.c.pipeline,
                     'specimen_id',
                     species_data_type.c.specimen_id,
+                    'reads',
+                    species_data_type.c.reads,
+                    'bases',
+                    species_data_type.c.bases,
                 )
             ).label('species_data'),
         )
@@ -432,6 +444,10 @@ def specimen_status_report_query():
                     wospi_data_type.c.pipeline,
                     'specimen_id',
                     wospi_data_type.c.specimen_id,
+                    'reads',
+                    wospi_data_type.c.reads,
+                    'bases',
+                    wospi_data_type.c.bases,
                 )
             ).label('specimen_data'),
         )
@@ -449,6 +465,7 @@ def specimen_status_report_query():
             Species.species_id.label('species'),
             Species.common_name,
             Species.taxon_id,
+            Species.tolid_prefix,
             Specimen.epithet,
             Specimen.taxon_id.label('specimen_taxon_id'),
             Specimen.sts_priority,
