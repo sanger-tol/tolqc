@@ -440,20 +440,6 @@ def specimen_status_report_query():
         .cte('wospi_pipeline')
     )
 
-    if False:
-        return (
-            select(
-                Specimen.specimen_id.label('specimen'),
-                wospi_pipeline.c.specimen_data,
-            )
-            .select_from(Specimen)
-            .outerjoin(Species)
-            .outerjoin(
-                wospi_pipeline,
-                Specimen.specimen_id == wospi_pipeline.c.specimen_id,
-            )
-        )
-
     return (
         select(
             Specimen.specimen_id.label('specimen'),
