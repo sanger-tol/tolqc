@@ -370,11 +370,14 @@ def specimen_status_report_query():
             Species.species_id,
             Library.library_type_id.label('pipeline'),
             Specimen.specimen_id,
+            func.sum(Data.reads).label('reads'),
+            func.sum(Data.bases).label('bases'),
         )
         .join(Specimen)
         .join(Sample)
         .join(Data)
         .join(Library)
+        .where(Species.species_id != 'unidentified')
         .group_by(
             Species.species_id,
             Library.library_type_id,
@@ -388,6 +391,29 @@ def specimen_status_report_query():
         .cte('species_data_type')
     )
 
+    wospi_data_type = (
+        select(
+            Library.library_type_id.label('pipeline'),
+            Specimen.specimen_id,
+            func.sum(Data.reads).label('reads'),
+            func.sum(Data.bases).label('bases'),
+        )
+        .select_from(Specimen)
+        .join(Sample)
+        .join(Data)
+        .join(Library)
+        .where(Specimen.species_id == 'unidentified')
+        .group_by(
+            Library.library_type_id,
+            Specimen.specimen_id,
+        )
+        .order_by(
+            Library.library_type_id,
+            Specimen.specimen_id,
+        )
+        .cte('wospi_data_type')
+    )
+
     specimen_pipeline = (
         select(
             species_data_type.c.species_id,
@@ -397,12 +423,37 @@ def specimen_status_report_query():
                     species_data_type.c.pipeline,
                     'specimen_id',
                     species_data_type.c.specimen_id,
+                    'reads',
+                    species_data_type.c.reads,
+                    'bases',
+                    species_data_type.c.bases,
                 )
             ).label('species_data'),
         )
         .select_from(species_data_type)
         .group_by(species_data_type.c.species_id)
         .cte('specimen_pipeline')
+    )
+
+    wospi_pipeline = (
+        select(
+            wospi_data_type.c.specimen_id,
+            func.jsonb_agg(
+                func.jsonb_build_object(
+                    'pipeline',
+                    wospi_data_type.c.pipeline,
+                    'specimen_id',
+                    wospi_data_type.c.specimen_id,
+                    'reads',
+                    wospi_data_type.c.reads,
+                    'bases',
+                    wospi_data_type.c.bases,
+                )
+            ).label('specimen_data'),
+        )
+        .select_from(wospi_data_type)
+        .group_by(wospi_data_type.c.specimen_id)
+        .cte('wospi_pipeline')
     )
 
     return (
@@ -414,6 +465,7 @@ def specimen_status_report_query():
             Species.species_id.label('species'),
             Species.common_name,
             Species.taxon_id,
+            Species.tolid_prefix,
             Specimen.epithet,
             Specimen.taxon_id.label('specimen_taxon_id'),
             Specimen.sts_priority,
@@ -427,7 +479,10 @@ def specimen_status_report_query():
             Specimen.accession_id.label('biospecimen'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Species.data_accession_id.label('data_bioproject'),
-            specimen_pipeline.c.species_data,
+            func.coalesce(
+                specimen_pipeline.c.species_data,
+                wospi_pipeline.c.specimen_data,
+            ).label('species_data'),
         )
         .select_from(Specimen)
         .outerjoin(Species)
@@ -438,6 +493,10 @@ def specimen_status_report_query():
         .outerjoin(Allocation)
         .outerjoin(Project)
         .outerjoin(specimen_pipeline)
+        .outerjoin(
+            wospi_pipeline,
+            Specimen.specimen_id == wospi_pipeline.c.specimen_id,
+        )
         .group_by(
             Specimen.specimen_id,
             Species.species_id,
@@ -458,6 +517,7 @@ def specimen_status_report_query():
             Species.umbrella_accession_id,
             Species.data_accession_id,
             specimen_pipeline.c.species_data,
+            wospi_pipeline.c.specimen_data,
         )
         .order_by(
             Specimen.specimen_id,

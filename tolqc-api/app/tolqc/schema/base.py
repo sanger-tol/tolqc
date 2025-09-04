@@ -114,7 +114,9 @@ class LogBase(ModificationBase):
         for col_name in state.mapper.columns.keys():  # noqa: SIM118
             hist = state.attrs[col_name].history
             if hist.has_changes():
-                logging.debug(f'{col_name} changed from {hist.deleted} to {hist.added}')
+                logging.debug(  # noqa: LOG015
+                    f'{col_name} changed from {hist.deleted} to {hist.added}',
+                )
                 cv = hist.deleted[0]
                 # Stringify datetime values. `datetime` isa `date`, so we just test for date
                 changes[col_name] = cv.isoformat() if isinstance(cv, date) else cv
@@ -184,7 +186,7 @@ def update_logbase_closure(user_id):
 
 @event.listens_for(Base, 'mapper_configured', propagate=True)
 def log_edit_class(mapper, cls):
-    logging.debug(f"Mapper configured for '{cls.__name__}'")
+    logging.debug(f"Mapper configured for '{cls.__name__}'")  # noqa: LOG015
 
 
 def now_with_local_tz() -> datetime:

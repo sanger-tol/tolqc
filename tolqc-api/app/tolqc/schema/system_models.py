@@ -34,6 +34,7 @@ class Metadata(LogBase):
     integer_value = mapped_column(Integer)
     float_value = mapped_column(Float)
     json_value = mapped_column(JSONB)
+    # json_value = mapped_column(JSONB, active_history=True)
 
 
 class User(Base):
