@@ -370,7 +370,6 @@ def specimen_status_report_query(req_args):
 
     # Filter on project name
     project_arg = req_args.pop_args('project')
-    import logging; logging.warning(f'{project_arg = }')
 
     # Species data summary for all species which are not 'unidentified'.
     species_data_query = (
