@@ -20,7 +20,7 @@ from tolqc.schema.base import Base, LogBase
 from tolqc.schema.folder_models import HasFolder
 
 
-class Assembly(LogBase):
+class Assembly(LogBase, HasFolder):
     __tablename__ = 'assembly'
 
     @classmethod
@@ -54,6 +54,7 @@ class Assembly(LogBase):
         String,
         ForeignKey('accession.accession_id'),
     )
+    assigned_user_id = mapped_column(Integer, ForeignKey('user.id'))
 
     specimen = relationship('Specimen', back_populates='assemblies')
 
@@ -121,6 +122,11 @@ class Assembly(LogBase):
         back_populates='source',
     )
     components = association_proxy('component_assembly_assn', 'component')
+    assignee = relationship(
+        'User',
+        primaryjoin='Assembly.assigned_user_id == User.id',
+        back_populates='assigned_assemblies',
+    )
 
 
 class AssemblyComponentType(Base):

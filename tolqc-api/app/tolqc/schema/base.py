@@ -54,7 +54,7 @@ class ModificationBase(Base):
 
     @declared_attr
     def modified_user(self):
-        return relationship('User')
+        return relationship('User', foreign_keys=[self.modified_by])
 
 
 class LogBase(ModificationBase):

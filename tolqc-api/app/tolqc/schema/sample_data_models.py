@@ -559,6 +559,7 @@ class Specimen(LogBase):
     ploidy = mapped_column(String)
     karyotype = mapped_column(String)
     cobiont_specimen_id = mapped_column(String, ForeignKey('specimen.specimen_id'))
+    assigned_user_id = mapped_column(Integer, ForeignKey('user.id'))
 
     species = relationship('Species', back_populates='specimens')
     samples = relationship('Sample', back_populates='specimen')
@@ -601,6 +602,12 @@ class Specimen(LogBase):
         'Specimen',
         primaryjoin='Specimen.specimen_id == Specimen.cobiont_specimen_id',
         back_populates='cobiont_of',
+    )
+
+    assignee = relationship(
+        'User',
+        primaryjoin='Specimen.assigned_user_id == User.id',
+        back_populates='assigned_specimens',
     )
 
 

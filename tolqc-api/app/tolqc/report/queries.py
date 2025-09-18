@@ -31,6 +31,7 @@ from tolqc.schema.sample_data_models import (
     Specimen,
     SpecimenStatus,
 )
+from tolqc.schema.system_models import User
 
 
 def pipeline_data_report_query(*_):
@@ -345,7 +346,6 @@ def metagenome_bin_report_query(*_):
             MetagenomeBin.completeness,
             MetagenomeBin.contamination,
             MetagenomeBin.mean_coverage,
-            MetagenomeBin.ssu_count,
             MetagenomeBin.trna_total,
             MetagenomeBin.trna_unique,
             MetagenomeBin.has_23s,
@@ -370,6 +370,9 @@ def specimen_status_report_query(req_args):
 
     # Filter on project name
     project_arg = req_args.pop_args('project')
+
+    # Filter on assignee
+    assignee_arg = req_args.pop_args('assignee')
 
     # Species data summary for all species which are not 'unidentified'.
     species_data_query = (
@@ -506,6 +509,7 @@ def specimen_status_report_query(req_args):
             Specimen.accession_id.label('biospecimen'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Species.data_accession_id.label('data_bioproject'),
+            func.split_part(User.email, '@sanger.ac.uk', 1).label('assignee'),
             func.coalesce(
                 # Will be able to use any_value() aggregate function and
                 # remove these columns from the GROUP BY once the server is
@@ -515,11 +519,12 @@ def specimen_status_report_query(req_args):
             ).label('species_data'),
         )
         .select_from(Specimen)
-        .outerjoin(Species)
+        .outerjoin(Specimen.species)
         .outerjoin(Specimen.status)
-        .outerjoin(Sample)
+        .outerjoin(Specimen.assignee)
+        .outerjoin(Specimen.samples)
         .outerjoin(Specimen.sex)
-        .outerjoin(Data)
+        .outerjoin(Sample.data)
         .outerjoin(Allocation)
         .outerjoin(Project)
         .outerjoin(specimen_pipeline)
@@ -546,6 +551,7 @@ def specimen_status_report_query(req_args):
             Specimen.accession_id,
             Species.umbrella_accession_id,
             Species.data_accession_id,
+            User.email,
             specimen_pipeline.c.species_data,
             wospi_pipeline.c.specimen_data,
         )
@@ -554,11 +560,16 @@ def specimen_status_report_query(req_args):
         )
     )
 
-    # Add `data` table and project name filtering to the main query
+    # Add `data` table, project name and assignee filtering to the main query
     for colname, val in data_vals.items():
         query = query.where(getattr(Data, colname) == val)
     if 'project' in project_arg:
         query = query.where(Allocation.project_id == project_arg['project'])
+    if 'assignee' in assignee_arg:
+        assignee = assignee_arg['assignee']
+        if '@' not in assignee:
+            assignee = assignee + '@sanger.ac.uk'
+        query = query.where(User.email == assignee)
 
     return query
 
