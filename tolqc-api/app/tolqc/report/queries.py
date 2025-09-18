@@ -33,7 +33,7 @@ from tolqc.schema.sample_data_models import (
 )
 
 
-def pipeline_data_report_query():
+def pipeline_data_report_query(*_):
     return (
         select(
             Data.data_id,
@@ -98,7 +98,7 @@ def pipeline_data_report_query():
     )
 
 
-def pacbio_data_report_query():
+def pacbio_data_report_query(*_):
     return (
         select(
             Species.species_id.label('species'),
@@ -157,7 +157,7 @@ def pacbio_data_report_query():
     )
 
 
-def mlwh_data_report_query():
+def mlwh_data_report_query(*_):
     return (
         mlwh_data_report_query_select()
         .select_from(Data)
@@ -177,7 +177,7 @@ def mlwh_data_report_query():
     )
 
 
-def mlwh_data_report_query_select():
+def mlwh_data_report_query_select(*_):
     return select(
         Data.data_id,
         Data.study_id,
@@ -243,7 +243,7 @@ def mlwh_data_report_query_select():
     )
 
 
-def illumina_data_report_query():
+def illumina_data_report_query(*_):
     return (
         select(
             Species.species_id.label('species'),
@@ -282,7 +282,7 @@ def illumina_data_report_query():
     )
 
 
-def metagenome_report_query():
+def metagenome_report_query(*_):
     # Construct CTE that counts bin types
     bin_counts = (
         select(
@@ -326,7 +326,7 @@ def metagenome_report_query():
     )
 
 
-def metagenome_bin_report_query():
+def metagenome_bin_report_query(*_):
     return (
         select(
             MetagenomeBin.metagenome_bin_id.label('metagenome_bin'),
@@ -364,8 +364,16 @@ def metagenome_bin_report_query():
     )
 
 
-def specimen_status_report_query():
-    species_data_type = (
+def specimen_status_report_query(req_args):
+    # Filters on the `data` table
+    data_vals = req_args.pop_args('processed', 'qc', 'visibility')
+
+    # Filter on project name
+    project_arg = req_args.pop_args('project')
+    import logging; logging.warning(f'{project_arg = }')
+
+    # Species data summary for all species which are not 'unidentified'.
+    species_data_query = (
         select(
             Species.species_id,
             Library.library_type_id.label('pipeline'),
@@ -388,10 +396,11 @@ def specimen_status_report_query():
             Library.library_type_id,
             Specimen.specimen_id,
         )
-        .cte('species_data_type')
     )
 
-    wospi_data_type = (
+    # Specimen summary data for the 'unidentified' species, which includes but
+    # is not necessarily limited to the WOSPI project.
+    wospi_data_query = (
         select(
             Library.library_type_id.label('pipeline'),
             Specimen.specimen_id,
@@ -411,9 +420,29 @@ def specimen_status_report_query():
             Library.library_type_id,
             Specimen.specimen_id,
         )
-        .cte('wospi_data_type')
     )
 
+    # Add `data` table filtering
+    for colname, val in data_vals.items():
+        species_data_query = species_data_query.where(getattr(Data, colname) == val)
+        wospi_data_query = wospi_data_query.where(getattr(Data, colname) == val)
+
+    # Add filtering on project name
+    if 'project' in project_arg:
+        project_id = project_arg['project']  # Can be `None`
+        species_data_query = species_data_query.join(Allocation).where(
+            Allocation.project_id == project_id
+        )
+        wospi_data_query = wospi_data_query.join(Allocation).where(
+            Allocation.project_id == project_id
+        )
+
+    # Turn queries into CTEs
+    species_data_type = species_data_query.cte('species_data_type')
+    wospi_data_type = wospi_data_query.cte('wospi_data_type')
+
+    # CTEs which aggregate species and WOSPI specimen data summaries into JSON
+    # lists
     specimen_pipeline = (
         select(
             species_data_type.c.species_id,
@@ -434,7 +463,6 @@ def specimen_status_report_query():
         .group_by(species_data_type.c.species_id)
         .cte('specimen_pipeline')
     )
-
     wospi_pipeline = (
         select(
             wospi_data_type.c.specimen_id,
@@ -456,7 +484,7 @@ def specimen_status_report_query():
         .cte('wospi_pipeline')
     )
 
-    return (
+    query = (
         select(
             Specimen.specimen_id.label('specimen'),
             Specimen.sts_specimen,
@@ -480,6 +508,9 @@ def specimen_status_report_query():
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Species.data_accession_id.label('data_bioproject'),
             func.coalesce(
+                # Will be able to use any_value() aggregate function and
+                # remove these columns from the GROUP BY once the server is
+                # PostgreSQL >= 16
                 specimen_pipeline.c.species_data,
                 wospi_pipeline.c.specimen_data,
             ).label('species_data'),
@@ -524,6 +555,14 @@ def specimen_status_report_query():
         )
     )
 
+    # Add `data` table and project name filtering to the main query
+    for colname, val in data_vals.items():
+        query = query.where(getattr(Data, colname) == val)
+    if 'project' in project_arg:
+        query = query.where(Allocation.project_id == project_arg['project'])
+
+    return query
+
 
 def array_distinct_non_null(label_txt, column):
     """
@@ -537,11 +576,7 @@ def percent_col(label_txt, nominator, divisor, decimal_places=4):
     """
     Builds SQL for returning a column in %
     """
-    return (
-        func.round(100 * nominator / divisor, decimal_places)
-        .cast(Float)
-        .label(label_txt)
-    )
+    return func.round(100 * nominator / divisor, decimal_places).cast(Float).label(label_txt)
 
 
 def iso_datetime_col(label_txt, column):
