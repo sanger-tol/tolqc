@@ -432,10 +432,10 @@ def specimen_status_report_query(req_args):
     # Add filtering on project name
     if 'project' in project_arg:
         project_id = project_arg['project']  # Can be `None`
-        species_data_query = species_data_query.join(Allocation).where(
+        species_data_query = species_data_query.outerjoin(Allocation).where(
             Allocation.project_id == project_id
         )
-        wospi_data_query = wospi_data_query.join(Allocation).where(
+        wospi_data_query = wospi_data_query.outerjoin(Allocation).where(
             Allocation.project_id == project_id
         )
 
