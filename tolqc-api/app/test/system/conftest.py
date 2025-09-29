@@ -139,7 +139,7 @@ def logbase_db_session(session_factory, token):
         remove(*hook_params)
 
 
-@pytest.fixture()
+@pytest.fixture
 def client(flask_app, token):
     class TestClient(testing.FlaskClient):
         def open(self, *args, **kwargs):  # noqa: A003

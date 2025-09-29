@@ -153,21 +153,63 @@ def good_param_combinations():
         yield {'format': 'NDJSON', **param}
 
 
-@pytest.mark.parametrize('params', good_param_combinations())
-def test_data_report_good_params(client, api_path, params):
-    url = api_path + '/report/pipeline-data?' + urlencode(params)
+def report_response_json(client, api_path, report, params):
+    url = f'{api_path}/report/{report}?' + urlencode(params)
     logging.warning(f'{url = }')
     response = client.get(url)
     assert response.status == '200 OK'
+    return [json.loads(x) for x in io.StringIO(response.text).readlines()]
 
-    json_lines = [json.loads(x) for x in io.StringIO(response.text).readlines()]
-    assert json_lines
+
+@pytest.mark.parametrize('params', good_param_combinations())
+def test_data_report_good_params(client, api_path, params):
+    json_lines = report_response_json(client, api_path, 'pipeline-data', params)
 
     # Check that values match those requested
     expected = expected_values(params)
     for row in json_lines:
         for col, val in expected.items():
             assert row.get(col) == val
+
+
+@pytest.fixture
+def max_bases(client, api_path):
+    json_lines = report_response_json(
+        client, api_path, 'specimen-status', {'format': 'NDJSON'}
+    )
+    assert json_lines
+    return sum_species_data_bases(json_lines)
+
+
+def sum_species_data_bases(json_lines):
+    bases = 0
+    for obj in json_lines:
+        for dtm in obj['species_data']:
+            bases += dtm['bases']
+    return bases
+
+
+def specimen_status_param_combinations():
+    for param in (
+        {'processed': '1'},
+        {'processed': '0'},
+        {'processed': 'null'},
+        {'project': 'protist_microalgae'},
+        {'qc': 'pass'},
+        {'qc': 'null'},
+        {'visibility': 'Always'},
+        {'assignee': 'tester'},
+        {'assignee': 'null'},
+    ):
+        yield {'format': 'NDJSON', **param}
+
+
+@pytest.mark.parametrize('params', specimen_status_param_combinations())
+def test_specimen_status_report(max_bases, client, api_path, params):
+    json_lines = report_response_json(client, api_path, 'specimen-status', params)
+
+    bases = sum_species_data_bases(json_lines)
+    assert 0 < bases < max_bases
 
 
 def expected_values(params):

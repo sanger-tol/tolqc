@@ -567,7 +567,7 @@ def specimen_status_report_query(req_args):
         query = query.where(Allocation.project_id == project_arg['project'])
     if 'assignee' in assignee_arg:
         assignee = assignee_arg['assignee']
-        if '@' not in assignee:
+        if assignee is not None and '@' not in assignee:
             assignee = assignee + '@sanger.ac.uk'
         query = query.where(User.email == assignee)
 

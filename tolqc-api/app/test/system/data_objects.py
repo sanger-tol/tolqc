@@ -31,6 +31,8 @@ from tolqc.schema.system_models import Token, User
 
 def test_data(token: str):
     return [
+        User(id=100, email='tester@sanger.ac.uk', name='test-user', registered=True),
+        Token(id=200, token=token, user_id=100),
         AccessionTypeDict(
             accession_type_id='GenBank Genome Assembly',
             regexp='^GCA_\\d+\\.\\d+$',
@@ -688,6 +690,7 @@ def test_data(token: str):
                                     tag1_id='130',
                                     date='2020-11-13T11:13:32+00:00',
                                     lims_qc='pass',
+                                    qc='pass',
                                     visibility='Always',
                                     reads=3205550,
                                     bases=484038050,
@@ -758,6 +761,7 @@ def test_data(token: str):
                                     tag1_id='131',
                                     date='2020-11-13T11:13:32+00:00',
                                     lims_qc='pass',
+                                    qc='pass',
                                     visibility='Always',
                                     reads=118915580,
                                     bases=17956252580,
@@ -828,6 +832,7 @@ def test_data(token: str):
                                     tag1_id='132',
                                     date='2020-11-13T11:13:32+00:00',
                                     lims_qc='pass',
+                                    qc='pass',
                                     visibility='Testing',
                                     reads=120600430,
                                     bases=18210664930,
@@ -1053,6 +1058,7 @@ def test_data(token: str):
                                     tag1_id='1022',
                                     date='2021-06-02T23:04:37+01:00',
                                     lims_qc='fail',
+                                    qc='pass',
                                     visibility='Always',
                                     reads=120626,
                                     bases=1290572095,
@@ -1284,6 +1290,7 @@ def test_data(token: str):
                                     tag2_id='18',
                                     date='2021-05-21T10:35:42+01:00',
                                     lims_qc='pass',
+                                    qc='fail',
                                     visibility='Always',
                                     reads=81186152,
                                     bases=12056143572,
@@ -1468,6 +1475,7 @@ def test_data(token: str):
                                     tag1_id='bc2076',
                                     date='2025-02-07T12:04:12+00:00',
                                     lims_qc='pass',
+                                    qc='pass',
                                     visibility='Always',
                                     reads=6782153,
                                     bases=58162339677,
@@ -1666,6 +1674,7 @@ def test_data(token: str):
                     sts_specimen='KDTOL10021',
                     accession_id='SAMEA7521930',
                     sex_id='Hermaphrodite, monoecious',
+                    assigned_user_id=100,
                     samples=[
                         Sample(
                             sample_id='DTOL10341656',
@@ -2491,6 +2500,4 @@ def test_data(token: str):
         Allocation(project_id='britain_and_ireland', data_id='m84309_250205_121831_s4#2076'),
         Allocation(project_id='darwin', data_id='m84309_250205_121831_s4#2076'),
         Allocation(project_id='tol', data_id='m84309_250205_121831_s4#2076'),
-        User(id=100, email='test@nowhere.ac.uk', name='test-user', registered=True),
-        Token(id=200, token=token, user_id=100),
     ]
