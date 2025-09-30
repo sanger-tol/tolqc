@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import datetime
+from typing import Any
 
 from flask import Blueprint, request
 
@@ -40,7 +41,7 @@ def reports_blueprint(
     rep_eng = ReportEngine(session_factory=session_factory, models=models)
 
     @rep.route('/<report_path>')
-    def pacbio_run_data(report_path):
+    def tolqc_report(report_path):
         return rep_eng.report(report_path)
 
     @rep.route('/folder/<folder_table>')
@@ -59,6 +60,64 @@ def tsv_rows(row_itr, query):
 def ndjson_rows(row_itr, _):
     for row in row_itr:
         yield json_dumps(row._asdict()) + '\n'
+
+
+class RequestArgs:
+    """
+    Takes the Flask request.args values and (case-insensitively) transforms
+    the string values:
+
+        'null'  -> None
+        'true'  -> True
+        'flase' -> False
+
+    Long strings are truncated to 256 characters to guard against excessively
+    long param values being passed to the SQL layer.
+    """
+
+    def __init__(self):
+        self.__req_args = self.parse_args(request.args)
+
+    @classmethod
+    def parse_args(cls, arg_dict: dict[str, str]):
+        parsed = {}
+        for arg, val in arg_dict.items():
+            val = val[:256]
+            match val.lower():
+                case 'null':
+                    val = None
+                case 'true':
+                    val = True
+                case 'false':
+                    val = False
+            parsed[arg] = val
+        return parsed
+
+    def pop_default(self, arg: str, default: Any) -> Any:
+        """
+        Removes the arg if present in the instance and returns it, or the
+        default value (which must be specified).
+        """
+        return self.__req_args.pop(arg, default)
+
+    def pop_args(self, *args: str) -> dict[str, Any]:
+        """
+        Removes any of the args which are present in the instance, returning
+        them in a dict keyed under their names.
+        """
+        ret = {}
+        for n in args:
+            if n in self.__req_args:
+                ret[n] = self.__req_args.pop(n)
+        return ret
+
+    def pop_all(self) -> dict[str, Any]:
+        """
+        Empty instance of arguments, returning them as a dict.
+        """
+        ret = self.__req_args
+        self.__req_args = None
+        return ret
 
 
 class ReportEngine:
@@ -83,10 +142,11 @@ class ReportEngine:
         'specimen-status': specimen_status_report_query,
     }
 
-    def do_report(self, report_name, query):
+    def do_report(self, report_name, query, req_args=None):
         # File format if requested; defaults to TSV
-        req_args = request.args.copy()
-        req_fmt = req_args.pop('format', 'tsv').lower()
+        if req_args is None:
+            req_args = RequestArgs()
+        req_fmt = req_args.pop_default('format', 'tsv').lower()
         fmt_mime = self.FORMATTERS.get(req_fmt)
         if not fmt_mime:
             valid = tuple(self.FORMATTERS)
@@ -106,7 +166,7 @@ class ReportEngine:
         # session.close() to avoid SELECT statements accumulating on server
         # with 'idle in transaction' state.
         with self.session_factory() as session:
-            query = self.add_arguments(session, req_args, query)
+            query = self.add_arguments(session, query, req_args)
             row_itr = session.execute(query)
 
         # Streams formatted data from the SQL query to the client
@@ -119,7 +179,8 @@ class ReportEngine:
             raise BadRequest(msg)
 
         report_name = report_path.replace('-', '_')
-        return self.do_report(report_name, query_gen())
+        req_args = RequestArgs()
+        return self.do_report(report_name, query_gen(req_args), req_args)
 
     def folder_report(self, folder_table):
         model = self.table_to_model.get(folder_table)
@@ -163,7 +224,7 @@ class ReportEngine:
 
         return self.do_report(f'{folder_table}_folders', query)
 
-    def add_arguments(self, session, req_args, query):
+    def add_arguments(self, session, query, req_args):
         """
         All remaining request arguments are treated as report column names to
         be selected on.
@@ -171,10 +232,7 @@ class ReportEngine:
 
         query_cols = {x['name']: x['expr'] for x in query.column_descriptions}
 
-        for arg, val in req_args.items():
-            # Guard against being passed excessively long param values
-            val = None if val.lower() == 'null' else val[:256]
-
+        for arg, val in req_args.pop_all().items():
             # Is the column in the report?
             expr = query_cols.get(arg)
             if expr is None:
@@ -187,8 +245,7 @@ class ReportEngine:
                 sel_col = columns[0]
             else:
                 msg = (
-                    f"Cannot select on report column '{arg}'"
-                    f' which contains {len(columns)} columns'
+                    f"Cannot select on report column '{arg}' which contains {len(columns)} columns"
                 )
                 raise BadRequest(msg)
 

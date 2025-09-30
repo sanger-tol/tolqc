@@ -4,8 +4,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from sqlalchemy import (
     DateTime,
     Float,
@@ -34,7 +32,6 @@ class Metadata(LogBase):
     integer_value = mapped_column(Integer)
     float_value = mapped_column(Float)
     json_value = mapped_column(JSONB)
-    # json_value = mapped_column(JSONB, active_history=True)
 
 
 class User(Base):
@@ -48,11 +45,22 @@ class User(Base):
     organisation: Mapped[str] = mapped_column(nullable=True)
     registered: Mapped[bool] = mapped_column(nullable=False, default=False)
 
-    _tokens: Mapped[list['Token']] = relationship(back_populates='user')
+    _tokens: Mapped[list[Token]] = relationship(back_populates='user')
 
     @property
     def roles(self) -> list[str]:
         return [] if self.registered is False else ['registered']
+
+    assigned_specimens = relationship(
+        'Specimen',
+        primaryjoin='User.id == Specimen.assigned_user_id',
+        back_populates='assignee',
+    )
+    assigned_assemblies = relationship(
+        'Assembly',
+        primaryjoin='User.id == Assembly.assigned_user_id',
+        back_populates='assignee',
+    )
 
 
 class Token(Base):
@@ -67,5 +75,5 @@ class Token(Base):
     user = relationship('User', back_populates='_tokens', foreign_keys=[user_id])
 
     @classmethod
-    def get(cls, sess: Session, token: str) -> Optional[Token]:
+    def get(cls, sess: Session, token: str) -> Token | None:
         return sess.query(cls).filter_by(token=token).one_or_none()

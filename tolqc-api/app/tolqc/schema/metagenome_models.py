@@ -136,7 +136,6 @@ class MetagenomeBin(LogBase):
     completeness = mapped_column(Float)
     contamination = mapped_column(Float)
     mean_coverage = mapped_column(Float)
-    ssu_count = mapped_column(Integer)
     trna_total = mapped_column(Integer)
     trna_unique = mapped_column(Integer)
     has_23s = mapped_column(Boolean)
