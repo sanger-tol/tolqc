@@ -3,9 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 import datetime
-from typing import Any
 
-from flask import Blueprint, request
+from flask import Blueprint
 
 from sqlalchemy import Column, inspect, select
 from sqlalchemy.orm import Bundle
@@ -21,10 +20,12 @@ from tolqc.report.queries import (
     metagenome_bin_report_query,
     metagenome_report_query,
     mlwh_data_report_query,
+    ont_data_report_query,
     pacbio_data_report_query,
     pipeline_data_report_query,
     specimen_status_report_query,
 )
+from tolqc.report.request_args import RequestArgs
 from tolqc.schema.folder_models import Folder, FolderLocation, HasFolder
 
 
@@ -62,64 +63,6 @@ def ndjson_rows(row_itr, _):
         yield json_dumps(row._asdict()) + '\n'
 
 
-class RequestArgs:
-    """
-    Takes the Flask request.args values and (case-insensitively) transforms
-    the string values:
-
-        'null'  -> None
-        'true'  -> True
-        'flase' -> False
-
-    Long strings are truncated to 256 characters to guard against excessively
-    long param values being passed to the SQL layer.
-    """
-
-    def __init__(self):
-        self.__req_args = self.parse_args(request.args)
-
-    @classmethod
-    def parse_args(cls, arg_dict: dict[str, str]):
-        parsed = {}
-        for arg, val in arg_dict.items():
-            val = val[:256]
-            match val.lower():
-                case 'null':
-                    val = None
-                case 'true':
-                    val = True
-                case 'false':
-                    val = False
-            parsed[arg] = val
-        return parsed
-
-    def pop_default(self, arg: str, default: Any) -> Any:
-        """
-        Removes the arg if present in the instance and returns it, or the
-        default value (which must be specified).
-        """
-        return self.__req_args.pop(arg, default)
-
-    def pop_args(self, *args: str) -> dict[str, Any]:
-        """
-        Removes any of the args which are present in the instance, returning
-        them in a dict keyed under their names.
-        """
-        ret = {}
-        for n in args:
-            if n in self.__req_args:
-                ret[n] = self.__req_args.pop(n)
-        return ret
-
-    def pop_all(self) -> dict[str, Any]:
-        """
-        Empty instance of arguments, returning them as a dict.
-        """
-        ret = self.__req_args
-        self.__req_args = None
-        return ret
-
-
 class ReportEngine:
     def __init__(self, session_factory=None, models=None):
         self.session_factory = session_factory
@@ -137,12 +80,13 @@ class ReportEngine:
         'metagenome': metagenome_report_query,
         'metagenome-bin': metagenome_bin_report_query,
         'mlwh-data': mlwh_data_report_query,
+        'ont-data': ont_data_report_query,
         'pacbio-data': pacbio_data_report_query,
         'pipeline-data': pipeline_data_report_query,
         'specimen-status': specimen_status_report_query,
     }
 
-    def do_report(self, report_name, query, req_args=None):
+    def do_report(self, report_name, query, req_args: RequestArgs | None = None):
         # File format if requested; defaults to TSV
         if req_args is None:
             req_args = RequestArgs()
@@ -224,7 +168,7 @@ class ReportEngine:
 
         return self.do_report(f'{folder_table}_folders', query)
 
-    def add_arguments(self, session, query, req_args):
+    def add_arguments(self, session, query, req_args: RequestArgs):
         """
         All remaining request arguments are treated as report column names to
         be selected on.

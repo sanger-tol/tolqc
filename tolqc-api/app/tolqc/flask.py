@@ -103,6 +103,7 @@ def application(session_factory=None):
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds,
         auth_inspector=create_auth_inspector(),
+        include_all_to_ones=False,
     )
     app.register_blueprint(
         blueprint_data_tolqc,
