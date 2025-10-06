@@ -2,36 +2,21 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM python:3.12
-
-WORKDIR /app
+FROM python:3.12-slim
 
 ENV FLASK_ENV=development
-ENV PYTHONPATH=/app
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV VIRTUAL_ENV=/app
 
-RUN apt-get update -y
-RUN apt-get install -y python3-pip python3-setuptools
+WORKDIR "$VIRTUAL_ENV"
+RUN python3 -m venv "$VIRTUAL_ENV"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+RUN pip3 install --upgrade pip
 
-RUN pip3 install --upgrade setuptools
-
-# Dockerize is needed to sync containers startup
-ENV DOCKERIZE_VERSION v0.6.0
-RUN wget --no-check-certificate https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-
-COPY ./app/setup.py .
-RUN pip3 --no-cache-dir install .
-
-COPY ./app/requirements.txt .
-RUN pip3 --no-cache-dir install -r requirements.txt
-
-# We install the tol-sdk here in editable mode
-VOLUME ["/packages"]
-
-COPY ./app /app
+COPY ./app app
+COPY ./pyproject.toml .
+COPY ./README.md .
 COPY ./migrations /migrations
-RUN if [ -d /packages/tol-sdk/src ] ; then pip3 install --editable /packages/tol-sdk[api-base]; fi
+RUN pip3 --no-cache-dir install . 'tolqc-api[dev]'
 
-CMD flask --app run run --debugger --port 80 --host 0.0.0.0
+CMD ["flask", "--app=app.run", "run", "--host=0.0.0.0", "--port=80", "--debugger"]

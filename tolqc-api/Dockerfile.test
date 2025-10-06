@@ -2,29 +2,19 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM python:3.12
-
-WORKDIR /app
+FROM python:3.12-slim
 
 ENV FLASK_ENV=development
-ENV PYTHONPATH=/app
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV VIRTUAL_ENV=/app
 
-RUN apt-get update -y
-RUN apt-get install -y python3-pip python3-setuptools
+WORKDIR "$VIRTUAL_ENV"
+RUN python3 -m venv "$VIRTUAL_ENV"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip3 install --upgrade setuptools
+COPY ./app app
+COPY ./pyproject.toml .
+COPY ./README.md .
+RUN pip3 --no-cache-dir install . 'tolqc-api[dev,test]'
 
-COPY ./app/setup.py .
-RUN pip3 --no-cache-dir install .
-
-COPY ./app/requirements.txt .
-RUN pip3 --no-cache-dir install -r requirements.txt
-
-COPY ./requirements-test.txt .
-RUN pip3 --no-cache-dir install -r requirements-test.txt
-
-COPY ./app /app
-COPY ./migrations /migrations
-
-WORKDIR /app/test
+WORKDIR "$VIRTUAL_ENV/app/test"

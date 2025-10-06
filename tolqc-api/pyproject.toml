@@ -1,0 +1,76 @@
+# SPDX-FileCopyrightText: 2021 Genome Research Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["app"]
+
+[project]
+name = "tolqc-api"
+version = "1.1.5"
+description = "Tree of Life QC API"
+readme = "README.md"
+authors = [
+    { name = "ToL Platforms Team", email = "tol-platforms@sanger.ac.uk" }
+]
+license = "MIT"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+urls = { "Homepage" = "https://gitlab.internal.sanger.ac.uk/tol/platforms/tolqc-api" }
+dependencies = [
+    "python_dateutil ~= 2.8.0",
+    "tol-sdk[api-base,postgresql,sheets] == 1.6.26",
+]
+
+[project.optional-dependencies]
+dev = [
+    "alembic ~= 1.13.0",
+]
+test = [
+    "pytest ~= 7.3.1"
+]
+
+[tool.black]
+line-length = 99
+
+[tool.ruff]
+target-version = "py310"
+line-length = 99
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint]
+select = [
+    "A",
+    "ARG",
+    "B",
+    "BLE",
+    "C4",
+    "COM",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "ISC",
+    "LOG",
+    "N",
+    "PYI",
+    "S",
+    "SIM",
+    "U"
+]
+ignore = [
+    "COM812",
+    "C901"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"{test_*,*_test,conftest}.py" = ["E501", "S101"]
