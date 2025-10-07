@@ -11,6 +11,7 @@ ENV VIRTUAL_ENV=/app
 WORKDIR "$VIRTUAL_ENV"
 RUN python3 -m venv "$VIRTUAL_ENV"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+RUN pip3 --no-cache-dir install --upgrade pip
 
 COPY ./app app
 COPY ./pyproject.toml .
