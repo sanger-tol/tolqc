@@ -25,14 +25,12 @@ classifiers = [
 ]
 urls = { "Homepage" = "https://gitlab.internal.sanger.ac.uk/tol/platforms/tolqc-api" }
 dependencies = [
+    "alembic ~= 1.13.0",
     "python_dateutil ~= 2.8.0",
     "tol-sdk[api-base,postgresql,sheets] == 1.6.26",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "alembic ~= 1.13.0",
-]
 test = [
     "pytest ~= 7.3.1"
 ]

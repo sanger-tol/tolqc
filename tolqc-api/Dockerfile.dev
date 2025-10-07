@@ -17,6 +17,6 @@ COPY ./app app
 COPY ./pyproject.toml .
 COPY ./README.md .
 COPY ./migrations /migrations
-RUN pip3 --no-cache-dir install . 'tolqc-api[dev]'
+RUN pip3 --no-cache-dir install . 'tolqc-api'
 
 CMD ["flask", "--app=app.run", "run", "--host=0.0.0.0", "--port=80", "--debugger"]

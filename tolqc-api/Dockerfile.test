@@ -16,6 +16,6 @@ RUN pip3 --no-cache-dir install --upgrade pip
 COPY ./app app
 COPY ./pyproject.toml .
 COPY ./README.md .
-RUN pip3 --no-cache-dir install . 'tolqc-api[dev,test]'
+RUN pip3 --no-cache-dir install . 'tolqc-api[test]'
 
 WORKDIR "$VIRTUAL_ENV/app/test"
