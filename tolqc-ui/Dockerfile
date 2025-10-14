@@ -19,7 +19,7 @@ RUN yarn build
 
 
 # Stage 2
-FROM gitlab-registry.internal.sanger.ac.uk/tol/tol-core/web-base:1.0.2
+FROM gitlab-registry.internal.sanger.ac.uk/tol/tol-core/web-base:1.0.4
 
 # Copy from the stage 1
 COPY --from=builder /workspace/build/ /var/www/
