@@ -44,9 +44,6 @@ def upgrade() -> None:
     op.drop_constraint('user_email_key', 'user')
     op.alter_column('user', 'email', new_column_name='oidc_id')
     op.create_unique_constraint(None, 'user', ['oidc_id'])
-    op.drop_column('user', 'name')
-    op.drop_column('user', 'organisation')
-    op.drop_column('user', 'registered')
 
     # Update role table
     op.add_column('role', sa.Column('name', sa.String, unique=True, nullable=False))
@@ -84,9 +81,6 @@ def downgrade() -> None:
     op.drop_constraint('user_oidc_id_key', table_name='user')
     op.alter_column('user', 'oidc_id', new_column_name='email')
     op.create_unique_constraint(None, 'user', ['email'])
-    op.add_column('user', sa.Column('name', sa.String, nullable=False))
-    op.add_column('user', sa.Column('organisation', sa.String, nullable=True))
-    op.add_column('user', sa.Column('registered', sa.Boolean, nullable=False, server_default=sa.boolean(False)))
 
     # Revert role table changes
     op.drop_column('role', 'name')

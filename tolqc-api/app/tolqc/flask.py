@@ -12,18 +12,22 @@ from sqlalchemy.exc import DBAPIError
 
 from tol.api_base import data_blueprint, system_blueprint
 from tol.api_base.auth import basic_auth_inspector
+from tol.board import board_blueprint
 from tol.core import core_data_object
-from tol.sql import create_sql_datasource
+from tol.sql import Model, create_sql_datasource
+from tol.sql.auth import db_auth_blueprint
+from tol.sql.board import create_board_models
 from tol.sql.session import create_session_factory
 
-from tolqc.auth import create_auth_ctx_setter
+# from tolqc.auth import create_auth_ctx_setter
 from tolqc.database import build_database_factory, flask_session, logbase_hook_params
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
-from tolqc.schema import models_list
+from tolqc.schema import models_list, Base, system_models
 
 from werkzeug.exceptions import BadRequest
+
 
 
 def application(session_factory=None):
@@ -46,7 +50,7 @@ def application(session_factory=None):
     if not session_factory:
         session_factory = create_session_factory(db_uri)
 
-    auth_ctx_setter = create_auth_ctx_setter(session_factory)
+    # auth_ctx_setter = create_auth_ctx_setter(session_factory)
 
     @app.before_request
     def set_auth_ctx() -> None:
@@ -75,6 +79,25 @@ def application(session_factory=None):
     # session_factory is now a wrapped factory which returns the same Session
     # instance during each Flask request.
     database_factory, session_factory = build_database_factory(session_factory, models)
+
+    # board_models, _board_user_mixin = __get_board_models(Base)
+
+    # auth
+    auth_bp = db_auth_blueprint(
+        Base,
+        os.environ['DB_URI'],
+        url_prefix=os.environ['API_PATH'] + '/auth',
+        user_mixin_class=
+    )
+    app.register_blueprint(auth_bp)
+    auth_bp.register_authenticator(app)
+
+    # dashboards
+    # all_models = [
+    #     *tolqc_models,
+    #     *board_models,
+    #     auth_bp.models.user_class,
+    # ]
 
     # Tol QC endpoints
     tolqc_ds = create_sql_datasource(
@@ -116,6 +139,20 @@ def application(session_factory=None):
     app.register_blueprint(
         blueprint_system,
         url_prefix=api_path + '/system',
+    )
+
+    # dashboards
+    boards_bp = board_blueprint(tolqc_ds)
+    app.register_blueprint(
+        boards_bp,
+        name='custom_boards',
+        url_prefix=os.environ['API_PATH'] + '/boards'
+    )
+    blueprint_board_data = data_blueprint(tolqc_ds)
+    app.register_blueprint(
+        blueprint_board_data,
+        name='boards',
+        url_prefix=os.getenv('API_PATH') + '/boards'
     )
 
     @app.errorhandler(BadRequest)

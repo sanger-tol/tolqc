@@ -4,16 +4,36 @@
 
 from sqlalchemy.orm import configure_mappers
 
+from tol.sql.board import create_board_models
+from tol.sql.auth.models import create_models
+
 import tolqc.schema.accession_models
 import tolqc.schema.assembly_models
 import tolqc.schema.folder_models
 import tolqc.schema.metagenome_models
 import tolqc.schema.sample_data_models  # noqa: F401
 from tolqc.schema.base import Base
-from tolqc.schema.system_models import Token
+from tol.sql import Model
 
+from tolqc.schema import system_models
+
+# def __get_board_models(
+#     base_model: Model
+# ) -> tuple[list[Model], Model]:
+#     board_models = create_board_models(base_model)
+
+#     return list(board_models), board_models._user_mixin
 
 def models_list():
+    board_models = create_board_models(Base)
+    create_models(Base)
+
+    user_mixin = type(
+        'User',
+        (system_models.UserMixin, board_models._user_mixin),
+        {}
+    )
+
     """
     The call to `configure_mappers()` is triggered lazily by SQLAlchemy when
     the first instance of a model is created.  Since we dynamically create an
@@ -23,5 +43,5 @@ def models_list():
     """
     configure_mappers()
 
-    # Exclude Token class from API
-    return tuple(x for m in Base.registry.mappers if (x := m.class_) != Token)
+    excluded_models = []
+    return tuple(x for m in Base.registry.mappers if (x := m.class_) not in excluded_models)

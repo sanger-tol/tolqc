@@ -551,7 +551,7 @@ def specimen_status_report_query(req_args):
             Specimen.accession_id,
             Species.umbrella_accession_id,
             Species.data_accession_id,
-            User.email,
+            User.oidc_id,
             specimen_pipeline.c.species_data,
             wospi_pipeline.c.specimen_data,
         )
