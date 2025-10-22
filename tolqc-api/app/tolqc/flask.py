@@ -9,6 +9,7 @@ from flask import Flask, request
 
 from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
+from sqlalchemy.orm import configure_mappers
 
 from tol.api_base import data_blueprint, system_blueprint
 from tol.api_base.auth import basic_auth_inspector
@@ -26,8 +27,16 @@ from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
 from tolqc.schema import models_list, Base, system_models
 
+from .auth import create_auth_inspector
+
 from werkzeug.exceptions import BadRequest
 
+def __get_board_models(
+    base_model: Model
+) -> tuple[list[Model], Model]:
+    board_models = create_board_models(base_model)
+
+    return list(board_models), board_models._user_mixin
 
 
 def application(session_factory=None):
@@ -50,13 +59,7 @@ def application(session_factory=None):
     if not session_factory:
         session_factory = create_session_factory(db_uri)
 
-    # auth_ctx_setter = create_auth_ctx_setter(session_factory)
 
-    @app.before_request
-    def set_auth_ctx() -> None:
-        token = request.headers.get('token')
-        if token is not None:
-            auth_ctx_setter(token)
 
     @app.teardown_request
     def remove_before_flush_hook(*_):
@@ -74,30 +77,42 @@ def application(session_factory=None):
             logging.debug(f'Removing {hook_params = }')
             remove(*hook_params)
 
-    models = models_list()
 
-    # session_factory is now a wrapped factory which returns the same Session
-    # instance during each Flask request.
-    database_factory, session_factory = build_database_factory(session_factory, models)
+    board_models, _board_user_mixin = __get_board_models(Base)
 
-    # board_models, _board_user_mixin = __get_board_models(Base)
+    user_mixin = type(
+        '',
+        (system_models.UserMixin, _board_user_mixin),
+        {}
+    )
 
     # auth
     auth_bp = db_auth_blueprint(
         Base,
         os.environ['DB_URI'],
         url_prefix=os.environ['API_PATH'] + '/auth',
-        user_mixin_class=
+        oidc_id_target="email",
+        user_mixin_class=user_mixin
     )
+
     app.register_blueprint(auth_bp)
     auth_bp.register_authenticator(app)
 
-    # dashboards
-    # all_models = [
-    #     *tolqc_models,
+    excluded_models = {x for x in auth_bp.models if x != auth_bp.models.user_class}
+
+    models = models_list(excluded_models)
+
+    # models = [
+    #     *models,
     #     *board_models,
-    #     auth_bp.models.user_class,
+    #     auth_bp.models.user_class
     # ]
+
+
+
+    # session_factory is now a wrapped factory which returns the same Session
+    # instance during each Flask request.
+    database_factory, session_factory = build_database_factory(session_factory, models)
 
     # Tol QC endpoints
     tolqc_ds = create_sql_datasource(
@@ -110,7 +125,7 @@ def application(session_factory=None):
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds,
-        auth_inspector=basic_auth_inspector('registered'),
+        auth_inspector=create_auth_inspector(),
     )
     app.register_blueprint(
         blueprint_data_tolqc,

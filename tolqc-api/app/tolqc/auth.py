@@ -2,40 +2,48 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Callable
+from typing import Callable, Optional
 
-from tol.api_base.auth import require_auth
-from tol.api_base.misc.auth_context import CtxGetter, default_ctx_getter
+from tol.api_base.auth import require_auth, CompositeAuthInspector
+from tol.api_base.auth.error import ForbiddenError
+from tol.api_base.misc.auth_context import (
+    AuthContext, 
+    CtxGetter, 
+    default_ctx_getter
+)
 from tol.sql.session import SessionFactory
+from tol.core.operator import OperatorMethod
+
 
 # from tolqc.schema.system_models import Token, User
 
+require_editor = require_auth(role='editor')
 
-require_registered = require_auth(role='registered')
+def create_auth_inspector(
+    admin_role: str = 'admin',
+    ctx_getter: CtxGetter = default_ctx_getter
+) -> CompositeAuthInspector:
 
+    composite = CompositeAuthInspector(
+        admin_role=admin_role,
+        ctx_getter=ctx_getter
+    )
 
-# def create_auth_ctx_setter(
-#     session_factory: SessionFactory,
+    @composite.noauth
+    def __no_write_without_auth(
+        __object_type: str,
+        op: OperatorMethod,
+        **kwargs
+    ):
 
-#     ctx_getter: CtxGetter = default_ctx_getter,
-# ) -> Callable[[str], None]:
-#     """
-#     Given a `SessionFactory`, returns a callable that takes a token
-#     and sets the relevant `User` details on the auth context.
-#     """
+        __WRITE_METHODS = (  # noqa N806
+            OperatorMethod.DELETE,
+            OperatorMethod.INSERT,
+            OperatorMethod.UPDATE,
+            OperatorMethod.UPSERT,
+        )
 
-#     def set_auth_context(token: str) -> None:
+        if op in __WRITE_METHODS:
+            raise ForbiddenError()
 
-#         with session_factory() as sess:
-#             token_row = Token.get(sess, token)
-
-#             if token_row is None:
-#                 return
-
-#             user: User = token_row.user
-#             auth_ctx = ctx_getter()
-
-#             auth_ctx.user_id = user.id
-#             auth_ctx.roles = user.roles
-
-#     return set_auth_context
+    return composite

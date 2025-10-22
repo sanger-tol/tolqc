@@ -39,11 +39,26 @@ def upgrade() -> None:
             ['role.id'],
         ),
     )
+    for sql in [
+        """
+        UPDATE role
+        SET created_at = CURRENT_TIMESTAMP
+        WHERE created_at IS NULL
+        """
+        """
+        UPDATE role_binding
+        SET created_at = CURRENT_TIMESTAMP
+        WHERE created_at IS NULL
+        """
+    ]:
+        op.execute(sa.text(sql))
+
 
     # Update user table
     op.drop_constraint('user_email_key', 'user')
     op.alter_column('user', 'email', new_column_name='oidc_id')
     op.create_unique_constraint(None, 'user', ['oidc_id'])
+    op.drop_column('user', 'registered')
 
     # Update role table
     op.add_column('role', sa.Column('name', sa.String, unique=True, nullable=False))

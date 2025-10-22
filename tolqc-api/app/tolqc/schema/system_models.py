@@ -45,12 +45,6 @@ class UserMixin:
         return mapped_column()
 
     @declared_attr
-    def requests(self) -> Mapped[list['Request']]:  # noqa F821
-        return relationship(
-            back_populates='user'
-        )
-
-    @declared_attr
     def assigned_specimens(self) -> Mapped[list['Specimen']]:  # noqa F821
         return relationship(
             primaryjoin='User.id == Specimen.assigned_user_id',

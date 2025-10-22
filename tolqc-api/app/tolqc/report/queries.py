@@ -31,8 +31,8 @@ from tolqc.schema.sample_data_models import (
     Specimen,
     SpecimenStatus,
 )
-from tolqc.schema.system_models import User
 
+from tolqc.schema.base import class_by_name
 
 def pipeline_data_report_query(*_):
     return (
@@ -365,6 +365,9 @@ def metagenome_bin_report_query(*_):
 
 
 def specimen_status_report_query(req_args):
+
+    User = class_by_name('User')
+
     # Filters on the `data` table
     data_vals = req_args.pop_args('processed', 'qc', 'visibility')
 
@@ -551,7 +554,7 @@ def specimen_status_report_query(req_args):
             Specimen.accession_id,
             Species.umbrella_accession_id,
             Species.data_accession_id,
-            User.oidc_id,
+            User.email,
             specimen_pipeline.c.species_data,
             wospi_pipeline.c.specimen_data,
         )

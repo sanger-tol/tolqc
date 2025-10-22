@@ -13,26 +13,11 @@ import tolqc.schema.folder_models
 import tolqc.schema.metagenome_models
 import tolqc.schema.sample_data_models  # noqa: F401
 from tolqc.schema.base import Base
-from tol.sql import Model
 
 from tolqc.schema import system_models
 
-# def __get_board_models(
-#     base_model: Model
-# ) -> tuple[list[Model], Model]:
-#     board_models = create_board_models(base_model)
 
-#     return list(board_models), board_models._user_mixin
-
-def models_list():
-    board_models = create_board_models(Base)
-    create_models(Base)
-
-    user_mixin = type(
-        'User',
-        (system_models.UserMixin, board_models._user_mixin),
-        {}
-    )
+def models_list(excluded_models: set):
 
     """
     The call to `configure_mappers()` is triggered lazily by SQLAlchemy when
@@ -43,5 +28,4 @@ def models_list():
     """
     configure_mappers()
 
-    excluded_models = []
-    return tuple(x for m in Base.registry.mappers if (x := m.class_) not in excluded_models)
+    return tuple(m for m in Base.registry.mappers if (x := m.class_) not in excluded_models)

@@ -26,10 +26,12 @@ from tolqc.schema.sample_data_models import (
     Study,
     VisibilityDict,
 )
-from tolqc.schema.system_models import Token, User
-
+from tolqc.schema.base import class_by_name
 
 def test_data(token: str):
+    Token = class_by_name('Token')
+    User = class_by_name('User')
+
     return [
         User(id=100, email='tester@sanger.ac.uk', name='test-user', registered=True),
         Token(id=200, token=token, user_id=100),

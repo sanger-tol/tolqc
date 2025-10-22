@@ -5,11 +5,11 @@
 from flask import Blueprint, request
 
 from tol.api_base import custom_blueprint
-
-from tolqc.auth import require_registered
 from tolqc.marshal.dataset import load_dataset_stream
 from tolqc.marshal.seq_data import load_seq_data_stream
 from tolqc.marshal.status import load_status_stream
+
+from .auth import require_editor
 
 
 def loaders_blueprint(
@@ -19,7 +19,7 @@ def loaders_blueprint(
     ldr = custom_blueprint(name='loader', url_prefix=url_prefix)
 
     @ldr.route('/seq-data', methods=['POST'])
-    @require_registered
+    @require_editor
     def load_seq_data():
         session = session_factory()
         changes = load_seq_data_stream(session, request.stream)
@@ -29,7 +29,7 @@ def loaders_blueprint(
         return changes, 200, {'Content-Type': 'application/json'}
 
     @ldr.route('/dataset', methods=['POST'])
-    @require_registered
+    @require_editor
     def load_datasets():
         session = session_factory()
         results = load_dataset_stream(session, request.stream)
@@ -39,7 +39,7 @@ def loaders_blueprint(
         return results, 200, {'Content-Type': 'application/json'}
 
     @ldr.route('/status/<string:table>', methods=['POST'])
-    @require_registered
+    @require_editor
     def load_statuses(table):
         session = session_factory()
         results = load_status_stream(session, request.stream, table)
