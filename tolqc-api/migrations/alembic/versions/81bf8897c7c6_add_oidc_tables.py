@@ -39,31 +39,33 @@ def upgrade() -> None:
             ['role.id'],
         ),
     )
-    for sql in [
-        """
-        UPDATE role
-        SET created_at = CURRENT_TIMESTAMP
-        WHERE created_at IS NULL
-        """
-        """
-        UPDATE role_binding
-        SET created_at = CURRENT_TIMESTAMP
-        WHERE created_at IS NULL
-        """
-    ]:
-        op.execute(sa.text(sql))
-
-
-    # Update user table
-    op.drop_constraint('user_email_key', 'user')
-    op.alter_column('user', 'email', new_column_name='oidc_id')
-    op.create_unique_constraint(None, 'user', ['oidc_id'])
-    op.drop_column('user', 'registered')
 
     # Update role table
     op.add_column('role', sa.Column('name', sa.String, unique=True, nullable=False))
     op.drop_constraint('role_user_id_fkey', 'role')
     op.drop_column('role', 'user_id')
+    for sql in [
+        """
+        INSERT INTO role (id, role, name)  
+        VALUES(DEFAULT, null, 'registered')
+        """
+    ]:
+        op.execute(sa.text(sql))
+
+    # Populate 'registered' role from user table data
+    for sql in [
+        """
+        INSERT INTO role_binding (id, user_id, role_id)  
+        SELECT DEFAULT, id, (SELECT id FROM "role" as r WHERE name = 'registered') 
+        FROM "user" as u WHERE u.registered = 't';
+        """
+    ]:
+        op.execute(sa.text(sql))
+
+    # Update user table
+    op.drop_constraint('user_email_key', 'user')
+    op.alter_column('user', 'email', new_column_name='oidc_id')
+    op.create_unique_constraint(None, 'user', ['oidc_id'])
 
     # Update token table
     op.add_column('token', sa.Column('created_at', sa.DateTime, nullable=True))
@@ -86,6 +88,16 @@ def upgrade() -> None:
 
 def downgrade() -> None:
 
+    # Delete data added in upgrade
+    for sql in [
+        """
+        DELETE FROM role
+        WHERE name = 'registered';
+        """
+    ]:
+        op.execute(sa.text(sql))
+
+
     # Drop oidc_state table
     op.drop_table('oidc_state')
 
@@ -105,4 +117,3 @@ def downgrade() -> None:
     # Revert token table changes
     op.drop_column('token', 'created_at')
     op.drop_column('token', 'expires_at')
-    
