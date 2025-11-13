@@ -18,8 +18,7 @@ from tol.sql.database import DefaultDatabase
 
 from tolqc.flask import application
 from tolqc.schema import models_list
-from tolqc.schema.base import Base, update_logbase_closure
-from tolqc.schema.system_models import Token, User
+from tolqc.schema.base import Base, update_logbase_closure, class_by_name
 
 from werkzeug.datastructures import Headers
 
@@ -122,14 +121,16 @@ def flask_app(database_factory_and_session):
 
 @pytest.fixture
 def logbase_db_session(session_factory, token):
+    token_class = class_by_name('Token')
+    user_class = class_by_name('User')
     with session_factory() as ssn:
         user_id = ssn.scalar(
-            select(User.id)
-            .join(Token)
+            select(user_class.id)
+            .join(token_class)
             .where(
                 and_(
-                    User.registered == True,  # noqa: E712
-                    Token.token == token,
+                    user_class.registered == True,  # noqa: E712
+                    token_class.token == token,
                 )
             )
         )

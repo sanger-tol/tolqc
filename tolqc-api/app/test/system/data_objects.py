@@ -30,12 +30,12 @@ from tolqc.schema.sample_data_models import (
 
 
 def test_data(token: str):
-    Token = class_by_name('Token')
-    User = class_by_name('User')
+    token_class = class_by_name('Token')
+    user_class = class_by_name('User')
 
     return [
-        User(id=100, email='tester@sanger.ac.uk', name='test-user', registered=True),
-        Token(id=200, token=token, user_id=100),
+        user_class(id=100, email='tester@sanger.ac.uk', name='test-user', registered=True),
+        token_class(id=200, token=token, user_id=100),
         AccessionTypeDict(
             accession_type_id='GenBank Genome Assembly',
             regexp='^GCA_\\d+\\.\\d+$',
