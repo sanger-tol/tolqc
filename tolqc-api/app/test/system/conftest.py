@@ -18,7 +18,7 @@ from tol.sql.database import DefaultDatabase
 
 from tolqc.flask import application
 from tolqc.schema import models_list
-from tolqc.schema.base import Base, update_logbase_closure, class_by_name
+from tolqc.schema.base import Base, class_by_name, update_logbase_closure
 
 from werkzeug.datastructures import Headers
 
