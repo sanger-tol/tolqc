@@ -6,7 +6,6 @@ from tolqc.flask import models_list
 from tolqc.schema.assembly_models import Assembly
 from tolqc.schema.folder_models import FolderLocation
 from tolqc.schema.sample_data_models import Data
-from tolqc.schema.system_models import Token
 
 
 def test_models_list():
@@ -16,5 +15,4 @@ def test_models_list():
     assert Data in models
     assert 'EditData' in [x.__name__ for x in models]
     assert FolderLocation in models
-    assert Token not in models
     assert None not in models

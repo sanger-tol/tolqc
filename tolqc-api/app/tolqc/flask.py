@@ -102,14 +102,6 @@ def application(session_factory=None):
 
     models = models_list(excluded_models)
 
-    # models = [
-    #     *models,
-    #     *board_models,
-    #     auth_bp.models.user_class
-    # ]
-
-
-
     # session_factory is now a wrapped factory which returns the same Session
     # instance during each Flask request.
     database_factory, session_factory = build_database_factory(session_factory, models)

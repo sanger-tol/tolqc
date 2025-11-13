@@ -28,4 +28,4 @@ def models_list(excluded_models: set):
     """
     configure_mappers()
 
-    return tuple(m for m in Base.registry.mappers if (x := m.class_) not in excluded_models)
+    return tuple(x for m in Base.registry.mappers if (x := m.class_) not in excluded_models)
