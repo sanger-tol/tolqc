@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 from tolqc.schema.accession_models import Accession, AccessionTypeDict
+from tolqc.schema.base import class_by_name
 from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
     Allocation,
@@ -26,7 +27,7 @@ from tolqc.schema.sample_data_models import (
     Study,
     VisibilityDict,
 )
-from tolqc.schema.base import class_by_name
+
 
 def test_data(token: str):
     Token = class_by_name('Token')

@@ -4,17 +4,7 @@
 
 from sqlalchemy.orm import configure_mappers
 
-from tol.sql.board import create_board_models
-from tol.sql.auth.models import create_models
-
-import tolqc.schema.accession_models
-import tolqc.schema.assembly_models
-import tolqc.schema.folder_models
-import tolqc.schema.metagenome_models
-import tolqc.schema.sample_data_models  # noqa: F401
 from tolqc.schema.base import Base
-
-from tolqc.schema import system_models
 
 
 def models_list(excluded_models: set):

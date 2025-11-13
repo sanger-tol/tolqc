@@ -5,14 +5,12 @@
 import logging
 import os
 
-from flask import Flask, request
+from flask import Flask
 
 from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
-from sqlalchemy.orm import configure_mappers
 
 from tol.api_base import data_blueprint, system_blueprint
-from tol.api_base.auth import basic_auth_inspector
 from tol.board import board_blueprint
 from tol.core import core_data_object
 from tol.sql import Model, create_sql_datasource
@@ -25,11 +23,12 @@ from tolqc.database import build_database_factory, flask_session, logbase_hook_p
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
-from tolqc.schema import models_list, Base, system_models
+from tolqc.schema import Base, models_list, system_models
+
+from werkzeug.exceptions import BadRequest
 
 from .auth import create_auth_inspector
 
-from werkzeug.exceptions import BadRequest
 
 def __get_board_models(
     base_model: Model
@@ -59,8 +58,6 @@ def application(session_factory=None):
     if not session_factory:
         session_factory = create_session_factory(db_uri)
 
-
-
     @app.teardown_request
     def remove_before_flush_hook(*_):
         if ssn := flask_session():
@@ -77,7 +74,6 @@ def application(session_factory=None):
             logging.debug(f'Removing {hook_params = }')
             remove(*hook_params)
 
-
     board_models, _board_user_mixin = __get_board_models(Base)
 
     user_mixin = type(
@@ -91,7 +87,7 @@ def application(session_factory=None):
         Base,
         os.environ['DB_URI'],
         url_prefix=os.environ['API_PATH'] + '/auth',
-        oidc_id_target="email",
+        oidc_id_target='email',
         user_mixin_class=user_mixin
     )
 

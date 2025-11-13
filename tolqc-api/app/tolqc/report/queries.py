@@ -9,6 +9,7 @@ from tolqc.report.bundles import (
     LastPathElementBundle,
     StarPathBundle,
 )
+from tolqc.schema.base import class_by_name
 from tolqc.schema.metagenome_models import (
     Metagenome,
     MetagenomeBin,
@@ -32,7 +33,6 @@ from tolqc.schema.sample_data_models import (
     SpecimenStatus,
 )
 
-from tolqc.schema.base import class_by_name
 
 def pipeline_data_report_query(*_):
     return (

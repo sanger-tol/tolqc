@@ -7,16 +7,14 @@ from __future__ import annotations
 from sqlalchemy import (
     DateTime,
     Float,
-    ForeignKey,
     Integer,
     String,
 )
-
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, Session, mapped_column, relationship, declared_attr
+from sqlalchemy.orm import Mapped, declared_attr, mapped_column, relationship
 
 
-from .base import Base, LogBase
+from .base import LogBase
 
 
 class Metadata(LogBase):
@@ -34,6 +32,7 @@ class Metadata(LogBase):
     float_value = mapped_column(Float)
     json_value = mapped_column(JSONB)
 
+
 class UserMixin:
 
     @declared_attr
@@ -50,7 +49,7 @@ class UserMixin:
             primaryjoin='User.id == Specimen.assigned_user_id',
             back_populates='assignee'
         )
-    
+
     @declared_attr
     def assigned_assemblies(self) -> Mapped[list['Assembly']]:  # noqa F821
         return relationship(

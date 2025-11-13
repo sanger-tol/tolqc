@@ -2,22 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Callable, Optional
-
-from tol.api_base.auth import require_auth, CompositeAuthInspector
+from tol.api_base.auth import CompositeAuthInspector, require_auth
 from tol.api_base.auth.error import ForbiddenError
 from tol.api_base.misc.auth_context import (
-    AuthContext, 
-    CtxGetter, 
+    CtxGetter,
     default_ctx_getter
 )
-from tol.sql.session import SessionFactory
 from tol.core.operator import OperatorMethod
 
-
-# from tolqc.schema.system_models import Token, User
-
 require_editor = require_auth(role='editor')
+
 
 def create_auth_inspector(
     admin_role: str = 'admin',
