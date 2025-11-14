@@ -4,6 +4,7 @@
 
 import logging
 import os
+from datetime import timedelta
 
 from flask import Flask
 
@@ -11,11 +12,11 @@ from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
 
 from tol.api_base import data_blueprint, system_blueprint
+from tol.api_base.auth import env_oidc_config
 from tol.board import board_blueprint
 from tol.core import core_data_object
-from tol.sql import Model, create_sql_datasource
-from tol.sql.auth import db_auth_blueprint
-from tol.sql.board import create_board_models
+from tol.sql import create_sql_datasource
+from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
 # from tolqc.auth import create_auth_ctx_setter
@@ -23,19 +24,10 @@ from tolqc.database import build_database_factory, flask_session, logbase_hook_p
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
-from tolqc.schema import Base, models_list, system_models
+from tolqc.schema import auth_models, models_list
 
 from werkzeug.exceptions import BadRequest
-
 from .auth import create_auth_inspector
-
-
-def __get_board_models(
-    base_model: Model
-) -> tuple[list[Model], Model]:
-    board_models = create_board_models(base_model)
-
-    return list(board_models), board_models._user_mixin
 
 
 def application(session_factory=None):
@@ -43,6 +35,7 @@ def application(session_factory=None):
     The `session_factory` and `database_factory` arguments are used during
     testing.
     """
+    models = models_list()
 
     app = Flask(__name__)
     app.json = JSONDateTimeProvider(app)
@@ -74,29 +67,24 @@ def application(session_factory=None):
             logging.debug(f'Removing {hook_params = }')
             remove(*hook_params)
 
-    board_models, _board_user_mixin = __get_board_models(Base)
-
-    user_mixin = type(
-        '',
-        (system_models.UserMixin, _board_user_mixin),
-        {}
-    )
-
     # auth
-    auth_bp = db_auth_blueprint(
-        Base,
-        os.environ['DB_URI'],
-        url_prefix=os.environ['API_PATH'] + '/auth',
+    auth_manager = DbAuthManager(
+        oidc_config=env_oidc_config(),
+        session_factory=session_factory,
+        model_tuple=auth_models,
+        state_delete_delta=timedelta(hours=1),
         oidc_id_target='email',
-        user_mixin_class=user_mixin
+        oidc_ext_mapping={},
+        authorisation_manager=None,
+    )
+    auth_bp = DbAuthBlueprint(
+        auth_manager,
+        api_path + '/auth',
+        auth_models,
     )
 
     app.register_blueprint(auth_bp)
     auth_bp.register_authenticator(app)
-
-    excluded_models = {x for x in auth_bp.models if x != auth_bp.models.user_class}
-
-    models = models_list(excluded_models)
 
     # session_factory is now a wrapped factory which returns the same Session
     # instance during each Flask request.
@@ -149,13 +137,13 @@ def application(session_factory=None):
     app.register_blueprint(
         boards_bp,
         name='custom_boards',
-        url_prefix=os.environ['API_PATH'] + '/boards'
+        url_prefix=api_path + '/boards',
     )
     blueprint_board_data = data_blueprint(tolqc_ds)
     app.register_blueprint(
         blueprint_board_data,
         name='boards',
-        url_prefix=os.getenv('API_PATH') + '/boards'
+        url_prefix=api_path + '/boards',
     )
 
     @app.errorhandler(BadRequest)

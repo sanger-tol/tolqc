@@ -31,10 +31,6 @@ from tol.sql import model_base
 Base = model_base()
 
 
-def class_by_name(name):
-    return next(x.class_ for x in Base.registry.mappers if x.class_.__name__ == name)
-
-
 class ModificationBase(Base):
     """
     Classes which contain a `modified_at` and `modified_by` column.

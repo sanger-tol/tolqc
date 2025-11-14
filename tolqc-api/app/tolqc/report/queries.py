@@ -9,7 +9,7 @@ from tolqc.report.bundles import (
     LastPathElementBundle,
     StarPathBundle,
 )
-from tolqc.schema.base import class_by_name
+from tolqc.schema import User
 from tolqc.schema.metagenome_models import (
     Metagenome,
     MetagenomeBin,
@@ -366,8 +366,6 @@ def metagenome_bin_report_query(*_):
 
 def specimen_status_report_query(req_args):
 
-    user_class = class_by_name('User')
-
     # Filters on the `data` table
     data_vals = req_args.pop_args('processed', 'qc', 'visibility')
 
@@ -512,7 +510,7 @@ def specimen_status_report_query(req_args):
             Specimen.accession_id.label('biospecimen'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Species.data_accession_id.label('data_bioproject'),
-            func.split_part(user_class.email, '@sanger.ac.uk', 1).label('assignee'),
+            func.split_part(User.email, '@sanger.ac.uk', 1).label('assignee'),
             func.coalesce(
                 # Will be able to use any_value() aggregate function and
                 # remove these columns from the GROUP BY once the server is
@@ -554,7 +552,7 @@ def specimen_status_report_query(req_args):
             Specimen.accession_id,
             Species.umbrella_accession_id,
             Species.data_accession_id,
-            user_class.email,
+            User.email,
             specimen_pipeline.c.species_data,
             wospi_pipeline.c.specimen_data,
         )
@@ -572,7 +570,7 @@ def specimen_status_report_query(req_args):
         assignee = assignee_arg['assignee']
         if assignee is not None and '@' not in assignee:
             assignee = assignee + '@sanger.ac.uk'
-        query = query.where(user_class.email == assignee)
+        query = query.where(User.email == assignee)
 
     return query
 

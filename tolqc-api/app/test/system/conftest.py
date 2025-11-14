@@ -17,8 +17,8 @@ from sqlalchemy.orm import configure_mappers, sessionmaker
 from tol.sql.database import DefaultDatabase
 
 from tolqc.flask import application
-from tolqc.schema import models_list
-from tolqc.schema.base import Base, class_by_name, update_logbase_closure
+from tolqc.schema import Token, User, models_list
+from tolqc.schema.base import Base, update_logbase_closure
 
 from werkzeug.datastructures import Headers
 
@@ -121,16 +121,14 @@ def flask_app(database_factory_and_session):
 
 @pytest.fixture
 def logbase_db_session(session_factory, token):
-    token_class = class_by_name('Token')
-    user_class = class_by_name('User')
     with session_factory() as ssn:
         user_id = ssn.scalar(
-            select(user_class.id)
-            .join(token_class)
+            select(User.id)
+            .join(Token)
             .where(
                 and_(
-                    user_class.registered == True,  # noqa: E712
-                    token_class.token == token,
+                    User.registered == True,  # noqa: E712
+                    Token.token == token,
                 )
             )
         )

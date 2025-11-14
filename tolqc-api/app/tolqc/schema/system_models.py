@@ -13,8 +13,9 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, declared_attr, mapped_column, relationship
 
-
-from .base import LogBase
+from tolqc.schema.assembly_models import Assembly
+from tolqc.schema.base import LogBase
+from tolqc.schema.sample_data_models import Specimen
 
 
 class Metadata(LogBase):
@@ -32,9 +33,7 @@ class Metadata(LogBase):
     float_value = mapped_column(Float)
     json_value = mapped_column(JSONB)
 
-
 class UserMixin:
-
     @declared_attr
     def name(self) -> Mapped[str]:
         return mapped_column()
@@ -44,17 +43,17 @@ class UserMixin:
         return mapped_column()
 
     @declared_attr
-    def assigned_specimens(self) -> Mapped[list['Specimen']]:  # noqa F821
+    def assigned_specimens(self) -> Mapped[list[Specimen]]:
         return relationship(
             primaryjoin='User.id == Specimen.assigned_user_id',
-            back_populates='assignee'
+            back_populates='assignee',
         )
 
     @declared_attr
-    def assigned_assemblies(self) -> Mapped[list['Assembly']]:  # noqa F821
+    def assigned_assemblies(self) -> Mapped[list[Assembly]]:
         return relationship(
             primaryjoin='User.id == Assembly.assigned_user_id',
-            back_populates='assignee'
+            back_populates='assignee',
         )
 
     def get_userinfo_ext(self) -> dict[str, str]:
@@ -62,6 +61,4 @@ class UserMixin:
         Augments the data on `/api/v2/auth/profile`
         """
 
-        return {
-            'name': self.name
-        }
+        return {'name': self.name}
