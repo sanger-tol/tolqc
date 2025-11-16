@@ -27,6 +27,7 @@ from tolqc.reports import reports_blueprint
 from tolqc.schema import auth_models, models_list
 
 from werkzeug.exceptions import BadRequest
+
 from .auth import create_auth_inspector
 
 

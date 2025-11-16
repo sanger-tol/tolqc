@@ -33,6 +33,7 @@ class Metadata(LogBase):
     float_value = mapped_column(Float)
     json_value = mapped_column(JSONB)
 
+
 class UserMixin:
     @declared_attr
     def name(self) -> Mapped[str]:

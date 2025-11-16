@@ -14,8 +14,9 @@ import tolqc.schema.assembly_models
 import tolqc.schema.folder_models
 import tolqc.schema.metagenome_models
 import tolqc.schema.sample_data_models  # noqa: F401
-from tolqc.schema.system_models import UserMixin
 from tolqc.schema.base import Base
+from tolqc.schema.system_models import UserMixin
+
 
 board_models = create_board_models(Base)
 auth_models = create_models(
