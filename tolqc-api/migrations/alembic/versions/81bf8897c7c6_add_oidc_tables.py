@@ -1,63 +1,73 @@
-"""update_user_table
+"""Tables for new authorisation system
 
 Revision ID: 81bf8897c7c6
-Revises: c8babd30b9f1
-Create Date: 2025-10-13 13:04:28.183333
+Revises: 403ee1086294
+Create Date: 2025-11-17 13:35:58.697694
 
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '81bf8897c7c6'
-down_revision = 'c8babd30b9f1'
+down_revision = '403ee1086294'
 branch_labels = None
 depends_on = None
 
 
 def upgrade() -> None:
+    # Legacy tables which may exist
+    op.drop_table('auth', if_exists=True)
+    op.drop_table('role', if_exists=True)
+    op.drop_table('state', if_exists=True)
 
     # Create oidc_state table
     op.create_table(
         'oidc_state',
-        sa.Column('id', sa.String, primary_key=True),
-        sa.Column('created_at', sa.DateTime, nullable=False),
+        sa.Column('id', sa.String(), nullable=False),
+        sa.Column('created_at', sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint('id'),
     )
+
+    # Create the role table
+    op.create_table(
+        'role',
+        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('name'),
+    )
+
     # Create role_binding table
     op.create_table(
         'role_binding',
-        sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column('user_id', sa.Integer, nullable=False),
-        sa.Column('role_id', sa.Integer, nullable=False),
+        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column('user_id', sa.Integer(), nullable=False),
+        sa.Column('role_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ('user_id',),
-            ['user.id'],
-        ),
-        sa.ForeignKeyConstraint(
-            ('role_id',),
+            ['role_id'],
             ['role.id'],
         ),
+        sa.ForeignKeyConstraint(
+            ['user_id'],
+            ['user.id'],
+        ),
+        sa.PrimaryKeyConstraint('id'),
     )
 
-    # Update role table
-    op.add_column('role', sa.Column('name', sa.String, unique=True, nullable=False))
-    op.drop_constraint('role_user_id_fkey', 'role')
-    op.drop_column('role', 'user_id')
     for sql in [
         """
-        INSERT INTO role (id, role, name)  
-        VALUES(DEFAULT, null, 'registered')
+        INSERT INTO role (name)
+        VALUES ('editor')
+        """,
+        # Populate 'editor' role from users who are 'registered'
         """
-    ]:
-        op.execute(sa.text(sql))
-
-    # Populate 'registered' role from user table data
-    for sql in [
-        """
-        INSERT INTO role_binding (id, user_id, role_id)  
-        SELECT DEFAULT, id, (SELECT id FROM "role" as r WHERE name = 'registered') 
-        FROM "user" as u WHERE u.registered = 't';
+        INSERT INTO role_binding (user_id, role_id)
+        SELECT u.id, r.id
+        FROM "user" AS u
+        JOIN role AS r
+          ON r.name = 'editor'
+        WHERE u.registered = 't'
         """
     ]:
         op.execute(sa.text(sql))
@@ -66,6 +76,7 @@ def upgrade() -> None:
     op.drop_constraint('user_email_key', 'user')
     op.alter_column('user', 'email', new_column_name='oidc_id')
     op.create_unique_constraint(None, 'user', ['oidc_id'])
+    op.drop_column('user', 'registered')
 
     # Update token table
     op.add_column('token', sa.Column('created_at', sa.DateTime, nullable=True))
@@ -87,33 +98,4 @@ def upgrade() -> None:
     op.alter_column('token', 'expires_at', nullable=False)
 
 def downgrade() -> None:
-
-    # Delete data added in upgrade
-    for sql in [
-        """
-        DELETE FROM role
-        WHERE name = 'registered';
-        """
-    ]:
-        op.execute(sa.text(sql))
-
-
-    # Drop oidc_state table
-    op.drop_table('oidc_state')
-
-    # Drop role_binding table
-    op.drop_table('role_binding')
-
-    # Revert user table changes
-    op.drop_constraint('user_oidc_id_key', table_name='user')
-    op.alter_column('user', 'oidc_id', new_column_name='email')
-    op.create_unique_constraint(None, 'user', ['email'])
-
-    # Revert role table changes
-    op.drop_column('role', 'name')
-    op.add_column('role', sa.Column('user_id', sa.Integer, nullable=True))
-    op.create_foreign_key('role_user_id_fkey', 'role', 'user', ['user_id'], ['id'])
-
-    # Revert token table changes
-    op.drop_column('token', 'created_at')
-    op.drop_column('token', 'expires_at')
+    pass

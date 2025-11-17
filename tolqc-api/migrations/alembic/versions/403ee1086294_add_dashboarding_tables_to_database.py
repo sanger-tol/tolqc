@@ -1,10 +1,11 @@
 """add_dashboarding_tables_to_database
 
 Revision ID: 403ee1086294
-Revises: 81bf8897c7c6
+Revises: c8babd30b9f1
 Create Date: 2025-10-13 13:08:39.428033
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import JSONB
@@ -12,7 +13,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 # revision identifiers, used by Alembic.
 revision = '403ee1086294'
-down_revision = '81bf8897c7c6'
+down_revision = 'c8babd30b9f1'
 branch_labels = None
 depends_on = None
 
@@ -24,12 +25,13 @@ def upgrade():
         sa.Column('id', sa.String, primary_key=True),
         sa.Column('title', sa.String, nullable=False),
         sa.Column('object_type', sa.String, nullable=False),
-        sa.Column('base_url', sa.String, nullable=True),
+        sa.Column('datasource', JSONB(astext_type=sa.Text()), server_default='{}', nullable=False),
         sa.Column('component_type', sa.String, nullable=False),
         sa.Column('widget_type', sa.String, nullable=False),
         sa.Column('config', JSONB, nullable=False),
         sa.Column('filter', JSONB, nullable=False, default={}, server_default='{}'),
-        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False)
+        sa.Column('filter_pass_through', sa.Boolean(), nullable=False),
+        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False),
     )
 
     # Create table `zone`
@@ -38,9 +40,9 @@ def upgrade():
         sa.Column('id', sa.String, primary_key=True),
         sa.Column('title', sa.String, nullable=False),
         sa.Column('object_type', sa.String, nullable=False),
-        sa.Column('base_url', sa.String, nullable=True),
+        sa.Column('datasource', JSONB(astext_type=sa.Text()), server_default='{}', nullable=False),
         sa.Column('filter', JSONB, nullable=False, default={}, server_default='{}'),
-        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False)
+        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False),
     )
 
     # Create table `view`
@@ -49,7 +51,7 @@ def upgrade():
         sa.Column('id', sa.String, primary_key=True),
         sa.Column('title', sa.String, nullable=False),
         sa.Column('filter', JSONB, nullable=False, default={}, server_default='{}'),
-        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False)
+        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False),
     )
 
     # Create table `board`
@@ -58,7 +60,7 @@ def upgrade():
         sa.Column('id', sa.String, primary_key=True),
         sa.Column('title', sa.String, nullable=False),
         sa.Column('filter', JSONB, nullable=False, default={}, server_default='{}'),
-        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False)
+        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False),
     )
 
     # Create table `component_zone`
@@ -67,7 +69,7 @@ def upgrade():
         sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('order', sa.Integer, nullable=False),
         sa.Column('component_id', sa.String, sa.ForeignKey('component.id'), nullable=False),
-        sa.Column('zone_id', sa.String, sa.ForeignKey('zone.id'), nullable=False)
+        sa.Column('zone_id', sa.String, sa.ForeignKey('zone.id'), nullable=False),
     )
 
     # Create table `zone_view`
@@ -76,7 +78,7 @@ def upgrade():
         sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('order', sa.Integer, nullable=False),
         sa.Column('zone_id', sa.String, sa.ForeignKey('zone.id'), nullable=False),
-        sa.Column('view_id', sa.String, sa.ForeignKey('view.id'), nullable=False)
+        sa.Column('view_id', sa.String, sa.ForeignKey('view.id'), nullable=False),
     )
 
     # Create table `view_board`
@@ -85,24 +87,24 @@ def upgrade():
         sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('order', sa.Integer, nullable=False),
         sa.Column('view_id', sa.String, sa.ForeignKey('view.id'), nullable=False),
-        sa.Column('board_id', sa.String, sa.ForeignKey('board.id'), nullable=False)
+        sa.Column('board_id', sa.String, sa.ForeignKey('board.id'), nullable=False),
     )
 
     # add order uniqueness constraints
     op.create_unique_constraint(
         None,
         'component_zone',
-        ['zone_id', 'order']
+        ['zone_id', 'order'],
     )
     op.create_unique_constraint(
         None,
         'zone_view',
-        ['view_id', 'order']
+        ['view_id', 'order'],
     )
     op.create_unique_constraint(
         None,
         'view_board',
-        ['board_id', 'order']
+        ['board_id', 'order'],
     )
 
 
