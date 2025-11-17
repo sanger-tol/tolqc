@@ -55,7 +55,20 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
     )
 
+    # Update user table
+    op.add_column('user', sa.Column('full_name', sa.String(), nullable=True))
+    op.create_unique_constraint(None, 'user', ['name'])
     for sql in [
+        """
+        UPDATE "user" SET full_name = name WHERE full_name IS NULL
+        """,
+        """
+        UPDATE "user" SET name = split_part(email, '@sanger.ac.uk', 1)
+        """,
+        r"""
+        UPDATE "user" SET organisation = 'Wellcome Sanger Institute'
+        WHERE email ~ '@sanger\.ac\.uk$'
+        """,
         """
         INSERT INTO role (name)
         VALUES ('editor')
@@ -72,10 +85,6 @@ def upgrade() -> None:
     ]:
         op.execute(sa.text(sql))
 
-    # Update user table
-    op.drop_constraint('user_email_key', 'user')
-    op.alter_column('user', 'email', new_column_name='oidc_id')
-    op.create_unique_constraint(None, 'user', ['oidc_id'])
     op.drop_column('user', 'registered')
 
     # Update token table

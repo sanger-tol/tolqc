@@ -22,7 +22,7 @@ board_models = create_board_models(Base)
 auth_models = create_models(
     model_base=Base,
     user_table_name='user',
-    oidc_id_column_name='oidc_id',
+    oidc_id_column_name='email',
     user_mixin_class=type(
         'ToLQCBoardUserMixin',
         (
@@ -37,8 +37,10 @@ auth_models = create_models(
     token_expiry_delta=timedelta(days=7),
     prefix_with_name=False,
 )
-User = auth_models.user_class
+Role = auth_models.role_class
+RoleBinding = auth_models.role_binding_class
 Token = auth_models.token_class
+User = auth_models.user_class
 
 
 def models_list():

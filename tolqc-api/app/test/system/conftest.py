@@ -17,7 +17,7 @@ from sqlalchemy.orm import configure_mappers, sessionmaker
 from tol.sql.database import DefaultDatabase
 
 from tolqc.flask import application
-from tolqc.schema import Token, User, models_list
+from tolqc.schema import Role, RoleBinding, Token, User, models_list
 from tolqc.schema.base import Base, update_logbase_closure
 
 from werkzeug.datastructures import Headers
@@ -125,9 +125,11 @@ def logbase_db_session(session_factory, token):
         user_id = ssn.scalar(
             select(User.id)
             .join(Token)
+            .join(RoleBinding)
+            .join(Role)
             .where(
                 and_(
-                    User.registered == True,  # noqa: E712
+                    Role.name == 'editor',
                     Token.token == token,
                 )
             )

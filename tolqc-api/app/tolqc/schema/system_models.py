@@ -37,11 +37,15 @@ class Metadata(LogBase):
 class UserMixin:
     @declared_attr
     def name(self) -> Mapped[str]:
-        return mapped_column()
+        return mapped_column(unique=True)
+
+    @declared_attr
+    def full_name(self) -> Mapped[str]:
+        return mapped_column(nullable=True)
 
     @declared_attr
     def organisation(self) -> Mapped[str]:
-        return mapped_column()
+        return mapped_column(nullable=True)
 
     @declared_attr
     def assigned_specimens(self) -> Mapped[list[Specimen]]:
@@ -62,4 +66,8 @@ class UserMixin:
         Augments the data on `/api/v2/auth/profile`
         """
 
-        return {'name': self.name}
+        return {
+            'name': self.name,
+            'full_name': self.full_name,
+            'organisation': self.organisation,
+        }

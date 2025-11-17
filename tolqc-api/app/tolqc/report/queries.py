@@ -510,7 +510,7 @@ def specimen_status_report_query(req_args):
             Specimen.accession_id.label('biospecimen'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Species.data_accession_id.label('data_bioproject'),
-            func.split_part(User.email, '@sanger.ac.uk', 1).label('assignee'),
+            User.name.label('assignee'),
             func.coalesce(
                 # Will be able to use any_value() aggregate function and
                 # remove these columns from the GROUP BY once the server is
@@ -552,7 +552,7 @@ def specimen_status_report_query(req_args):
             Specimen.accession_id,
             Species.umbrella_accession_id,
             Species.data_accession_id,
-            User.email,
+            User.name,
             specimen_pipeline.c.species_data,
             wospi_pipeline.c.specimen_data,
         )
@@ -568,9 +568,7 @@ def specimen_status_report_query(req_args):
         query = query.where(Allocation.project_id == project_arg['project'])
     if 'assignee' in assignee_arg:
         assignee = assignee_arg['assignee']
-        if assignee is not None and '@' not in assignee:
-            assignee = assignee + '@sanger.ac.uk'
-        query = query.where(User.email == assignee)
+        query = query.where(User.name == assignee)
 
     return query
 
