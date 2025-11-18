@@ -19,19 +19,72 @@ depends_on = None
 
 
 def upgrade():
+    # Create `data_source_config` table (needed for the `data_source_instance` table)
+    op.create_table(
+        'data_source_config',
+        sa.Column('id', sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.Column('description', sa.String(), nullable=False),
+    )
+
+    # Create `data_source_config_attribute` table (needed for the `data_source_instance` table)
+    op.create_table(
+        'data_source_config_attribute',
+        sa.Column('id', sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column('data_source_config_id', sa.Integer(), sa.ForeignKey('data_source_config.id'), nullable=False),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.Column('object_type', sa.String(), nullable=False),
+        sa.Column('display_name', sa.String(), nullable=True),
+        sa.Column('description', sa.String(), nullable=True),
+        sa.Column('available_on_relationships', sa.Boolean(), nullable=False, server_default=sa.text('true')),
+        sa.Column('is_authoritative', sa.Boolean(), nullable=False, server_default=sa.text('false')),
+        sa.Column('source', sa.String(), nullable=True),
+        sa.Column('runtime_definition', JSONB(astext_type=sa.Text()), nullable=True),
+    )
+
+    # Create `data_source_config_relationship` table (needed for the `data_source_instance` table)
+    op.create_table(
+        'data_source_config_relationship',
+        sa.Column('id', sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column('object_type', sa.String(), nullable=False),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.Column('foreign_object_type', sa.String(), nullable=False),
+        sa.Column('foreign_name', sa.String(), nullable=False),
+        sa.Column('data_source_config_id', sa.Integer(), sa.ForeignKey('data_source_config.id'), nullable=False),
+    )
+
+    # Create `data_source_instance` table
+    op.create_table(
+        'data_source_instance',
+        sa.Column('id', sa.String(), primary_key=True),
+        sa.Column('builtin_name', sa.String(), nullable=False),
+        sa.Column('kwargs', JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column('publish', sa.Boolean(), nullable=False, server_default=sa.text('false')),
+        sa.Column('data_source_config_id', sa.Integer(), sa.ForeignKey('data_source_config.id'), nullable=True),
+        sa.Column('ui_api_details', JSONB, nullable=True)
+    )
+
+    op.execute(
+        sa.text("""
+        INSERT INTO data_source_instance (id, builtin_name, kwargs, publish, data_source_config_id, ui_api_details)
+        VALUES ('tolqc', 'tolqc', '{}', 'true', NULL, '{"url": "https://qc.tol.sanger.ac.uk", "apiPath": "/api/v1", "apiDataPath": "", "dataspace": ""}')
+        """)
+    )
+
+
     # Create table `component`
     op.create_table(
         'component',
         sa.Column('id', sa.String, primary_key=True),
         sa.Column('title', sa.String, nullable=False),
         sa.Column('object_type', sa.String, nullable=False),
-        sa.Column('datasource', JSONB(astext_type=sa.Text()), server_default='{}', nullable=False),
+        sa.Column('data_source_instance_id', sa.String(), sa.ForeignKey('data_source_instance.id'), nullable=False),
         sa.Column('component_type', sa.String, nullable=False),
         sa.Column('widget_type', sa.String, nullable=False),
         sa.Column('config', JSONB, nullable=False),
         sa.Column('filter', JSONB, nullable=False, default={}, server_default='{}'),
         sa.Column('filter_pass_through', sa.Boolean(), nullable=False),
-        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False),
+        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False)
     )
 
     # Create table `zone`
@@ -40,7 +93,7 @@ def upgrade():
         sa.Column('id', sa.String, primary_key=True),
         sa.Column('title', sa.String, nullable=False),
         sa.Column('object_type', sa.String, nullable=False),
-        sa.Column('datasource', JSONB(astext_type=sa.Text()), server_default='{}', nullable=False),
+        sa.Column('data_source_instance_id', sa.String(), sa.ForeignKey('data_source_instance.id'), nullable=False),
         sa.Column('filter', JSONB, nullable=False, default={}, server_default='{}'),
         sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), nullable=False),
     )

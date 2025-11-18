@@ -7,7 +7,7 @@ from datetime import timedelta
 from sqlalchemy.orm import configure_mappers
 
 from tol.sql.auth.models import create_models
-from tol.sql.board import create_board_models
+from tol.sql.standard import create_standard_models
 
 import tolqc.schema.accession_models
 import tolqc.schema.assembly_models
@@ -18,7 +18,7 @@ from tolqc.schema.base import Base
 from tolqc.schema.system_models import UserMixin
 
 
-board_models = create_board_models(Base)
+standard_models = create_standard_models(Base)
 auth_models = create_models(
     model_base=Base,
     user_table_name='user',
@@ -27,7 +27,7 @@ auth_models = create_models(
         'ToLQCBoardUserMixin',
         (
             UserMixin,
-            board_models._user_mixin,
+            standard_models._user_mixin,
         ),
         {},
     ),
