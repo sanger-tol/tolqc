@@ -47,7 +47,7 @@ export default defineConfig({
     https: httpsConfig, // Apply the HTTPS configuration conditionally
     proxy: {
       "/api": {
-        target: "http://tol-qc-api:80",
+        target: "http://tolqc-api:80",
         secure: false,
         changeOrigin: true,
         ws: true,
