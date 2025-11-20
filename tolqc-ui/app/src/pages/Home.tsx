@@ -4,7 +4,15 @@ SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import { RemoteTable, Widgets, Button, Row, Col} from '@tol/tol-ui'
+import { 
+  RemoteTable, 
+  Widgets, 
+  Button, 
+  Row, 
+  Col
+} from '@tol/tol-ui';
+import { ELASTIC_DS } from '..';
+
 
 const button = (
 	<Button
@@ -30,32 +38,30 @@ const intro = (
 	</Row>
 )
 
-const dataTable = (
-  <RemoteTable
-		id="data-home-table-v2"
-    endpoint="data"
-    height={500}
-    fields={{
-      "id": {
-        rename: "ID"
-      },
-      "date": {
-        rename: "Date"
-      },
-      "name": {
-        rename: "Name"
-      },
-      "sample.id": {
-        rename: "Sanger Sample ID",
-        relationshipBox: true
-      }
-    }}
-  />
-)
-
-
-
 function Home() {
+  const dataTable = (
+    <RemoteTable
+      id="data-home-table-v2"
+      endpoint="data"
+      height={500}
+      fields={{
+        "id": {
+          rename: "ID"
+        },
+        "date": {
+          rename: "Date"
+        },
+        "name": {
+          rename: "Name"
+        },
+        "sample.id": {
+          rename: "Sanger Sample ID",
+          relationshipBox: true
+        }
+      }}
+    />
+  );
+
   return (
     <div className="data">
       <Widgets components={[intro]}/>

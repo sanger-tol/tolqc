@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2025 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
+from tolqc.schema import Role, RoleBinding, Token, User
 from tolqc.schema.accession_models import Accession, AccessionTypeDict
 from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
@@ -26,13 +27,14 @@ from tolqc.schema.sample_data_models import (
     Study,
     VisibilityDict,
 )
-from tolqc.schema.system_models import Token, User
 
 
 def test_data(token: str):
     return [
-        User(id=100, email='tester@sanger.ac.uk', name='test-user', registered=True),
+        User(id=100, name='tester', email='tester@sanger.ac.uk'),
         Token(id=200, token=token, user_id=100),
+        Role(id=300, name='editor'),
+        RoleBinding(user_id=100, role_id=300),
         AccessionTypeDict(
             accession_type_id='GenBank Genome Assembly',
             regexp='^GCA_\\d+\\.\\d+$',

@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 # This is used for local development only
-version: '3.2'
 
 services:
   tolqc-db:
@@ -28,18 +27,16 @@ services:
       - TOLQC_URL
       - API_PATH
       - API_TOKEN
-      - ELIXIR_CLIENT_ID
-      - ELIXIR_CLIENT_SECRET
-      - ELIXIR_REDIRECT_URI
-      - ELIXIR_JWK
-      - MAIL_SENDER
-      - MAIL_SENDER_NAME
-      - MAIL_USERNAME_SMTP
-      - MAIL_PASSWORD_SMTP
-      - MAIL_HOST
-      - MAIL_PORT
+      - OIDC_CLIENT_ID
+      - OIDC_CLIENT_SECRET
+      - OIDC_REDIRECT_URI
+      - OIDC_AUTH_URL
+      - OIDC_USER_INFO_URL
+      - OIDC_TOKEN_URL
+      - OIDC_REVOKE_TOKEN_URL
       - ENVIRONMENT
       - FLASK_ENV
+      - TOLQC_DEBUG
     ports:
       - 8082:80
     volumes:
