@@ -2,15 +2,24 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import Float, distinct, func, literal, select
+from sqlalchemy import Numeric, Float, case, distinct, func, literal, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
+    FolderBundle,
     LastPathElementBundle,
     StarPathBundle,
 )
 from tolqc.report.request_args import NoArg, RequestArgs
 from tolqc.schema import User
+from tolqc.schema.assembly_models import (
+    Dataset,
+    DatasetElement,
+    DatasetStatus,
+    GenomescopeMetrics,
+    SmudgeplotMetrics,
+)
+from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.metagenome_models import (
     Metagenome,
     MetagenomeBin,
@@ -631,6 +640,127 @@ def specimen_status_report_query(req_args: RequestArgs):
         query = query.where(User.name == assignee)
 
     return query
+
+
+def datasets_report_query(*_):
+    # Genomescope results partitioned by `dataset_id`
+    pttnd_gscope = select(
+        GenomescopeMetrics.review_id.label('review_status'),
+        GenomescopeMetrics.dataset_id,
+        GenomescopeMetrics.folder_ulid,
+        func.round(GenomescopeMetrics.kcov.cast(Numeric), 1).cast(Float).label('kcov'),
+        func.row_number()
+        .over(
+            order_by=(
+                # Bubble "Accepted" results to the top
+                case((GenomescopeMetrics.review_id == 'Accepted', 0), else_=1),
+                # else sort by the most recent (which assumes the )
+                GenomescopeMetrics.id.desc(),
+            ),
+            partition_by=GenomescopeMetrics.dataset_id,
+        )
+        .label('gs_ds_index'),
+    ).cte('pttnd_gscope')
+
+    # Smudgeplot results partitioned by `dataset_id`
+    pttnd_smdg_plt = select(
+        SmudgeplotMetrics.interpretation,
+        SmudgeplotMetrics.dataset_id,
+        SmudgeplotMetrics.folder_ulid,
+        func.row_number()
+        .over(
+            order_by=SmudgeplotMetrics.id.desc(),
+            partition_by=SmudgeplotMetrics.dataset_id,
+        )
+        .label('smdg_ds_index'),
+    ).cte('pttnd_smdg_plt')
+
+    # Will be joining into the folder and folder_location tables twice, so
+    # they need to be aliased
+    gscope_fldr = aliased(Folder)
+    smdg_plt_fldr = aliased(Folder)
+    gscope_fldr_loc = aliased(FolderLocation)
+    smdg_plt_fldr_loc = aliased(FolderLocation)
+
+    # Dataset columns listed for convenience to avoid repetition
+    # in the GROUP BY
+    dataset_cols = (
+        Dataset.dataset_id,
+        Dataset.name,
+        DatasetStatus.status_type_id.label('dataset_status'),
+        DatasetStatus.status_time.label('status_time'),
+        pttnd_gscope.c.review_status,
+        pttnd_gscope.c.kcov,
+        pttnd_smdg_plt.c.interpretation,
+    )
+
+    return (
+        select(
+            *dataset_cols,
+            array_distinct_non_null('data', Data.data_id),
+            array_distinct_non_null('specimens', Sample.specimen_id),
+            func.round(func.sum(Data.bases) / func.max(Species.genome_size), 1)
+            .cast(Float)
+            .label('naive_coverage'),
+            FolderBundle(
+                'gscope_image_list',
+                gscope_fldr_loc.uri_prefix,
+                gscope_fldr.folder_ulid,
+                gscope_fldr.image_file_list,
+            ),
+            FolderBundle(
+                'gscope_file_list',
+                gscope_fldr_loc.uri_prefix,
+                gscope_fldr.folder_ulid,
+                gscope_fldr.other_file_list,
+            ),
+            FolderBundle(
+                'smudgeplot_image_list',
+                smdg_plt_fldr_loc.uri_prefix,
+                smdg_plt_fldr.folder_ulid,
+                smdg_plt_fldr.image_file_list,
+            ),
+        )
+        .select_from(Dataset)
+        .join(Dataset.status)
+        .join(Dataset.data_assn)
+        .join(DatasetElement.data)
+        .outerjoin(Data.sample)
+        .outerjoin(Sample.specimen)
+        .outerjoin(Specimen.species)
+        # Partitioned Genomescope table and folder
+        .outerjoin(pttnd_gscope, Dataset.dataset_id == pttnd_gscope.c.dataset_id)
+        .outerjoin(
+            gscope_fldr,
+            pttnd_gscope.c.folder_ulid == gscope_fldr.folder_ulid,
+        )
+        .outerjoin(
+            gscope_fldr_loc,
+            gscope_fldr.folder_location_id == gscope_fldr_loc.folder_location_id,
+        )
+        # Partitioned Smudgeplot table and folder
+        .outerjoin(pttnd_smdg_plt, Dataset.dataset_id == pttnd_smdg_plt.c.dataset_id)
+        .outerjoin(
+            smdg_plt_fldr,
+            pttnd_smdg_plt.c.folder_ulid == smdg_plt_fldr.folder_ulid,
+        )
+        .outerjoin(
+            smdg_plt_fldr_loc,
+            smdg_plt_fldr.folder_location_id == smdg_plt_fldr_loc.folder_location_id,
+        )
+        .group_by(
+            *dataset_cols,
+            gscope_fldr_loc.uri_prefix,
+            gscope_fldr.folder_ulid,
+            gscope_fldr.image_file_list,
+            gscope_fldr.other_file_list,
+            smdg_plt_fldr_loc.uri_prefix,
+            smdg_plt_fldr.folder_ulid,
+            smdg_plt_fldr.image_file_list,
+        )
+        .where(pttnd_gscope.c.gs_ds_index == 1)
+        .order_by(Dataset.dataset_id.desc())
+    )
 
 
 def array_distinct_non_null(label_txt, column):
