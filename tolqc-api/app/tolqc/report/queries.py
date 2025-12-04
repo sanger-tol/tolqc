@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import Numeric, Float, case, distinct, func, literal, select
+from sqlalchemy import Float, Numeric, case, distinct, func, literal, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
@@ -642,7 +642,9 @@ def specimen_status_report_query(req_args: RequestArgs):
     return query
 
 
-def datasets_report_query(*_):
+def datasets_report_query(req_args: RequestArgs):
+    tolid_prefix = req_args.pop_arg('tolid_prefix')
+
     # Genomescope results partitioned by `dataset_id`
     pttnd_gscope = select(
         GenomescopeMetrics.review_id.label('review_status'),
@@ -694,7 +696,7 @@ def datasets_report_query(*_):
         pttnd_smdg_plt.c.interpretation,
     )
 
-    return (
+    query = (
         select(
             *dataset_cols,
             array_distinct_non_null('data', Data.data_id),
@@ -761,6 +763,11 @@ def datasets_report_query(*_):
         .where(pttnd_gscope.c.gs_ds_index == 1)
         .order_by(Dataset.dataset_id.desc())
     )
+
+    if tolid_prefix is not NoArg:
+        query = query.where(Species.tolid_prefix == tolid_prefix)
+
+    return query
 
 
 def array_distinct_non_null(label_txt, column):
