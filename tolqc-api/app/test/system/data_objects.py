@@ -1,8 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
+
 from tolqc.schema import Role, RoleBinding, Token, User
-from tolqc.schema.accession_models import Accession, AccessionTypeDict
+from tolqc.schema.accession_models import Accession, AccessionTypeDict, SubmitterDict
 from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
     Allocation,
@@ -27,14 +28,16 @@ from tolqc.schema.sample_data_models import (
     Study,
     VisibilityDict,
 )
+from tolqc.schema.system_models import Metadata
 
 
 def test_data(token: str):
     return [
-        User(id=100, name='tester', email='tester@sanger.ac.uk'),
-        Token(id=200, token=token, user_id=100),
+        User(id=100, email='tester@sanger.ac.uk', name='tester'),
+        Token(token=token, user_id=100, id=200),
         Role(id=300, name='editor'),
         RoleBinding(user_id=100, role_id=300),
+        Metadata(name='location.root', string_value='/test/loc_root'),
         AccessionTypeDict(
             accession_type_id='GenBank Genome Assembly',
             regexp='^GCA_\\d+\\.\\d+$',
@@ -102,17 +105,27 @@ def test_data(token: str):
             url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
         ),
         AccessionTypeDict(
-            accession_type_id='BioProject - Metagenome',
+            accession_type_id='BioProject - Species Assembly',
             regexp='^PRJ[A-Z]{2}\\d+$',
             url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
         ),
         AccessionTypeDict(
-            accession_type_id='BioProject - Eukaryotic Cobiont',
+            accession_type_id='BioProject - Species Organelle Assembly',
             regexp='^PRJ[A-Z]{2}\\d+$',
             url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
         ),
         AccessionTypeDict(
-            accession_type_id='BioProject - Prokaryotic Cobiont',
+            accession_type_id='BioProject - Eukaryotic Cobiont Assembly',
+            regexp='^PRJ[A-Z]{2}\\d+$',
+            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
+        ),
+        AccessionTypeDict(
+            accession_type_id='BioProject - Metagenome Assembly',
+            regexp='^PRJ[A-Z]{2}\\d+$',
+            url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
+        ),
+        AccessionTypeDict(
+            accession_type_id='BioProject - Prokaryotic Cobiont Assembly',
             regexp='^PRJ[A-Z]{2}\\d+$',
             url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
         ),
@@ -535,16 +548,16 @@ def test_data(token: str):
             uri_prefix='s3://tolqc-dev/genomescope',
             files_template={
                 'image_file_patterns': [
-                    {'caption': 'Genomescope 2.0 linear plot', 'pattern': '.*linear_plot\\.png'},
-                    {'caption': 'Genomescope 2.0 log plot', 'pattern': '.*log_plot\\.png'},
                     {
                         'caption': 'Genomescope 2.0 transformed linear plot',
                         'pattern': '.*transformed_linear_plot\\.png',
                     },
+                    {'caption': 'Genomescope 2.0 linear plot', 'pattern': '.*linear_plot\\.png'},
                     {
                         'caption': 'Genomescope 2.0 transformed log plot',
                         'pattern': '.*transformed_log_plot\\.png',
                     },
+                    {'caption': 'Genomescope 2.0 log plot', 'pattern': '.*log_plot\\.png'},
                 ],
                 'other_file_patterns': [
                     {'caption': 'Kmer counts histogram data', 'pattern': '.*\\.hist\\.txt'}
@@ -565,6 +578,49 @@ def test_data(token: str):
         Sex(sex_id='Sexual morph'),
         Sex(sex_id='Not collected'),
         Sex(sex_id='Not provided'),
+        SubmitterDict(
+            submitter_id='Wellcome Sanger Institute',
+            webin_account='Webin-2',
+            description='Sanger Data Release Team account',
+        ),
+        SubmitterDict(
+            submitter_id='WELLCOME SANGER INSTITUTE',
+            webin_account='Webin-57671',
+            description='ToL-Datahose account used for submitting data, assemblies and projects',
+        ),
+        SubmitterDict(
+            submitter_id='Tree of Life Programme',
+            webin_account='Webin-58409',
+            description='ToL Platforms account for registering Biosamples',
+        ),
+        SubmitterDict(submitter_id='Bat1K', description='Bat1K Project'),
+        SubmitterDict(
+            submitter_id='Baylor College of Medicine', description='Baylor College of Medicine'
+        ),
+        SubmitterDict(submitter_id='Earlham Institute', description='Earlham Institute'),
+        SubmitterDict(submitter_id='EBP', description='Earth Biogenome Project'),
+        SubmitterDict(
+            submitter_id='european reference genome atlas',
+            description='European Reference Genome Atlas',
+        ),
+        SubmitterDict(submitter_id='Genome 10K', description='Genome 10K Project'),
+        SubmitterDict(
+            submitter_id='NOAA Southwest Fisheries Science Center',
+            description='NOAA Southwest Fisheries Science Center',
+        ),
+        SubmitterDict(submitter_id='SC', description='Sanger Centre'),
+        SubmitterDict(submitter_id='University of Bari', description='University of Bari'),
+        SubmitterDict(
+            submitter_id='University of Florence', description='University of Florence'
+        ),
+        SubmitterDict(
+            submitter_id='Wellcome Trust Sanger Institute',
+            description='Wellcome Trust Sanger Institute',
+        ),
+        SubmitterDict(
+            submitter_id='University of Cambridge, UK', description='University of Cambridge, UK'
+        ),
+        SubmitterDict(submitter_id='B10K', description='Bird 10K Project'),
         VisibilityDict(visibility='Always', description='Shown in standard reporting'),
         VisibilityDict(visibility='Testing', description='Sequencing development data'),
         VisibilityDict(visibility='Withdrawn', description='Data has been deleted'),
@@ -626,6 +682,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=117883578,
                                     bases=17800420278,
+                                    read_length_mean=151.0,
+                                    bases_a=3535469853,
+                                    bases_c=5344296934,
+                                    bases_g=5363949726,
+                                    bases_t=3554034645,
                                     folder_ulid='01J8GNT7RDJNSEPWTKHG8QSHSB',
                                     library=Library(
                                         library_id='DN683544F:A5',
@@ -696,6 +757,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=3205550,
                                     bases=484038050,
+                                    read_length_mean=151.0,
+                                    bases_a=96323000,
+                                    bases_c=145218591,
+                                    bases_g=145800670,
+                                    bases_t=96626120,
                                     folder_ulid='01J8GNT901PKS6AZBX0QPJEP95',
                                     library=Library(
                                         library_id='DN683544F:A5',
@@ -767,6 +833,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=118915580,
                                     bases=17956252580,
+                                    read_length_mean=151.0,
+                                    bases_a=3574864149,
+                                    bases_c=5387034008,
+                                    bases_g=5399306197,
+                                    bases_t=3592329137,
                                     folder_ulid='01J8GNTAE04KEY675Z4WX8KDK4',
                                     library=Library(
                                         library_id='DN683544F:A5',
@@ -838,6 +909,11 @@ def test_data(token: str):
                                     visibility='Testing',
                                     reads=120600430,
                                     bases=18210664930,
+                                    read_length_mean=151.0,
+                                    bases_a=3612935737,
+                                    bases_c=5477449982,
+                                    bases_g=5489970795,
+                                    bases_t=3627594029,
                                     folder_ulid='01J8GNTBMMYVA2RJZKYZCHZAAM',
                                     library=Library(
                                         library_id='DN683544F:A5',
@@ -921,6 +997,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=748759474,
                                     bases=113062680574,
+                                    read_length_mean=151.0,
+                                    bases_a=25282939585,
+                                    bases_c=30291651451,
+                                    bases_g=33032570272,
+                                    bases_t=24454648885,
                                     folder_ulid='01J8GP34MFJNAHCBM0X20TA8VF',
                                     library=Library(
                                         library_id='DN703060C:H1',
@@ -1007,6 +1088,9 @@ def test_data(token: str):
                                     read_length_longest=39513,
                                     read_length_shortest=53,
                                     reads_duplicated=0,
+                                    reads_discarded=200,
+                                    reads_trimmed=1652,
+                                    bases_removed=1850523,
                                     library=Library(
                                         library_id='DN703483V', library_type_id='PacBio - HiFi'
                                     ),
@@ -1047,6 +1131,7 @@ def test_data(token: str):
                                             size_bytes=7877130682,
                                             md5='391fc5db79b693a27bb95cc5291888be',
                                             file_type='BAM',
+                                            has_methylation=True,
                                         )
                                     ],
                                 ),
@@ -1073,6 +1158,9 @@ def test_data(token: str):
                                     read_length_longest=42852,
                                     read_length_shortest=56,
                                     reads_duplicated=0,
+                                    reads_discarded=60,
+                                    reads_trimmed=114,
+                                    bases_removed=427249,
                                     library=Library(
                                         library_id='DN695911V-H1', library_type_id='PacBio - HiFi'
                                     ),
@@ -1219,6 +1307,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=41616914,
                                     bases=6284154014,
+                                    read_length_mean=151.0,
+                                    bases_a=1485594035,
+                                    bases_c=1669256406,
+                                    bases_g=1684013113,
+                                    bases_t=1444777110,
                                     folder_ulid='01J8GQ6KCY1QQ32TSMP7KRRT3Z',
                                     library=Library(
                                         library_id='DN611904M:F3', library_type_id='RNA PolyA'
@@ -1296,6 +1389,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=81186152,
                                     bases=12056143572,
+                                    read_length_mean=148.0,
+                                    bases_a=2574611227,
+                                    bases_c=3421507646,
+                                    bases_g=3531935839,
+                                    bases_t=2527342736,
                                     folder_ulid='01J8GSEF3JDHWEVBP5EWYD9QC8',
                                     library=Library(
                                         library_id='DN805609I:B3',
@@ -1376,6 +1474,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=27966966,
                                     bases=4153094451,
+                                    read_length_mean=148.0,
+                                    bases_a=797145425,
+                                    bases_c=1275996438,
+                                    bases_g=1284970808,
+                                    bases_t=794904415,
                                     folder_ulid='01J8GQ93RN80BXDY4WTYJZYB24',
                                     library=Library(
                                         library_id='NT1659733A',
@@ -1620,6 +1723,7 @@ def test_data(token: str):
                                             size_bytes=23451855096,
                                             md5='f48387aeea2595cbfd4397ab97336485',
                                             file_type='BAM',
+                                            has_methylation=True,
                                         )
                                     ],
                                 )
@@ -1704,6 +1808,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=3345851480,
                                     bases=505223573480,
+                                    read_length_mean=151.0,
+                                    bases_a=165046940660,
+                                    bases_c=88665580861,
+                                    bases_g=88955239448,
+                                    bases_t=162546734482,
                                     folder_ulid='01J8GVRDZR9KA1EXWZM48W09MZ',
                                     library=Library(
                                         library_id='DN826505P:B3',
@@ -1797,6 +1906,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=195080402,
                                     bases=29457140702,
+                                    read_length_mean=151.0,
+                                    bases_a=9258985827,
+                                    bases_c=5442014861,
+                                    bases_g=5558090183,
+                                    bases_t=9197450561,
                                     folder_ulid='01J8GQ31A3VN2XMDY7PP7XMFSV',
                                     library=Library(
                                         library_id='DN771163M:G8',
@@ -1878,6 +1992,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=206862242,
                                     bases=31236198542,
+                                    read_length_mean=151.0,
+                                    bases_a=9812272262,
+                                    bases_c=5778032407,
+                                    bases_g=5899517116,
+                                    bases_t=9745758677,
                                     folder_ulid='01J8GQ32MZ3YKMTSPGRS5HWCD1',
                                     library=Library(
                                         library_id='DN771163M:G8',
@@ -1959,6 +2078,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=183614994,
                                     bases=27725864094,
+                                    read_length_mean=151.0,
+                                    bases_a=8716084313,
+                                    bases_c=5126488093,
+                                    bases_g=5237913221,
+                                    bases_t=8644832190,
                                     folder_ulid='01J8GQ33XK1D5AVJN9XCP7YQ84',
                                     library=Library(
                                         library_id='DN771163M:G8',
@@ -2040,6 +2164,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=210626924,
                                     bases=31804665524,
+                                    read_length_mean=151.0,
+                                    bases_a=9992182143,
+                                    bases_c=5876706784,
+                                    bases_g=6004233902,
+                                    bases_t=9930898084,
                                     folder_ulid='01J8GQ356P8AEKKAPW0VD2PJKD',
                                     library=Library(
                                         library_id='DN771163M:G8',
@@ -2142,6 +2271,9 @@ def test_data(token: str):
                                     read_length_longest=37726,
                                     read_length_shortest=51,
                                     reads_duplicated=0,
+                                    reads_discarded=369,
+                                    reads_trimmed=12744,
+                                    bases_removed=6409521,
                                     library=Library(
                                         library_id='DN765124Q-B1', library_type_id='PacBio - HiFi'
                                     ),
@@ -2253,6 +2385,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=36344960,
                                     bases=5488088960,
+                                    read_length_mean=151.0,
+                                    bases_a=1518941960,
+                                    bases_c=1267752556,
+                                    bases_g=1232383463,
+                                    bases_t=1468060555,
                                     folder_ulid='01J8GSDTKDZYAX2X2F8K7WD045',
                                     library=Library(
                                         library_id='DN612239G:G9', library_type_id='RNA PolyA'
@@ -2343,6 +2480,11 @@ def test_data(token: str):
                                     visibility='Always',
                                     reads=52850970,
                                     bases=7980496470,
+                                    read_length_mean=151.0,
+                                    bases_a=2178367667,
+                                    bases_c=1864133032,
+                                    bases_g=1828534352,
+                                    bases_t=2108890126,
                                     folder_ulid='01J8HAZJY0CG2BHX6Q7TSA54DA',
                                     library=Library(
                                         library_id='SQPP-7739-H:B9', library_type_id='RNA PolyA'
@@ -2422,14 +2564,630 @@ def test_data(token: str):
             data_accession=Accession(
                 accession_id='PRJEB50167',
                 accession_type_id='BioProject - Species Data',
+                secondary='ERP134724',
+                submission='ERA8395505',
+                date_submitted='2022-01-17T00:00:00+00:00',
+                name='lpJunEffu',
+                title='Juncus effusus, genomic and transcriptomic data',
+                description=(
+                    'This project collects the genomic and transcriptomic data generated for'
+                    ' Juncus effusus to facilitate genome assembly and annotation as part of the'
+                    ' Darwin Tree of Life Project (https://www.darwintreeoflife.org/). The data'
+                    ' under this project are made available subject to the Darwin Tree of Life'
+                    ' Open Data Release Policy (https://www.darwintreeoflife.org/project'
+                    '-resources/).'
+                ),
+                alias='ena-tol-lpJunEffu-study-rawdata-20220117',
+                submitter_id='WELLCOME SANGER INSTITUTE',
                 is_deleted=False,
             ),
             umbrella_accession=Accession(
                 accession_id='PRJEB50168',
                 accession_type_id='BioProject - Species Umbrella',
+                submission='ERA8395506',
+                date_submitted='2022-01-17T00:00:00+00:00',
+                name='lpJunEffu',
+                title='Juncus effusus',
+                description=(
+                    'This project collects the sequencing data and assemblies generated for'
+                    ' Juncus effusus by the Darwin Tree of Life Project (https'
+                    '://www.darwintreeoflife.org/). The data under this project are made'
+                    ' available subject to the Darwin Tree of Life Open Data Release Policy'
+                    ' (https://www.darwintreeoflife.org/project-resources/).'
+                ),
+                alias='ena-tol-lpJunEffu-study-umbrella-20220117',
+                submitter_id='WELLCOME SANGER INSTITUTE',
                 is_deleted=False,
             ),
             location=Location(location_id=299, path='e/1/3/d/d/0/Juncus_effusus'),
+        ),
+        Species(
+            species_id='Rallus aquaticus',
+            location_id=824,
+            tolid_prefix='bRalAqu',
+            taxon_id=54496,
+            family_taxon_id=9119,
+            taxon_family='Rallidae',
+            taxon_order='Gruiformes',
+            taxon_phylum='Chordata',
+            taxon_group='birds',
+            genome_size=1222500000,
+            chromosome_number=78,
+            data_accession_id='PRJEB75638',
+            umbrella_accession_id='PRJEB75639',
+            specimens=[
+                Specimen(
+                    specimen_id='bRalAqu1',
+                    location_id=824,
+                    species_id='Rallus aquaticus',
+                    supplied_name='NHMUK014551542',
+                    sts_specimen='NHMUK014551542',
+                    sts_priority=1,
+                    accession_id='SAMEA113398957',
+                    sex_id='Male',
+                    samples=[
+                        Sample(
+                            sample_id='DTOL14392235',
+                            specimen_id='bRalAqu1',
+                            accession_id='SAMEA114299701',
+                            accession=Accession(
+                                accession_id='SAMEA114299701',
+                                accession_type_id='BioSample',
+                                is_deleted=False,
+                            ),
+                            data=[
+                                Data(
+                                    data_id='48587_5-6#2',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL14392235',
+                                    library_id='SQPP-49303-W:B1',
+                                    accession_id='ERR13093686',
+                                    run_id='48587_5-6',
+                                    processed=1,
+                                    tag1_id='2',
+                                    tag2_id='2',
+                                    date='2024-03-08T14:01:36+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=694971792,
+                                    bases=104940740592,
+                                    read_length_mean=151.0,
+                                    folder_ulid='01J8HAY65YNTH7P0M2F65PMN39',
+                                    library=Library(
+                                        library_id='SQPP-49303-W:B1',
+                                        library_type_id='Hi-C - Arima v2',
+                                    ),
+                                    accession=Accession(
+                                        accession_id='ERR13093686',
+                                        accession_type_id='Run',
+                                        secondary='ERX12465384',
+                                        date_submitted='2024-05-13T00:00:00+01:00',
+                                        is_deleted=False,
+                                    ),
+                                    run=Run(
+                                        run_id='48587_5-6',
+                                        platform_id=8,
+                                        centre_id=2,
+                                        element='5-6',
+                                        instrument_name='NX1',
+                                        complete='2024-03-07T09:39:25+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=134928,
+                                            data_id='48587_5-6#2',
+                                            name='48587_5-6#2.cram',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/48/48587/lane5-6/plex2'
+                                                '/48587_5-6#2.cram'
+                                            ),
+                                            size_bytes=31081394145,
+                                            md5='0ac93acd48d2dd15577a8c161764878b',
+                                            file_type='CRAM',
+                                        )
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8HAY65YNTH7P0M2F65PMN39',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '48587_5-6#2_F0xB00-acgt-cycles.png',
+                                                'caption': 'Hi-C - Arima v2 A|C|G|T Content Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '48587_5-6#2_F0xB00-quals3.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '48587_5-6#2_F0xB00-gc-content.png',
+                                                'caption': 'Hi-C - Arima v2 G|C Content',
+                                            },
+                                            {
+                                                'file': '48587_5-6#2_F0xB00-quals.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '48587_5-6#2_F0xB00-quals-hm.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '48587_5-6#2_F0xB00-quals2.png',
+                                                'caption': 'Hi-C - Arima v2 Quality Per Cycle (Split)',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=151114,
+                                    ),
+                                )
+                            ],
+                        ),
+                        Sample(
+                            sample_id='DTOL14550031',
+                            specimen_id='bRalAqu1',
+                            accession_id='SAMEA114299701',
+                            accession=Accession(
+                                accession_id='SAMEA114299701',
+                                accession_type_id='BioSample',
+                                is_deleted=False,
+                            ),
+                            data=[
+                                Data(
+                                    data_id='m84047_240219_121238_s3#2089',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL14550031',
+                                    library_id='DTOL14550031',
+                                    accession_id='ERR13112065',
+                                    run_id='m84047_240219_121238_s3',
+                                    processed=1,
+                                    tag1_id='bc2089',
+                                    date='2024-02-21T10:56:38+00:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=5667911,
+                                    bases=52090647829,
+                                    read_length_mean=9190.44914943089,
+                                    read_length_n50=10306,
+                                    bases_a=14668588897,
+                                    bases_c=11006690502,
+                                    bases_g=11411698987,
+                                    bases_t=15003669443,
+                                    read_length_longest=46331,
+                                    read_length_shortest=70,
+                                    reads_duplicated=0,
+                                    reads_discarded=0,
+                                    reads_trimmed=3398,
+                                    bases_removed=509700,
+                                    library=Library(
+                                        library_id='DTOL14550031', library_type_id='PacBio - HiFi'
+                                    ),
+                                    accession=Accession(
+                                        accession_id='ERR13112065',
+                                        accession_type_id='Run',
+                                        secondary='ERX12483603',
+                                        date_submitted='2024-05-17T00:00:00+01:00',
+                                        is_deleted=False,
+                                    ),
+                                    run=Run(
+                                        run_id='m84047_240219_121238_s3',
+                                        platform_id=6,
+                                        centre_id=2,
+                                        lims_id='TRACTION-RUN-1132',
+                                        element='C1.1',
+                                        instrument_name='m84047',
+                                        start='2024-02-19T11:01:46+00:00',
+                                        complete='2024-02-20T17:26:57+00:00',
+                                        plex_count=1,
+                                        chemistry='R/P1-C1/5.0-25M',
+                                        pacbio_run_metrics=[
+                                            PacbioRunMetrics(
+                                                run_id='m84047_240219_121238_s3',
+                                                movie_minutes=1440,
+                                                binding_kit='Revio polymerase kit',
+                                                sequencing_kit='Revio sequencing plate',
+                                                sequencing_kit_lot_number='033482',
+                                                cell_lot_number='1000002283',
+                                                include_kinetics='false',
+                                                loading_conc=214.0,
+                                                control_num_reads=3556,
+                                                control_read_length_mean=67141.0,
+                                                control_concordance_mean=0.907988,
+                                                control_concordance_mode=0.91,
+                                                local_base_rate=2.60376,
+                                                polymerase_read_bases=919164234856,
+                                                polymerase_num_reads=9917451,
+                                                polymerase_read_length_mean=92682.0,
+                                                unique_molecular_bases=117783101440,
+                                                productive_zmws_num=25165824,
+                                                p0_num=15179993,
+                                                p1_num=9921007,
+                                                p2_num=64824,
+                                                adapter_dimer_percent=0.0,
+                                                short_insert_percent=0.0,
+                                                hifi_read_bases=52481919295,
+                                                hifi_num_reads=5710242,
+                                                hifi_read_length_mean=9190,
+                                                hifi_read_quality_median=40,
+                                                hifi_number_passes_mean=16.0,
+                                                hifi_low_quality_read_quality_median=17,
+                                                hifi_barcoded_reads=5667911,
+                                                hifi_bases_in_barcoded_reads=52090647829,
+                                                folder_ulid='01K0YCTXF8WGJNVF8VVS8FXBRE',
+                                                folder=Folder(
+                                                    folder_ulid='01K0YCTXF8WGJNVF8VVS8FXBRE',
+                                                    folder_location_id='pacbio_run_s3',
+                                                    image_file_list=[
+                                                        {
+                                                            'file': 'readlength_histogram.png',
+                                                            'caption': 'Mean readlength histogram',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'raw_read_length_plot.png',
+                                                            'caption': 'Loading evaluation',
+                                                        },
+                                                        {
+                                                            'file': 'hexbin_length_plot.png',
+                                                            'caption': 'Insert read length density',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'base_yield_plot.png',
+                                                            'caption': 'Base yield density',
+                                                        },
+                                                        {
+                                                            'file': 'nreads_histogram.png',
+                                                            'caption': 'Number of reads per barcode histogram',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'm5c_detections_hist.png',
+                                                            'caption': 'CpG methylation in reads histogram',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'readLenDist0.png',
+                                                            'caption': 'Polymerase read length',
+                                                        },
+                                                        {
+                                                            'file': 'readlength_qv_hist2d.hexbin.png',  # noqa: E501
+                                                            'caption': 'Accuracy versus read length density',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'm5c_detections.png',
+                                                            'caption': 'CpG methylation in reads',
+                                                        },
+                                                        {
+                                                            'file': 'ccs_npasses_hist.png',
+                                                            'caption': 'Number of passes',
+                                                        },
+                                                        {
+                                                            'file': 'bq_histogram.png',
+                                                            'caption': 'Barcode quality distribution',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'readlength_plot.png',
+                                                            'caption': 'Control polymerase read length',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'concordance_plot.png',
+                                                            'caption': 'Control concordance',
+                                                        },
+                                                        {
+                                                            'file': 'ccs_all_readlength_hist_plot.png',  # noqa: E501
+                                                            'caption': 'Read length distribution (all)',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'ccs_hifi_read_length_yield_plot.png',  # noqa: E501
+                                                            'caption': 'HiFi yield by read length',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'ccs_accuracy_hist.png',
+                                                            'caption': 'Read quality distribution',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'ccs_readlength_hist_plot.png',  # noqa: E501
+                                                            'caption': 'HiFi read length distribution',  # noqa: E501
+                                                        },
+                                                        {
+                                                            'file': 'nreads.png',
+                                                            'caption': 'Number of reads per barcode',  # noqa: E501
+                                                        },
+                                                    ],
+                                                    files_total_bytes=4895736,
+                                                ),
+                                            )
+                                        ],
+                                    ),
+                                    files=[
+                                        File(
+                                            id=134661,
+                                            data_id='m84047_240219_121238_s3#2089',
+                                            name='m84047_240219_121238_s3.hifi_reads.bc2089.bam',
+                                            remote_path=(
+                                                'irods:/seq/pacbio/r84047_20240219_102003/1_C01'
+                                                '/m84047_240219_121238_s3.hifi_reads.bc2089.bam'
+                                            ),
+                                            size_bytes=20408107049,
+                                            md5='0fedeb709610324722cfb27dd3f37d75',
+                                            file_type='BAM',
+                                        )
+                                    ],
+                                )
+                            ],
+                        ),
+                        Sample(
+                            sample_id='DTOL15217660',
+                            specimen_id='bRalAqu1',
+                            accession_id='SAMEA114299701',
+                            accession=Accession(
+                                accession_id='SAMEA114299701',
+                                accession_type_id='BioSample',
+                                is_deleted=False,
+                            ),
+                            data=[
+                                Data(
+                                    data_id='ONTRUN-232#PBA64077#21',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL15217660',
+                                    library_id='TRAC-2-12370',
+                                    run_id='ONTRUN-232',
+                                    processed=1,
+                                    date='2024-12-03T12:50:13+00:00',
+                                    visibility='Always',
+                                    reads=11148681,
+                                    bases=46146404036,
+                                    read_length_mean=4139.18059329171,
+                                    read_length_n50=7799,
+                                    read_length_longest=580083,
+                                    read_length_shortest=14,
+                                    library=Library(
+                                        library_id='TRAC-2-12370',
+                                        library_type_id='ONT_PromethIon',
+                                    ),
+                                    run=Run(
+                                        run_id='ONTRUN-232',
+                                        platform_id=23,
+                                        centre_id=2,
+                                        element='20',
+                                        instrument_name='PC24B148',
+                                        start='2024-11-26T13:13:10+00:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=153247,
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                            remote_path=(
+                                                'irods:/seq/ont/promethion/PC24B148/ONTRUN-232'
+                                                '/TRAC-2-12370/20241126_1238_3E_PBA64077_e8f2cb9b'
+                                                '/bam_pass'
+                                            ),
+                                            file_type='RAW_BAM_DIR',
+                                        ),
+                                        File(
+                                            id=153248,
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                            remote_path=(
+                                                'irods:/seq/ont/promethion/offline-basecalls'
+                                                '/PC24B148/ONTRUN-232/TRAC-2-12370'
+                                                '/20241126_1238_3E_PBA64077_e8f2cb9b/dorado'
+                                                '/7.2.13/sup/simplex/normal/pass'
+                                            ),
+                                            file_type='RECALL_FASTQ_DIR',
+                                        ),
+                                        File(
+                                            id=153425,
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                            remote_path=(
+                                                'irods:/seq/ont/promethion/PC24B148/ONTRUN-232'
+                                                '/TRAC-2-12370/20241126_1238_3E_PBA64077_e8f2cb9b'
+                                                '/pod5'
+                                            ),
+                                            file_type='RAW_POD5_DIR',
+                                            has_methylation=True,
+                                        ),
+                                    ],
+                                )
+                            ],
+                        ),
+                        Sample(
+                            sample_id='DTOL16058752',
+                            specimen_id='bRalAqu1',
+                            accession_id='SAMEA114299701',
+                            accession=Accession(
+                                accession_id='SAMEA114299701',
+                                accession_type_id='BioSample',
+                                is_deleted=False,
+                            ),
+                            data=[
+                                Data(
+                                    data_id='ONTRUN-304#PBE95016#21#NB09',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL16058752',
+                                    library_id='NT1863132U',
+                                    run_id='ONTRUN-304',
+                                    processed=1,
+                                    tag1_id='NB09',
+                                    date='2025-09-14T01:00:02+01:00',
+                                    visibility='Always',
+                                    reads=10585274,
+                                    bases=16071581924,
+                                    read_length_mean=1518.29625987953,
+                                    read_length_n50=2459,
+                                    read_length_longest=767551,
+                                    read_length_shortest=63,
+                                    library=Library(
+                                        library_id='NT1863132U',
+                                        library_type_id='ONT_PromethIon_mplx',
+                                    ),
+                                    run=Run(
+                                        run_id='ONTRUN-304',
+                                        platform_id=23,
+                                        centre_id=2,
+                                        instrument_name='PC24B148',
+                                        start='2025-09-09T16:46:24+01:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=154839,
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                            remote_path=(
+                                                'irods:/seq/ont/promethion/offline-deplexes'
+                                                '/PC24B148/ONTRUN-304/NT1863132U'
+                                                '/20250909_1434_3E_PBE95016_2a80ed02/dorado/7.6.8'
+                                                '/sup/simplex/normal/default/pass/barcode09'
+                                            ),
+                                            file_type='RECALL_FASTQ_DIR',
+                                            has_methylation=False,
+                                        )
+                                    ],
+                                )
+                            ],
+                        ),
+                        Sample(
+                            sample_id='DTOLRNA14668771',
+                            specimen_id='bRalAqu1',
+                            accession_id='SAMEA114299701',
+                            accession=Accession(
+                                accession_id='SAMEA114299701',
+                                accession_type_id='BioSample',
+                                is_deleted=False,
+                            ),
+                            data=[
+                                Data(
+                                    data_id='49280_2#11',
+                                    study_id=6327,
+                                    category='transcriptomic_data',
+                                    sample_id='DTOLRNA14668771',
+                                    library_id='SQPP-50358-G:C2',
+                                    accession_id='ERR13493954',
+                                    run_id='49280_2',
+                                    processed=1,
+                                    tag1_id='11',
+                                    tag2_id='11',
+                                    date='2024-08-27T10:39:49+01:00',
+                                    lims_qc='pass',
+                                    visibility='Always',
+                                    reads=125591826,
+                                    bases=18964365726,
+                                    read_length_mean=151.0,
+                                    bases_a=5041998937,
+                                    bases_c=4371050043,
+                                    bases_g=4492252651,
+                                    bases_t=5056804821,
+                                    folder_ulid='01J8HD27D98F8FFYV5NDE4B10H',
+                                    library=Library(
+                                        library_id='SQPP-50358-G:C2', library_type_id='RNA PolyA'
+                                    ),
+                                    accession=Accession(
+                                        accession_id='ERR13493954',
+                                        accession_type_id='Run',
+                                        secondary='ERX12864221',
+                                        date_submitted='2024-08-13T00:00:00+01:00',
+                                        is_deleted=False,
+                                    ),
+                                    run=Run(
+                                        run_id='49280_2',
+                                        platform_id=8,
+                                        centre_id=2,
+                                        element='2',
+                                        instrument_name='NX2',
+                                        complete='2024-08-04T02:59:55+01:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=144313,
+                                            data_id='49280_2#11',
+                                            name='49280_2#11.cram',
+                                            remote_path=(
+                                                'irods:/seq/illumina/runs/49/49280/lane2/plex11'
+                                                '/49280_2#11.cram'
+                                            ),
+                                            size_bytes=2885723248,
+                                            md5='801ab57f7024d2bb93ac8b65646c414d',
+                                            file_type='CRAM',
+                                        )
+                                    ],
+                                    folder=Folder(
+                                        folder_ulid='01J8HD27D98F8FFYV5NDE4B10H',
+                                        folder_location_id='illumina_data_s3',
+                                        image_file_list=[
+                                            {
+                                                'file': '49280_2#11_F0xB00-quals-hm.png',
+                                                'caption': 'RNA PolyA Quality Frequencies, Per Cycle Heat Map',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '49280_2#11_F0xB00-acgt-cycles.png',
+                                                'caption': 'RNA PolyA A|C|G|T Content Per Cycle',
+                                            },
+                                            {
+                                                'file': '49280_2#11_F0xB00-quals2.png',
+                                                'caption': 'RNA PolyA Quality Per Cycle (Split)',
+                                            },
+                                            {
+                                                'file': '49280_2#11_F0xB00-gc-content.png',
+                                                'caption': 'RNA PolyA G|C Content',
+                                            },
+                                            {
+                                                'file': '49280_2#11_F0xB00-quals3.png',
+                                                'caption': 'RNA PolyA Quality Frequencies, Separate Curve Per Cycle',  # noqa: E501
+                                            },
+                                            {
+                                                'file': '49280_2#11_F0xB00-quals.png',
+                                                'caption': 'RNA PolyA Quality Per Cycle (Overlaid)',  # noqa: E501
+                                            },
+                                        ],
+                                        files_total_bytes=160468,
+                                    ),
+                                )
+                            ],
+                        ),
+                    ],
+                    accession=Accession(
+                        accession_id='SAMEA113398957',
+                        accession_type_id='BioSample',
+                        is_deleted=False,
+                    ),
+                    location=Location(location_id=824, path='3/b/5/0/1/e/Rallus_aquaticus'),
+                )
+            ],
+            data_accession=Accession(
+                accession_id='PRJEB75638',
+                accession_type_id='BioProject - Species Data',
+                secondary='ERP160198',
+                submission='ERA29771179',
+                date_submitted='2024-05-12T00:00:00+01:00',
+                name='bRalAqu',
+                title='Rallus aquaticus (water rail), genomic and transcriptomic data',
+                description=(
+                    'This project collects the genomic and transcriptomic data generated for'
+                    ' Rallus aquaticus, common name water rail, to facilitate genome assembly and'
+                    ' annotation as part of the Darwin Tree of Life Project (https'
+                    '://www.darwintreeoflife.org/). The data under this project are made'
+                    ' available subject to the Darwin Tree of Life Open Data Release Policy'
+                    ' (https://www.darwintreeoflife.org/project-resources/).'
+                ),
+                alias='ena-tol-bRalAqu-study-rawdata-20240512',
+                submitter_id='WELLCOME SANGER INSTITUTE',
+                is_deleted=False,
+            ),
+            umbrella_accession=Accession(
+                accession_id='PRJEB75639',
+                accession_type_id='BioProject - Species Umbrella',
+                submission='ERA29771181',
+                date_submitted='2024-05-12T00:00:00+01:00',
+                name='bRalAqu',
+                title='Rallus aquaticus (water rail)',
+                description=(
+                    'This project collects the sequencing data and assemblies generated for'
+                    ' Rallus aquaticus, common name water rail, by the Darwin Tree of Life'
+                    ' Project (https://www.darwintreeoflife.org/). The data under this project'
+                    ' are made available subject to the Darwin Tree of Life Open Data Release'
+                    ' Policy (https://www.darwintreeoflife.org/project-resources/).'
+                ),
+                alias='ena-tol-bRalAqu-study-umbrella-20240512',
+                submitter_id='WELLCOME SANGER INSTITUTE',
+                is_deleted=False,
+            ),
+            location=Location(location_id=824, path='3/b/5/0/1/e/Rallus_aquaticus'),
         ),
         Project(project_id='britain_and_ireland'),
         Project(project_id='darwin'),

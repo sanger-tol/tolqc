@@ -25,13 +25,7 @@ def pacbio_row_count(db_session):
     To avoid hard coding a number, query for the number of PacBio data rows in
     the test database.
     """
-    n = (
-        db_session.query(Platform)
-        .join(Run)
-        .join(Data)
-        .where(Platform.name == 'PacBio')
-        .count()
-    )
+    n = db_session.query(Platform).join(Run).join(Data).where(Platform.name == 'PacBio').count()
 
     # Guard against tests being run on an empty database
     if not n > 1:
@@ -81,6 +75,11 @@ def test_pacbio_run_data_report_csv(client, api_path):
     """
     response = client.get(api_path + '/report/pacbio-data?format=CSV')
     assert response.status == '400 BAD REQUEST'
+
+
+def test_illumna_data_report(client, api_path):
+    response = client.get(api_path + '/report/illumina-data')
+    assert response.status == '200 OK'
 
 
 def test_pipeline_data_report(client, api_path):
@@ -172,11 +171,74 @@ def test_data_report_good_params(client, api_path, params):
             assert row.get(col) == val
 
 
+def test_pipeline_data_location(client, api_path):
+    for param, expected in (
+        ('true', r'/test/loc_root/.+'),  # Uses default from metadata table test data
+        ('/my/loc/root', r'/my/loc/root/.+'),
+    ):
+        json_lines = report_response_json(
+            client,
+            api_path,
+            'pipeline-data',
+            {
+                'format': 'NDJSON',
+                'root': param,
+            },
+        )
+        for row in json_lines:
+            for col in (
+                'location_root',
+                'location',
+                'file_location',
+            ):
+                assert re.fullmatch(expected, row[col])
+
+
+def test_ont_data_report(client, api_path):
+    all_ont = report_response_json(
+        client,
+        api_path,
+        'ont-data',
+        {
+            'format': 'NDJSON',
+        },
+    )
+    meth_ont = report_response_json(
+        client,
+        api_path,
+        'ont-data',
+        {
+            'format': 'NDJSON',
+            'has_methylation': 'true',
+        },
+    )
+    assert len(meth_ont) < len(all_ont)
+
+
+def test_pacbio_data_report(client, api_path):
+    all_pacbio = report_response_json(
+        client,
+        api_path,
+        'pacbio-data',
+        {
+            'format': 'NDJSON',
+        },
+    )
+    null_meth_pacbio = report_response_json(
+        client,
+        api_path,
+        'pacbio-data',
+        {
+            'format': 'NDJSON',
+            'has_methylation': 'null',
+        },
+    )
+    assert len(null_meth_pacbio) < len(all_pacbio)
+
+
 @pytest.fixture
 def max_bases(client, api_path):
-    json_lines = report_response_json(
-        client, api_path, 'specimen-status', {'format': 'NDJSON'}
-    )
+    json_lines = report_response_json(client, api_path, 'specimen-status', {'format': 'NDJSON'})
     assert json_lines
     return sum_species_data_bases(json_lines)
 
@@ -231,7 +293,5 @@ def expected_values(params):
 
 
 def test_data_report_bad_params(client, api_path):
-    response = client.get(
-        api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'})
-    )
+    response = client.get(api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'}))
     assert response.status == '500 INTERNAL SERVER ERROR'

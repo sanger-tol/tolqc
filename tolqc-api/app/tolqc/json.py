@@ -10,7 +10,7 @@ from flask.json.provider import JSONProvider
 
 class JSONDateTimeProvider(JSONProvider):
     """
-    Used to replace flask's default encoder. Does not sort keys and formats
+    Used to replace flask's default encoder. Does not sort keys. Formats
     datetime objects using ISO 8601 format instead of flask's default of
     werkzeug.http.http_date
     """

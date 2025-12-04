@@ -12,6 +12,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.sql import expression
@@ -218,6 +219,9 @@ class File(Base):
     size_bytes = mapped_column(BigInteger)
     md5 = mapped_column(String)
     file_type = mapped_column(String, ForeignKey('file_type_dict.file_type'))
+    has_methylation = mapped_column(Boolean, index=True)
+    has_kinetics = mapped_column(Boolean, index=True)
+    sam_tags = mapped_column(JSONB)
 
     data = relationship('Data', back_populates='files')
 

@@ -2,13 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import Float, distinct, func, select
+from sqlalchemy import Float, distinct, func, literal, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
     LastPathElementBundle,
     StarPathBundle,
 )
+from tolqc.report.request_args import NoArg, RequestArgs
 from tolqc.schema import User
 from tolqc.schema.metagenome_models import (
     Metagenome,
@@ -32,36 +33,81 @@ from tolqc.schema.sample_data_models import (
     Specimen,
     SpecimenStatus,
 )
+from tolqc.schema.system_models import Metadata
 
 
-def pipeline_data_report_query(*_):
+def seq_data_header_cols():
     return (
+        Data.data_id,
+        Species.tolid_prefix,
+        Species.species_id.label('species'),
+        Specimen.specimen_id.label('specimen'),
+        Sample.sample_id.label('sample'),
+        Library.library_id.label('library'),
+        Platform.name.label('platform'),
+        Platform.model,
+        Run.instrument_name.label('instrument'),
+        iso_date_col('date', func.coalesce(Run.complete, Run.start)),
+        Data.lims_qc,
+        Run.lims_id.label('run'),
+        Specimen.accession_id.label('biospecimen_accession'),
+        Sample.accession_id.label('biosample_accession'),
+        Data.accession_id.label('run_accession'),
+    )
+
+
+def basic_seq_stat_cols():
+    return (
+        Data.reads,
+        Data.bases,
+        Data.bases_a,
+        Data.bases_c,
+        Data.bases_g,
+        Data.bases_t,
+        Data.read_length_mean,
+    )
+
+
+def pipeline_data_report_query(req_args: RequestArgs):
+    loc_root = req_args.pop_arg('root')
+    if loc_root is NoArg:
+        location_path = Location.path
+        root_path = []
+    elif loc_root is True:
+        location_path = func.concat_ws('/', Metadata.string_value, Location.path)
+        root_path = [Metadata.string_value]
+    else:
+        loc_path = literal(loc_root.rstrip('/'))
+        location_path = func.concat_ws('/', loc_path, Location.path)
+        root_path = [Metadata.string_value]
+        root_path = [loc_path]
+
+    hierarchy = [
+        *root_path,
+        Location.path,
+        Data.category,
+        Specimen.specimen_id,
+        LibraryType.hierarchy_name,
+    ]
+
+    query = (
         select(
-            Data.data_id,
+            *seq_data_header_cols(),
             File.remote_path,
-            Species.species_id.label('species'),
             LastPathElementBundle('species_dir', Location.path),
-            Species.tolid_prefix,
             Species.taxon_id,
-            Location.path.label('location_root'),
+            location_path.label('location_root'),
             Data.category,
-            Specimen.specimen_id.label('specimen'),
             LibraryType.hierarchy_name.label('lib_type_dir'),
             File.name.label('file_name'),
             File.file_type,
             StarPathBundle(
                 'location',
-                Location.path,
-                Data.category,
-                Specimen.specimen_id,
-                LibraryType.hierarchy_name,
+                *hierarchy,
             ),
             StarPathBundle(
                 'file_location',
-                Location.path,
-                Data.category,
-                Specimen.specimen_id,
-                LibraryType.hierarchy_name,
+                *hierarchy,
                 File.name,
             ),
             StarPathBundle(
@@ -71,76 +117,65 @@ def pipeline_data_report_query(*_):
                 LibraryType.hierarchy_name,
             ),
             Library.library_type_id.label('pipeline'),
-            Data.tag1_id,
-            Data.tag2_id,
             Data.pcr_adapter_id.label('pcr_adapter_id'),
-            Data.accession_id.label('run_accession'),
-            Sample.accession_id.label('biosample_accession'),
-            Specimen.accession_id.label('biospecimen_accession'),
             Species.data_accession_id.label('data_bioproject'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Data.study_id,
             Data.visibility,
-            Data.lims_qc,
             Data.qc,
             Data.processed,
-            Sample.sample_id.label('sample'),
-            Library.library_id.label('library'),
         )
         .select_from(Data)
         .outerjoin(Sample)
         .outerjoin(Specimen)
-        .outerjoin(Location)  # Important to join to Location from Speciemn not Species
+        # Important to join to Location from Specimen not Species!
+        .outerjoin(Specimen.location)
         .outerjoin(Specimen.species)
         .join(File)
         .outerjoin(Library)
         .outerjoin(LibraryType)
+        .outerjoin(Run)
+        .outerjoin(Platform)
         .order_by(Data.data_id.desc())
     )
 
+    if loc_root is True:
+        query = query.join(Metadata, Metadata.name == 'location.root')
 
-def pacbio_data_report_query(*_):
-    return (
+    return query
+
+
+def pacbio_data_report_query(req_args: RequestArgs):
+    data_columns = (
+        *seq_data_header_cols(),
+        Run.run_id.label('movie_name'),
+        Run.element.label('well'),
+        Run.plex_count,
+        PacbioRunMetrics.movie_minutes.label('movie_length'),
+        Data.tag1_id.label('tag'),
+        *basic_seq_stat_cols(),
+        Data.read_length_n50,
+        Data.read_length_longest,
+        Data.read_length_shortest,
+        percent_col('reads_duplicated_pct', Data.reads_duplicated, Data.reads),
+        percent_col('reads_discarded_pct', Data.reads_discarded, Data.reads),
+        percent_col('reads_trimmed_pct', Data.reads_trimmed, Data.reads),
+        percent_col('bases_removed_pct', Data.bases_removed, Data.bases),
+        PacbioRunMetrics.loading_conc.label('loading_concentration'),
+        PacbioRunMetrics.binding_kit,
+        PacbioRunMetrics.sequencing_kit,
+        PacbioRunMetrics.productive_zmws_num,
+        PacbioRunMetrics.p0_num,
+        PacbioRunMetrics.p1_num,
+        PacbioRunMetrics.p2_num,
+        Data.pcr_adapter_id,
+        Run.chemistry,
+    )
+
+    query = (
         select(
-            Species.species_id.label('species'),
-            Specimen.specimen_id.label('specimen'),
-            Sample.sample_id.label('sample'),
-            Library.library_type_id.label('pipeline'),
-            Platform.name.label('platform'),
-            Platform.model,
-            iso_date_col('date', Run.start),
-            Data.lims_qc,
-            Run.lims_id.label('run'),
-            Run.run_id.label('movie_name'),
-            Run.element.label('well'),
-            Run.instrument_name.label('instrument'),
-            Run.plex_count,
-            PacbioRunMetrics.movie_minutes.label('movie_length'),
-            Data.tag1_id.label('tag'),
-            Sample.accession_id.label('sample_accession'),
-            Data.accession_id.label('run_accession'),
-            Data.library_id.label('library'),
-            Data.reads,
-            Data.read_length_mean,
-            Data.read_length_n50,
-            Data.read_length_longest,
-            Data.read_length_shortest,
-            percent_col('reads_duplicated_pct', Data.reads_duplicated, Data.reads),
-            percent_col('reads_discarded_pct', Data.reads_discarded, Data.reads),
-            percent_col('reads_trimmed_pct', Data.reads_trimmed, Data.reads),
-            percent_col('bases_removed_pct', Data.bases_removed, Data.bases),
-            Data.bases,
-            Data.bases_a,
-            Data.bases_c,
-            Data.bases_g,
-            Data.bases_t,
-            PacbioRunMetrics.loading_conc.label('loading_concentration'),
-            PacbioRunMetrics.binding_kit,
-            PacbioRunMetrics.sequencing_kit,
-            PacbioRunMetrics.productive_zmws_num,
-            PacbioRunMetrics.p0_num,
-            PacbioRunMetrics.p1_num,
-            PacbioRunMetrics.p2_num,
+            *data_columns,
+            func.bool_or(File.has_methylation).label('has_methylation'),
         )
         .select_from(Data)
         .outerjoin(Sample)
@@ -150,12 +185,60 @@ def pacbio_data_report_query(*_):
         .join(Platform)
         .outerjoin(Library)
         .outerjoin(PacbioRunMetrics)
+        .outerjoin(File)
         .where(Platform.name == 'PacBio')
+        .group_by(*data_columns)
         .order_by(
             Data.date.desc(),
             Specimen.specimen_id,
         )
     )
+
+    return add_methylation_filter(query, req_args)
+
+
+def add_methylation_filter(query, req_args: RequestArgs):
+    meth_arg = req_args.pop_arg('has_methylation')
+    if meth_arg is not NoArg:
+        query = query.having(func.bool_or(File.has_methylation) == meth_arg)
+    return query
+
+
+def ont_data_report_query(req_args: RequestArgs):
+    data_columns = (
+        *seq_data_header_cols(),
+        Run.run_id.label('flowcell'),
+        Run.element.label('element'),
+        Data.tag1_id.label('tag'),
+        *basic_seq_stat_cols(),
+        Data.read_length_n50,
+        Data.read_length_longest,
+        Data.read_length_shortest,
+        Run.chemistry,
+    )
+
+    query = (
+        select(
+            *data_columns,
+            func.bool_or(File.has_methylation).label('has_methylation'),
+        )
+        .select_from(Data)
+        .outerjoin(Sample)
+        .outerjoin(Specimen)
+        .outerjoin(Species)
+        .join(Run)
+        .join(Platform)
+        .outerjoin(Library)
+        .outerjoin(File)
+        .where(Platform.name == 'ONT')
+        .group_by(*data_columns)
+        .order_by(
+            Data.date.desc(),
+            Specimen.specimen_id,
+        )
+    )
+
+    return add_methylation_filter(query, req_args)
 
 
 def mlwh_data_report_query(*_):
@@ -247,26 +330,8 @@ def mlwh_data_report_query_select(*_):
 def illumina_data_report_query(*_):
     return (
         select(
-            Species.species_id.label('species'),
-            Specimen.specimen_id.label('specimen'),
-            Platform.name.label('platform'),
-            Platform.model,
-            Data.data_id.label('data_id'),
-            Data.reads.label('reads'),
-            Data.bases.label('bases'),
-            Data.read_length_mean.label('read_length'),
-            Sample.accession_id.label('sample_accession'),
-            Data.accession_id.label('run_accession'),
-            Sample.sample_id.label('sample'),
-            Data.tag1_id.label('tag_id'),
-            Data.tag2_id.label('tag2_id'),
-            Data.lims_qc.label('lims_qc'),
-            iso_date_col('date', Run.complete),
-            Library.library_type_id.label('pipeline'),
-            Data.bases_a,
-            Data.bases_c,
-            Data.bases_g,
-            Data.bases_t,
+            *seq_data_header_cols(),
+            *basic_seq_stat_cols(),
         )
         .select_from(Data)
         .outerjoin(Sample)
@@ -304,14 +369,14 @@ def metagenome_report_query(*_):
             Metagenome.metagenome_id.label('metagenome'),
             Specimen.specimen_id.label('host_specimen'),
             MetagenomeStatus.status_type_id.label('status'),
-            Specimen.accession_id.label('host_biospecimen_accn'),
+            Specimen.accession_id.label('host_biospecimen_accession'),
             host_species.species_id.label('host_species'),
             host_species.taxon_id.label('host_taxon_id'),
             Species.species_id.label('taxon_name'),
             Species.taxon_id,
-            Metagenome.biosample_accession_id.label('biosample_accn'),
+            Metagenome.biosample_accession_id.label('biosample_accession'),
             Metagenome.bioproject_accession_id.label('bioproject'),
-            Metagenome.assembly_accession_id.label('assembly_accn'),
+            Metagenome.assembly_accession_id.label('assembly_accession'),
             bin_counts.c.mag_count,
             bin_counts.c.bin_count,
             Metagenome.coverage,
@@ -336,8 +401,8 @@ def metagenome_bin_report_query(*_):
             MetagenomeBinStatus.status_type_id.label('status'),
             Species.species_id.label('taxon_name'),
             Species.taxon_id,
-            MetagenomeBin.biosample_accession_id.label('biosample_accn'),
-            MetagenomeBin.assembly_accession_id.label('assembly_accn'),
+            MetagenomeBin.biosample_accession_id.label('biosample_accession'),
+            MetagenomeBin.assembly_accession_id.label('assembly_accession'),
             MetagenomeBin.gtdb_taxonomy,
             MetagenomeBin.bin_type,
             MetagenomeBin.length,
@@ -364,16 +429,13 @@ def metagenome_bin_report_query(*_):
     )
 
 
-def specimen_status_report_query(req_args):
-
+def specimen_status_report_query(req_args: RequestArgs):
     # Filters on the `data` table
-    data_vals = req_args.pop_args('processed', 'qc', 'visibility')
+    data_vals = req_args.pop_args_dict('processed', 'qc', 'visibility')
 
-    # Filter on project name
-    project_arg = req_args.pop_args('project')
-
-    # Filter on assignee
-    assignee_arg = req_args.pop_args('assignee')
+    # Filters on project name and assignee
+    project = req_args.pop_arg('project')
+    assignee = req_args.pop_arg('assignee')
 
     # Species data summary for all species which are not 'unidentified'.
     species_data_query = (
@@ -431,13 +493,12 @@ def specimen_status_report_query(req_args):
         wospi_data_query = wospi_data_query.where(getattr(Data, colname) == val)
 
     # Add filtering on project name
-    if 'project' in project_arg:
-        project_id = project_arg['project']  # Can be `None`
+    if project is not NoArg:
         species_data_query = species_data_query.outerjoin(Allocation).where(
-            Allocation.project_id == project_id
+            Allocation.project_id == project
         )
         wospi_data_query = wospi_data_query.outerjoin(Allocation).where(
-            Allocation.project_id == project_id
+            Allocation.project_id == project
         )
 
     # Turn queries into CTEs
@@ -507,7 +568,7 @@ def specimen_status_report_query(req_args):
             Species.taxon_order,
             Species.taxon_phylum,
             Species.taxon_group,
-            Specimen.accession_id.label('biospecimen'),
+            Specimen.accession_id.label('biospecimen_accession'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
             Species.data_accession_id.label('data_bioproject'),
             User.name.label('assignee'),
@@ -564,10 +625,9 @@ def specimen_status_report_query(req_args):
     # Add `data` table, project name and assignee filtering to the main query
     for colname, val in data_vals.items():
         query = query.where(getattr(Data, colname) == val)
-    if 'project' in project_arg:
-        query = query.where(Allocation.project_id == project_arg['project'])
-    if 'assignee' in assignee_arg:
-        assignee = assignee_arg['assignee']
+    if project is not NoArg:
+        query = query.where(Allocation.project_id == project)
+    if assignee is not NoArg:
         query = query.where(User.name == assignee)
 
     return query
