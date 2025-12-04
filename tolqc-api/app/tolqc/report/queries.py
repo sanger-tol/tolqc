@@ -684,8 +684,8 @@ def datasets_report_query(req_args: RequestArgs):
     gscope_fldr_loc = aliased(FolderLocation)
     smdg_plt_fldr_loc = aliased(FolderLocation)
 
-    # Dataset columns listed for convenience to avoid repetition
-    # in the GROUP BY
+    # Dataset columns listed for convenience so that they can be reused in
+    # both the SELECT and in the GROUP BY
     dataset_cols = (
         Dataset.dataset_id,
         Dataset.name,
