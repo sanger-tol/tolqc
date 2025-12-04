@@ -16,6 +16,7 @@ from tol.api_base import custom_blueprint
 from tolqc.json import json_dumps
 from tolqc.report.bundles import FolderBundle, IsoDateTimeBundle
 from tolqc.report.queries import (
+    datasets_report_query,
     illumina_data_report_query,
     metagenome_bin_report_query,
     metagenome_report_query,
@@ -76,6 +77,7 @@ class ReportEngine:
     }
 
     QUERY_FUNCS = {
+        'datasets': datasets_report_query,
         'illumina-data': illumina_data_report_query,
         'metagenome': metagenome_report_query,
         'metagenome-bin': metagenome_bin_report_query,
