@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import Float, Numeric, case, distinct, func, literal, select
+from sqlalchemy import Float, Numeric, and_, case, distinct, func, literal, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
@@ -691,7 +691,7 @@ def datasets_report_query(req_args: RequestArgs):
         Dataset.dataset_id,
         Dataset.name,
         DatasetStatus.status_type_id.label('dataset_status'),
-        DatasetStatus.status_time.label('status_time'),
+        iso_datetime_col('status_time', DatasetStatus.status_time),
         pttnd_gscope.c.review_status,
         pttnd_gscope.c.kcov,
         pttnd_smdg_plt.c.interpretation,
@@ -732,7 +732,13 @@ def datasets_report_query(req_args: RequestArgs):
         .outerjoin(Sample.specimen)
         .outerjoin(Specimen.species)
         # Partitioned Genomescope table and folder
-        .outerjoin(pttnd_gscope, Dataset.dataset_id == pttnd_gscope.c.dataset_id)
+        .outerjoin(
+            pttnd_gscope,
+            and_(
+                Dataset.dataset_id == pttnd_gscope.c.dataset_id,
+                pttnd_gscope.c.gs_ds_index == 1,
+            ),
+        )
         .outerjoin(
             gscope_fldr,
             pttnd_gscope.c.folder_ulid == gscope_fldr.folder_ulid,
@@ -742,7 +748,13 @@ def datasets_report_query(req_args: RequestArgs):
             gscope_fldr.folder_location_id == gscope_fldr_loc.folder_location_id,
         )
         # Partitioned Smudgeplot table and folder
-        .outerjoin(pttnd_smdg_plt, Dataset.dataset_id == pttnd_smdg_plt.c.dataset_id)
+        .outerjoin(
+            pttnd_smdg_plt,
+            and_(
+                Dataset.dataset_id == pttnd_smdg_plt.c.dataset_id,
+                pttnd_smdg_plt.c.smdg_ds_index == 1,
+            ),
+        )
         .outerjoin(
             smdg_plt_fldr,
             pttnd_smdg_plt.c.folder_ulid == smdg_plt_fldr.folder_ulid,
@@ -761,7 +773,6 @@ def datasets_report_query(req_args: RequestArgs):
             smdg_plt_fldr.folder_ulid,
             smdg_plt_fldr.image_file_list,
         )
-        .where(pttnd_gscope.c.gs_ds_index == 1)
         .order_by(Dataset.dataset_id.desc())
     )
 
