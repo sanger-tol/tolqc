@@ -44,6 +44,7 @@ def seq_data_header_cols():
         Specimen.specimen_id.label('specimen'),
         Sample.sample_id.label('sample'),
         Library.library_id.label('library'),
+        Library.library_type_id.label('pipeline'),
         Platform.name.label('platform'),
         Platform.model,
         Run.instrument_name.label('instrument'),
