@@ -646,6 +646,11 @@ def specimen_status_report_query(req_args: RequestArgs):
 def datasets_report_query(req_args: RequestArgs):
     tolid_prefix = req_args.pop_arg('tolid_prefix')
 
+    # Filtering on:
+    #  - specimen count
+    #  - genomescope result count
+    #  - smudgeplot result count
+
     # Genomescope results partitioned by `dataset_id`
     pttnd_gscope = select(
         GenomescopeMetrics.review_id.label('review_status'),
@@ -657,7 +662,8 @@ def datasets_report_query(req_args: RequestArgs):
             order_by=(
                 # Bubble "Accepted" results to the top
                 case((GenomescopeMetrics.review_id == 'Accepted', 0), else_=1),
-                # else sort by the most recent (which assumes the )
+                # else sort by the most recent (which assumes the
+                # auto-incremented PK is always increasing).
                 GenomescopeMetrics.id.desc(),
             ),
             partition_by=GenomescopeMetrics.dataset_id,
@@ -701,7 +707,7 @@ def datasets_report_query(req_args: RequestArgs):
         select(
             *dataset_cols,
             array_distinct_non_null('data', Data.data_id),
-            array_distinct_non_null('specimens', Sample.specimen_id),
+            array_distinct_non_null('specimens', Specimen.specimen_id),
             func.round(func.sum(Data.bases) / func.max(Species.genome_size), 1)
             .cast(Float)
             .label('naive_coverage'),
