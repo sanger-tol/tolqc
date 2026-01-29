@@ -26,6 +26,7 @@ services:
       - DB_URI
       - TOLQC_URL
       - API_PATH
+      - API_DATA_PATH
       - API_TOKEN
       - OIDC_CLIENT_ID
       - OIDC_CLIENT_SECRET
@@ -54,6 +55,7 @@ services:
     environment:
       - NODE_ENV=development
       - REACT_APP_API_PATH=${API_PATH}
+      - REACT_APP_API_DATA_PATH=${API_DATA_PATH}
       - REACT_APP_MATOMO_SITE_ID=${MATOMO_SITE_ID}
     ports:
       - 3004:3000
@@ -70,6 +72,7 @@ services:
       - DB_URI
       - TOLQC_URL
       - API_PATH
+      - API_DATA_PATH
       - API_TOKEN
       - ELIXIR_CLIENT_ID
       - ELIXIR_CLIENT_SECRET

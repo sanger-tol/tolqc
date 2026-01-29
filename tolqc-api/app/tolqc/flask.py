@@ -46,7 +46,9 @@ def application(session_factory=None):
         logging.getLogger().setLevel(logging.DEBUG)
 
     api_path = os.getenv('TOLQC_API_PATH', os.getenv('API_PATH', '/api/v1'))
+    api_data_path = os.getenv('TOLQC_API_DATA_PATH', os.getenv('API_DATA_PATH', '/data'))
     logging.debug(f'{api_path = }')
+    logging.debug(f'{api_data_path = }')
 
     db_uri = os.getenv('DB_URI')
     if not session_factory:
@@ -108,7 +110,7 @@ def application(session_factory=None):
     app.register_blueprint(
         blueprint_data_tolqc,
         name='tolqc',
-        url_prefix=api_path + '/data',
+        url_prefix=api_path + api_data_path,
     )
     core_data_object(tolqc_ds)
 
