@@ -9,12 +9,16 @@ import {
   Home 
 } from './pages';
 import reportWebVitals from './reportWebVitals';
-import { TolApp, Page, Dropdown, TsDataSource } from '@tol/tol-ui'
+import { TolApp, TsDataSource, env } from '@tol/tol-ui'
 import Logo from './assets/logo.png';
 import './scss/styling.scss';
 
-export const ELASTIC_DS = new TsDataSource({apiPrefix: "data/tol_production"});
-export const TOLQC_DS = new TsDataSource({apiPrefix: "data/tolqc"});
+export const TOLQC_DS = new TsDataSource(
+  {
+    apiPath: env.API_PATH,
+    apiDataPath: env.API_DATA_PATH,
+  }
+);
 
 const root = createRoot(document.getElementById('root')!);
 root.render(
