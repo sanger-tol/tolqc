@@ -14,8 +14,8 @@ from sqlalchemy.exc import DBAPIError
 from tol.api_base import data_blueprint, system_blueprint
 from tol.api_base.auth import env_oidc_config
 from tol.board import board_blueprint
-from tol.core import core_data_object
-from tol.sql import create_sql_datasource
+from tol.core import DataSourceUtils
+from tol.sources.portaldb import portaldb
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
@@ -93,8 +93,10 @@ def application(session_factory=None):
     # instance during each Flask request.
     database_factory, session_factory = build_database_factory(session_factory, models)
 
-    # Tol QC endpoints
-    tolqc_ds = create_sql_datasource(
+    portaldb_ds = portaldb()
+    tolqc_datasource_instance = portaldb_ds.get_one('data_source_instance', 'tolqc_internal')
+    tolqc_ds = DataSourceUtils.get_datasource_by_datasource_instance(
+        tolqc_datasource_instance,
         models=models,
         db_uri=db_uri,
         behind_api=True,
@@ -112,7 +114,6 @@ def application(session_factory=None):
         name='tolqc',
         url_prefix=api_path + api_data_path,
     )
-    core_data_object(tolqc_ds)
 
     # Reports
     blueprint_reports = reports_blueprint(

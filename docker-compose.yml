@@ -28,6 +28,8 @@ services:
       - API_PATH
       - API_DATA_PATH
       - API_TOKEN
+      - PORTAL_URL
+      - PORTAL_API_PATH
       - OIDC_CLIENT_ID
       - OIDC_CLIENT_SECRET
       - OIDC_REDIRECT_URI
