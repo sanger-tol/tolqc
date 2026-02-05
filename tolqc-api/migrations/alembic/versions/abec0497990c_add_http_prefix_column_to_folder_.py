@@ -1,18 +1,17 @@
 """Add http_prefix column to folder_location
 
 Revision ID: abec0497990c
-Revises: ffe2aae8d627
+Revises: 9a5f4bb6f974
 Create Date: 2026-02-05 16:26:43.134811
 
 """
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'abec0497990c'
-down_revision = 'ffe2aae8d627'
+down_revision = '9a5f4bb6f974'
 branch_labels = None
 depends_on = None
 
@@ -34,10 +33,6 @@ def upgrade() -> None:
     )
 
     # Update data source tables to stay in sync with tol-sdk
-    op.add_column(
-        'data_source_config_relationship',
-        sa.Column('source_order', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    )
     op.alter_column(
         'data_source_instance',
         'data_source_config_id',
