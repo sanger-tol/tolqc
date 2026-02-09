@@ -117,7 +117,6 @@ def pipeline_data_report_query(req_args: RequestArgs):
                 Specimen.specimen_id,
                 LibraryType.hierarchy_name,
             ),
-            Library.library_type_id.label('pipeline'),
             Data.pcr_adapter_id.label('pcr_adapter_id'),
             Species.data_accession_id.label('data_bioproject'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
