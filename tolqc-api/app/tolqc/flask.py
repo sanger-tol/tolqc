@@ -8,6 +8,8 @@ from datetime import timedelta
 
 from flask import Flask
 
+from flask_cors import CORS
+
 from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
 
@@ -49,6 +51,9 @@ def application(session_factory=None):
     api_data_path = os.getenv('TOLQC_API_DATA_PATH', os.getenv('API_DATA_PATH', '/data'))
     logging.debug(f'{api_path = }')
     logging.debug(f'{api_data_path = }')
+
+    CORS(app, resources={r'/api/*': {'origins': '*'}})
+    app.config['CORS_HEADERS'] = 'Content-Type'
 
     db_uri = os.getenv('DB_URI')
     if not session_factory:
