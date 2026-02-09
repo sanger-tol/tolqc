@@ -15,7 +15,6 @@ from sqlalchemy.exc import DBAPIError
 
 from tol.api_base import data_blueprint, system_blueprint
 from tol.api_base.auth import env_oidc_config
-from tol.board import board_blueprint
 from tol.core import DataSourceUtils
 from tol.sources.portaldb import portaldb
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
@@ -140,20 +139,6 @@ def application(session_factory=None):
     app.register_blueprint(
         blueprint_system,
         url_prefix=api_path + '/system',
-    )
-
-    # dashboards
-    boards_bp = board_blueprint(tolqc_ds)
-    app.register_blueprint(
-        boards_bp,
-        name='custom_boards',
-        url_prefix=api_path + '/boards',
-    )
-    blueprint_board_data = data_blueprint(tolqc_ds)
-    app.register_blueprint(
-        blueprint_board_data,
-        name='boards',
-        url_prefix=api_path + '/boards',
     )
 
     @app.errorhandler(BadRequest)
