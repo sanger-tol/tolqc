@@ -113,9 +113,11 @@ tolcore:
     fullname: "tolqc-api"
     probe_url: '/api/v1/system/healthz'
     path: '/api/v1'
+    data_path: '/data'
     token: ""
     extra_env:
       API_PATH: api.path
+      API_DATA_PATH: api.data_path
       API_TOKEN: api.token
   flask:
     env: ""
@@ -125,6 +127,7 @@ tolcore:
     matomo_site_id: ''
     extra_env:
       REACT_APP_API_PATH: api.path
+      REACT_APP_API_DATA_PATH: api.data_path
       REACT_APP_MATOMO_SITE_ID: ui.matomo_site_id
   s3:
     uri: ""
