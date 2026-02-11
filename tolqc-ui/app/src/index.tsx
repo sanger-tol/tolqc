@@ -21,7 +21,7 @@ export const PAGE_ELEMENTS: TPageElements = {
 const root = createRoot(document.getElementById("root")!);
 root.render(
   <SmartApp
-    boards={{ dataSource: TOLQC_DS }}
+    boards={{ boardDataSource: TOLQC_DS }}
     brand={<img src={Logo} alt="ToL Portal Logo" style={{ height: 30 }} />}
     navigation={NAV_CONFIG}
     pageElements={PAGE_ELEMENTS}

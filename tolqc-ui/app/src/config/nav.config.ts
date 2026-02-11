@@ -16,7 +16,6 @@ export const NAV_CONFIG: TNavConfig = {
         route: "/",
       }
     },
-    
   },
   order:[]
 }
