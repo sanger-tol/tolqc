@@ -8,14 +8,15 @@ from datetime import timedelta
 
 from flask import Flask
 
+from flask_cors import CORS
+
 from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
 
 from tol.api_base import data_blueprint, system_blueprint
 from tol.api_base.auth import env_oidc_config
-from tol.board import board_blueprint
-from tol.core import core_data_object
-from tol.sql import create_sql_datasource
+from tol.core import DataSourceUtils
+from tol.sources.portaldb import portaldb
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
@@ -46,7 +47,12 @@ def application(session_factory=None):
         logging.getLogger().setLevel(logging.DEBUG)
 
     api_path = os.getenv('TOLQC_API_PATH', os.getenv('API_PATH', '/api/v1'))
+    api_data_path = os.getenv('TOLQC_API_DATA_PATH', os.getenv('API_DATA_PATH', '/data'))
     logging.debug(f'{api_path = }')
+    logging.debug(f'{api_data_path = }')
+
+    CORS(app, resources={r'/api/*': {'origins': '*'}})
+    app.config['CORS_HEADERS'] = 'Content-Type'
 
     db_uri = os.getenv('DB_URI')
     if not session_factory:
@@ -91,8 +97,10 @@ def application(session_factory=None):
     # instance during each Flask request.
     database_factory, session_factory = build_database_factory(session_factory, models)
 
-    # Tol QC endpoints
-    tolqc_ds = create_sql_datasource(
+    portaldb_ds = portaldb()
+    tolqc_datasource_instance = portaldb_ds.get_one('data_source_instance', 'tolqc_internal')
+    tolqc_ds = DataSourceUtils.get_datasource_by_datasource_instance(
+        tolqc_datasource_instance,
         models=models,
         db_uri=db_uri,
         behind_api=True,
@@ -108,9 +116,8 @@ def application(session_factory=None):
     app.register_blueprint(
         blueprint_data_tolqc,
         name='tolqc',
-        url_prefix=api_path + '/data',
+        url_prefix=api_path + api_data_path,
     )
-    core_data_object(tolqc_ds)
 
     # Reports
     blueprint_reports = reports_blueprint(
@@ -132,20 +139,6 @@ def application(session_factory=None):
     app.register_blueprint(
         blueprint_system,
         url_prefix=api_path + '/system',
-    )
-
-    # dashboards
-    boards_bp = board_blueprint(tolqc_ds)
-    app.register_blueprint(
-        boards_bp,
-        name='custom_boards',
-        url_prefix=api_path + '/boards',
-    )
-    blueprint_board_data = data_blueprint(tolqc_ds)
-    app.register_blueprint(
-        blueprint_board_data,
-        name='boards',
-        url_prefix=api_path + '/boards',
     )
 
     @app.errorhandler(BadRequest)
