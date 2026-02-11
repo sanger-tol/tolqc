@@ -45,18 +45,28 @@ function Home() {
       endpoint="data"
       height={500}
       fields={{
-        "id": {
-          rename: "ID"
+        data:{
+          "id": {
+            rename: "ID"
+          },
+          "date": {
+            rename: "Date"
+          },
+          "name": {
+            rename: "Name"
+          },
+          "sample.id": {
+            rename: "Sanger Sample ID",
+            relationshipBox: true
+          }
         },
-        "date": {
-          rename: "Date"
-        },
-        "name": {
-          rename: "Name"
-        },
-        "sample.id": {
-          rename: "Sanger Sample ID",
-          relationshipBox: true
+        order:{
+          active:[
+            "id",
+            "date",
+            "name",
+            "sample.id"
+          ]
         }
       }}
     />
