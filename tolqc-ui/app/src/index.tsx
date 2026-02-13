@@ -7,13 +7,15 @@ SPDX-License-Identifier: MIT
 import { createRoot } from "react-dom/client";
 import { Home } from "./pages";
 import reportWebVitals from "./reportWebVitals";
-import { SmartApp, TPageElements, TsDataSource } from "@tol/tol-ui";
+import { SmartApp, TPageElements, TsDataSource, TOL_DS, env} from "@tol/tol-ui";
 import Logo from "./assets/logo.png";
 import "./scss/styling.scss";
 import { NAV_CONFIG } from "./config";
 
-export const ELASTIC_DS = new TsDataSource({ apiPath: "data/tol_production" });
-export const TOLQC_DS = new TsDataSource({ apiPath: "data/tolqc" });
+export const TOLQC_DS = new TsDataSource({
+  apiPath: env.API_PATH ,
+  apiDataPath: env.API_DATA_PATH
+});
 export const PAGE_ELEMENTS: TPageElements = {
   home: <Home />,
 };
@@ -21,7 +23,7 @@ export const PAGE_ELEMENTS: TPageElements = {
 const root = createRoot(document.getElementById("root")!);
 root.render(
   <SmartApp
-    boards={{ boardDataSource: TOLQC_DS }}
+    boards={{ boardDataSource: TOL_DS }}
     brand={<img src={Logo} alt="ToL Portal Logo" style={{ height: 30 }} />}
     navigation={NAV_CONFIG}
     pageElements={PAGE_ELEMENTS}

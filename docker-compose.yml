@@ -59,11 +59,13 @@ services:
       - REACT_APP_API_PATH=${API_PATH}
       - REACT_APP_API_DATA_PATH=${API_DATA_PATH}
       - REACT_APP_MATOMO_SITE_ID=${MATOMO_SITE_ID}
+      - LOCAL_TOLUI=${LOCAL_TOLUI}
     ports:
       - 3004:3000
     volumes:
       - './tolqc-ui/app:/usr/src/app'
       - '/usr/src/app/node_modules'
+      - '../components/components-ui/app/src/tol-ui:/usr/src/app/src/tol-ui'
     
   tolqc-api-test:
     image: tolqc-api

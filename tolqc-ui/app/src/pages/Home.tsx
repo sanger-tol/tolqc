@@ -4,12 +4,14 @@ SPDX-FileCopyrightText: 2022 Genome Research Ltd.
 SPDX-License-Identifier: MIT
 */
 
-import { RemoteTable, Widgets, Button, Row, Col } from "@tol/tol-ui";
+import { RemoteTable, Widgets, Button, Row, Col, useZone } from "@tol/tol-ui";
+import { TOLQC_DS } from "..";
 
 const button = (
-  <Button href="https://portal.tol.sanger.ac.uk" style={{ float: "right" }}>
-    Visit ToL Portal
-  </Button>
+  <Button
+  text="Visit ToL Portal"
+  onClick={() => window.open("https://portal.tol.sanger.ac.uk", "_blank")}
+/>
 );
 
 const title = (
@@ -33,10 +35,15 @@ const intro = (
 );
 
 function Home() {
+
+  const tolQCTable = useZone({
+    objectType: "data",
+    dataSource: TOLQC_DS,
+    components: [{ id: "home-table" }],
+  });
+
   const dataTable = (
     <RemoteTable
-      id="data-home-table-v2"
-      displaySource
       height={500}
       fields={{
         data: {
@@ -51,20 +58,30 @@ function Home() {
           },
           "sample.id": {
             rename: "Sanger Sample ID",
-            relationshipBox: true,
           },
         },
         order: {
-          active: ["id", "date", "name", "sample.id"],
+          active: ["id", "date", "sample.id"],
         },
       }}
+      {...tolQCTable}
     />
   );
 
+  const Components = [
+    {
+      component: intro,
+      type: "full",
+    },
+    {
+      component: dataTable,
+      type: "full",
+    },
+  ];
+
   return (
     <div className="data">
-      <Widgets components={[intro]} />
-      <Widgets components={[dataTable]} />
+      <Widgets components={Components} />
     </div>
   );
 }
