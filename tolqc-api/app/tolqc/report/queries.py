@@ -102,6 +102,8 @@ def pipeline_data_report_query(req_args: RequestArgs):
             LibraryType.hierarchy_name.label('lib_type_dir'),
             File.name.label('file_name'),
             File.file_type,
+            File.has_kinetics,
+            File.has_methylation,
             StarPathBundle(
                 'location',
                 *hierarchy,
@@ -152,6 +154,7 @@ def pacbio_data_report_query(req_args: RequestArgs):
         Run.element.label('well'),
         Run.plex_count,
         PacbioRunMetrics.movie_minutes.label('movie_length'),
+        File.has_kinetics,
         Data.tag1_id.label('tag'),
         *basic_seq_stat_cols(),
         Data.read_length_n50,
