@@ -98,7 +98,12 @@ def application(session_factory=None):
     database_factory, session_factory = build_database_factory(session_factory, models)
 
     portaldb_ds = portaldb()
-    tolqc_datasource_instance = portaldb_ds.get_one('data_source_instance', 'tolqc_internal')
+    portaldb_ds.page_size = 500
+    instance_name = 'tolqc_internal'
+    tolqc_datasource_instance = portaldb_ds.get_one('data_source_instance', instance_name)
+    if not tolqc_datasource_instance:
+        msg = f"Failed to get data_source_instance = '{instance_name}'"
+        raise ValueError(msg)
     tolqc_ds = DataSourceUtils.get_datasource_by_datasource_instance(
         tolqc_datasource_instance,
         models=models,
@@ -106,6 +111,7 @@ def application(session_factory=None):
         behind_api=True,
         database_factory=database_factory,
     )
+    portaldb_ds.page_size = 20
 
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
