@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from urllib.parse import quote
+
 from sqlalchemy.orm import Bundle
 
 
@@ -18,7 +20,13 @@ class FolderBundle(Bundle):
             if file_list:
                 for f in file_list:
                     if file := f.get('file'):
-                        f['file'] = '/'.join((prefix, folder_ulid, file))
+                        f['file'] = '/'.join(
+                            (
+                                prefix,
+                                quote(folder_ulid),
+                                quote(file),
+                            )
+                        )
 
             return file_list
 

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import Float, distinct, func, literal, select
+from sqlalchemy import Float, case, distinct, func, literal, or_, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.bundles import (
@@ -106,12 +106,33 @@ def pipeline_data_report_query(req_args: RequestArgs):
             File.has_methylation,
             StarPathBundle(
                 'location',
-                *hierarchy,
+                *hierarchy[:-1],
+                case(
+                    (
+                        File.relative_path != None,  # noqa: E711
+                        func.concat_ws(
+                            '/',
+                            hierarchy[-1],
+                            File.relative_path,
+                        ),
+                    ),
+                    else_=hierarchy[-1],
+                ),
             ),
             StarPathBundle(
                 'file_location',
                 *hierarchy,
-                File.name,
+                case(
+                    (
+                        File.relative_path != None,  # noqa: E711
+                        func.concat_ws(
+                            '/',
+                            File.relative_path,
+                            File.name,
+                        ),
+                    ),
+                    else_=File.name,
+                ),
             ),
             StarPathBundle(
                 'location_branch',
@@ -258,6 +279,14 @@ def mlwh_data_report_query(*_):
         .outerjoin(PacbioRunMetrics)
         .where(Data.study_id != None)  # noqa: E711
         .where(Platform.name.in_(('Illumina', 'PacBio')))
+        .where(
+            or_(
+                # Ignore file types other than BAM and CRAM, which are
+                # (currently) the only ones returned from querying the MLWH.
+                File.file_type == None,  # noqa: E711
+                File.file_type.in_(['BAM', 'CRAM']),
+            )
+        )
         .order_by(
             Data.date.desc(),
         )

@@ -150,13 +150,13 @@ class ReportEngine:
                 *tbl_select,
                 FolderBundle(
                     'image_file_list',
-                    FolderLocation.uri_prefix,
+                    FolderLocation.http_prefix,
                     Folder.folder_ulid,
                     Folder.image_file_list,
                 ),
                 FolderBundle(
                     'other_file_list',
-                    FolderLocation.uri_prefix,
+                    FolderLocation.http_prefix,
                     Folder.folder_ulid,
                     Folder.other_file_list,
                 ),
