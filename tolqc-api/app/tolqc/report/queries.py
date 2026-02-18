@@ -80,7 +80,6 @@ def pipeline_data_report_query(req_args: RequestArgs):
     else:
         loc_path = literal(loc_root.rstrip('/'))
         location_path = func.concat_ws('/', loc_path, Location.path)
-        root_path = [Metadata.string_value]
         root_path = [loc_path]
 
     hierarchy = [
