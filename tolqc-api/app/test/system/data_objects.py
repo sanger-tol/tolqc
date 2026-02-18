@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 Genome Research Ltd.
+# SPDX-FileCopyrightText: 2026 Genome Research Ltd.
 #
 # SPDX-License-Identifier: MIT
 
@@ -380,18 +380,6 @@ def test_data(token: str):
         LibraryType(library_type_id='Ligation'),
         LibraryType(library_type_id='Rapid'),
         LibraryType(
-            library_type_id='ONT_GridIon', hierarchy_name='ont', reporting_category='ont'
-        ),
-        LibraryType(
-            library_type_id='ONT_PromethIon', hierarchy_name='ont', reporting_category='ont'
-        ),
-        LibraryType(
-            library_type_id='ONT_PromethIon_mplx', hierarchy_name='ont', reporting_category='ont'
-        ),
-        LibraryType(
-            library_type_id='ONT_Ultralong', hierarchy_name='ont', reporting_category='ont'
-        ),
-        LibraryType(
             library_type_id='PacBio - HiFi (Ampli-Fi)',
             hierarchy_name='pacbio',
             default_category='genomic_data',
@@ -402,6 +390,30 @@ def test_data(token: str):
             hierarchy_name='pacbio',
             default_category='genomic_data',
             reporting_category='pacbio',
+        ),
+        LibraryType(
+            library_type_id='ONT_GridIon',
+            hierarchy_name='ont',
+            default_category='genomic_data',
+            reporting_category='ont',
+        ),
+        LibraryType(
+            library_type_id='ONT_PromethIon',
+            hierarchy_name='ont',
+            default_category='genomic_data',
+            reporting_category='ont',
+        ),
+        LibraryType(
+            library_type_id='ONT_PromethIon_mplx',
+            hierarchy_name='ont',
+            default_category='genomic_data',
+            reporting_category='ont',
+        ),
+        LibraryType(
+            library_type_id='ONT_Ultralong',
+            hierarchy_name='ont',
+            default_category='genomic_data',
+            reporting_category='ont',
         ),
         Platform(id=1, name='Illumina', model='HiSeq'),
         Platform(id=2, name='Illumina', model='HiSeqX'),
@@ -456,8 +468,74 @@ def test_data(token: str):
             file_type='RAW_POD5_DIR', description='Directory of raw ONT data in POD5 format'
         ),
         FolderLocation(
+            folder_location_id='genomescope_s3',
+            uri_prefix='s3://tolqc-dev/genomescope',
+            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/genomescope',
+            files_template={
+                'image_file_patterns': [
+                    {
+                        'index': 2,
+                        'caption': 'Genomescope 2.0 transformed linear plot',
+                        'pattern': '.*_genomescope_transformed_linear_plot\\.png',
+                    },
+                    {
+                        'index': 0,
+                        'caption': 'Genomescope 2.0 linear plot',
+                        'pattern': '.*_genomescope_linear_plot\\.png',
+                    },
+                    {
+                        'index': 3,
+                        'caption': 'Genomescope 2.0 transformed log plot',
+                        'pattern': '.*_genomescope_transformed_log_plot\\.png',
+                    },
+                    {
+                        'index': 1,
+                        'caption': 'Genomescope 2.0 log plot',
+                        'pattern': '.*_genomescope_log_plot\\.png',
+                    },
+                ],
+                'other_file_patterns': [
+                    {'caption': 'Kmer counts histogram data', 'pattern': '.*\\.hist\\.txt'}
+                ],
+            },
+        ),
+        FolderLocation(
+            folder_location_id='illumina_data_s3',
+            uri_prefix='s3://tolqc-dev/illumina_data',
+            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/illumina_data',
+            files_template={
+                'image_file_patterns': [
+                    {
+                        'caption': '{library_type} G|C Content',
+                        'pattern': '.+_F0xB00-gc-content\\.png',
+                    },
+                    {
+                        'caption': '{library_type} A|C|G|T Content Per Cycle',
+                        'pattern': '.+_F0xB00-acgt-cycles\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Per Cycle (Overlaid)',
+                        'pattern': '.+_F0xB00-quals\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Per Cycle (Split)',
+                        'pattern': '.+_F0xB00-quals2\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Frequencies, Per Cycle Heat Map',
+                        'pattern': '.+_F0xB00-quals-hm\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Frequencies, Separate Curve Per Cycle',
+                        'pattern': '.+_F0xB00-quals3\\.png',
+                    },
+                ]
+            },
+        ),
+        FolderLocation(
             folder_location_id='pacbio_run_s3',
             uri_prefix='s3://tolqc-dev/pacbio_run',
+            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/pacbio_run',
             files_template={
                 'image_file_patterns': [
                     {'caption': 'Base yield density', 'pattern': 'base_yield_plot\\.png'},
@@ -512,56 +590,27 @@ def test_data(token: str):
             },
         ),
         FolderLocation(
-            folder_location_id='illumina_data_s3',
-            uri_prefix='s3://tolqc-dev/illumina_data',
+            folder_location_id='smudgeplot_s3',
+            uri_prefix='s3://tolqc-dev/smudgeplot',
+            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/smudgeplot',
             files_template={
                 'image_file_patterns': [
                     {
-                        'caption': '{library_type} G|C Content',
-                        'pattern': '.+_F0xB00-gc-content\\.png',
+                        'index': 0,
+                        'caption': 'Smudgeplot plot',
+                        'pattern': '.*_smudgeplot_smudgeplot\\.png',
                     },
                     {
-                        'caption': '{library_type} A|C|G|T Content Per Cycle',
-                        'pattern': '.+_F0xB00-acgt-cycles\\.png',
+                        'index': 1,
+                        'caption': 'Smudgeplot log plot',
+                        'pattern': '.*_smudgeplot_smudgeplot_log10\\.png',
                     },
                     {
-                        'caption': '{library_type} Quality Per Cycle (Overlaid)',
-                        'pattern': '.+_F0xB00-quals\\.png',
-                    },
-                    {
-                        'caption': '{library_type} Quality Per Cycle (Split)',
-                        'pattern': '.+_F0xB00-quals2\\.png',
-                    },
-                    {
-                        'caption': '{library_type} Quality Frequencies, Per Cycle Heat Map',
-                        'pattern': '.+_F0xB00-quals-hm\\.png',
-                    },
-                    {
-                        'caption': '{library_type} Quality Frequencies, Separate Curve Per Cycle',
-                        'pattern': '.+_F0xB00-quals3\\.png',
+                        'index': 2,
+                        'caption': 'Smudgeplot centralities',
+                        'pattern': '.*_smudgeplot_centralities\\.png',
                     },
                 ]
-            },
-        ),
-        FolderLocation(
-            folder_location_id='genomescope_s3',
-            uri_prefix='s3://tolqc-dev/genomescope',
-            files_template={
-                'image_file_patterns': [
-                    {
-                        'caption': 'Genomescope 2.0 transformed linear plot',
-                        'pattern': '.*transformed_linear_plot\\.png',
-                    },
-                    {'caption': 'Genomescope 2.0 linear plot', 'pattern': '.*linear_plot\\.png'},
-                    {
-                        'caption': 'Genomescope 2.0 transformed log plot',
-                        'pattern': '.*transformed_log_plot\\.png',
-                    },
-                    {'caption': 'Genomescope 2.0 log plot', 'pattern': '.*log_plot\\.png'},
-                ],
-                'other_file_patterns': [
-                    {'caption': 'Kmer counts histogram data', 'pattern': '.*\\.hist\\.txt'}
-                ],
             },
         ),
         QCDict(qc_state='pass'),
@@ -663,6 +712,7 @@ def test_data(token: str):
                     sts_specimen='SAN0000889',
                     accession_id='SAMEA7532740',
                     sex_id='Not collected',
+                    ploidy='2',
                     samples=[
                         Sample(
                             sample_id='DTOL9310949',
@@ -709,6 +759,7 @@ def test_data(token: str):
                                             size_bytes=8253265734,
                                             md5='a8ebee530fc5edf3cb3644e2af276498',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -784,6 +835,17 @@ def test_data(token: str):
                                             size_bytes=226437448,
                                             md5='794433fd4dbcf8e81f4b7e87073ebe33',
                                             file_type='CRAM',
+                                            sam_tags=[
+                                                'BC:Z',
+                                                'QT:Z',
+                                                'RG:Z',
+                                                'a3:i',
+                                                'aa:Z',
+                                                'af:f',
+                                                'ah:i',
+                                                'ar:f',
+                                                'as:i',
+                                            ],
                                         )
                                     ],
                                     folder=Folder(
@@ -860,6 +922,7 @@ def test_data(token: str):
                                             size_bytes=8269429324,
                                             md5='d62df44f9dcb5982497720667ba017a3',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z', 'a3:i', 'ah:i'],
                                         )
                                     ],
                                     folder=Folder(
@@ -936,6 +999,15 @@ def test_data(token: str):
                                             size_bytes=8421281844,
                                             md5='901f0a009eee03f14c2ddb3b614e217e',
                                             file_type='CRAM',
+                                            sam_tags=[
+                                                'BC:Z',
+                                                'QT:Z',
+                                                'RG:Z',
+                                                'aa:Z',
+                                                'af:f',
+                                                'ar:f',
+                                                'as:i',
+                                            ],
                                         )
                                     ],
                                     folder=Folder(
@@ -1027,6 +1099,7 @@ def test_data(token: str):
                                             size_bytes=38152933620,
                                             md5='6fdc802b815d8109cca0e05b64390c3f',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -1132,6 +1205,27 @@ def test_data(token: str):
                                             md5='391fc5db79b693a27bb95cc5291888be',
                                             file_type='BAM',
                                             has_methylation=True,
+                                            sam_tags=[
+                                                'HZ:f',
+                                                'RG:Z',
+                                                'bc:B',
+                                                'bl:Z',
+                                                'bq:i',
+                                                'bt:Z',
+                                                'bx:B',
+                                                'cx:i',
+                                                'ec:f',
+                                                'np:i',
+                                                'qe:i',
+                                                'ql:Z',
+                                                'qs:i',
+                                                'qt:Z',
+                                                'rq:f',
+                                                'sn:B',
+                                                'we:i',
+                                                'ws:i',
+                                                'zm:i',
+                                            ],
                                         )
                                     ],
                                 ),
@@ -1277,6 +1371,33 @@ def test_data(token: str):
                                             size_bytes=4943416701,
                                             md5='cfb6b3e0cb54eb97ee1fec78964b6944',
                                             file_type='BAM',
+                                            has_kinetics=True,
+                                            sam_tags=[
+                                                'RG:Z',
+                                                'bc:B',
+                                                'bl:Z',
+                                                'bq:i',
+                                                'bt:Z',
+                                                'bx:B',
+                                                'cx:i',
+                                                'ec:f',
+                                                'fi:B',
+                                                'fn:i',
+                                                'fp:B',
+                                                'np:i',
+                                                'qe:i',
+                                                'ql:Z',
+                                                'qs:i',
+                                                'qt:Z',
+                                                'ri:B',
+                                                'rn:i',
+                                                'rp:B',
+                                                'rq:f',
+                                                'sn:B',
+                                                'we:i',
+                                                'ws:i',
+                                                'zm:i',
+                                            ],
                                         )
                                     ],
                                 ),
@@ -1333,6 +1454,7 @@ def test_data(token: str):
                                             size_bytes=2596511348,
                                             md5='a4f243cf29cabaa05fbeeb126495e7f8',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z', 'a3:i', 'ah:i'],
                                         )
                                     ],
                                     folder=Folder(
@@ -1419,6 +1541,7 @@ def test_data(token: str):
                                             size_bytes=4232398866,
                                             md5='c0ac0c8f911a62997ad2afc28642a56a',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -1504,6 +1627,7 @@ def test_data(token: str):
                                             size_bytes=1417578072,
                                             md5='6001d9101395ae26e07a3c619d6f5985',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -1558,6 +1682,7 @@ def test_data(token: str):
                     sts_specimen='Ox800027',
                     accession_id='SAMEA12753558',
                     sex_id='Not applicable',
+                    ploidy='2',
                     samples=[
                         Sample(
                             sample_id='DTOL14909592',
@@ -1724,6 +1849,31 @@ def test_data(token: str):
                                             md5='f48387aeea2595cbfd4397ab97336485',
                                             file_type='BAM',
                                             has_methylation=True,
+                                            sam_tags=[
+                                                'ML:B',
+                                                'MM:Z',
+                                                'RG:Z',
+                                                'ac:B',
+                                                'bc:B',
+                                                'bl:Z',
+                                                'bq:i',
+                                                'bt:Z',
+                                                'bx:B',
+                                                'cx:i',
+                                                'ec:f',
+                                                'ls:B',
+                                                'ma:i',
+                                                'np:i',
+                                                'qe:i',
+                                                'ql:Z',
+                                                'qs:i',
+                                                'qt:Z',
+                                                'rq:f',
+                                                'sn:B',
+                                                'we:i',
+                                                'ws:i',
+                                                'zm:i',
+                                            ],
                                         )
                                     ],
                                 )
@@ -1744,6 +1894,7 @@ def test_data(token: str):
                     location_id=3113,
                     species_id='Brachiomonas submarina',
                     accession_id='SAMEA7532740',
+                    ploidy='2',
                     accession=Accession(
                         accession_id='SAMEA7532740',
                         accession_type_id='BioSample',
@@ -1780,6 +1931,7 @@ def test_data(token: str):
                     sts_specimen='KDTOL10021',
                     accession_id='SAMEA7521930',
                     sex_id='Hermaphrodite, monoecious',
+                    ploidy='2',
                     assigned_user_id=100,
                     samples=[
                         Sample(
@@ -1845,6 +1997,7 @@ def test_data(token: str):
                                             size_bytes=158472491403,
                                             md5='da73a821a18429f9fc956e806b7f4a82',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -1943,6 +2096,7 @@ def test_data(token: str):
                                             size_bytes=9307345471,
                                             md5='d5ddea4e50f28e1438c8042cbfcc31a8',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -2029,6 +2183,7 @@ def test_data(token: str):
                                             size_bytes=9778070700,
                                             md5='09e26bf8255cd03b333744f9432b5393',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -2115,6 +2270,7 @@ def test_data(token: str):
                                             size_bytes=8754454310,
                                             md5='8b87819338c08db3f325a451e864f227',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -2201,6 +2357,7 @@ def test_data(token: str):
                                             size_bytes=9969777773,
                                             md5='66334c7f81b59b0f1d99b840e6d36550',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -2354,6 +2511,33 @@ def test_data(token: str):
                                             size_bytes=87814836350,
                                             md5='9a6ffb74593409209ab8857b114d799d',
                                             file_type='BAM',
+                                            has_kinetics=True,
+                                            sam_tags=[
+                                                'RG:Z',
+                                                'bc:B',
+                                                'bl:Z',
+                                                'bq:i',
+                                                'bt:Z',
+                                                'bx:B',
+                                                'cx:i',
+                                                'ec:f',
+                                                'fi:B',
+                                                'fn:i',
+                                                'fp:B',
+                                                'np:i',
+                                                'qe:i',
+                                                'ql:Z',
+                                                'qs:i',
+                                                'qt:Z',
+                                                'ri:B',
+                                                'rn:i',
+                                                'rp:B',
+                                                'rq:f',
+                                                'sn:B',
+                                                'we:i',
+                                                'ws:i',
+                                                'zm:i',
+                                            ],
                                         )
                                     ],
                                 )
@@ -2418,6 +2602,7 @@ def test_data(token: str):
                                             size_bytes=2246652402,
                                             md5='40c3393cf594d9e84e6d4cb932328e33',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -2516,6 +2701,7 @@ def test_data(token: str):
                                             size_bytes=2338594230,
                                             md5='2271d40cf440b7fa532b9d808766b189',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
                                     ],
                                     folder=Folder(
@@ -2625,6 +2811,7 @@ def test_data(token: str):
                     sts_priority=1,
                     accession_id='SAMEA113398957',
                     sex_id='Male',
+                    ploidy='2',
                     samples=[
                         Sample(
                             sample_id='DTOL14392235',
@@ -2685,6 +2872,7 @@ def test_data(token: str):
                                             size_bytes=31081394145,
                                             md5='0ac93acd48d2dd15577a8c161764878b',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z', 'a3:i', 'ah:i'],
                                         )
                                     ],
                                     folder=Folder(
@@ -2907,6 +3095,32 @@ def test_data(token: str):
                                             size_bytes=20408107049,
                                             md5='0fedeb709610324722cfb27dd3f37d75',
                                             file_type='BAM',
+                                            has_methylation=True,
+                                            sam_tags=[
+                                                'ML:B',
+                                                'MM:Z',
+                                                'RG:Z',
+                                                'ac:B',
+                                                'bc:B',
+                                                'bl:Z',
+                                                'bq:i',
+                                                'bt:Z',
+                                                'bx:B',
+                                                'cx:i',
+                                                'ec:f',
+                                                'ls:B',
+                                                'ma:i',
+                                                'np:i',
+                                                'qe:i',
+                                                'ql:Z',
+                                                'qs:i',
+                                                'qt:Z',
+                                                'rq:f',
+                                                'sn:B',
+                                                'we:i',
+                                                'ws:i',
+                                                'zm:i',
+                                            ],
                                         )
                                     ],
                                 )
@@ -3104,6 +3318,7 @@ def test_data(token: str):
                                             size_bytes=2885723248,
                                             md5='801ab57f7024d2bb93ac8b65646c414d',
                                             file_type='CRAM',
+                                            sam_tags=['BC:Z', 'QT:Z', 'RG:Z', 'a3:i', 'ah:i'],
                                         )
                                     ],
                                     folder=Folder(
