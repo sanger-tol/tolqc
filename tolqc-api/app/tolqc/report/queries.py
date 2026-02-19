@@ -253,7 +253,6 @@ def mlwh_data_report_query(*_):
         .outerjoin(PacbioRunMetrics)
         .where(Data.study_id != None)  # noqa: E711
         .where(Platform.name.in_(('Illumina', 'PacBio')))
-        .where(File.remote_path.like('irods:%'))
         .where(
             or_(
                 # Ignore file types other than BAM and CRAM, which are
