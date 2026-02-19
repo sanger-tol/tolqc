@@ -2,13 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import Float, case, distinct, func, literal, or_, select
+from sqlalchemy import Float, case, distinct, func, or_, select
 from sqlalchemy.orm import aliased
 
-from tolqc.report.bundles import (
-    LastPathElementBundle,
-    StarPathBundle,
-)
 from tolqc.report.request_args import NoArg, RequestArgs
 from tolqc.schema import User
 from tolqc.schema.metagenome_models import (
@@ -71,15 +67,14 @@ def basic_seq_stat_cols():
 
 def pipeline_data_report_query(req_args: RequestArgs):
     loc_root = req_args.pop_arg('root')
-    if loc_root is NoArg:
-        location_path = Location.path
-        root_path = []
-    elif loc_root is True:
+    location_path = Location.path
+    root_path = []
+    if loc_root is True:
         location_path = func.concat_ws('/', Metadata.string_value, Location.path)
         root_path = [Metadata.string_value]
-    else:
-        loc_path = literal(loc_root.rstrip('/'))
-        location_path = func.concat_ws('/', loc_path, Location.path)
+    elif isinstance(loc_root, str):
+        loc_path = loc_root.rstrip('/')
+        location_path = func.concat(f'{loc_path}/', Location.path)
         root_path = [loc_path]
 
     hierarchy = [
@@ -87,14 +82,25 @@ def pipeline_data_report_query(req_args: RequestArgs):
         Location.path,
         Data.category,
         Specimen.specimen_id,
-        LibraryType.hierarchy_name,
+        case(
+            (
+                # Include relative_path if set
+                File.relative_path != None,  # noqa: E711
+                func.concat_ws(
+                    '/',
+                    func.coalesce(LibraryType.hierarchy_name, '*'),
+                    File.relative_path,
+                ),
+            ),
+            else_=LibraryType.hierarchy_name,
+        ),
     ]
 
     query = (
         select(
             *seq_data_header_cols(),
             File.remote_path,
-            LastPathElementBundle('species_dir', Location.path),
+            func.split_part(Location.path, '/', -1).label('species_dir'),
             Species.taxon_id,
             location_path.label('location_root'),
             Data.category,
@@ -103,42 +109,11 @@ def pipeline_data_report_query(req_args: RequestArgs):
             File.file_type,
             File.has_kinetics,
             File.has_methylation,
-            StarPathBundle(
-                'location',
-                *hierarchy[:-1],
-                case(
-                    (
-                        File.relative_path != None,  # noqa: E711
-                        func.concat_ws(
-                            '/',
-                            hierarchy[-1],
-                            File.relative_path,
-                        ),
-                    ),
-                    else_=hierarchy[-1],
-                ),
-            ),
-            StarPathBundle(
-                'file_location',
-                *hierarchy,
-                case(
-                    (
-                        File.relative_path != None,  # noqa: E711
-                        func.concat_ws(
-                            '/',
-                            File.relative_path,
-                            File.name,
-                        ),
-                    ),
-                    else_=File.name,
-                ),
-            ),
-            StarPathBundle(
-                'location_branch',
-                Data.category,
-                Specimen.specimen_id,
-                LibraryType.hierarchy_name,
-            ),
+            star_if_null_path(*hierarchy).label('location'),
+            star_if_null_path(*hierarchy, File.name).label('file_location'),
+            star_if_null_path(
+                Data.category, Specimen.specimen_id, LibraryType.hierarchy_name
+            ).label('location_branch'),
             Data.pcr_adapter_id.label('pcr_adapter_id'),
             Species.data_accession_id.label('data_bioproject'),
             Species.umbrella_accession_id.label('umbrella_bioproject'),
@@ -278,6 +253,7 @@ def mlwh_data_report_query(*_):
         .outerjoin(PacbioRunMetrics)
         .where(Data.study_id != None)  # noqa: E711
         .where(Platform.name.in_(('Illumina', 'PacBio')))
+        .where(File.remote_path.like('irods:%'))
         .where(
             or_(
                 # Ignore file types other than BAM and CRAM, which are
@@ -691,3 +667,11 @@ def iso_date_col(label_txt, column):
     Builds SQL for returning an ISO 8601 date string
     """
     return func.to_char(column, 'YYYY-MM-DD').label(label_txt)
+
+
+def star_if_null_path(*path):
+    """
+    Builds SQL for returning a file path, replacing any null null with '*'
+    """
+    cols = [func.coalesce(x, '*') for x in path]
+    return func.concat_ws('/', *cols)
