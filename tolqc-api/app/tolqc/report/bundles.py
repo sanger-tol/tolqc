@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from urllib.parse import quote
+
 from sqlalchemy.orm import Bundle
 
 
@@ -18,63 +20,15 @@ class FolderBundle(Bundle):
             if file_list:
                 for f in file_list:
                     if file := f.get('file'):
-                        f['file'] = '/'.join((prefix, folder_ulid, file))
+                        f['file'] = '/'.join(
+                            (
+                                prefix,
+                                quote(folder_ulid),
+                                quote(file),
+                            )
+                        )
 
             return file_list
-
-        return processor
-
-
-class LastPathElementBundle(Bundle):
-    """Return the last element of the path"""
-
-    def create_row_processor(self, query, getters, _):
-        (get_path,) = getters
-
-        def processor(row):
-            path = get_path(row)
-            return path.split('/')[-1] if path else None
-
-        return processor
-
-
-class StarPathBundle(Bundle):
-    """
-    Provided that the first element is not null, return all elements joined as
-    a path, with `*` replacing any values which are null.
-    """
-
-    def create_row_processor(self, query, getters, _):
-        def processor(row):
-            elements = tuple(g(row) for g in getters)
-            if elements[0] is None:
-                return None
-            else:
-                return '/'.join('*' if x is None else x for x in elements)
-
-        return processor
-
-
-class ProjectGroupBundle(Bundle):
-    """
-    Combine the "proj" and "taxon_group" columns if the "proj" column
-    contains "{}", else returns the "proj" itself.
-    e.g. ("darwin/{}", "birds") becomes "darwin/birds"
-    """  # noqa: P102
-
-    def create_row_processor(self, query, getters, _):
-        get_proj, get_taxon_group = getters
-
-        def processor(row):
-            proj = get_proj(row)
-            taxon_group = get_taxon_group(row)
-            group = None
-            if proj is not None:
-                if '{}' in proj and taxon_group is not None:  # noqa: P103
-                    group = proj.format(taxon_group)
-                else:
-                    group = proj
-            return group
 
         return processor
 

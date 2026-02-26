@@ -127,7 +127,7 @@ def test_folder_report(client, api_path):
             if files is not None:
                 files_count += 1
                 for spec in files:
-                    assert spec['file'].startswith('s3://')
+                    assert spec['file'].startswith('https://')
     assert files_count > 0
 
 
