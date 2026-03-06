@@ -41,6 +41,7 @@ def seq_data_header_cols():
         Sample.sample_id.label('sample'),
         Library.library_id.label('library'),
         Library.library_type_id.label('pipeline'),
+        LibraryType.reporting_category.label('data_type'),
         Platform.name.label('platform'),
         Platform.model,
         Run.instrument_name.label('instrument'),
@@ -66,6 +67,8 @@ def basic_seq_stat_cols():
 
 
 def pipeline_data_report_query(req_args: RequestArgs):
+    project = req_args.pop_arg('project')
+
     loc_root = req_args.pop_arg('root')
     location_path = Location.path
     root_path = []
@@ -96,33 +99,56 @@ def pipeline_data_report_query(req_args: RequestArgs):
         ),
     ]
 
+    # Need aliases for allocation and project table since we join into them to
+    # get both the primary project and the list of all projects which the
+    # data is in.
+    primary_allocation = aliased(Allocation)
+
+    top_data_columns = [
+        *seq_data_header_cols(),
+        Specimen.sts_specimen,
+        primary_allocation.project_id.label('primary_project'),
+    ]
+
+    bottom_data_columns = [
+        File.remote_path,
+        func.split_part(Location.path, '/', -1).label('species_dir'),
+        Species.taxon_id,
+        location_path.label('location_root'),
+        Data.category,
+        LibraryType.hierarchy_name.label('lib_type_dir'),
+        File.name.label('file_name'),
+        File.md5,
+        File.file_type,
+        File.has_kinetics,
+        File.has_methylation,
+        star_if_null_path(*hierarchy).label('location'),
+        star_if_null_path(*hierarchy, File.name).label('file_location'),
+        star_if_null_path(
+            Data.category, Specimen.specimen_id, LibraryType.hierarchy_name
+        ).label('location_branch'),
+        Data.pcr_adapter_id.label('pcr_adapter_id'),
+        Species.data_accession_id.label('data_bioproject'),
+        Species.umbrella_accession_id.label('umbrella_bioproject'),
+        Data.study_id,
+        Data.visibility,
+        Data.qc,
+        Data.processed,
+    ]
+
     query = (
         select(
-            *seq_data_header_cols(),
-            File.remote_path,
-            func.split_part(Location.path, '/', -1).label('species_dir'),
-            Species.taxon_id,
-            location_path.label('location_root'),
-            Data.category,
-            LibraryType.hierarchy_name.label('lib_type_dir'),
-            File.name.label('file_name'),
-            File.file_type,
-            File.has_kinetics,
-            File.has_methylation,
-            star_if_null_path(*hierarchy).label('location'),
-            star_if_null_path(*hierarchy, File.name).label('file_location'),
-            star_if_null_path(
-                Data.category, Specimen.specimen_id, LibraryType.hierarchy_name
-            ).label('location_branch'),
-            Data.pcr_adapter_id.label('pcr_adapter_id'),
-            Species.data_accession_id.label('data_bioproject'),
-            Species.umbrella_accession_id.label('umbrella_bioproject'),
-            Data.study_id,
-            Data.visibility,
-            Data.qc,
-            Data.processed,
+            *top_data_columns,
+            array_distinct_non_null('projects', Allocation.project_id),
+            *bottom_data_columns,
         )
         .select_from(Data)
+        .outerjoin(Allocation)
+        # Second join into allocation table to get the primary project
+        .outerjoin(
+            primary_allocation,
+            Data.project_assn.and_(primary_allocation.is_primary == True),  # noqa: E712
+        )
         .outerjoin(Sample)
         .outerjoin(Specimen)
         # Important to join to Location from Specimen not Species!
@@ -134,8 +160,11 @@ def pipeline_data_report_query(req_args: RequestArgs):
         .outerjoin(Run)
         .outerjoin(Platform)
         .order_by(Data.data_id.desc())
+        .group_by(*top_data_columns, *bottom_data_columns)
     )
 
+    if project is not NoArg:
+        query = query.where(Allocation.project_id == project)
     if loc_root is True:
         query = query.join(Metadata, Metadata.name == 'location.root')
 
@@ -182,6 +211,7 @@ def pacbio_data_report_query(req_args: RequestArgs):
         .join(Run)
         .join(Platform)
         .outerjoin(Library)
+        .outerjoin(LibraryType)
         .outerjoin(PacbioRunMetrics)
         .outerjoin(File)
         .where(Platform.name == 'PacBio')
@@ -227,6 +257,7 @@ def ont_data_report_query(req_args: RequestArgs):
         .join(Run)
         .join(Platform)
         .outerjoin(Library)
+        .outerjoin(LibraryType)
         .outerjoin(File)
         .where(Platform.name == 'ONT')
         .group_by(*data_columns)
@@ -346,6 +377,7 @@ def illumina_data_report_query(*_):
         .join(Run)
         .join(Platform)
         .outerjoin(Library)
+        .outerjoin(LibraryType)
         .where(Platform.name == 'Illumina')
         .order_by(
             Data.date.desc(),
@@ -651,7 +683,11 @@ def percent_col(label_txt, nominator, divisor, decimal_places=4):
     """
     Builds SQL for returning a column in %
     """
-    return func.round(100 * nominator / divisor, decimal_places).cast(Float).label(label_txt)
+    return (
+        func.round(100 * nominator / divisor, decimal_places)
+        .cast(Float)
+        .label(label_txt)
+    )
 
 
 def iso_datetime_col(label_txt, column):
