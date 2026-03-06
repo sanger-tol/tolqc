@@ -216,6 +216,8 @@ class File(Base):
     name = mapped_column(String, index=True)
     relative_path = mapped_column(String)
     remote_path = mapped_column(String, index=True)
+    public_path = mapped_column(String)
+    insdc_path = mapped_column(String)
     size_bytes = mapped_column(BigInteger)
     md5 = mapped_column(String)
     file_type = mapped_column(String, ForeignKey('file_type_dict.file_type'))

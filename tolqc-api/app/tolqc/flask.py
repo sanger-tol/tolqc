@@ -111,7 +111,6 @@ def application(session_factory=None):
         behind_api=True,
         database_factory=database_factory,
     )
-    portaldb_ds.page_size = 20
 
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
