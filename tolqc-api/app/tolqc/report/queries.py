@@ -164,7 +164,11 @@ def pipeline_data_report_query(req_args: RequestArgs):
     )
 
     if project is not NoArg:
-        query = query.where(Allocation.project_id == project)
+        # Add a new Allocation alias for filtering on project
+        filter_allocation = aliased(Allocation)
+        query = query.outerjoin(filter_allocation).where(
+            filter_allocation.project_id == project
+        )
     if loc_root is True:
         query = query.join(Metadata, Metadata.name == 'location.root')
 
@@ -664,7 +668,10 @@ def specimen_status_report_query(req_args: RequestArgs):
     for colname, val in data_vals.items():
         query = query.where(getattr(Data, colname) == val)
     if project is not NoArg:
-        query = query.where(Allocation.project_id == project)
+        filter_allocation = aliased(Allocation)
+        query = query.outerjoin(filter_allocation, Data.project_assn).where(
+            filter_allocation.project_id == project
+        )
     if assignee is not NoArg:
         query = query.where(User.name == assignee)
 
