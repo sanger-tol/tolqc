@@ -267,7 +267,7 @@ class LibraryType(Base):
     library_type_id = mapped_column(String, primary_key=True)
     hierarchy_name = mapped_column(String)
     default_category = mapped_column(String)
-    reporting_category = mapped_column(String)
+    reporting_category = mapped_column(String, index=True)
     kit = mapped_column(String)
     enzymes = mapped_column(String)
     cut_sites = mapped_column(String)

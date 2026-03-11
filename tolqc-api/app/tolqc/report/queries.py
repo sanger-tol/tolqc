@@ -106,6 +106,8 @@ def pipeline_data_report_query(req_args: RequestArgs):
 
     top_data_columns = [
         *seq_data_header_cols(),
+        File.insdc_path,
+        File.public_path,
         Specimen.sts_specimen,
         primary_allocation.project_id.label('primary_project'),
     ]
