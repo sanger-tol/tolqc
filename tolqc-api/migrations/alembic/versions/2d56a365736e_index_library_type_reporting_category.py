@@ -32,6 +32,14 @@ def upgrade() -> None:
             'data_id',
         ],
     )
+    op.create_unique_constraint(
+        'allocation_data_id_is_primary_key',
+        'allocation',
+        [
+            'data_id',
+            'is_primary',
+        ],
+    )
 
 
 def downgrade() -> None:

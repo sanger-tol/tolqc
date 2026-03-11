@@ -30,6 +30,7 @@ class Allocation(Base):
     is_primary = mapped_column(Boolean)
 
     UniqueConstraint('project_id', 'data_id')
+    UniqueConstraint('data_id', 'is_primary')
 
     project = relationship('Project', back_populates='data_assn')
     data = relationship('Data', back_populates='project_assn')
