@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-
 from sqlalchemy import (
     BigInteger,
     DateTime,
@@ -56,6 +55,45 @@ class Assembly(LogBase, HasFolder):
     )
     assigned_user_id = mapped_column(Integer, ForeignKey('user.id'))
 
+    # Assembly metrics columns
+    bases_count = mapped_column(BigInteger)
+    bases_a = mapped_column(BigInteger)
+    bases_c = mapped_column(BigInteger)
+    bases_g = mapped_column(BigInteger)
+    bases_t = mapped_column(BigInteger)
+    bases_n = mapped_column(BigInteger)
+    bases_cpg = mapped_column(BigInteger)
+
+    contig_count = mapped_column(Integer)
+    contig_length = mapped_column(BigInteger)
+    contig_longest = mapped_column(BigInteger)
+    contig_shortest = mapped_column(BigInteger)
+    contig_length_mean = mapped_column(Float)
+    contig_n50 = mapped_column(BigInteger)
+    contig_l50 = mapped_column(BigInteger)
+    contig_aun = mapped_column(Float)
+
+    scaffold_count = mapped_column(Integer)
+    scaffold_length = mapped_column(BigInteger)
+    scaffold_longest = mapped_column(BigInteger)
+    scaffold_shortest = mapped_column(BigInteger)
+    scaffold_length_mean = mapped_column(Float)
+    scaffold_n50 = mapped_column(BigInteger)
+    scaffold_l50 = mapped_column(BigInteger)
+    scaffold_aun = mapped_column(Float)
+
+    gap_count = mapped_column(Integer)
+    gap_length = mapped_column(BigInteger)
+    gap_longest = mapped_column(BigInteger)
+    gap_shortest = mapped_column(BigInteger)
+    gap_length_mean = mapped_column(Float)
+    gap_n50 = mapped_column(BigInteger)
+    gap_l50 = mapped_column(BigInteger)
+    gap_aun = mapped_column(Float)
+
+    # For further metrics beyond those above
+    metrics = mapped_column(JSONB)
+
     specimen = relationship('Specimen', back_populates='assemblies')
 
     dataset_assn = relationship('AssemblyDataset', back_populates='assembly')
@@ -70,10 +108,6 @@ class Assembly(LogBase, HasFolder):
         back_populates='assemblies',
     )
 
-    assembly_metrics = relationship(
-        'AssemblyMetrics',
-        back_populates='assembly',
-    )
     busco_metrics = relationship('BuscoMetrics', back_populates='assembly')
     contigviz_metrics = relationship(
         'ContigvizMetrics',
@@ -151,38 +185,6 @@ class AssemblyDataset(Base):
 
     assembly = relationship('Assembly', back_populates='dataset_assn')
     dataset = relationship('Dataset', back_populates='assembly_assn')
-
-
-class AssemblyMetrics(Base):
-    __tablename__ = 'assembly_metrics'
-
-    id = mapped_column(Integer, primary_key=True)  # noqa: A003
-    assembly_id = mapped_column(Integer, ForeignKey('assembly.assembly_id'))
-    bases = mapped_column(BigInteger)
-    bases_a = mapped_column(BigInteger)
-    bases_c = mapped_column(BigInteger)
-    bases_g = mapped_column(BigInteger)
-    bases_t = mapped_column(BigInteger)
-    bases_n = mapped_column(BigInteger)
-    bases_cpg = mapped_column(BigInteger)
-    bases_iupac3 = mapped_column(BigInteger)
-    bases_iupac2 = mapped_column(BigInteger)
-    bases_ts = mapped_column(BigInteger)
-    bases_tv = mapped_column(BigInteger)
-    bases_cpg_ts = mapped_column(BigInteger)
-    contig_n = mapped_column(Integer)
-    contig_length = mapped_column(BigInteger)
-    contig_n50 = mapped_column(BigInteger)
-    contig_aun = mapped_column(Float)
-    contig_longest = mapped_column(BigInteger)
-    contig_shortest = mapped_column(BigInteger)
-    contig_length_mean = mapped_column(Float)
-    scaffolds = mapped_column(Integer)
-    scaffold_n50 = mapped_column(BigInteger)
-    scaffold_aun = mapped_column(Float)
-    gaps = mapped_column(Integer)
-    gap_n50 = mapped_column(BigInteger)
-    assembly = relationship('Assembly', back_populates='assembly_metrics')
 
 
 class AssemblySource(Base):
@@ -273,12 +275,14 @@ class BuscoMetrics(Base, HasFolder):
     fragmented = mapped_column(Integer)
     missing = mapped_column(Integer)
     count = mapped_column(Integer)
+    stop_codons = mapped_column(Integer)
     busco_lineage_id = mapped_column(Integer, ForeignKey('busco_lineage.id'))
     summary = mapped_column(String)
     pipeline_id = mapped_column(
         Integer,
         ForeignKey('pipeline.pipeline_id'),
     )
+    results = mapped_column(JSONB)
 
     assembly = relationship('Assembly', back_populates='busco_metrics')
     busco_lineage = relationship(

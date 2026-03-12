@@ -606,6 +606,7 @@ def specimen_status_report_query(req_args: RequestArgs):
             Specimen.taxon_id.label('specimen_taxon_id'),
             Specimen.sts_priority,
             Specimen.sex_id.label('sex'),
+            Specimen.ploidy,
             Species.genome_size,
             Species.family_taxon_id,
             Species.taxon_family,
