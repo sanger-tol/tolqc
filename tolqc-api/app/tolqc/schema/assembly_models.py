@@ -56,7 +56,7 @@ class Assembly(LogBase, HasFolder):
     assigned_user_id = mapped_column(Integer, ForeignKey('user.id'))
 
     # Assembly metrics columns
-    bases_count = mapped_column(BigInteger)
+    bases = mapped_column(BigInteger)
     bases_a = mapped_column(BigInteger)
     bases_c = mapped_column(BigInteger)
     bases_g = mapped_column(BigInteger)
@@ -64,7 +64,7 @@ class Assembly(LogBase, HasFolder):
     bases_n = mapped_column(BigInteger)
     bases_cpg = mapped_column(BigInteger)
 
-    contig_count = mapped_column(Integer)
+    contigs = mapped_column(Integer)
     contig_length = mapped_column(BigInteger)
     contig_longest = mapped_column(BigInteger)
     contig_shortest = mapped_column(BigInteger)
@@ -73,7 +73,7 @@ class Assembly(LogBase, HasFolder):
     contig_l50 = mapped_column(BigInteger)
     contig_aun = mapped_column(Float)
 
-    scaffold_count = mapped_column(Integer)
+    scaffolds = mapped_column(Integer)
     scaffold_length = mapped_column(BigInteger)
     scaffold_longest = mapped_column(BigInteger)
     scaffold_shortest = mapped_column(BigInteger)
@@ -82,7 +82,7 @@ class Assembly(LogBase, HasFolder):
     scaffold_l50 = mapped_column(BigInteger)
     scaffold_aun = mapped_column(Float)
 
-    gap_count = mapped_column(Integer)
+    gaps = mapped_column(Integer)
     gap_length = mapped_column(BigInteger)
     gap_longest = mapped_column(BigInteger)
     gap_shortest = mapped_column(BigInteger)

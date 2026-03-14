@@ -48,7 +48,7 @@ def upgrade() -> None:
 
     op.drop_table('assembly_metrics')
 
-    op.add_column('assembly', sa.Column('bases_count', sa.BigInteger(), nullable=True))
+    op.add_column('assembly', sa.Column('bases', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('bases_a', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('bases_c', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('bases_g', sa.BigInteger(), nullable=True))
@@ -56,7 +56,7 @@ def upgrade() -> None:
     op.add_column('assembly', sa.Column('bases_n', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('bases_cpg', sa.BigInteger(), nullable=True))
 
-    op.add_column('assembly', sa.Column('contig_count', sa.Integer(), nullable=True))
+    op.add_column('assembly', sa.Column('contigs', sa.Integer(), nullable=True))
     op.add_column('assembly', sa.Column('contig_length', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('contig_longest', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('contig_shortest', sa.BigInteger(), nullable=True))
@@ -65,7 +65,7 @@ def upgrade() -> None:
     op.add_column('assembly', sa.Column('contig_l50', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('contig_aun', sa.Float(), nullable=True))
 
-    op.add_column('assembly', sa.Column('scaffold_count', sa.Integer(), nullable=True))
+    op.add_column('assembly', sa.Column('scaffolds', sa.Integer(), nullable=True))
     op.add_column('assembly', sa.Column('scaffold_length', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('scaffold_longest', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('scaffold_shortest', sa.BigInteger(), nullable=True))
@@ -74,7 +74,7 @@ def upgrade() -> None:
     op.add_column('assembly', sa.Column('scaffold_l50', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('scaffold_aun', sa.Float(), nullable=True))
 
-    op.add_column('assembly', sa.Column('gap_count', sa.Integer(), nullable=True))
+    op.add_column('assembly', sa.Column('gaps', sa.Integer(), nullable=True))
     op.add_column('assembly', sa.Column('gap_length', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('gap_longest', sa.BigInteger(), nullable=True))
     op.add_column('assembly', sa.Column('gap_shortest', sa.BigInteger(), nullable=True))
