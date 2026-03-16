@@ -30,6 +30,7 @@ class Allocation(Base):
     is_primary = mapped_column(Boolean)
 
     UniqueConstraint('project_id', 'data_id')
+    UniqueConstraint('data_id', 'is_primary')
 
     project = relationship('Project', back_populates='data_assn')
     data = relationship('Data', back_populates='project_assn')
@@ -267,7 +268,7 @@ class LibraryType(Base):
     library_type_id = mapped_column(String, primary_key=True)
     hierarchy_name = mapped_column(String)
     default_category = mapped_column(String)
-    reporting_category = mapped_column(String)
+    reporting_category = mapped_column(String, index=True)
     kit = mapped_column(String)
     enzymes = mapped_column(String)
     cut_sites = mapped_column(String)

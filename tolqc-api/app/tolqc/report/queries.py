@@ -106,6 +106,8 @@ def pipeline_data_report_query(req_args: RequestArgs):
 
     top_data_columns = [
         *seq_data_header_cols(),
+        File.insdc_path,
+        File.public_path,
         Specimen.sts_specimen,
         primary_allocation.project_id.label('primary_project'),
     ]
@@ -604,6 +606,7 @@ def specimen_status_report_query(req_args: RequestArgs):
             Specimen.taxon_id.label('specimen_taxon_id'),
             Specimen.sts_priority,
             Specimen.sex_id.label('sex'),
+            Specimen.ploidy,
             Species.genome_size,
             Species.family_taxon_id,
             Species.taxon_family,
