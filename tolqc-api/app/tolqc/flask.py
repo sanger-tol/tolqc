@@ -13,14 +13,18 @@ from flask_cors import CORS
 from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
 
-from tol.api_base import data_blueprint, system_blueprint
+from tol.api_base import (
+    action_blueprint,
+    data_blueprint,
+    system_blueprint
+)
 from tol.api_base.auth import env_oidc_config
 from tol.core import DataSourceUtils
+from tol.sources.prefect import prefect
 from tol.sources.portaldb import portaldb
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
-# from tolqc.auth import create_auth_ctx_setter
 from tolqc.database import build_database_factory, flask_session, logbase_hook_params
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
@@ -29,7 +33,7 @@ from tolqc.schema import auth_models, models_list
 
 from werkzeug.exceptions import BadRequest
 
-from .auth import create_auth_inspector
+from .auth import create_auth_inspector, get_prefect_auth_inspector
 
 
 def application(session_factory=None):
@@ -131,6 +135,27 @@ def application(session_factory=None):
         url_prefix=api_path + '/report',
     )
     app.register_blueprint(blueprint_reports)
+
+    # actions
+    pds = prefect(insecure=True)
+    actions_bp = action_blueprint(
+        tolqc_ds,
+        pds,
+        role=None
+    )
+    app.register_blueprint(
+        actions_bp,
+        url_prefix=api_path + '/local/run-action'
+    )
+    blueprint_prefect_data = data_blueprint(
+        pds,
+        auth_inspector=get_prefect_auth_inspector()
+    )
+    app.register_blueprint(
+        blueprint_prefect_data,
+        name='pds',
+        url_prefix=api_path + '/prefect'
+    )
 
     # Data loaders
     blueprint_loaders = loaders_blueprint(
