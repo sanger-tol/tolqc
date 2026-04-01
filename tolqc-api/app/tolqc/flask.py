@@ -20,8 +20,8 @@ from tol.api_base import (
 )
 from tol.api_base.auth import env_oidc_config
 from tol.core import DataSourceUtils
-from tol.sources.prefect import prefect
 from tol.sources.portaldb import portaldb
+from tol.sources.prefect import prefect
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 

@@ -6,8 +6,8 @@ from datetime import timedelta
 
 from sqlalchemy.orm import configure_mappers
 
-from tol.sql.auth.models import create_models
 from tol.sql.action import create_action_models
+from tol.sql.auth.models import create_models
 
 import tolqc.schema.accession_models
 import tolqc.schema.assembly_models
