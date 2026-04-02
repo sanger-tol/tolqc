@@ -33,6 +33,7 @@ from tolqc.schema import auth_models, models_list
 
 from werkzeug.exceptions import BadRequest
 
+
 def application(session_factory=None):
     """
     The `session_factory` and `database_factory` arguments are used during
