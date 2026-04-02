@@ -27,7 +27,7 @@ auth_models = create_models(
     user_mixin_class=type('ToLQCUserMixin', (UserMixin, action_models._user_mixin), {}),
     token_mixin_class=object,
     token_is_pk=False,
-    role_mixin_class=type('ToLQCRoleMixin', (action_models._role_mixin), {}),
+    role_mixin_class=type('', (action_models._role_mixin,), {}),
     token_expiry_delta=timedelta(days=7),
     prefix_with_name=False,
 )
