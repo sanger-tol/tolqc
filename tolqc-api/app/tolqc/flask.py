@@ -33,9 +33,6 @@ from tolqc.schema import auth_models, models_list
 
 from werkzeug.exceptions import BadRequest
 
-from .auth import create_auth_inspector, get_prefect_auth_inspector
-
-
 def application(session_factory=None):
     """
     The `session_factory` and `database_factory` arguments are used during
@@ -119,7 +116,6 @@ def application(session_factory=None):
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds,
-        auth_inspector=create_auth_inspector(),
         include_all_to_ones=False,
     )
     app.register_blueprint(
@@ -148,8 +144,7 @@ def application(session_factory=None):
         url_prefix=api_path + '/local/run-action'
     )
     blueprint_prefect_data = data_blueprint(
-        pds,
-        auth_inspector=get_prefect_auth_inspector()
+        pds
     )
     app.register_blueprint(
         blueprint_prefect_data,
