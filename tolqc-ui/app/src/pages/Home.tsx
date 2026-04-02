@@ -17,8 +17,8 @@ const button = (
 const title = (
   <span>
     <p className="mt-2">
-      Welcome to ToLQC. The preferred place to view ToLQC data is in the ToL
-      Portal.
+      Welcome to ToLQC. This is the admin interface for the ToLQC process. To view data, please
+      visit the ToL Portal.
     </p>
   </span>
 );
