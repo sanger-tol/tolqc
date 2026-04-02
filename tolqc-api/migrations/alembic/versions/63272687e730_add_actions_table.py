@@ -47,6 +47,21 @@ def upgrade() -> None:
         ),
     )
 
+    op.create_table(
+        'role_action',
+        sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
+        sa.Column('action_id', sa.Integer, nullable=False),
+        sa.Column('role_id', sa.Integer, nullable=False),
+        sa.ForeignKeyConstraint(
+            ('action_id',),
+            ['action.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ('role_id',),
+            ['role.id'],
+        ),
+    )
+
 
 def downgrade() -> None:
     pass
