@@ -46,8 +46,6 @@ def models_list():
     subclasses and generate the full list of models.
     """
 
-    excluded_models = {x for x in auth_models if x not in {User, Role}}
-    if not has_action_role_mixin:
-        excluded_models.add(Role)
+    excluded_models = {x for x in auth_models if x != User}
     configure_mappers()
     return tuple(x for m in Base.registry.mappers if (x := m.class_) not in excluded_models)
