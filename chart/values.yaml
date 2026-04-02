@@ -100,10 +100,6 @@ tolcore:
     name: ""
     host: ""
     port: "" # specify as a string
-  dbutils:
-    image:
-      repository: ""
-      tag: ""
   schemaspy:
     image:
       repository: ""
