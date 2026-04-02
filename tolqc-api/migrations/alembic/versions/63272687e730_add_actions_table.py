@@ -1,7 +1,7 @@
 """add_actions_table
 
 Revision ID: 63272687e730
-Revises: c3cc354a7fb6
+Revises: 2d56a365736e
 Create Date: 2026-03-25 13:22:41.532319
 
 """
@@ -13,7 +13,7 @@ from datetime import datetime
 
 # revision identifiers, used by Alembic.
 revision = '63272687e730'
-down_revision = 'c3cc354a7fb6'
+down_revision = '2d56a365736e'
 branch_labels = None
 depends_on = None
 
