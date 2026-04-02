@@ -14,14 +14,12 @@ from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
 
 from tol.api_base import (
-    action_blueprint,
     data_blueprint,
     system_blueprint
 )
 from tol.api_base.auth import env_oidc_config
 from tol.core import DataSourceUtils
 from tol.sources.portaldb import portaldb
-from tol.sources.prefect import prefect
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
@@ -117,6 +115,7 @@ def application(session_factory=None):
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds,
+        action_ds=tolqc_ds,
         include_all_to_ones=False,
     )
     app.register_blueprint(
@@ -132,26 +131,6 @@ def application(session_factory=None):
         url_prefix=api_path + '/report',
     )
     app.register_blueprint(blueprint_reports)
-
-    # actions
-    pds = prefect(insecure=True)
-    actions_bp = action_blueprint(
-        tolqc_ds,
-        pds,
-        role=None
-    )
-    app.register_blueprint(
-        actions_bp,
-        url_prefix=api_path + '/local/run-action'
-    )
-    blueprint_prefect_data = data_blueprint(
-        pds
-    )
-    app.register_blueprint(
-        blueprint_prefect_data,
-        name='pds',
-        url_prefix=api_path + '/prefect'
-    )
 
     # Data loaders
     blueprint_loaders = loaders_blueprint(
