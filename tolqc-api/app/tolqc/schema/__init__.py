@@ -27,7 +27,7 @@ auth_models = create_models(
     user_mixin_class=type('ToLQCUserMixin', (UserMixin, action_models._user_mixin), {}),
     token_mixin_class=object,
     token_is_pk=False,
-    role_mixin_class=object,
+    role_mixin_class=action_models._role_mixin,
     token_expiry_delta=timedelta(days=7),
     prefix_with_name=False,
 )
@@ -46,6 +46,6 @@ def models_list():
     subclasses and generate the full list of models.
     """
 
-    excluded_models = {x for x in auth_models if x != User}
+    excluded_models = {x for x in auth_models if x not in (User, Role)}
     configure_mappers()
     return tuple(x for m in Base.registry.mappers if (x := m.class_) not in excluded_models)
