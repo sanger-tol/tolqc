@@ -287,7 +287,7 @@ class Location(Base):
     path = mapped_column(String, index=True)
 
     species = relationship('Species', back_populates='location')
-    specimen = relationship('Specimen', back_populates='location')
+    specimens = relationship('Specimen', back_populates='location')
 
 
 class MappingMetrics(Base, HasFolder):
@@ -580,7 +580,7 @@ class Specimen(LogBase):
         back_populates='specimen',
     )
 
-    location = relationship('Location', back_populates='specimen')
+    location = relationship('Location', back_populates='specimens')
 
     parent_assn = relationship(
         'Offspring',
