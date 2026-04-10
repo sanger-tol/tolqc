@@ -18,8 +18,12 @@ from tol.api_base import (
     system_blueprint
 )
 from tol.api_base.auth import env_oidc_config
-from tol.core import DataSourceUtils
+from tol.core import (
+    DataSourceUtils,
+    core_data_object
+)
 from tol.sources.portaldb import portaldb
+from tol.sql import create_sql_datasource
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
@@ -27,7 +31,10 @@ from tolqc.database import build_database_factory, flask_session, logbase_hook_p
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
-from tolqc.schema import auth_models, models_list
+from tolqc.schema import (
+    auth_models,
+    models_list,
+)
 
 from werkzeug.exceptions import BadRequest
 
@@ -73,7 +80,7 @@ def application(session_factory=None):
         if hook_params := logbase_hook_params():
             logging.debug(f'Removing {hook_params = }')
             remove(*hook_params)
-
+    
     # auth
     auth_manager = DbAuthManager(
         oidc_config=env_oidc_config(),
@@ -81,7 +88,7 @@ def application(session_factory=None):
         model_tuple=auth_models,
         state_delete_delta=timedelta(hours=1),
         oidc_id_target='email',
-        oidc_ext_mapping={},
+        oidc_ext_mapping={'name': 'name'},
         authorisation_manager=None,
     )
     auth_bp = DbAuthBlueprint(
@@ -122,6 +129,22 @@ def application(session_factory=None):
         blueprint_data_tolqc,
         name='tolqc',
         url_prefix=api_path + api_data_path,
+    )
+    
+    # Local endpoints (used for actions on the database e.g status changes)
+    sql_ds = create_sql_datasource(
+        models=models,
+        db_uri=os.environ['DB_URI']
+    )
+    core_data_object(sql_ds)
+    blueprint_data_local = data_blueprint(
+        sql_ds,
+        action_ds=sql_ds
+    )
+    app.register_blueprint(
+        blueprint_data_local,
+        name='local',
+        url_prefix=os.getenv('API_PATH') + '/local',
     )
 
     # Reports
