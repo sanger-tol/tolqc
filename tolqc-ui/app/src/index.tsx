@@ -11,10 +11,12 @@ import { SmartApp, TPageElements, TsDataSource, TOL_DS, env} from "@tol/tol-ui";
 import Logo from "./assets/logo.png";
 import "./scss/styling.scss";
 
+
 export const TOLQC_DS = new TsDataSource({
   apiPath: env.API_PATH ,
   apiDataPath: env.API_DATA_PATH
 });
+
 export const PAGE_ELEMENTS: TPageElements = {
   home: <Home />,
 };
@@ -24,9 +26,9 @@ root.render(
   <SmartApp
     id="tolqc"
     boards={{ boardDataSource: TOL_DS }}
-    brand={<img src={Logo} alt="ToL Portal Logo" style={{ height: 30 }} />}
+    brand={<img src={Logo} alt="ToLQC Logo" style={{ height: 30 }} />}
     pageElements={PAGE_ELEMENTS}
-    login={true}
+    login={false}
   />,
 );
 

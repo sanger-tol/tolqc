@@ -9,14 +9,15 @@ import { TOLQC_DS } from "..";
 
 const button = (
   <Button
-  text="Visit ToL Portal"
-  onClick={() => window.open("https://portal.tol.sanger.ac.uk", "_blank")}
-/>
+    text="Visit ToL Portal"
+    onClick={() => window.open("https://portal.tol.sanger.ac.uk", "_blank")}
+    position="right"
+  />
 );
 
 const title = (
   <span>
-    <p className="mt-2">
+    <p>
       Welcome to ToLQC. This is the admin interface for the ToLQC process. To view data, please
       visit the ToL Portal.
     </p>
