@@ -13,14 +13,16 @@ from flask_cors import CORS
 from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
 
-from tol.api_base import data_blueprint, system_blueprint
+from tol.api_base import (
+    data_blueprint,
+    system_blueprint
+)
 from tol.api_base.auth import env_oidc_config
 from tol.core import DataSourceUtils
 from tol.sources.portaldb import portaldb
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
-# from tolqc.auth import create_auth_ctx_setter
 from tolqc.database import build_database_factory, flask_session, logbase_hook_params
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
@@ -28,8 +30,6 @@ from tolqc.reports import reports_blueprint
 from tolqc.schema import auth_models, models_list
 
 from werkzeug.exceptions import BadRequest
-
-from .auth import create_auth_inspector
 
 
 def application(session_factory=None):
@@ -115,7 +115,7 @@ def application(session_factory=None):
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds,
-        auth_inspector=create_auth_inspector(),
+        action_ds=tolqc_ds,
         include_all_to_ones=False,
     )
     app.register_blueprint(
