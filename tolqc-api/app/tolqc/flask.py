@@ -122,7 +122,6 @@ def application(session_factory=None):
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds,
-        action_ds=tolqc_ds,
         include_all_to_ones=False,
     )
     app.register_blueprint(
