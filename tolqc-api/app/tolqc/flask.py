@@ -80,7 +80,7 @@ def application(session_factory=None):
         if hook_params := logbase_hook_params():
             logging.debug(f'Removing {hook_params = }')
             remove(*hook_params)
-    
+
     # auth
     auth_manager = DbAuthManager(
         oidc_config=env_oidc_config(),
@@ -129,7 +129,7 @@ def application(session_factory=None):
         name='tolqc',
         url_prefix=api_path + api_data_path,
     )
-    
+
     # Local endpoints (used for actions on the database e.g status changes)
     sql_ds = create_sql_datasource(
         models=models,
