@@ -28,7 +28,7 @@ root.render(
     boards={{ boardDataSource: TOL_DS }}
     brand={<img src={Logo} alt="ToLQC Logo" style={{ height: 30 }} />}
     pageElements={PAGE_ELEMENTS}
-    login={false}
+    login={true}
   />,
 );
 
