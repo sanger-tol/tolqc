@@ -4,7 +4,9 @@
 
 import logging
 import os
+import json
 from datetime import timedelta
+from unittest.mock import create_autospec
 
 from flask import Flask
 
@@ -14,16 +16,22 @@ from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
 
 from tol.api_base import (
+    action_blueprint,
     data_blueprint,
     system_blueprint
 )
 from tol.api_base.auth import env_oidc_config
 from tol.core import (
+    DataSource,
     DataSourceUtils,
     core_data_object
 )
+from tol.core.operator import Inserter
 from tol.sources.portaldb import portaldb
-from tol.sql import create_sql_datasource
+from tol.sql import (
+    sql_datasource,
+    create_sql_datasource
+)
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
@@ -80,6 +88,36 @@ def application(session_factory=None):
         if hook_params := logbase_hook_params():
             logging.debug(f'Removing {hook_params = }')
             remove(*hook_params)
+    
+    # TODO: Remove this mock once actions blueprint is not needed (when actions use :actions)
+    def __mock_prefect_ds() -> OperableDataSource:
+        _PrefectDS = type(  # noqa
+            '',
+            (DataSource, Inserter),
+            {}
+        )
+
+        prefect_ds: _PrefectDS = create_autospec(
+            _PrefectDS,
+            spec_set=True
+        )
+
+        def __factory(
+            __type: str,
+            id_=None,
+            attributes={},
+            **kwargs
+        ) -> None:
+
+            # this needs to be `error()` to appear in the server logs
+            logging.error(
+                json.dumps(attributes, indent=2)
+            )
+
+        prefect_ds.supported_types = ['flow_run']
+        prefect_ds.data_object_factory.side_effect = __factory
+
+        return prefect_ds
 
     # auth
     auth_manager = DbAuthManager(
@@ -140,6 +178,18 @@ def application(session_factory=None):
         sql_ds,
         action_ds=sql_ds
     )
+    
+    # TODO: Remove this blueprint once actions blueprint is not needed (when actions use :actions)
+    actions_bp = action_blueprint(
+        sql_ds,
+        __mock_prefect_ds(),
+        role=None
+    )
+    app.register_blueprint(
+        actions_bp,
+        url_prefix=os.getenv('API_PATH') + '/local/run-action'
+    )
+
     app.register_blueprint(
         blueprint_data_local,
         name='local',
