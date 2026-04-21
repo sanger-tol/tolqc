@@ -24,12 +24,12 @@ from tol.api_base.auth import env_oidc_config
 from tol.core import (
     DataSource,
     DataSourceUtils,
-    core_data_object
+    core_data_object,
+    OperableDataSource
 )
 from tol.core.operator import Inserter
 from tol.sources.portaldb import portaldb
 from tol.sql import (
-    sql_datasource,
     create_sql_datasource
 )
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
@@ -126,7 +126,7 @@ def application(session_factory=None):
         model_tuple=auth_models,
         state_delete_delta=timedelta(hours=1),
         oidc_id_target='email',
-        oidc_ext_mapping={'name': 'name'},
+        oidc_ext_mapping={'name': 'name', 'email': 'email'},
         authorisation_manager=None,
     )
     auth_bp = DbAuthBlueprint(

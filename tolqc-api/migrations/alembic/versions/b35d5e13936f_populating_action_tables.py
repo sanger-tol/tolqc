@@ -65,6 +65,24 @@ def upgrade() -> None:
         },
     ])
 
+    action_table = sa.table(
+        'role_action',
+        sa.column('action_id', sa.Integer),
+        sa.column('role_id', sa.Integer),
+    )
+
+    op.bulk_insert(action_table, [
+        {'action_id': 1, 'role_id': 1},
+        {'action_id': 2, 'role_id': 1},
+        {'action_id': 3, 'role_id': 1},
+        {'action_id': 4, 'role_id': 1},
+        {'action_id': 5, 'role_id': 1},
+        {'action_id': 6, 'role_id': 1},
+    ])
+    
+    op.add_column('user', sa.Column('oidc_id', sa.String, nullable=True))
+    
+
 
 def downgrade() -> None:
     pass
