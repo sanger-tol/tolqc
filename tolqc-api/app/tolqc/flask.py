@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 import logging
-import os
 import json
+import os
 from datetime import timedelta
 from unittest.mock import create_autospec
 
@@ -24,8 +24,8 @@ from tol.api_base.auth import env_oidc_config
 from tol.core import (
     DataSource,
     DataSourceUtils,
-    core_data_object,
-    OperableDataSource
+    OperableDataSource,
+    core_data_object
 )
 from tol.core.operator import Inserter
 from tol.sources.portaldb import portaldb
@@ -88,7 +88,7 @@ def application(session_factory=None):
         if hook_params := logbase_hook_params():
             logging.debug(f'Removing {hook_params = }')
             remove(*hook_params)
-    
+
     # TODO: Remove this mock once actions blueprint is not needed (when actions use :actions)
     def __mock_prefect_ds() -> OperableDataSource:
         _PrefectDS = type(  # noqa
@@ -178,7 +178,7 @@ def application(session_factory=None):
         sql_ds,
         action_ds=sql_ds
     )
-    
+
     # TODO: Remove this blueprint once actions blueprint is not needed (when actions use :actions)
     actions_bp = action_blueprint(
         sql_ds,
