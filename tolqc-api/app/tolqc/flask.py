@@ -187,13 +187,13 @@ def application(session_factory=None):
     )
     app.register_blueprint(
         actions_bp,
-        url_prefix=os.getenv('API_PATH') + '/local/run-action'
+        url_prefix=api_path + '/local/run-action'
     )
 
     app.register_blueprint(
         blueprint_data_local,
         name='local',
-        url_prefix=os.getenv('API_PATH') + '/local',
+        url_prefix=api_path + '/local',
     )
 
     # Reports
