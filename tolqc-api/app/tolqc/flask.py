@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-import logging
 import json
+import logging
 import os
 from datetime import timedelta
 from unittest.mock import create_autospec
