@@ -25,13 +25,11 @@ from tol.core import (
     DataSource,
     DataSourceUtils,
     OperableDataSource,
-    core_data_object
 )
 from tol.core.operator import Inserter
 from tol.sources.portaldb import portaldb
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
-from tol.sql import create_sql_datasource
 
 from tolqc.database import build_database_factory, flask_session, logbase_hook_params
 from tolqc.json import JSONDateTimeProvider
@@ -175,7 +173,6 @@ def application(session_factory=None):
         actions_bp,
         url_prefix=api_path + '/local/run-action'
     )
-
 
     # Reports
     blueprint_reports = reports_blueprint(
