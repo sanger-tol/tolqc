@@ -101,9 +101,7 @@ tolcore:
     host: ""
     port: "" # specify as a string
   schemaspy:
-    image:
-      repository: ""
-      tag: ""
+    enabled: false
   api:
     enabled: true
     fullname: "tolqc-api"

@@ -1,5 +1,5 @@
 apiVersion: v2
-name: tolqc-app
+name: sts-app
 description: A Helm chart for Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
@@ -24,6 +24,6 @@ version: 0.4.5
 appVersion: "0.0.1"
 
 dependencies:
-- name: tolcore
-  version: "1.0.7"
+- name: toldb
+  version: "1.0.1"
   repository: "https://gitlab.internal.sanger.ac.uk/api/v4/projects/2930/packages/helm/tol-core"
