@@ -29,11 +29,9 @@ from tol.core import (
 )
 from tol.core.operator import Inserter
 from tol.sources.portaldb import portaldb
-from tol.sql import (
-    create_sql_datasource
-)
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
+from tol.sql import create_sql_datasource
 
 from tolqc.database import build_database_factory, flask_session, logbase_hook_params
 from tolqc.json import JSONDateTimeProvider
@@ -160,6 +158,7 @@ def application(session_factory=None):
     # Data endpoints
     blueprint_data_tolqc = data_blueprint(
         tolqc_ds,
+        action_ds=tolqc_ds,
         include_all_to_ones=False,
     )
     app.register_blueprint(
@@ -167,21 +166,8 @@ def application(session_factory=None):
         name='tolqc',
         url_prefix=api_path + api_data_path,
     )
-
-    # Local endpoints (used for actions on the database e.g status changes)
-    sql_ds = create_sql_datasource(
-        models=models,
-        db_uri=os.environ['DB_URI']
-    )
-    core_data_object(sql_ds)
-    blueprint_data_local = data_blueprint(
-        sql_ds,
-        action_ds=sql_ds
-    )
-
-    # TODO: Remove this blueprint once actions blueprint is not needed (when actions use :actions)
     actions_bp = action_blueprint(
-        sql_ds,
+        tolqc_ds,
         __mock_prefect_ds(),
         role=None
     )
@@ -190,11 +176,6 @@ def application(session_factory=None):
         url_prefix=api_path + '/local/run-action'
     )
 
-    app.register_blueprint(
-        blueprint_data_local,
-        name='local',
-        url_prefix=api_path + '/local',
-    )
 
     # Reports
     blueprint_reports = reports_blueprint(
