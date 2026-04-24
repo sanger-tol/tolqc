@@ -452,11 +452,9 @@ class Run(Base):
         return 'run_id'
 
     run_id = mapped_column(String, primary_key=True)
-    name = mapped_column(String)
-    hierarchy_name = mapped_column(String)
     platform_id = mapped_column(Integer, ForeignKey('platform.id'))
     centre_id = mapped_column(Integer, ForeignKey('centre.id'))
-    lims_id = mapped_column(String)
+    lims_id = mapped_column(String, index=True)
     element = mapped_column(String)
     instrument_name = mapped_column(String)
     start = mapped_column(DateTime(timezone=True))

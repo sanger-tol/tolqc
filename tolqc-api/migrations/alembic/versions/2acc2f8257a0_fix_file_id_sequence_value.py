@@ -1,7 +1,7 @@
 """Fix file.id sequence value
 
 Revision ID: 2acc2f8257a0
-Revises: 2d56a365736e
+Revises: 63272687e730
 Create Date: 2026-04-09 14:49:48.254577
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.schema import CreateSequence, DropSequence, Sequence
 
 # revision identifiers, used by Alembic.
 revision = '2acc2f8257a0'
-down_revision = '2d56a365736e'
+down_revision = '63272687e730'
 branch_labels = None
 depends_on = None
 
@@ -21,11 +21,10 @@ depends_on = None
 def upgrade() -> None:
     # Remove the old sequence
     op.alter_column('file', 'id', server_default=None)
-    seq = 'file_id_seq'
-    for x in (seq, '_alembic_tmp_file_id_seq'):
-        op.execute(DropSequence(Sequence(x)))
+    op.execute(DropSequence(Sequence('_alembic_tmp_file_id_seq')))
 
     # Create the new sequence
+    seq = 'file_id_seq'
     op.execute(CreateSequence(Sequence(seq)))
     op.alter_column(
         'file',
@@ -38,6 +37,11 @@ def upgrade() -> None:
       SELECT setval('{seq}', ( SELECT MAX(id) FROM file) )
     """)  # noqa: S608
     op.execute(set_sql)
+
+    # Patches to Run model
+    op.drop_column('run', 'name')
+    op.drop_column('run', 'hierarchy_name')
+    op.create_index(None, 'run', ['lims_id'], unique=False)
 
 
 def downgrade() -> None:
