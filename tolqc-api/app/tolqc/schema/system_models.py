@@ -40,6 +40,10 @@ class UserMixin:
         return mapped_column(unique=True)
 
     @declared_attr
+    def email(self) -> Mapped[str]:
+        return mapped_column(nullable=True)
+
+    @declared_attr
     def full_name(self) -> Mapped[str]:
         return mapped_column(nullable=True)
 

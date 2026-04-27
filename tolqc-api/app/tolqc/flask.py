@@ -2,9 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
+import json
 import logging
 import os
 from datetime import timedelta
+from unittest.mock import create_autospec
 
 from flask import Flask
 
@@ -14,11 +16,17 @@ from sqlalchemy.event import remove
 from sqlalchemy.exc import DBAPIError
 
 from tol.api_base import (
+    action_blueprint,
     data_blueprint,
     system_blueprint
 )
 from tol.api_base.auth import env_oidc_config
-from tol.core import DataSourceUtils
+from tol.core import (
+    DataSource,
+    DataSourceUtils,
+    OperableDataSource,
+)
+from tol.core.operator import Inserter
 from tol.sources.portaldb import portaldb
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
@@ -27,7 +35,10 @@ from tolqc.database import build_database_factory, flask_session, logbase_hook_p
 from tolqc.json import JSONDateTimeProvider
 from tolqc.loaders import loaders_blueprint
 from tolqc.reports import reports_blueprint
-from tolqc.schema import auth_models, models_list
+from tolqc.schema import (
+    auth_models,
+    models_list,
+)
 
 from werkzeug.exceptions import BadRequest
 
@@ -74,6 +85,36 @@ def application(session_factory=None):
             logging.debug(f'Removing {hook_params = }')
             remove(*hook_params)
 
+    # TODO: Remove this mock once actions blueprint is not needed (when actions use :actions)
+    def __mock_prefect_ds() -> OperableDataSource:
+        _PrefectDS = type(  # noqa
+            '',
+            (DataSource, Inserter),
+            {}
+        )
+
+        prefect_ds: _PrefectDS = create_autospec(
+            _PrefectDS,
+            spec_set=True
+        )
+
+        def __factory(
+            __type: str,
+            id_=None,
+            attributes={},
+            **kwargs
+        ) -> None:
+
+            # this needs to be `error()` to appear in the server logs
+            logging.error(
+                json.dumps(attributes, indent=2)
+            )
+
+        prefect_ds.supported_types = ['flow_run']
+        prefect_ds.data_object_factory.side_effect = __factory
+
+        return prefect_ds
+
     # auth
     auth_manager = DbAuthManager(
         oidc_config=env_oidc_config(),
@@ -81,7 +122,7 @@ def application(session_factory=None):
         model_tuple=auth_models,
         state_delete_delta=timedelta(hours=1),
         oidc_id_target='email',
-        oidc_ext_mapping={},
+        oidc_ext_mapping={'name': 'name', 'email': 'email'},
         authorisation_manager=None,
     )
     auth_bp = DbAuthBlueprint(
@@ -122,6 +163,15 @@ def application(session_factory=None):
         blueprint_data_tolqc,
         name='tolqc',
         url_prefix=api_path + api_data_path,
+    )
+    actions_bp = action_blueprint(
+        tolqc_ds,
+        __mock_prefect_ds(),
+        role=None
+    )
+    app.register_blueprint(
+        actions_bp,
+        url_prefix=api_path + '/local/run-action'
     )
 
     # Reports
