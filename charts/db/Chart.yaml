@@ -25,5 +25,5 @@ appVersion: "0.0.1"
 
 dependencies:
 - name: toldb
-  version: "1.0.1"
+  version: "1.0.5"
   repository: "https://gitlab.internal.sanger.ac.uk/api/v4/projects/2930/packages/helm/tol-core"
