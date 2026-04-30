@@ -15,14 +15,16 @@ from tol.api_base import custom_blueprint
 
 from tolqc.json import json_dumps
 from tolqc.report.bundles import FolderBundle, IsoDateTimeBundle
-from tolqc.report.queries import (
+from tolqc.report.queries.sequence_data import (
     illumina_data_report_query,
-    metagenome_bin_report_query,
-    metagenome_report_query,
     mlwh_data_report_query,
     ont_data_report_query,
     pacbio_data_report_query,
     pipeline_data_report_query,
+)
+from tolqc.report.queries.species_data import (
+    metagenome_bin_report_query,
+    metagenome_report_query,
     specimen_status_report_query,
 )
 from tolqc.report.request_args import RequestArgs
