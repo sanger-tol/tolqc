@@ -8,6 +8,7 @@ from sqlalchemy.orm import aliased
 from tolqc.report.column_funcs import array_distinct_non_null
 from tolqc.report.request_args import NoArg, RequestArgs
 from tolqc.schema import User
+from tolqc.schema.accession_models import Accession, BioprojectLink
 from tolqc.schema.metagenome_models import (
     Metagenome,
     MetagenomeBin,
@@ -105,6 +106,78 @@ def metagenome_bin_report_query(*_):
         .outerjoin(MetagenomeBin.status)
         .order_by(MetagenomeBin.metagenome_bin_id)
     )
+
+
+def species_bioproject_query(req_args: RequestArgs):
+
+    project_accession = aliased(Accession)
+    project_cte = (
+        select(
+            Accession.accession_id,
+            func.jsonb_agg(
+                accession_struct(
+                    project_accession,
+                )
+            ).label('project_accs'),
+        )
+        .select_from(Accession)
+        .join(BioprojectLink, Accession.parent_assn)
+        .join(project_accession, BioprojectLink.parent)
+        .group_by(Accession.accession_id)
+    ).cte('project_accessions')
+
+    product_accession = aliased(Accession)
+    product_cte = (
+        select(
+            Accession.accession_id,
+            func.jsonb_agg(
+                accession_struct(
+                    product_accession,
+                )
+            ).label('product_accs'),
+        )
+        .select_from(Accession)
+        .join(BioprojectLink, Accession.child_assn)
+        .join(product_accession, BioprojectLink.child)
+        .group_by(Accession.accession_id)
+    ).cte('product_accessions')
+
+    umbrella_acc = aliased(Accession)
+    data_acc = aliased(Accession)
+    group_by = [
+        Species.species_id,
+        project_cte.c.project_accs,
+        product_cte.c.product_accs,
+    ]
+    return (
+        select(
+            Species.species_id.label('species'),
+            accession_struct(umbrella_acc, group_by).label('umbrella_acc'),
+            accession_struct(data_acc, group_by).label('data_acc'),
+            project_cte.c.project_accs,
+            product_cte.c.product_accs,
+        )
+        .select_from(Species)
+        .outerjoin(umbrella_acc, Species.umbrella_accession)
+        .outerjoin(data_acc, Species.data_accession)
+        .outerjoin(project_cte, Species.umbrella_accession)
+        .outerjoin(product_cte, Species.umbrella_accession)
+        .group_by(*group_by)
+    )
+
+
+def accession_struct(accn, col_list: list | None = None):
+    struct = [
+        'accession',
+        accn.accession_id,
+        'name',
+        accn.name,
+        'type',
+        accn.accession_type_id,
+    ]
+    if col_list:
+        col_list.extend([struct[i] for i in range(1, len(struct), 2)])
+    return func.jsonb_build_object(*struct)
 
 
 def specimen_status_report_query(req_args: RequestArgs):

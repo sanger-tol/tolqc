@@ -26,6 +26,7 @@ from tolqc.report.queries.species_data import (
     metagenome_bin_report_query,
     metagenome_report_query,
     specimen_status_report_query,
+    species_bioproject_query,
 )
 from tolqc.report.request_args import RequestArgs
 from tolqc.schema.folder_models import Folder, FolderLocation, HasFolder
@@ -85,6 +86,7 @@ class ReportEngine:
         'ont-data': ont_data_report_query,
         'pacbio-data': pacbio_data_report_query,
         'pipeline-data': pipeline_data_report_query,
+        'species-bioproject': species_bioproject_query,
         'specimen-status': specimen_status_report_query,
     }
 
