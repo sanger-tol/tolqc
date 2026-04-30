@@ -1,7 +1,7 @@
 """Fix file.id sequence value
 
 Revision ID: 2acc2f8257a0
-Revises: 63272687e730
+Revises: b35d5e13936f
 Create Date: 2026-04-09 14:49:48.254577
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.schema import CreateSequence, DropSequence, Sequence
 
 # revision identifiers, used by Alembic.
 revision = '2acc2f8257a0'
-down_revision = '63272687e730'
+down_revision = 'b35d5e13936f'
 branch_labels = None
 depends_on = None
 
