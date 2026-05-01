@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import func, select
-from sqlalchemy.orm import aliased
+from sqlalchemy import case, func, or_, select
+from sqlalchemy.orm import InstrumentedAttribute, aliased
 
 from tolqc.report.column_funcs import array_distinct_non_null
 from tolqc.report.request_args import NoArg, RequestArgs
@@ -109,53 +109,68 @@ def metagenome_bin_report_query(*_):
 
 
 def species_bioproject_query(req_args: RequestArgs):
+    accession = req_args.pop_arg('accession')
 
-    project_accession = aliased(Accession)
+    # List of accession structs from BioprojectLink parents
+    project_acc = aliased(Accession)
     project_cte = (
         select(
             Accession.accession_id,
             func.jsonb_agg(
                 accession_struct(
-                    project_accession,
+                    project_acc,
+                    link_status=BioprojectLink.link_status,
                 )
-            ).label('project_accs'),
+            ).label('project_accessions'),
         )
         .select_from(Accession)
         .join(BioprojectLink, Accession.parent_assn)
-        .join(project_accession, BioprojectLink.parent)
+        .join(project_acc, BioprojectLink.parent)
         .group_by(Accession.accession_id)
-    ).cte('project_accessions')
+    ).cte('project_accs')
 
-    product_accession = aliased(Accession)
+    # List of accession structs from BioprojectLink children
+    product_acc = aliased(Accession)
     product_cte = (
         select(
             Accession.accession_id,
             func.jsonb_agg(
                 accession_struct(
-                    product_accession,
+                    product_acc,
+                    link_status=BioprojectLink.link_status,
                 )
-            ).label('product_accs'),
+            ).label('product_accessions'),
         )
         .select_from(Accession)
         .join(BioprojectLink, Accession.child_assn)
-        .join(product_accession, BioprojectLink.child)
+        .join(product_acc, BioprojectLink.child)
         .group_by(Accession.accession_id)
-    ).cte('product_accessions')
+    ).cte('product_accs')
 
     umbrella_acc = aliased(Accession)
     data_acc = aliased(Accession)
     group_by = [
         Species.species_id,
-        project_cte.c.project_accs,
-        product_cte.c.product_accs,
+        Species.taxon_id,
+        Species.tolid_prefix,
+        project_cte.c.project_accessions,
+        product_cte.c.product_accessions,
     ]
-    return (
+    query = (
         select(
             Species.species_id.label('species'),
-            accession_struct(umbrella_acc, group_by).label('umbrella_acc'),
-            accession_struct(data_acc, group_by).label('data_acc'),
-            project_cte.c.project_accs,
-            product_cte.c.product_accs,
+            Species.taxon_id,
+            Species.tolid_prefix,
+            accession_struct(
+                umbrella_acc,
+                col_list=group_by,
+            ).label('umbrella_accession'),
+            accession_struct(
+                data_acc,
+                col_list=group_by,
+            ).label('data_accession'),
+            project_cte.c.project_accessions,
+            product_cte.c.product_accessions,
         )
         .select_from(Species)
         .outerjoin(umbrella_acc, Species.umbrella_accession)
@@ -165,19 +180,53 @@ def species_bioproject_query(req_args: RequestArgs):
         .group_by(*group_by)
     )
 
+    if accession is not NoArg:
+        project_bpl = aliased(BioprojectLink)
+        product_bpl = aliased(BioprojectLink)
+        query = (
+            query.outerjoin(project_bpl, umbrella_acc.parent_assn)
+            .outerjoin(product_bpl, umbrella_acc.child_assn)
+            .where(
+                or_(
+                    Species.umbrella_accession_id == accession,
+                    Species.data_accession_id == accession,
+                    project_bpl.parent_accession_id == accession,
+                    product_bpl.child_accession_id == accession,
+                )
+            )
+        )
 
-def accession_struct(accn, col_list: list | None = None):
+    return query
+
+
+def accession_struct(
+    accn,
+    link_status: InstrumentedAttribute | None = None,
+    col_list: list | None = None,
+):
     struct = [
         'accession',
         accn.accession_id,
         'name',
         accn.name,
+        'title',
+        accn.title,
         'type',
         accn.accession_type_id,
     ]
+    if link_status:
+        struct.extend(
+            [
+                'link_status',
+                link_status,
+            ]
+        )
     if col_list:
         col_list.extend([struct[i] for i in range(1, len(struct), 2)])
-    return func.jsonb_build_object(*struct)
+    return case(
+        (accn.accession_id == None, None),  # noqa: E711
+        else_=func.jsonb_build_object(*struct),
+    )
 
 
 def specimen_status_report_query(req_args: RequestArgs):
