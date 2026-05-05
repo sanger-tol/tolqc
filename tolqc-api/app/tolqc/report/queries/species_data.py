@@ -108,12 +108,34 @@ def metagenome_bin_report_query(*_):
     )
 
 
-def species_bioproject_query(req_args: RequestArgs):
-    accession = req_args.pop_arg('accession')
+class ParentFlag:
+    """Join to parent accessions"""
 
-    # List of accession structs from BioprojectLink parents
+
+class ChildFlag:
+    """Join to child accessions"""
+
+
+def linked_accessions_json(
+    name: str,
+    link: type[ParentFlag] | type[ChildFlag],
+    suppressed: bool | NoArg,
+):
+    """
+    Builds a CTE which returns either child or parent Bioproject link
+    accessions as a JSON array.
+    """
+
     project_acc = aliased(Accession)
-    project_cte = (
+
+    # Join to either parent or child accessions
+    (assn_rel, link_rel) = (
+        (Accession.parent_assn, BioprojectLink.parent)
+        if link is ParentFlag
+        else (Accession.child_assn, BioprojectLink.child)
+    )
+
+    query = (
         select(
             Accession.accession_id,
             func.jsonb_agg(
@@ -121,31 +143,29 @@ def species_bioproject_query(req_args: RequestArgs):
                     project_acc,
                     link_status=BioprojectLink.link_status,
                 )
-            ).label('project_accessions'),
+            ).label(f'{name}_accessions'),
         )
         .select_from(Accession)
-        .join(BioprojectLink, Accession.parent_assn)
-        .join(project_acc, BioprojectLink.parent)
+        .join(BioprojectLink, assn_rel)
+        .join(project_acc, link_rel)
         .group_by(Accession.accession_id)
-    ).cte('project_accs')
+    )
+
+    if suppressed is not True:
+        query = query.where(BioprojectLink.link_status != 'Suppressed')
+
+    return query.cte(f'{name}_accs')
+
+
+def species_bioproject_query(req_args: RequestArgs):
+    accession = req_args.pop_arg('accession')
+    suppressed = req_args.pop_arg('suppressed')
+
+    # List of accession structs from BioprojectLink parents
+    project_cte = linked_accessions_json('project', ParentFlag, suppressed)
 
     # List of accession structs from BioprojectLink children
-    product_acc = aliased(Accession)
-    product_cte = (
-        select(
-            Accession.accession_id,
-            func.jsonb_agg(
-                accession_struct(
-                    product_acc,
-                    link_status=BioprojectLink.link_status,
-                )
-            ).label('product_accessions'),
-        )
-        .select_from(Accession)
-        .join(BioprojectLink, Accession.child_assn)
-        .join(product_acc, BioprojectLink.child)
-        .group_by(Accession.accession_id)
-    ).cte('product_accs')
+    product_cte = linked_accessions_json('product', ChildFlag, suppressed)
 
     umbrella_acc = aliased(Accession)
     data_acc = aliased(Accession)
