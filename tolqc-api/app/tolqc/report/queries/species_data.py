@@ -119,7 +119,7 @@ class ChildFlag:
 def linked_accessions_json(
     name: str,
     link: type[ParentFlag] | type[ChildFlag],
-    suppressed: bool | NoArg,
+    include_suppressed: bool | NoArg,
 ):
     """
     Builds a CTE which returns either child or parent Bioproject link
@@ -151,7 +151,7 @@ def linked_accessions_json(
         .group_by(Accession.accession_id)
     )
 
-    if suppressed is not True:
+    if include_suppressed is not True:
         query = query.where(BioprojectLink.link_status != 'Suppressed')
 
     return query.cte(f'{name}_accs')
@@ -159,13 +159,13 @@ def linked_accessions_json(
 
 def species_bioproject_query(req_args: RequestArgs):
     accession = req_args.pop_arg('accession')
-    suppressed = req_args.pop_arg('suppressed')
+    include_suppressed = req_args.pop_arg('include_suppressed')
 
     # List of accession structs from BioprojectLink parents
-    project_cte = linked_accessions_json('project', ParentFlag, suppressed)
+    project_cte = linked_accessions_json('project', ParentFlag, include_suppressed)
 
     # List of accession structs from BioprojectLink children
-    product_cte = linked_accessions_json('product', ChildFlag, suppressed)
+    product_cte = linked_accessions_json('product', ChildFlag, include_suppressed)
 
     umbrella_acc = aliased(Accession)
     data_acc = aliased(Accession)
