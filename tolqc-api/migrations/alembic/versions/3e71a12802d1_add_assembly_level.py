@@ -43,9 +43,12 @@ def upgrade() -> None:
         op.drop_constraint(f'{tbl}_assembly_id_fkey', tbl)
     op.drop_constraint('assembly_source_source_assembly_id_fkey', 'assembly_source')
 
-    # Alter assembly table
+    # Drop `assembly_id` sequence to avoid it being trashed by alembic
+    # `batch_alter_table()`
     seq = 'assembly_assembly_id_seq'
     op.execute(DropSequence(Sequence(seq)))
+
+    # Alter assembly table
     with op.batch_alter_table('assembly', recreate='always') as batch_op:
         batch_op.add_column(
             sa.Column('level', sa.String(), nullable=True),
@@ -55,6 +58,8 @@ def upgrade() -> None:
             sa.Column('is_reference', sa.Boolean(), nullable=True),
             insert_after='level',
         )
+
+    # Recreate and reset `assembly_id` sequence
     op.execute(CreateSequence(Sequence(seq)))
     op.alter_column(
         'assembly',
