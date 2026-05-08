@@ -126,7 +126,7 @@ def linked_accessions_json(
     accessions as a JSON array.
     """
 
-    project_acc = aliased(Accession)
+    linked_acc = aliased(Accession)
 
     # Join to either parent or child accessions
     (assn_rel, link_rel) = (
@@ -140,14 +140,14 @@ def linked_accessions_json(
             Accession.accession_id,
             func.jsonb_agg(
                 accession_struct(
-                    project_acc,
+                    linked_acc,
                     link_status=BioprojectLink.link_status,
                 )
             ).label(f'{name}_accessions'),
         )
         .select_from(Accession)
-        .join(BioprojectLink, assn_rel)
-        .join(project_acc, link_rel)
+        .join(assn_rel)
+        .join(link_rel.of_type(linked_acc))
         .group_by(Accession.accession_id)
     )
 
@@ -195,8 +195,8 @@ def species_bioproject_query(req_args: RequestArgs):
         .select_from(Species)
         .outerjoin(umbrella_acc, Species.umbrella_accession)
         .outerjoin(data_acc, Species.data_accession)
-        .outerjoin(project_cte, Species.umbrella_accession)
-        .outerjoin(product_cte, Species.umbrella_accession)
+        .outerjoin(project_cte, Species.umbrella_accession_id == project_cte.c.accession_id)
+        .outerjoin(product_cte, Species.umbrella_accession_id == product_cte.c.accession_id)
         .group_by(*group_by)
     )
 

@@ -25,7 +25,13 @@ def pacbio_row_count(db_session):
     To avoid hard coding a number, query for the number of PacBio data rows in
     the test database.
     """
-    n = db_session.query(Platform).join(Run).join(Data).where(Platform.name == 'PacBio').count()
+    n = (
+        db_session.query(Platform)
+        .join(Run)
+        .join(Data)
+        .where(Platform.name == 'PacBio')
+        .count()
+    )
 
     # Guard against tests being run on an empty database
     if not n > 1:
@@ -236,9 +242,43 @@ def test_pacbio_data_report(client, api_path):
     assert len(null_meth_pacbio) < len(all_pacbio)
 
 
+def test_bioproject_report(client, api_path):
+    species_bioprojects = report_response_json(
+        client,
+        api_path,
+        'species-bioproject',
+        {
+            'format': 'NDJSON',
+        },
+    )
+    assert len(species_bioprojects) == 3
+    proj_links = 0
+    prod_links = 0
+    for row in species_bioprojects:
+        if p := row['project_accessions']:
+            proj_links += len(p)
+        if d := row['product_accessions']:
+            prod_links += len(d)
+    assert proj_links > 1
+    assert prod_links > 1
+
+    tol_bioprojects = report_response_json(
+        client,
+        api_path,
+        'species-bioproject',
+        {
+            'format': 'NDJSON',
+            'accession': 'PRJEB40665',
+        },
+    )
+    assert len(tol_bioprojects) == 2
+
+
 @pytest.fixture
 def max_bases(client, api_path):
-    json_lines = report_response_json(client, api_path, 'specimen-status', {'format': 'NDJSON'})
+    json_lines = report_response_json(
+        client, api_path, 'specimen-status', {'format': 'NDJSON'}
+    )
     assert json_lines
     return sum_species_data_bases(json_lines)
 
@@ -256,7 +296,7 @@ def specimen_status_param_combinations():
         {'processed': '1'},
         {'processed': '0'},
         {'processed': 'null'},
-        {'project': 'protist_microalgae'},
+        {'project': 'protist-microalgae'},
         {'qc': 'pass'},
         {'qc': 'null'},
         {'visibility': 'Always'},
@@ -293,5 +333,7 @@ def expected_values(params):
 
 
 def test_data_report_bad_params(client, api_path):
-    response = client.get(api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'}))
+    response = client.get(
+        api_path + '/report/pipeline-data?' + urlencode({'processed': 'x'})
+    )
     assert response.status == '500 INTERNAL SERVER ERROR'
