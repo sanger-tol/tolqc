@@ -427,6 +427,7 @@ class Project(LogBase):
     name = mapped_column(String)
     description = mapped_column(String)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
+    symlink_template = mapped_column(String)
 
     accession = relationship('Accession', back_populates='projects')
     data_assn = relationship('Allocation', back_populates='project')
