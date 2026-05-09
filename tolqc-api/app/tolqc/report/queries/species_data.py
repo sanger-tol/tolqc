@@ -147,7 +147,7 @@ def linked_accessions_json(
         )
         .select_from(Accession)
         .join(assn_rel)
-        .join(link_rel.of_type(linked_acc))
+        .join(linked_acc, link_rel)
         .group_by(Accession.accession_id)
     )
 
