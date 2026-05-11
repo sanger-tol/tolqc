@@ -3,7 +3,13 @@
 # SPDX-License-Identifier: MIT
 
 from tolqc.schema import Role, RoleBinding, Token, User
-from tolqc.schema.accession_models import Accession, AccessionTypeDict, SubmitterDict
+from tolqc.schema.accession_models import (
+    Accession,
+    AccessionTypeDict,
+    BioprojectLink,
+    LinkStatusDict,
+    SubmitterDict,
+)
 from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
     Allocation,
@@ -33,12 +39,7 @@ from tolqc.schema.system_models import Metadata
 
 def test_data(token: str):
     return [
-        User(
-            id=100,
-            oidc_id='tester@sanger.ac.uk',
-            email='tester@sanger.ac.uk',
-            name='tester'
-        ),
+        User(id=100, oidc_id='tester@sanger.ac.uk', name='tester', email='tester@sanger.ac.uk'),
         Token(token=token, user_id=100, id=200),
         Role(id=300, name='editor'),
         RoleBinding(user_id=100, role_id=300),
@@ -137,6 +138,11 @@ def test_data(token: str):
         CategoryDict(category='transcriptomic_data'),
         CategoryDict(category='genomic_data'),
         CategoryDict(category='resequencing_data'),
+        Centre(id=2, name='Wellcome Sanger Institute'),
+        Centre(id=3, name='Baylor College of Medicine'),
+        Centre(id=4, name='Pacific Biosciences'),
+        Centre(id=5, name='Arima Genomics'),
+        Centre(id=6, name='University of Cambridge'),
         ChemistryDict(chemistry='R/P1-C1/5.0-25M'),
         ChemistryDict(chemistry='R/P2-C2/5.0-25M'),
         ChemistryDict(chemistry='S/P2-C2/5.0'),
@@ -145,6 +151,184 @@ def test_data(token: str):
         ChemistryDict(chemistry='S/P4.1-C2/5.0-8M'),
         ChemistryDict(chemistry='S/P4-C2/5.0-8M'),
         ChemistryDict(chemistry='S/P5-C2/5.0-8M'),
+        FileTypeDict(file_type='BAM', description='Binary Alignment Map'),
+        FileTypeDict(file_type='CRAM', description='Compressed Reference-oriented Alignment Map'),
+        FileTypeDict(file_type='BNX', description='BioNano BNX'),
+        FileTypeDict(file_type='CMAP', description='BioNano CMAP'),
+        FileTypeDict(
+            file_type='RAW_FAST5_TAR_DIR',
+            description=(
+                'Early ONT data. A directory of TAR archives containing FAST5 format raw ONT data'
+            ),
+        ),
+        FileTypeDict(
+            file_type='RAW_FASTQ_DIR',
+            description='Directory of raw ONT data in (gzipped) FASTQ format',
+        ),
+        FileTypeDict(
+            file_type='RAW_BAM_DIR', description='Directory of raw ONT data in BAM format'
+        ),
+        FileTypeDict(
+            file_type='RECALL_FASTQ_DIR',
+            description='Directory of re-basecalled ONT data in (gzipped) FASTQ format',
+        ),
+        FileTypeDict(
+            file_type='RAW_FAST5_DIR', description='Directory of raw ONT data in FAST5 format'
+        ),
+        FileTypeDict(
+            file_type='RAW_POD5_DIR', description='Directory of raw ONT data in POD5 format'
+        ),
+        FileTypeDict(
+            file_type='PACBIO_TRIMMED_FASTA',
+            description='PacBio data in (gzipped) FASTA format processed for input into assembly',
+        ),
+        FileTypeDict(file_type='RECALL_BAM', description='BAM file of re-basecalled ONT data'),
+        FolderLocation(
+            folder_location_id='smudgeplot_s3',
+            uri_prefix='s3://tolqc-dev/smudgeplot',
+            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/smudgeplot',
+            files_template={
+                'image_file_patterns': [
+                    {
+                        'index': 0,
+                        'caption': 'Smudgeplot plot',
+                        'pattern': '.*_smudgeplot_smudgeplot\\.png',
+                    },
+                    {
+                        'index': 1,
+                        'caption': 'Smudgeplot log plot',
+                        'pattern': '.*_smudgeplot_smudgeplot_log10\\.png',
+                    },
+                    {
+                        'index': 2,
+                        'caption': 'Smudgeplot centralities',
+                        'pattern': '.*_smudgeplot_centralities\\.png',
+                    },
+                ]
+            },
+        ),
+        FolderLocation(
+            folder_location_id='genomescope_s3',
+            uri_prefix='s3://tolqc-dev/genomescope',
+            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/genomescope',
+            files_template={
+                'image_file_patterns': [
+                    {
+                        'index': 2,
+                        'caption': 'Genomescope 2.0 transformed linear plot',
+                        'pattern': '.*_genomescope_transformed_linear_plot\\.png',
+                    },
+                    {
+                        'index': 0,
+                        'caption': 'Genomescope 2.0 linear plot',
+                        'pattern': '.*_genomescope_linear_plot\\.png',
+                    },
+                    {
+                        'index': 3,
+                        'caption': 'Genomescope 2.0 transformed log plot',
+                        'pattern': '.*_genomescope_transformed_log_plot\\.png',
+                    },
+                    {
+                        'index': 1,
+                        'caption': 'Genomescope 2.0 log plot',
+                        'pattern': '.*_genomescope_log_plot\\.png',
+                    },
+                ],
+                'other_file_patterns': [
+                    {'caption': 'Kmer counts histogram data', 'pattern': '.*\\.hist\\.txt'}
+                ],
+            },
+        ),
+        FolderLocation(
+            folder_location_id='illumina_data_s3',
+            uri_prefix='s3://tolqc-dev/illumina_data',
+            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/illumina_data',
+            files_template={
+                'image_file_patterns': [
+                    {
+                        'caption': '{library_type} G|C Content',
+                        'pattern': '.+_F0xB00-gc-content\\.png',
+                    },
+                    {
+                        'caption': '{library_type} A|C|G|T Content Per Cycle',
+                        'pattern': '.+_F0xB00-acgt-cycles\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Per Cycle (Overlaid)',
+                        'pattern': '.+_F0xB00-quals\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Per Cycle (Split)',
+                        'pattern': '.+_F0xB00-quals2\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Frequencies, Per Cycle Heat Map',
+                        'pattern': '.+_F0xB00-quals-hm\\.png',
+                    },
+                    {
+                        'caption': '{library_type} Quality Frequencies, Separate Curve Per Cycle',
+                        'pattern': '.+_F0xB00-quals3\\.png',
+                    },
+                ]
+            },
+        ),
+        FolderLocation(
+            folder_location_id='pacbio_run_s3',
+            uri_prefix='s3://tolqc-dev/pacbio_run',
+            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/pacbio_run',
+            files_template={
+                'image_file_patterns': [
+                    {'caption': 'Base yield density', 'pattern': 'base_yield_plot\\.png'},
+                    {'caption': 'Barcode quality distribution', 'pattern': 'bq_histogram\\.png'},
+                    {
+                        'caption': 'Read quality distribution',
+                        'pattern': 'ccs_accuracy_hist\\.png',
+                    },
+                    {
+                        'caption': 'Read length distribution (all)',
+                        'pattern': 'ccs_all_readlength_hist_plot\\.png',
+                    },
+                    {
+                        'caption': 'HiFi yield by read length',
+                        'pattern': 'ccs_hifi_read_length_yield_plot\\.png',
+                    },
+                    {'caption': 'Number of passes', 'pattern': 'ccs_npasses_hist\\.png'},
+                    {
+                        'caption': 'HiFi read length distribution',
+                        'pattern': 'ccs_readlength_hist_plot\\.png',
+                    },
+                    {'caption': 'Control concordance', 'pattern': 'concordance_plot\\.png'},
+                    {
+                        'caption': 'Insert read length density',
+                        'pattern': 'hexbin_length_plot\\.png',
+                    },
+                    {'caption': 'CpG methylation in reads', 'pattern': 'm5c_detections\\.png'},
+                    {
+                        'caption': 'CpG methylation in reads histogram',
+                        'pattern': 'm5c_detections_hist\\.png',
+                    },
+                    {'caption': 'Number of reads per barcode', 'pattern': 'nreads\\.png'},
+                    {
+                        'caption': 'Number of reads per barcode histogram',
+                        'pattern': 'nreads_histogram\\.png',
+                    },
+                    {'caption': 'Loading evaluation', 'pattern': 'raw_read_length_plot\\.png'},
+                    {'caption': 'Polymerase read length', 'pattern': 'readLenDist0\\.png'},
+                    {
+                        'caption': 'Control polymerase read length',
+                        'pattern': 'readlength_plot\\.png',
+                    },
+                    {
+                        'caption': 'Mean readlength histogram',
+                        'pattern': 'readlength_histogram\\.png',
+                    },
+                    {
+                        'caption': 'Accuracy versus read length density',
+                        'pattern': 'readlength_qv_hist2d\\.hexbin\\.png',
+                    },
+                ]
+            },
+        ),
         LibraryType(
             library_type_id='Chromium genome',
             hierarchy_name='10x',
@@ -327,7 +511,6 @@ def test_data(token: str):
             default_category='genomic_data',
         ),
         LibraryType(library_type_id='RNA Ribo', hierarchy_name='rna-seq'),
-        LibraryType(library_type_id='Pacbio_Amplicon', hierarchy_name='pacbio'),
         LibraryType(library_type_id='PacBio - CLR', hierarchy_name='pacbio'),
         LibraryType(
             library_type_id='Hi-C - OmniC',
@@ -391,12 +574,6 @@ def test_data(token: str):
             reporting_category='pacbio',
         ),
         LibraryType(
-            library_type_id='Pacbio_AmpliFi',
-            hierarchy_name='pacbio',
-            default_category='genomic_data',
-            reporting_category='pacbio',
-        ),
-        LibraryType(
             library_type_id='ONT_GridIon',
             hierarchy_name='ont',
             default_category='genomic_data',
@@ -420,6 +597,22 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='ont',
         ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (Amplicon)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+        ),
+        LibraryType(library_type_id='LCMB'),
+        LinkStatusDict(link_status='New', description='BioProject link newly created'),
+        LinkStatusDict(
+            link_status='Verified', description='BioProject link verified to exist at ENA'
+        ),
+        LinkStatusDict(link_status='Suppressed', description='BioProject link suppressed at ENA'),
+        LinkStatusDict(
+            link_status='Suppression Requested',
+            description='BioProject link has been requested to be suppressed',
+        ),
         Platform(id=1, name='Illumina', model='HiSeq'),
         Platform(id=2, name='Illumina', model='HiSeqX'),
         Platform(id=4, name='Illumina', model='HiSeq 4000'),
@@ -440,184 +633,6 @@ def test_data(token: str):
         Platform(id=21, name='BioNano', model='Irys'),
         Platform(id=22, name='ONT', model='gridion'),
         Platform(id=23, name='ONT', model='promethion'),
-        Centre(id=2, name='Wellcome Sanger Institute'),
-        Centre(id=3, name='Baylor College of Medicine'),
-        Centre(id=4, name='Pacific Biosciences'),
-        Centre(id=5, name='Arima Genomics'),
-        Centre(id=6, name='University of Cambridge'),
-        FileTypeDict(file_type='BAM', description='Binary Alignment Map'),
-        FileTypeDict(file_type='CRAM', description='Compressed Reference-oriented Alignment Map'),
-        FileTypeDict(file_type='BNX', description='BioNano BNX'),
-        FileTypeDict(file_type='CMAP', description='BioNano CMAP'),
-        FileTypeDict(
-            file_type='RAW_FAST5_TAR_DIR',
-            description=(
-                'Early ONT data. A directory of TAR archives containing FAST5 format raw ONT data'
-            ),
-        ),
-        FileTypeDict(
-            file_type='RAW_FASTQ_DIR',
-            description='Directory of raw ONT data in (gzipped) FASTQ format',
-        ),
-        FileTypeDict(
-            file_type='RAW_BAM_DIR', description='Directory of raw ONT data in BAM format'
-        ),
-        FileTypeDict(
-            file_type='RECALL_FASTQ_DIR',
-            description='Directory of re-basecalled ONT data in (gzipped) FASTQ format',
-        ),
-        FileTypeDict(
-            file_type='RAW_FAST5_DIR', description='Directory of raw ONT data in FAST5 format'
-        ),
-        FileTypeDict(
-            file_type='RAW_POD5_DIR', description='Directory of raw ONT data in POD5 format'
-        ),
-        FolderLocation(
-            folder_location_id='genomescope_s3',
-            uri_prefix='s3://tolqc-dev/genomescope',
-            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/genomescope',
-            files_template={
-                'image_file_patterns': [
-                    {
-                        'index': 2,
-                        'caption': 'Genomescope 2.0 transformed linear plot',
-                        'pattern': '.*_genomescope_transformed_linear_plot\\.png',
-                    },
-                    {
-                        'index': 0,
-                        'caption': 'Genomescope 2.0 linear plot',
-                        'pattern': '.*_genomescope_linear_plot\\.png',
-                    },
-                    {
-                        'index': 3,
-                        'caption': 'Genomescope 2.0 transformed log plot',
-                        'pattern': '.*_genomescope_transformed_log_plot\\.png',
-                    },
-                    {
-                        'index': 1,
-                        'caption': 'Genomescope 2.0 log plot',
-                        'pattern': '.*_genomescope_log_plot\\.png',
-                    },
-                ],
-                'other_file_patterns': [
-                    {'caption': 'Kmer counts histogram data', 'pattern': '.*\\.hist\\.txt'}
-                ],
-            },
-        ),
-        FolderLocation(
-            folder_location_id='illumina_data_s3',
-            uri_prefix='s3://tolqc-dev/illumina_data',
-            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/illumina_data',
-            files_template={
-                'image_file_patterns': [
-                    {
-                        'caption': '{library_type} G|C Content',
-                        'pattern': '.+_F0xB00-gc-content\\.png',
-                    },
-                    {
-                        'caption': '{library_type} A|C|G|T Content Per Cycle',
-                        'pattern': '.+_F0xB00-acgt-cycles\\.png',
-                    },
-                    {
-                        'caption': '{library_type} Quality Per Cycle (Overlaid)',
-                        'pattern': '.+_F0xB00-quals\\.png',
-                    },
-                    {
-                        'caption': '{library_type} Quality Per Cycle (Split)',
-                        'pattern': '.+_F0xB00-quals2\\.png',
-                    },
-                    {
-                        'caption': '{library_type} Quality Frequencies, Per Cycle Heat Map',
-                        'pattern': '.+_F0xB00-quals-hm\\.png',
-                    },
-                    {
-                        'caption': '{library_type} Quality Frequencies, Separate Curve Per Cycle',
-                        'pattern': '.+_F0xB00-quals3\\.png',
-                    },
-                ]
-            },
-        ),
-        FolderLocation(
-            folder_location_id='pacbio_run_s3',
-            uri_prefix='s3://tolqc-dev/pacbio_run',
-            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/pacbio_run',
-            files_template={
-                'image_file_patterns': [
-                    {'caption': 'Base yield density', 'pattern': 'base_yield_plot\\.png'},
-                    {'caption': 'Barcode quality distribution', 'pattern': 'bq_histogram\\.png'},
-                    {
-                        'caption': 'Read quality distribution',
-                        'pattern': 'ccs_accuracy_hist\\.png',
-                    },
-                    {
-                        'caption': 'Read length distribution (all)',
-                        'pattern': 'ccs_all_readlength_hist_plot\\.png',
-                    },
-                    {
-                        'caption': 'HiFi yield by read length',
-                        'pattern': 'ccs_hifi_read_length_yield_plot\\.png',
-                    },
-                    {'caption': 'Number of passes', 'pattern': 'ccs_npasses_hist\\.png'},
-                    {
-                        'caption': 'HiFi read length distribution',
-                        'pattern': 'ccs_readlength_hist_plot\\.png',
-                    },
-                    {'caption': 'Control concordance', 'pattern': 'concordance_plot\\.png'},
-                    {
-                        'caption': 'Insert read length density',
-                        'pattern': 'hexbin_length_plot\\.png',
-                    },
-                    {'caption': 'CpG methylation in reads', 'pattern': 'm5c_detections\\.png'},
-                    {
-                        'caption': 'CpG methylation in reads histogram',
-                        'pattern': 'm5c_detections_hist\\.png',
-                    },
-                    {'caption': 'Number of reads per barcode', 'pattern': 'nreads\\.png'},
-                    {
-                        'caption': 'Number of reads per barcode histogram',
-                        'pattern': 'nreads_histogram\\.png',
-                    },
-                    {'caption': 'Loading evaluation', 'pattern': 'raw_read_length_plot\\.png'},
-                    {'caption': 'Polymerase read length', 'pattern': 'readLenDist0\\.png'},
-                    {
-                        'caption': 'Control polymerase read length',
-                        'pattern': 'readlength_plot\\.png',
-                    },
-                    {
-                        'caption': 'Mean readlength histogram',
-                        'pattern': 'readlength_histogram\\.png',
-                    },
-                    {
-                        'caption': 'Accuracy versus read length density',
-                        'pattern': 'readlength_qv_hist2d\\.hexbin\\.png',
-                    },
-                ]
-            },
-        ),
-        FolderLocation(
-            folder_location_id='smudgeplot_s3',
-            uri_prefix='s3://tolqc-dev/smudgeplot',
-            http_prefix='https://tolqc-dev.cog.sanger.ac.uk/smudgeplot',
-            files_template={
-                'image_file_patterns': [
-                    {
-                        'index': 0,
-                        'caption': 'Smudgeplot plot',
-                        'pattern': '.*_smudgeplot_smudgeplot\\.png',
-                    },
-                    {
-                        'index': 1,
-                        'caption': 'Smudgeplot log plot',
-                        'pattern': '.*_smudgeplot_smudgeplot_log10\\.png',
-                    },
-                    {
-                        'index': 2,
-                        'caption': 'Smudgeplot centralities',
-                        'pattern': '.*_smudgeplot_centralities\\.png',
-                    },
-                ]
-            },
-        ),
         QCDict(qc_state='pass'),
         QCDict(qc_state='fail'),
         Sex(sex_id='Male'),
@@ -764,8 +779,27 @@ def test_data(token: str):
                                             size_bytes=8253265734,
                                             md5='a8ebee530fc5edf3cb3644e2af276498',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=6963,
+                                            project_id='britain-and-ireland',
+                                            data_id='35344_1#1',
+                                        ),
+                                        Allocation(
+                                            id=6964, project_id='darwin', data_id='35344_1#1'
+                                        ),
+                                        Allocation(
+                                            id=6965,
+                                            project_id='protist-microalgae',
+                                            data_id='35344_1#1',
+                                        ),
+                                        Allocation(
+                                            id=6966, project_id='tol', data_id='35344_1#1'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNT7RDJNSEPWTKHG8QSHSB',
@@ -840,6 +874,7 @@ def test_data(token: str):
                                             size_bytes=226437448,
                                             md5='794433fd4dbcf8e81f4b7e87073ebe33',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=[
                                                 'BC:Z',
                                                 'QT:Z',
@@ -852,6 +887,24 @@ def test_data(token: str):
                                                 'as:i',
                                             ],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=6967,
+                                            project_id='britain-and-ireland',
+                                            data_id='35344_1#2',
+                                        ),
+                                        Allocation(
+                                            id=6968, project_id='darwin', data_id='35344_1#2'
+                                        ),
+                                        Allocation(
+                                            id=6969,
+                                            project_id='protist-microalgae',
+                                            data_id='35344_1#2',
+                                        ),
+                                        Allocation(
+                                            id=6970, project_id='tol', data_id='35344_1#2'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNT901PKS6AZBX0QPJEP95',
@@ -927,8 +980,27 @@ def test_data(token: str):
                                             size_bytes=8269429324,
                                             md5='d62df44f9dcb5982497720667ba017a3',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z', 'a3:i', 'ah:i'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=6971,
+                                            project_id='britain-and-ireland',
+                                            data_id='35344_1#3',
+                                        ),
+                                        Allocation(
+                                            id=6972, project_id='darwin', data_id='35344_1#3'
+                                        ),
+                                        Allocation(
+                                            id=6973,
+                                            project_id='protist-microalgae',
+                                            data_id='35344_1#3',
+                                        ),
+                                        Allocation(
+                                            id=6974, project_id='tol', data_id='35344_1#3'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNTAE04KEY675Z4WX8KDK4',
@@ -1004,6 +1076,7 @@ def test_data(token: str):
                                             size_bytes=8421281844,
                                             md5='901f0a009eee03f14c2ddb3b614e217e',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=[
                                                 'BC:Z',
                                                 'QT:Z',
@@ -1014,6 +1087,24 @@ def test_data(token: str):
                                                 'as:i',
                                             ],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=6975,
+                                            project_id='britain-and-ireland',
+                                            data_id='35344_1#4',
+                                        ),
+                                        Allocation(
+                                            id=6976, project_id='darwin', data_id='35344_1#4'
+                                        ),
+                                        Allocation(
+                                            id=6977,
+                                            project_id='protist-microalgae',
+                                            data_id='35344_1#4',
+                                        ),
+                                        Allocation(
+                                            id=6978, project_id='tol', data_id='35344_1#4'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNTBMMYVA2RJZKYZCHZAAM',
@@ -1104,8 +1195,27 @@ def test_data(token: str):
                                             size_bytes=38152933620,
                                             md5='6fdc802b815d8109cca0e05b64390c3f',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=7551,
+                                            project_id='britain-and-ireland',
+                                            data_id='35528_4#8',
+                                        ),
+                                        Allocation(
+                                            id=7552, project_id='darwin', data_id='35528_4#8'
+                                        ),
+                                        Allocation(
+                                            id=7553,
+                                            project_id='protist-microalgae',
+                                            data_id='35528_4#8',
+                                        ),
+                                        Allocation(
+                                            id=7554, project_id='tol', data_id='35528_4#8'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GP34MFJNAHCBM0X20TA8VF',
@@ -1232,6 +1342,28 @@ def test_data(token: str):
                                                 'zm:i',
                                             ],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=46274,
+                                            project_id='britain-and-ireland',
+                                            data_id='m64016_201115_112225#1022',
+                                        ),
+                                        Allocation(
+                                            id=46275,
+                                            project_id='darwin',
+                                            data_id='m64016_201115_112225#1022',
+                                        ),
+                                        Allocation(
+                                            id=46276,
+                                            project_id='protist-microalgae',
+                                            data_id='m64016_201115_112225#1022',
+                                        ),
+                                        Allocation(
+                                            id=46277,
+                                            project_id='tol',
+                                            data_id='m64016_201115_112225#1022',
+                                        ),
                                     ],
                                 ),
                                 Data(
@@ -1376,6 +1508,7 @@ def test_data(token: str):
                                             size_bytes=4943416701,
                                             md5='cfb6b3e0cb54eb97ee1fec78964b6944',
                                             file_type='BAM',
+                                            has_methylation=False,
                                             has_kinetics=True,
                                             sam_tags=[
                                                 'RG:Z',
@@ -1404,6 +1537,28 @@ def test_data(token: str):
                                                 'zm:i',
                                             ],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=47766,
+                                            project_id='britain-and-ireland',
+                                            data_id='m64089e_210601_133425#1022',
+                                        ),
+                                        Allocation(
+                                            id=47767,
+                                            project_id='darwin',
+                                            data_id='m64089e_210601_133425#1022',
+                                        ),
+                                        Allocation(
+                                            id=47768,
+                                            project_id='protist-microalgae',
+                                            data_id='m64089e_210601_133425#1022',
+                                        ),
+                                        Allocation(
+                                            id=47769,
+                                            project_id='tol',
+                                            data_id='m64089e_210601_133425#1022',
+                                        ),
                                     ],
                                 ),
                             ],
@@ -1459,8 +1614,27 @@ def test_data(token: str):
                                             size_bytes=2596511348,
                                             md5='a4f243cf29cabaa05fbeeb126495e7f8',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z', 'a3:i', 'ah:i'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=9435,
+                                            project_id='britain-and-ireland',
+                                            data_id='36703_5#4',
+                                        ),
+                                        Allocation(
+                                            id=9436, project_id='darwin', data_id='36703_5#4'
+                                        ),
+                                        Allocation(
+                                            id=9437,
+                                            project_id='protist-microalgae',
+                                            data_id='36703_5#4',
+                                        ),
+                                        Allocation(
+                                            id=9438, project_id='tol', data_id='36703_5#4'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ6KCY1QQ32TSMP7KRRT3Z',
@@ -1546,8 +1720,27 @@ def test_data(token: str):
                                             size_bytes=4232398866,
                                             md5='c0ac0c8f911a62997ad2afc28642a56a',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=12848,
+                                            project_id='britain-and-ireland',
+                                            data_id='37939_1#2',
+                                        ),
+                                        Allocation(
+                                            id=12849, project_id='darwin', data_id='37939_1#2'
+                                        ),
+                                        Allocation(
+                                            id=12850,
+                                            project_id='protist-microalgae',
+                                            data_id='37939_1#2',
+                                        ),
+                                        Allocation(
+                                            id=12851, project_id='tol', data_id='37939_1#2'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GSEF3JDHWEVBP5EWYD9QC8',
@@ -1632,8 +1825,25 @@ def test_data(token: str):
                                             size_bytes=1417578072,
                                             md5='6001d9101395ae26e07a3c619d6f5985',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=9466,
+                                            project_id='britain-and-ireland',
+                                            data_id='36857#13',
+                                        ),
+                                        Allocation(
+                                            id=9467, project_id='darwin', data_id='36857#13'
+                                        ),
+                                        Allocation(
+                                            id=9468,
+                                            project_id='protist-microalgae',
+                                            data_id='36857#13',
+                                        ),
+                                        Allocation(id=9469, project_id='tol', data_id='36857#13'),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ93RN80BXDY4WTYJZYB24',
@@ -1881,6 +2091,23 @@ def test_data(token: str):
                                             ],
                                         )
                                     ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=80860,
+                                            project_id='britain-and-ireland',
+                                            data_id='m84309_250205_121831_s4#2076',
+                                        ),
+                                        Allocation(
+                                            id=80861,
+                                            project_id='darwin',
+                                            data_id='m84309_250205_121831_s4#2076',
+                                        ),
+                                        Allocation(
+                                            id=80862,
+                                            project_id='tol',
+                                            data_id='m84309_250205_121831_s4#2076',
+                                        ),
+                                    ],
                                 )
                             ],
                         )
@@ -1999,11 +2226,29 @@ def test_data(token: str):
                                                 'irods:/seq/illumina/runs/40/40666/lane2/plex2'
                                                 '/40666_2#2.cram'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR809'
+                                                '/ERR8097174/40666_2%232.cram'
+                                            ),
                                             size_bytes=158472491403,
                                             md5='da73a821a18429f9fc956e806b7f4a82',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=16987,
+                                            project_id='britain-and-ireland',
+                                            data_id='40666_2#2',
+                                        ),
+                                        Allocation(
+                                            id=16988, project_id='darwin', data_id='40666_2#2'
+                                        ),
+                                        Allocation(
+                                            id=16989, project_id='tol', data_id='40666_2#2'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GVRDZR9KA1EXWZM48W09MZ',
@@ -2098,11 +2343,29 @@ def test_data(token: str):
                                                 'irods:/seq/illumina/runs/36/36691/lane2/plex5'
                                                 '/36691_2#5.cram'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR809'
+                                                '/ERR8097169/36691_2%235.cram'
+                                            ),
                                             size_bytes=9307345471,
                                             md5='d5ddea4e50f28e1438c8042cbfcc31a8',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=9234,
+                                            project_id='britain-and-ireland',
+                                            data_id='36691_2#5',
+                                        ),
+                                        Allocation(
+                                            id=9235, project_id='darwin', data_id='36691_2#5'
+                                        ),
+                                        Allocation(
+                                            id=9236, project_id='tol', data_id='36691_2#5'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ31A3VN2XMDY7PP7XMFSV',
@@ -2185,11 +2448,29 @@ def test_data(token: str):
                                                 'irods:/seq/illumina/runs/36/36691/lane2/plex6'
                                                 '/36691_2#6.cram'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR809'
+                                                '/ERR8097170/36691_2%236.cram'
+                                            ),
                                             size_bytes=9778070700,
                                             md5='09e26bf8255cd03b333744f9432b5393',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=9237,
+                                            project_id='britain-and-ireland',
+                                            data_id='36691_2#6',
+                                        ),
+                                        Allocation(
+                                            id=9238, project_id='darwin', data_id='36691_2#6'
+                                        ),
+                                        Allocation(
+                                            id=9239, project_id='tol', data_id='36691_2#6'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ32MZ3YKMTSPGRS5HWCD1',
@@ -2272,11 +2553,29 @@ def test_data(token: str):
                                                 'irods:/seq/illumina/runs/36/36691/lane2/plex7'
                                                 '/36691_2#7.cram'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR809'
+                                                '/ERR8097171/36691_2%237.cram'
+                                            ),
                                             size_bytes=8754454310,
                                             md5='8b87819338c08db3f325a451e864f227',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=9240,
+                                            project_id='britain-and-ireland',
+                                            data_id='36691_2#7',
+                                        ),
+                                        Allocation(
+                                            id=9241, project_id='darwin', data_id='36691_2#7'
+                                        ),
+                                        Allocation(
+                                            id=9242, project_id='tol', data_id='36691_2#7'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ33XK1D5AVJN9XCP7YQ84',
@@ -2359,11 +2658,29 @@ def test_data(token: str):
                                                 'irods:/seq/illumina/runs/36/36691/lane2/plex8'
                                                 '/36691_2#8.cram'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR809'
+                                                '/ERR8097172/36691_2%238.cram'
+                                            ),
                                             size_bytes=9969777773,
                                             md5='66334c7f81b59b0f1d99b840e6d36550',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=9243,
+                                            project_id='britain-and-ireland',
+                                            data_id='36691_2#8',
+                                        ),
+                                        Allocation(
+                                            id=9244, project_id='darwin', data_id='36691_2#8'
+                                        ),
+                                        Allocation(
+                                            id=9245, project_id='tol', data_id='36691_2#8'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ356P8AEKKAPW0VD2PJKD',
@@ -2513,9 +2830,16 @@ def test_data(token: str):
                                                 '/demultiplex.bc1019_BAK8B_OA'
                                                 '--bc1019_BAK8B_OA.bam'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR828'
+                                                '/ERR8282830'
+                                                '/m64097e_210221_172213.ccs.bc1019_BAK8B_OA'
+                                                '--bc1019_BAK8B_OA.bam'
+                                            ),
                                             size_bytes=87814836350,
                                             md5='9a6ffb74593409209ab8857b114d799d',
                                             file_type='BAM',
+                                            has_methylation=False,
                                             has_kinetics=True,
                                             sam_tags=[
                                                 'RG:Z',
@@ -2544,6 +2868,23 @@ def test_data(token: str):
                                                 'zm:i',
                                             ],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=50680,
+                                            project_id='britain-and-ireland',
+                                            data_id='m64097e_210221_172213#1019',
+                                        ),
+                                        Allocation(
+                                            id=50681,
+                                            project_id='darwin',
+                                            data_id='m64097e_210221_172213#1019',
+                                        ),
+                                        Allocation(
+                                            id=50682,
+                                            project_id='tol',
+                                            data_id='m64097e_210221_172213#1019',
+                                        ),
                                     ],
                                 )
                             ],
@@ -2604,11 +2945,29 @@ def test_data(token: str):
                                             data_id='37935_8#13',
                                             name='37935_8#13.cram',
                                             remote_path='irods:/seq/37935/37935_8#13.cram',
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR809'
+                                                '/ERR8097173/37935_8%2313.cram'
+                                            ),
                                             size_bytes=2246652402,
                                             md5='40c3393cf594d9e84e6d4cb932328e33',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=12798,
+                                            project_id='britain-and-ireland',
+                                            data_id='37935_8#13',
+                                        ),
+                                        Allocation(
+                                            id=12799, project_id='darwin', data_id='37935_8#13'
+                                        ),
+                                        Allocation(
+                                            id=12800, project_id='tol', data_id='37935_8#13'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GSDTKDZYAX2X2F8K7WD045',
@@ -2703,11 +3062,29 @@ def test_data(token: str):
                                                 'irods:/seq/illumina/runs/48/48593/lane1/plex25'
                                                 '/48593_1#25.cram'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR127'
+                                                '/ERR12765103/48593_1%2325.cram'
+                                            ),
                                             size_bytes=2338594230,
                                             md5='2271d40cf440b7fa532b9d808766b189',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=30343,
+                                            project_id='britain-and-ireland',
+                                            data_id='48593_1#25',
+                                        ),
+                                        Allocation(
+                                            id=30344, project_id='darwin', data_id='48593_1#25'
+                                        ),
+                                        Allocation(
+                                            id=30345, project_id='tol', data_id='48593_1#25'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8HAZJY0CG2BHX6Q7TSA54DA',
@@ -2789,6 +3166,153 @@ def test_data(token: str):
                 alias='ena-tol-lpJunEffu-study-umbrella-20220117',
                 submitter_id='WELLCOME SANGER INSTITUTE',
                 is_deleted=False,
+                child_assn=[
+                    BioprojectLink(
+                        id=2168,
+                        parent_accession_id='PRJEB50168',
+                        child_accession_id='PRJEB55668',
+                        link_status='New',
+                        child=Accession(
+                            accession_id='PRJEB55668',
+                            accession_type_id='BioProject - Species Assembly',
+                            secondary='ERP140591',
+                            submission='ERA17616049',
+                            date_submitted='2022-08-31T00:00:00+01:00',
+                            name='lpJunEffu1',
+                            title='Juncus effusus genome assembly, lpJunEffu1',
+                            description=(
+                                'This project provides the genome assembly of Juncus effusus. The'
+                                ' assembly is provided by the Darwin Tree of Life Project (https'
+                                ': //www.darwintreeoflife.org/). The data under this project are'
+                                ' made available subject to the Darwin Tree of Life Open Data'
+                                ' Release Policy (https: //www.darwintreeoflife.org/project'
+                                '-resources/).'
+                            ),
+                            alias='WSI_primary_lpJunEffu1.1',
+                            submitter_id='WELLCOME SANGER INSTITUTE',
+                            is_deleted=False,
+                        ),
+                    ),
+                    BioprojectLink(
+                        id=2169,
+                        parent_accession_id='PRJEB50168',
+                        child_accession_id='PRJEB55669',
+                        link_status='New',
+                        child=Accession(
+                            accession_id='PRJEB55669',
+                            accession_type_id='BioProject - Species Assembly',
+                            secondary='ERP140592',
+                            submission='ERA17616049',
+                            date_submitted='2022-08-31T00:00:00+01:00',
+                            name='lpJunEffu1 alternate haplotype',
+                            title=(
+                                'Juncus effusus genome assembly, lpJunEffu1, alternate haplotype'
+                            ),
+                            description=(
+                                'This project provides the genome assembly of Juncus effusus. The'
+                                ' assembly is provided by the Darwin Tree of Life Project (https'
+                                ': //www.darwintreeoflife.org/). The data under this project are'
+                                ' made available subject to the Darwin Tree of Life Open Data'
+                                ' Release Policy (https: //www.darwintreeoflife.org/project'
+                                '-resources/).'
+                            ),
+                            alias='WSI_haplotigs_lpJunEffu1.1',
+                            submitter_id='WELLCOME SANGER INSTITUTE',
+                            is_deleted=False,
+                        ),
+                    ),
+                    BioprojectLink(
+                        id=2170,
+                        parent_accession_id='PRJEB50168',
+                        child_accession_id='PRJEB50167',
+                        link_status='New',
+                        child=Accession(
+                            accession_id='PRJEB50167',
+                            accession_type_id='BioProject - Species Data',
+                            secondary='ERP134724',
+                            submission='ERA8395505',
+                            date_submitted='2022-01-17T00:00:00+00:00',
+                            name='lpJunEffu',
+                            title='Juncus effusus, genomic and transcriptomic data',
+                            description=(
+                                'This project collects the genomic and transcriptomic data'
+                                ' generated for Juncus effusus to facilitate genome assembly and'
+                                ' annotation as part of the Darwin Tree of Life Project (https'
+                                '://www.darwintreeoflife.org/). The data under this project are'
+                                ' made available subject to the Darwin Tree of Life Open Data'
+                                ' Release Policy (https://www.darwintreeoflife.org/project'
+                                '-resources/).'
+                            ),
+                            alias='ena-tol-lpJunEffu-study-rawdata-20220117',
+                            submitter_id='WELLCOME SANGER INSTITUTE',
+                            is_deleted=False,
+                        ),
+                    ),
+                ],
+                parent_assn=[
+                    BioprojectLink(
+                        id=2171,
+                        parent_accession_id='PRJEB40665',
+                        child_accession_id='PRJEB50168',
+                        link_status='New',
+                        parent=Accession(
+                            accession_id='PRJEB40665',
+                            accession_type_id='BioProject - Project Umbrella',
+                            submission='ERA2939302',
+                            date_submitted='2020-10-05T00:00:00+01:00',
+                            name='Darwin Tree of Life Project',
+                            title='Darwin Tree of Life Project: Genome Data and Assemblies',
+                            description=(
+                                'The Darwin Tree of Life Project (darwintreeoflife.org) generates'
+                                ' high quality genome assemblies for the approximately 60,000'
+                                ' species of eukaryotic organisms found in Britain and Ireland to'
+                                ' contribute towards providing reference genome sequences for all'
+                                ' life. It is a collaboration between biodiversity, genomics and'
+                                ' analysis partners that hopes to transform the way we do biology'
+                                ', conservation and biotechnology. The project partners are the'
+                                ' Natural History Museum London, the Royal Botanic Gardens Kew'
+                                ', the Royal Botanic Gardens Edinburgh, the Marine Biological'
+                                ' Association, the Earlham Institute, the University of Oxford'
+                                ' and its Wytham Woods field station, the University of Edinburgh'
+                                ', the University of Cambridge, EMBL-EBI and others, led by the'
+                                ' Wellcome Sanger Institute, UK'
+                            ),
+                            alias='SC_2020-10-05T14:21:44Z',
+                            submitter_id='Wellcome Sanger Institute',
+                            is_deleted=False,
+                        ),
+                    ),
+                    BioprojectLink(
+                        id=2172,
+                        parent_accession_id='PRJEB43745',
+                        child_accession_id='PRJEB50168',
+                        link_status='New',
+                        parent=Accession(
+                            accession_id='PRJEB43745',
+                            accession_type_id='BioProject - Project Umbrella',
+                            submission='ERA3682544',
+                            date_submitted='2021-03-18T00:00:00+00:00',
+                            name='Sanger Institute Tree of Life Programme',
+                            title='Sanger Institute Tree of Life Programme: Data and Assemblies',
+                            description=(
+                                'The Wellcome Sanger Institute Tree of Life programme (https'
+                                '://www.sanger.ac.uk/programme/tree-of-life/) generates reference'
+                                ' genome assemblies and other genomic and transcriptome data to'
+                                ' deliver to an overarching goal of sequencing all of eukaryotic'
+                                ' life. The Tree of Life programme is affiliated with the Earth'
+                                ' BioGenome Project (EBP: PRJNA533106). The data and analyses are'
+                                ' generated in collaboration with a range of external colleagues'
+                                ', alongside Tree of Life contributions to the Darwin Tree of'
+                                ' Life Project (DToL: PRJEB40665), the Aquatic Symbiosis Genomics'
+                                ' project (ASG: PRJEB43743) the Vertebrate Genomes Project (VGP'
+                                ': PRJNA489243) and others.'
+                            ),
+                            alias='ena-tol-ToL-project-umbrella-20210317',
+                            submitter_id='WELLCOME SANGER INSTITUTE',
+                            is_deleted=False,
+                        ),
+                    ),
+                ],
             ),
             location=Location(location_id=299, path='e/1/3/d/d/0/Juncus_effusus'),
         ),
@@ -2874,11 +3398,35 @@ def test_data(token: str):
                                                 'irods:/seq/illumina/runs/48/48587/lane5-6/plex2'
                                                 '/48587_5-6#2.cram'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR130'
+                                                '/ERR13093686/48587_5-6%232.cram'
+                                            ),
                                             size_bytes=31081394145,
                                             md5='0ac93acd48d2dd15577a8c161764878b',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z', 'a3:i', 'ah:i'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=30287, project_id='aegis', data_id='48587_5-6#2'
+                                        ),
+                                        Allocation(
+                                            id=30288,
+                                            project_id='britain-and-ireland',
+                                            data_id='48587_5-6#2',
+                                        ),
+                                        Allocation(
+                                            id=30289, project_id='darwin', data_id='48587_5-6#2'
+                                        ),
+                                        Allocation(
+                                            id=30290, project_id='tol', data_id='48587_5-6#2'
+                                        ),
+                                        Allocation(
+                                            id=30291, project_id='vgp', data_id='48587_5-6#2'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8HAY65YNTH7P0M2F65PMN39',
@@ -3097,6 +3645,11 @@ def test_data(token: str):
                                                 'irods:/seq/pacbio/r84047_20240219_102003/1_C01'
                                                 '/m84047_240219_121238_s3.hifi_reads.bc2089.bam'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR131'
+                                                '/ERR13112065'
+                                                '/m84047_240219_121238_s3.hifi_reads.bc2089.bam'
+                                            ),
                                             size_bytes=20408107049,
                                             md5='0fedeb709610324722cfb27dd3f37d75',
                                             file_type='BAM',
@@ -3127,6 +3680,33 @@ def test_data(token: str):
                                                 'zm:i',
                                             ],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=63001,
+                                            project_id='aegis',
+                                            data_id='m84047_240219_121238_s3#2089',
+                                        ),
+                                        Allocation(
+                                            id=63002,
+                                            project_id='britain-and-ireland',
+                                            data_id='m84047_240219_121238_s3#2089',
+                                        ),
+                                        Allocation(
+                                            id=63003,
+                                            project_id='darwin',
+                                            data_id='m84047_240219_121238_s3#2089',
+                                        ),
+                                        Allocation(
+                                            id=63004,
+                                            project_id='tol',
+                                            data_id='m84047_240219_121238_s3#2089',
+                                        ),
+                                        Allocation(
+                                            id=63005,
+                                            project_id='vgp',
+                                            data_id='m84047_240219_121238_s3#2089',
+                                        ),
                                     ],
                                 )
                             ],
@@ -3203,6 +3783,33 @@ def test_data(token: str):
                                             has_methylation=True,
                                         ),
                                     ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=41667,
+                                            project_id='aegis',
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                        ),
+                                        Allocation(
+                                            id=41668,
+                                            project_id='britain-and-ireland',
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                        ),
+                                        Allocation(
+                                            id=41669,
+                                            project_id='darwin',
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                        ),
+                                        Allocation(
+                                            id=41670,
+                                            project_id='tol',
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                        ),
+                                        Allocation(
+                                            id=41671,
+                                            project_id='vgp',
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                        ),
+                                    ],
                                 )
                             ],
                         ),
@@ -3257,6 +3864,33 @@ def test_data(token: str):
                                             file_type='RECALL_FASTQ_DIR',
                                             has_methylation=False,
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=41973,
+                                            project_id='aegis',
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                        ),
+                                        Allocation(
+                                            id=41974,
+                                            project_id='britain-and-ireland',
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                        ),
+                                        Allocation(
+                                            id=41975,
+                                            project_id='darwin',
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                        ),
+                                        Allocation(
+                                            id=41976,
+                                            project_id='tol',
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                        ),
+                                        Allocation(
+                                            id=41977,
+                                            project_id='vgp',
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                        ),
                                     ],
                                 )
                             ],
@@ -3320,11 +3954,35 @@ def test_data(token: str):
                                                 'irods:/seq/illumina/runs/49/49280/lane2/plex11'
                                                 '/49280_2#11.cram'
                                             ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR134'
+                                                '/ERR13493954/49280_2%2311.cram'
+                                            ),
                                             size_bytes=2885723248,
                                             md5='801ab57f7024d2bb93ac8b65646c414d',
                                             file_type='CRAM',
+                                            has_methylation=False,
                                             sam_tags=['BC:Z', 'QT:Z', 'RG:Z', 'a3:i', 'ah:i'],
                                         )
+                                    ],
+                                    project_assn=[
+                                        Allocation(
+                                            id=32657, project_id='aegis', data_id='49280_2#11'
+                                        ),
+                                        Allocation(
+                                            id=32658,
+                                            project_id='britain-and-ireland',
+                                            data_id='49280_2#11',
+                                        ),
+                                        Allocation(
+                                            id=32659, project_id='darwin', data_id='49280_2#11'
+                                        ),
+                                        Allocation(
+                                            id=32660, project_id='tol', data_id='49280_2#11'
+                                        ),
+                                        Allocation(
+                                            id=32661, project_id='vgp', data_id='49280_2#11'
+                                        ),
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8HD27D98F8FFYV5NDE4B10H',
@@ -3406,78 +4064,174 @@ def test_data(token: str):
                 alias='ena-tol-bRalAqu-study-umbrella-20240512',
                 submitter_id='WELLCOME SANGER INSTITUTE',
                 is_deleted=False,
+                child_assn=[
+                    BioprojectLink(
+                        id=13251,
+                        parent_accession_id='PRJEB75639',
+                        child_accession_id='PRJEB88631',
+                        link_status='New',
+                        child=Accession(
+                            accession_id='PRJEB88631',
+                            accession_type_id='BioProject - Species Assembly',
+                            secondary='ERP171720',
+                            submission='ERA32435027',
+                            date_submitted='2025-04-17T00:00:00+01:00',
+                            name='bRalAqu1.1',
+                            title='bRalAqu1',
+                            description=(
+                                'This project provides the genome assembly of Rallus aquaticus'
+                                ', common name water rail. The assembly is provided by the Darwin'
+                                ' Tree of Life Project (https'
+                            ),
+                            alias='WSI_primary_bRalAqu1.1',
+                            submitter_id='WELLCOME SANGER INSTITUTE',
+                            is_deleted=False,
+                        ),
+                    ),
+                    BioprojectLink(
+                        id=13252,
+                        parent_accession_id='PRJEB75639',
+                        child_accession_id='PRJEB88632',
+                        link_status='New',
+                        child=Accession(
+                            accession_id='PRJEB88632',
+                            accession_type_id='BioProject - Species Assembly',
+                            secondary='ERP171721',
+                            submission='ERA32435028',
+                            date_submitted='2025-04-17T00:00:00+01:00',
+                            name='bRalAqu1.1 alternate haplotype',
+                            title='bRalAqu1 alternate haplotype',
+                            description=(
+                                'This project provides the genome assembly of Rallus aquaticus'
+                                ', common name water rail. The assembly is provided by the Darwin'
+                                ' Tree of Life Project (https'
+                            ),
+                            alias='WSI_primary_bRalAqu1.1 alternate haplotype',
+                            submitter_id='WELLCOME SANGER INSTITUTE',
+                            is_deleted=False,
+                        ),
+                    ),
+                    BioprojectLink(
+                        id=13253,
+                        parent_accession_id='PRJEB75639',
+                        child_accession_id='PRJEB75638',
+                        link_status='New',
+                        child=Accession(
+                            accession_id='PRJEB75638',
+                            accession_type_id='BioProject - Species Data',
+                            secondary='ERP160198',
+                            submission='ERA29771179',
+                            date_submitted='2024-05-12T00:00:00+01:00',
+                            name='bRalAqu',
+                            title=(
+                                'Rallus aquaticus (water rail), genomic and transcriptomic data'
+                            ),
+                            description=(
+                                'This project collects the genomic and transcriptomic data'
+                                ' generated for Rallus aquaticus, common name water rail, to'
+                                ' facilitate genome assembly and annotation as part of the Darwin'
+                                ' Tree of Life Project (https://www.darwintreeoflife.org/). The'
+                                ' data under this project are made available subject to the'
+                                ' Darwin Tree of Life Open Data Release Policy (https'
+                                '://www.darwintreeoflife.org/project-resources/).'
+                            ),
+                            alias='ena-tol-bRalAqu-study-rawdata-20240512',
+                            submitter_id='WELLCOME SANGER INSTITUTE',
+                            is_deleted=False,
+                        ),
+                    ),
+                ],
+                parent_assn=[
+                    BioprojectLink(
+                        id=13254,
+                        parent_accession_id='PRJEB40665',
+                        child_accession_id='PRJEB75639',
+                        link_status='New',
+                    ),
+                    BioprojectLink(
+                        id=13255,
+                        parent_accession_id='PRJEB43745',
+                        child_accession_id='PRJEB75639',
+                        link_status='New',
+                    ),
+                    BioprojectLink(
+                        id=13256,
+                        parent_accession_id='PRJNA489243',
+                        child_accession_id='PRJEB75639',
+                        link_status='New',
+                        parent=Accession(
+                            accession_id='PRJNA489243',
+                            accession_type_id='BioProject - Project Umbrella',
+                            date_submitted='2018-09-06T00:00:00+01:00',
+                            title='Vertebrate Genomes Project',
+                            description=(
+                                'Reference genomes for all > 70,000 vertebrate species.   The'
+                                ' goal of the Vertebrate Genomes Project (VGP) is to generate or'
+                                ' collect at least one high-quality, error-free, near gapless'
+                                ', chromosome-level, haplotype phased, and annotated reference'
+                                ' genome assembly of all extant vertebrate species, and to'
+                                ' utilize those genomes to address fundamental questions in'
+                                ' biology, disease, and conservation. This umbrella BioProject ID'
+                                ' collects all such assemblies that reach these metrics'
+                                ', generated by the VGP, collaborators, and others that wish to'
+                                ' be grouped under VGP reference genomes, and that are publicly'
+                                ' available to the community. The aspired metric minimum to be'
+                                ' included in this list as of February 2017 are assemblies that'
+                                ' have a contig N50 > 1Mb, scaffold N50 > 10Mb, 90% of the'
+                                ' assembly assigned to scaffolds that represent chromosomes, base'
+                                ' call accuracy of QV40 or greater, and haplotype phased as much'
+                                ' as possible.'
+                            ),
+                            alias='PRJNA489243',
+                            submitter_id='Genome 10K',
+                            is_deleted=False,
+                        ),
+                    ),
+                    BioprojectLink(
+                        id=21132,
+                        parent_accession_id='PRJEB80366',
+                        child_accession_id='PRJEB75639',
+                        link_status='New',
+                        parent=Accession(
+                            accession_id='PRJEB80366',
+                            accession_type_id='BioProject - Project Umbrella',
+                            submission='ERA30823184',
+                            date_submitted='2024-09-20T00:00:00+01:00',
+                            name='AEGIS',
+                            title=(
+                                'AEGIS (Ancient Environmental Genomics Initiative for'
+                                ' Sustainability)'
+                            ),
+                            description=(
+                                'AEGIS (Ancient Environmental Genomics Initiative for'
+                                ' Sustainability) is a multi-centre project, funded by the'
+                                ' NovoNordisk Foundation (Denmark) and the Wellcome Trust (UK'
+                                ') (https://www.sanger.ac.uk/collaboration/ancient-environmental'
+                                '-genomics-initiative-for-sustainability-aegis/). The overarching'
+                                ' aims of AEGIS are to develop the essential science and'
+                                ' methodology to use ancient eDNA – coupled with other ancient'
+                                ' and modern biomolecule-based approaches – to identify important'
+                                ' organismal associations and genetic adaptations in natural and'
+                                ' agroecosystems that will improve future food security under'
+                                ' climate change. At the Wellcome Sanger Institute, the Tree of'
+                                ' Life programme (https://www.sanger.ac.uk/programme/tree-of-life'
+                                '/) is sequencing to reference standard the genomes of modern'
+                                ' species that will enhance the library of genomes available for'
+                                ' ancient eDNA mapping.'
+                            ),
+                            alias='ena-tol-aegis-project-umbrella-20240920',
+                            submitter_id='WELLCOME SANGER INSTITUTE',
+                            is_deleted=False,
+                        ),
+                    ),
+                ],
             ),
             location=Location(location_id=824, path='3/b/5/0/1/e/Rallus_aquaticus'),
         ),
-        Project(project_id='britain_and_ireland'),
+        Project(project_id='aegis'),
+        Project(project_id='britain-and-ireland'),
         Project(project_id='darwin'),
-        Project(project_id='protist_microalgae'),
+        Project(project_id='protist-microalgae'),
         Project(project_id='tol'),
-        Allocation(project_id='britain_and_ireland', data_id='35344_1#1'),
-        Allocation(project_id='darwin', data_id='35344_1#1'),
-        Allocation(project_id='protist_microalgae', data_id='35344_1#1'),
-        Allocation(project_id='tol', data_id='35344_1#1'),
-        Allocation(project_id='britain_and_ireland', data_id='35344_1#2'),
-        Allocation(project_id='darwin', data_id='35344_1#2'),
-        Allocation(project_id='protist_microalgae', data_id='35344_1#2'),
-        Allocation(project_id='tol', data_id='35344_1#2'),
-        Allocation(project_id='britain_and_ireland', data_id='35344_1#3'),
-        Allocation(project_id='darwin', data_id='35344_1#3'),
-        Allocation(project_id='protist_microalgae', data_id='35344_1#3'),
-        Allocation(project_id='tol', data_id='35344_1#3'),
-        Allocation(project_id='britain_and_ireland', data_id='35344_1#4'),
-        Allocation(project_id='darwin', data_id='35344_1#4'),
-        Allocation(project_id='protist_microalgae', data_id='35344_1#4'),
-        Allocation(project_id='tol', data_id='35344_1#4'),
-        Allocation(project_id='britain_and_ireland', data_id='35528_4#8'),
-        Allocation(project_id='darwin', data_id='35528_4#8'),
-        Allocation(project_id='protist_microalgae', data_id='35528_4#8'),
-        Allocation(project_id='tol', data_id='35528_4#8'),
-        Allocation(project_id='britain_and_ireland', data_id='36691_2#5'),
-        Allocation(project_id='darwin', data_id='36691_2#5'),
-        Allocation(project_id='tol', data_id='36691_2#5'),
-        Allocation(project_id='britain_and_ireland', data_id='36691_2#6'),
-        Allocation(project_id='darwin', data_id='36691_2#6'),
-        Allocation(project_id='tol', data_id='36691_2#6'),
-        Allocation(project_id='britain_and_ireland', data_id='36691_2#7'),
-        Allocation(project_id='darwin', data_id='36691_2#7'),
-        Allocation(project_id='tol', data_id='36691_2#7'),
-        Allocation(project_id='britain_and_ireland', data_id='36691_2#8'),
-        Allocation(project_id='darwin', data_id='36691_2#8'),
-        Allocation(project_id='tol', data_id='36691_2#8'),
-        Allocation(project_id='britain_and_ireland', data_id='36703_5#4'),
-        Allocation(project_id='darwin', data_id='36703_5#4'),
-        Allocation(project_id='protist_microalgae', data_id='36703_5#4'),
-        Allocation(project_id='tol', data_id='36703_5#4'),
-        Allocation(project_id='britain_and_ireland', data_id='36857#13'),
-        Allocation(project_id='darwin', data_id='36857#13'),
-        Allocation(project_id='protist_microalgae', data_id='36857#13'),
-        Allocation(project_id='tol', data_id='36857#13'),
-        Allocation(project_id='britain_and_ireland', data_id='37935_8#13'),
-        Allocation(project_id='darwin', data_id='37935_8#13'),
-        Allocation(project_id='tol', data_id='37935_8#13'),
-        Allocation(project_id='britain_and_ireland', data_id='37939_1#2'),
-        Allocation(project_id='darwin', data_id='37939_1#2'),
-        Allocation(project_id='protist_microalgae', data_id='37939_1#2'),
-        Allocation(project_id='tol', data_id='37939_1#2'),
-        Allocation(project_id='britain_and_ireland', data_id='40666_2#2'),
-        Allocation(project_id='darwin', data_id='40666_2#2'),
-        Allocation(project_id='tol', data_id='40666_2#2'),
-        Allocation(project_id='britain_and_ireland', data_id='48593_1#25'),
-        Allocation(project_id='darwin', data_id='48593_1#25'),
-        Allocation(project_id='tol', data_id='48593_1#25'),
-        Allocation(project_id='britain_and_ireland', data_id='m64016_201115_112225#1022'),
-        Allocation(project_id='darwin', data_id='m64016_201115_112225#1022'),
-        Allocation(project_id='protist_microalgae', data_id='m64016_201115_112225#1022'),
-        Allocation(project_id='tol', data_id='m64016_201115_112225#1022'),
-        Allocation(project_id='britain_and_ireland', data_id='m64089e_210601_133425#1022'),
-        Allocation(project_id='darwin', data_id='m64089e_210601_133425#1022'),
-        Allocation(project_id='protist_microalgae', data_id='m64089e_210601_133425#1022'),
-        Allocation(project_id='tol', data_id='m64089e_210601_133425#1022'),
-        Allocation(project_id='britain_and_ireland', data_id='m64097e_210221_172213#1019'),
-        Allocation(project_id='darwin', data_id='m64097e_210221_172213#1019'),
-        Allocation(project_id='tol', data_id='m64097e_210221_172213#1019'),
-        Allocation(project_id='britain_and_ireland', data_id='m84309_250205_121831_s4#2076'),
-        Allocation(project_id='darwin', data_id='m84309_250205_121831_s4#2076'),
-        Allocation(project_id='tol', data_id='m84309_250205_121831_s4#2076'),
+        Project(project_id='vgp'),
     ]

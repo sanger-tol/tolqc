@@ -4,6 +4,7 @@
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     DateTime,
     Float,
     ForeignKey,
@@ -45,6 +46,11 @@ class Assembly(LogBase, HasFolder):
     )
     name = mapped_column(String, index=True)
     description = mapped_column(String)
+    level = mapped_column(
+        String,
+        ForeignKey('assembly_level_dict.level'),
+    )
+    is_reference = mapped_column(Boolean, default=False, index=True)
     bioproject_accession_id = mapped_column(
         String,
         ForeignKey('accession.accession_id'),
@@ -185,6 +191,17 @@ class AssemblyDataset(Base):
 
     assembly = relationship('Assembly', back_populates='dataset_assn')
     dataset = relationship('Dataset', back_populates='assembly_assn')
+
+
+class AssemblyLevelDict(Base):
+    __tablename__ = 'assembly_level_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'level'
+
+    level = mapped_column(String, primary_key=True)
+    description = mapped_column(String)
 
 
 class AssemblySource(Base):
