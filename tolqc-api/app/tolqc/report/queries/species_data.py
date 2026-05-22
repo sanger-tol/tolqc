@@ -25,6 +25,7 @@ from tolqc.schema.sample_data_models import (
     Specimen,
     SpecimenStatus,
 )
+from tolqc.schema.assembly_models import Assembly, AssemblyStatus
 
 
 def metagenome_report_query(*_):
@@ -246,6 +247,34 @@ def accession_struct(
     return case(
         (accn.accession_id == None, None),  # noqa: E711
         else_=func.jsonb_build_object(*struct),
+    )
+
+
+def ena_assembly_report_query(req_args: RequestArgs):
+    return (
+        select(
+            Specimen.accession_id.label('specimen_biosample'),
+            Specimen.specimen_id.label('specimen'),
+            Assembly.bioproject_accession_id.label('assembly_bioproject'),
+            Assembly.genome_accession_id,
+            Assembly.name,
+            Assembly.description,
+            Assembly.level,
+            AssemblyStatus.status_type_id.label('status'),
+            AssemblyStatus.status_time,
+        )
+        .select_from(Specimen)
+        .outerjoin(Specimen.assemblies)
+        .outerjoin(Assembly.status_history)
+        .where(
+            or_(
+                AssemblyStatus.status_type_id == 'ENA Public',
+                Assembly.assembly_status_id == None,  # noqa: E711
+            ),
+            # The BioSample accession is used to link to ENA assemblies
+            Specimen.accession_id != None,  # noqa: E711
+        )
+        .order_by(Specimen.accession_id)
     )
 
 
