@@ -6,7 +6,7 @@ import datetime
 
 from flask import Blueprint
 
-from sqlalchemy import Column, inspect, select
+from sqlalchemy import Column, Select, inspect, select
 from sqlalchemy.orm import Bundle
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.elements import Label
@@ -92,7 +92,12 @@ class ReportEngine:
         'specimen-status': specimen_status_report_query,
     }
 
-    def do_report(self, report_name, query, req_args: RequestArgs | None = None):
+    def do_report(
+        self,
+        report_name: str,
+        query: Select,
+        req_args: RequestArgs | None = None,
+    ):
         # File format if requested; defaults to TSV
         if req_args is None:
             req_args = RequestArgs()
@@ -195,7 +200,8 @@ class ReportEngine:
                 sel_col = columns[0]
             else:
                 msg = (
-                    f"Cannot select on report column '{arg}' which contains {len(columns)} columns"
+                    f"Cannot select on report column '{arg}'"
+                    f' which contains {len(columns)} columns'
                 )
                 raise BadRequest(msg)
 
