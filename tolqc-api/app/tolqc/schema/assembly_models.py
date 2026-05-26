@@ -58,6 +58,7 @@ class Assembly(LogBase, HasFolder):
     genome_accession_id = mapped_column(
         String,
         ForeignKey('accession.accession_id'),
+        unique=True,
     )
     assigned_user_id = mapped_column(Integer, ForeignKey('user.id'))
 

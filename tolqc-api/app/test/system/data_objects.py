@@ -10,6 +10,14 @@ from tolqc.schema.accession_models import (
     LinkStatusDict,
     SubmitterDict,
 )
+from tolqc.schema.assembly_models import (
+    Assembly,
+    AssemblyLevelDict,
+    AssemblyStatus,
+    AssemblyStatusType,
+    Dataset,
+    DatasetElement,
+)
 from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
     Allocation,
@@ -44,6 +52,12 @@ def test_data(token: str):
         Role(id=300, name='editor'),
         RoleBinding(user_id=100, role_id=300),
         Metadata(name='location.root', string_value='/test/loc_root'),
+        Project(project_id='aegis'),
+        Project(project_id='britain-and-ireland'),
+        Project(project_id='darwin'),
+        Project(project_id='protist-microalgae'),
+        Project(project_id='tol'),
+        Project(project_id='vgp'),
         AccessionTypeDict(
             accession_type_id='GenBank Genome Assembly',
             regexp='^GCA_\\d+\\.\\d+$',
@@ -134,6 +148,53 @@ def test_data(token: str):
             accession_type_id='BioProject - Prokaryotic Cobiont Assembly',
             regexp='^PRJ[A-Z]{2}\\d+$',
             url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
+        ),
+        AssemblyLevelDict(
+            level='contig', description='A list of contiguous nucleotide sequences'
+        ),
+        AssemblyLevelDict(
+            level='scaffold',
+            description='Scaffolds of ordered and oriented contigs separated by gaps',
+        ),
+        AssemblyLevelDict(
+            level='chromosome', description='Contains scaffolds representing chromosomes'
+        ),
+        AssemblyLevelDict(
+            level='complete genome',
+            description=(
+                'A whole prokaryote or plastid genome, or a telomere-to-telomere quality'
+                ' chromosomal genome'
+            ),
+        ),
+        AssemblyStatusType(
+            status_type_id='Pending',
+            description='New entry waiting to be assembled',
+            assign_order=10,
+        ),
+        AssemblyStatusType(
+            status_type_id='Hifiasm Complete',
+            description='Hifiasm assembly has finished',
+            assign_order=20,
+        ),
+        AssemblyStatusType(
+            status_type_id='YaHS Complete',
+            description='YaHS assembly scaffolding has finished',
+            assign_order=30,
+        ),
+        AssemblyStatusType(
+            status_type_id='Good Metrics',
+            description='The metrics of the assembly have passed',
+            assign_order=40,
+        ),
+        AssemblyStatusType(
+            status_type_id='BUSCO Pass',
+            description='BUSCO genes assembly completeness check has passed',
+            assign_order=50,
+        ),
+        AssemblyStatusType(
+            status_type_id='ENA Public',
+            description='Assembly is public with a GCA accession at the ENA',
+            assign_order=60,
         ),
         CategoryDict(category='transcriptomic_data'),
         CategoryDict(category='genomic_data'),
@@ -3127,6 +3188,99 @@ def test_data(token: str):
                         is_deleted=False,
                     ),
                     location=Location(location_id=299, path='e/1/3/d/d/0/Juncus_effusus'),
+                    assemblies=[
+                        Assembly(
+                            assembly_id=7153,
+                            specimen_id='lpJunEffu1',
+                            name='lpJunEffu1.1',
+                            description='lpJunEffu1.1 assembly for Juncus effusus',
+                            level='chromosome',
+                            is_reference=False,
+                            bioproject_accession_id='PRJEB55668',
+                            genome_accession_id='GCA_946800655.1',
+                            bioproject_accession=Accession(
+                                accession_id='PRJEB55668',
+                                accession_type_id='BioProject - Species Assembly',
+                                secondary='ERP140591',
+                                submission='ERA17616049',
+                                date_submitted='2022-08-31T00:00:00+01:00',
+                                name='lpJunEffu1',
+                                title='Juncus effusus genome assembly, lpJunEffu1',
+                                description=(
+                                    'This project provides the genome assembly of Juncus effusus.'
+                                    ' The assembly is provided by the Darwin Tree of Life Project'
+                                    ' (https: //www.darwintreeoflife.org/). The data under this'
+                                    ' project are made available subject to the Darwin Tree of'
+                                    ' Life Open Data Release Policy (https'
+                                    ': //www.darwintreeoflife.org/project-resources/).'
+                                ),
+                                alias='WSI_primary_lpJunEffu1.1',
+                                submitter_id='WELLCOME SANGER INSTITUTE',
+                                is_deleted=False,
+                            ),
+                            genome_accession=Accession(
+                                accession_id='GCA_946800655.1',
+                                accession_type_id='GenBank Genome Assembly',
+                                is_deleted=False,
+                            ),
+                            status_history=[
+                                AssemblyStatus(
+                                    assembly_status_id=7153,
+                                    assembly_id=7153,
+                                    status_type_id='ENA Public',
+                                    status_time='2022-10-12T00:00:00+01:00',
+                                )
+                            ],
+                        ),
+                        Assembly(
+                            assembly_id=7154,
+                            specimen_id='lpJunEffu1',
+                            name='lpJunEffu1.1 alternate haplotype',
+                            description=(
+                                'lpJunEffu1.1 alternate haplotype assembly for Juncus effusus'
+                            ),
+                            level='contig',
+                            is_reference=False,
+                            bioproject_accession_id='PRJEB55669',
+                            genome_accession_id='GCA_946800645.1',
+                            bioproject_accession=Accession(
+                                accession_id='PRJEB55669',
+                                accession_type_id='BioProject - Species Assembly',
+                                secondary='ERP140592',
+                                submission='ERA17616049',
+                                date_submitted='2022-08-31T00:00:00+01:00',
+                                name='lpJunEffu1 alternate haplotype',
+                                title=(
+                                    'Juncus effusus genome assembly, lpJunEffu1, alternate'
+                                    ' haplotype'
+                                ),
+                                description=(
+                                    'This project provides the genome assembly of Juncus effusus.'
+                                    ' The assembly is provided by the Darwin Tree of Life Project'
+                                    ' (https: //www.darwintreeoflife.org/). The data under this'
+                                    ' project are made available subject to the Darwin Tree of'
+                                    ' Life Open Data Release Policy (https'
+                                    ': //www.darwintreeoflife.org/project-resources/).'
+                                ),
+                                alias='WSI_haplotigs_lpJunEffu1.1',
+                                submitter_id='WELLCOME SANGER INSTITUTE',
+                                is_deleted=False,
+                            ),
+                            genome_accession=Accession(
+                                accession_id='GCA_946800645.1',
+                                accession_type_id='GenBank Genome Assembly',
+                                is_deleted=False,
+                            ),
+                            status_history=[
+                                AssemblyStatus(
+                                    assembly_status_id=7154,
+                                    assembly_id=7154,
+                                    status_type_id='ENA Public',
+                                    status_time='2022-09-25T00:00:00+01:00',
+                                )
+                            ],
+                        ),
+                    ],
                 )
             ],
             data_accession=Accession(
@@ -4025,6 +4179,90 @@ def test_data(token: str):
                         is_deleted=False,
                     ),
                     location=Location(location_id=824, path='3/b/5/0/1/e/Rallus_aquaticus'),
+                    assemblies=[
+                        Assembly(
+                            assembly_id=156,
+                            specimen_id='bRalAqu1',
+                            name='bRalAqu1.1',
+                            description='bRalAqu1.1 assembly for Rallus aquaticus',
+                            level='chromosome',
+                            is_reference=False,
+                            bioproject_accession_id='PRJEB88631',
+                            genome_accession_id='GCA_965250365.1',
+                            bioproject_accession=Accession(
+                                accession_id='PRJEB88631',
+                                accession_type_id='BioProject - Species Assembly',
+                                secondary='ERP171720',
+                                submission='ERA32435027',
+                                date_submitted='2025-04-17T00:00:00+01:00',
+                                name='bRalAqu1.1',
+                                title='bRalAqu1',
+                                description=(
+                                    'This project provides the genome assembly of Rallus'
+                                    ' aquaticus, common name water rail. The assembly is provided'
+                                    ' by the Darwin Tree of Life Project (https'
+                                ),
+                                alias='WSI_primary_bRalAqu1.1',
+                                submitter_id='WELLCOME SANGER INSTITUTE',
+                                is_deleted=False,
+                            ),
+                            genome_accession=Accession(
+                                accession_id='GCA_965250365.1',
+                                accession_type_id='GenBank Genome Assembly',
+                                is_deleted=False,
+                            ),
+                            status_history=[
+                                AssemblyStatus(
+                                    assembly_status_id=156,
+                                    assembly_id=156,
+                                    status_type_id='ENA Public',
+                                    status_time='2025-04-19T00:00:00+01:00',
+                                )
+                            ],
+                        ),
+                        Assembly(
+                            assembly_id=157,
+                            specimen_id='bRalAqu1',
+                            name='bRalAqu1.1 alternate haplotype',
+                            description=(
+                                'bRalAqu1.1 alternate haplotype assembly for Rallus aquaticus'
+                            ),
+                            level='contig',
+                            is_reference=False,
+                            bioproject_accession_id='PRJEB88632',
+                            genome_accession_id='GCA_965250415.1',
+                            bioproject_accession=Accession(
+                                accession_id='PRJEB88632',
+                                accession_type_id='BioProject - Species Assembly',
+                                secondary='ERP171721',
+                                submission='ERA32435028',
+                                date_submitted='2025-04-17T00:00:00+01:00',
+                                name='bRalAqu1.1 alternate haplotype',
+                                title='bRalAqu1 alternate haplotype',
+                                description=(
+                                    'This project provides the genome assembly of Rallus'
+                                    ' aquaticus, common name water rail. The assembly is provided'
+                                    ' by the Darwin Tree of Life Project (https'
+                                ),
+                                alias='WSI_primary_bRalAqu1.1 alternate haplotype',
+                                submitter_id='WELLCOME SANGER INSTITUTE',
+                                is_deleted=False,
+                            ),
+                            genome_accession=Accession(
+                                accession_id='GCA_965250415.1',
+                                accession_type_id='GenBank Genome Assembly',
+                                is_deleted=False,
+                            ),
+                            status_history=[
+                                AssemblyStatus(
+                                    assembly_status_id=157,
+                                    assembly_id=157,
+                                    status_type_id='ENA Public',
+                                    status_time='2025-04-19T00:00:00+01:00',
+                                )
+                            ],
+                        ),
+                    ],
                 )
             ],
             data_accession=Accession(
@@ -4228,10 +4466,8 @@ def test_data(token: str):
             ),
             location=Location(location_id=824, path='3/b/5/0/1/e/Rallus_aquaticus'),
         ),
-        Project(project_id='aegis'),
-        Project(project_id='britain-and-ireland'),
-        Project(project_id='darwin'),
-        Project(project_id='protist-microalgae'),
-        Project(project_id='tol'),
-        Project(project_id='vgp'),
+        Assembly(assembly_id=7153, assembly_status_id=7153),
+        Assembly(assembly_id=7154, assembly_status_id=7154),
+        Assembly(assembly_id=156, assembly_status_id=156),
+        Assembly(assembly_id=157, assembly_status_id=157),
     ]

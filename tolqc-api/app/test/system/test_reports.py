@@ -274,6 +274,24 @@ def test_bioproject_report(client, api_path):
     assert len(tol_bioprojects) == 2
 
 
+def test_ena_assembly_report(client, api_path):
+    assemblies = report_response_json(
+        client,
+        api_path,
+        'ena-assembly',
+        {
+            'format': 'NDJSON',
+        },
+    )
+    assert len(assemblies) > 0
+
+    have_gca = [x for x in assemblies if x['genome_accession_id'] != None]
+    assert len(have_gca) > 0
+
+    miss_gca = [x for x in assemblies if x['genome_accession_id'] == None]
+    assert len(miss_gca) > 0
+
+
 @pytest.fixture
 def max_bases(client, api_path):
     json_lines = report_response_json(
