@@ -285,10 +285,10 @@ def test_ena_assembly_report(client, api_path):
     )
     assert len(assemblies) > 0
 
-    have_gca = [x for x in assemblies if x['genome_accession_id'] != None]
+    have_gca = [x for x in assemblies if x['genome_accession_id'] is not None]
     assert len(have_gca) > 0
 
-    miss_gca = [x for x in assemblies if x['genome_accession_id'] == None]
+    miss_gca = [x for x in assemblies if x['genome_accession_id'] is None]
     assert len(miss_gca) > 0
 
 
