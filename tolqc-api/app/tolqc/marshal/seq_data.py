@@ -268,7 +268,7 @@ def build_sample(session, row):
             # or is a WOSPI ID, e.g. "ttSAN90000012"
             specimen_acc = accession_if_valid(
                 session,
-                'BioSample',
+                'BioSpecimen',
                 row.get('biospecimen_accession'),
             )
             species = build_species(session, row)

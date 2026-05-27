@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import case, func, or_, select
+from sqlalchemy import Select, case, func, or_, select
 from sqlalchemy.orm import aliased
 
 from tolqc.report.column_funcs import (
@@ -35,6 +35,7 @@ def seq_data_header_cols():
         Data.data_id,
         Species.tolid_prefix,
         Species.species_id.label('species'),
+        Species.genome_size,
         Specimen.specimen_id.label('specimen'),
         Sample.sample_id.label('sample'),
         Library.library_id.label('library'),
@@ -64,7 +65,7 @@ def basic_seq_stat_cols():
     )
 
 
-def pipeline_data_report_query(req_args: RequestArgs):
+def pipeline_data_report_query(req_args: RequestArgs) -> Select:
     project = req_args.pop_arg('project')
 
     loc_root = req_args.pop_arg('root')
@@ -173,7 +174,7 @@ def pipeline_data_report_query(req_args: RequestArgs):
     return query
 
 
-def pacbio_data_report_query(req_args: RequestArgs):
+def pacbio_data_report_query(req_args: RequestArgs) -> Select:
     data_columns = (
         *seq_data_header_cols(),
         Run.run_id.label('movie_name'),
@@ -234,7 +235,7 @@ def add_methylation_filter(query, req_args: RequestArgs):
     return query
 
 
-def ont_data_report_query(req_args: RequestArgs):
+def ont_data_report_query(req_args: RequestArgs) -> Select:
     data_columns = (
         *seq_data_header_cols(),
         Run.run_id.label('flowcell'),
@@ -272,7 +273,7 @@ def ont_data_report_query(req_args: RequestArgs):
     return add_methylation_filter(query, req_args)
 
 
-def mlwh_data_report_query(*_):
+def mlwh_data_report_query(*_) -> Select:
     return (
         mlwh_data_report_query_select()
         .select_from(Data)
@@ -300,7 +301,7 @@ def mlwh_data_report_query(*_):
     )
 
 
-def mlwh_data_report_query_select(*_):
+def mlwh_data_report_query_select(*_) -> Select:
     return select(
         Data.data_id,
         Data.study_id,
@@ -366,7 +367,7 @@ def mlwh_data_report_query_select(*_):
     )
 
 
-def illumina_data_report_query(*_):
+def illumina_data_report_query(*_) -> Select:
     return (
         select(
             *seq_data_header_cols(),

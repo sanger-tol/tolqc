@@ -2,13 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy import case, func, or_, select
+from sqlalchemy import Select, case, func, or_, select
 from sqlalchemy.orm import InstrumentedAttribute, aliased
 
 from tolqc.report.column_funcs import array_distinct_non_null
 from tolqc.report.request_args import NoArg, RequestArgs
 from tolqc.schema import User
 from tolqc.schema.accession_models import Accession, BioprojectLink
+from tolqc.schema.assembly_models import Assembly, AssemblyStatus
 from tolqc.schema.metagenome_models import (
     Metagenome,
     MetagenomeBin,
@@ -27,7 +28,7 @@ from tolqc.schema.sample_data_models import (
 )
 
 
-def metagenome_report_query(*_):
+def metagenome_report_query(*_) -> Select:
     # Construct CTE that counts bin types
     bin_counts = (
         select(
@@ -71,7 +72,7 @@ def metagenome_report_query(*_):
     )
 
 
-def metagenome_bin_report_query(*_):
+def metagenome_bin_report_query(*_) -> Select:
     return (
         select(
             MetagenomeBin.metagenome_bin_id.label('metagenome_bin'),
@@ -157,7 +158,7 @@ def linked_accessions_json(
     return query.cte(f'{name}_accs')
 
 
-def species_bioproject_query(req_args: RequestArgs):
+def species_bioproject_query(req_args: RequestArgs) -> Select:
     accession = req_args.pop_arg('accession')
     include_suppressed = req_args.pop_arg('include_suppressed')
 
@@ -195,8 +196,12 @@ def species_bioproject_query(req_args: RequestArgs):
         .select_from(Species)
         .outerjoin(umbrella_acc, Species.umbrella_accession)
         .outerjoin(data_acc, Species.data_accession)
-        .outerjoin(project_cte, Species.umbrella_accession_id == project_cte.c.accession_id)
-        .outerjoin(product_cte, Species.umbrella_accession_id == product_cte.c.accession_id)
+        .outerjoin(
+            project_cte, Species.umbrella_accession_id == project_cte.c.accession_id
+        )
+        .outerjoin(
+            product_cte, Species.umbrella_accession_id == product_cte.c.accession_id
+        )
         .group_by(*group_by)
     )
 
@@ -249,7 +254,55 @@ def accession_struct(
     )
 
 
-def specimen_status_report_query(req_args: RequestArgs):
+def ena_assembly_report_query(*_) -> Select:
+    """
+    All specimens with a BioSample accession but no GCA accession are returned
+    in one row, and any with GCA accessions are returned in multiple rows,
+    one per GCA acccession.
+    """
+
+    # CTE that only returns asssemblies and their ENA record fields which have
+    # the "ENA Public" status.
+    gca_acc = (
+        select(
+            Specimen.specimen_id,
+            Assembly.bioproject_accession_id.label('assembly_bioproject'),
+            Assembly.genome_accession_id,
+            Assembly.name,
+            Assembly.description,
+            Assembly.level,
+            AssemblyStatus.status_type_id.label('status'),
+            AssemblyStatus.status_time,
+        )
+        .select_from(Specimen)
+        .join(Specimen.assemblies)
+        .join(Assembly.status_history)
+        .where(
+            AssemblyStatus.status_type_id == 'ENA Public',
+        )
+        .cte('gca_acc')
+    )
+
+    return (
+        select(
+            Specimen.accession_id.label('specimen_biosample'),
+            Specimen.specimen_id.label('specimen'),
+            gca_acc.c.assembly_bioproject,
+            gca_acc.c.genome_accession_id,
+            gca_acc.c.name,
+            gca_acc.c.description,
+            gca_acc.c.level,
+            gca_acc.c.status,
+            gca_acc.c.status_time,
+        )
+        .select_from(Specimen)
+        .outerjoin(gca_acc, Specimen.specimen_id == gca_acc.c.specimen_id)
+        .where(Specimen.accession_id != None)  # noqa: E711
+        .order_by(Specimen.accession_id)
+    )
+
+
+def specimen_status_report_query(req_args: RequestArgs) -> Select:
     # Filters on the `data` table
     data_vals = req_args.pop_args_dict('processed', 'qc', 'visibility')
 

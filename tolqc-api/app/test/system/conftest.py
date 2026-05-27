@@ -80,9 +80,8 @@ def session_factory(token: str):
 
     with ssn_fctry() as session:
         # Create the database schema
-        with session.no_autoflush:
-            for obj in test_data(token):
-                session.merge(obj)
+        for obj in test_data(token):
+            session.merge(obj)
         session.commit()
 
     yield ssn_fctry
