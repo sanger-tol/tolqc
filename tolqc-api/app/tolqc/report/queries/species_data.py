@@ -9,7 +9,13 @@ from tolqc.report.column_funcs import array_distinct_non_null
 from tolqc.report.request_args import NoArg, RequestArgs
 from tolqc.schema import User
 from tolqc.schema.accession_models import Accession, BioprojectLink
-from tolqc.schema.assembly_models import Assembly, AssemblyStatus
+from tolqc.schema.assembly_models import (
+    Assembly,
+    AssemblyDataset,
+    AssemblyStatus,
+    Dataset,
+    DatasetElement,
+)
 from tolqc.schema.metagenome_models import (
     Metagenome,
     MetagenomeBin,
@@ -20,6 +26,7 @@ from tolqc.schema.sample_data_models import (
     Allocation,
     Data,
     Library,
+    LibraryType,
     Project,
     Sample,
     Species,
@@ -251,6 +258,42 @@ def accession_struct(
     return case(
         (accn.accession_id == None, None),  # noqa: E711
         else_=func.jsonb_build_object(*struct),
+    )
+
+
+def ena_assembly_data_report_query(*_) -> Select:
+    dataset_assemblies = (
+        select(
+            AssemblyDataset.dataset_id,
+            func.jsonb_agg(
+                func.jsonb_build_object(
+                    'assembly_id',
+                    Assembly.assembly_id,
+                    'genome_accession_id',
+                    Assembly.genome_accession_id,
+                )
+            ).label('assemblies')
+        )
+        .select_from(AssemblyDataset)
+        .join(AssemblyDataset.assembly)
+        .filter(Assembly.genome_accession_id != None)  # noqa: E711
+        .group_by(AssemblyDataset.dataset_id)
+        .cte('dataset_assemblies')
+    )
+
+    return (
+        select(
+            Data.data_id,
+            Data.accession_id.label('run_accession'),
+            DatasetElement.dataset_id,
+            LibraryType.reporting_category.label('data_type'),
+            dataset_assemblies.c.assemblies,
+        )
+        .select_from(Data)
+        .join(Library)
+        .join(LibraryType)
+        .outerjoin(Data.dataset_assn)
+        .outerjoin(dataset_assemblies, DatasetElement.dataset_id == dataset_assemblies.c.dataset_id)
     )
 
 

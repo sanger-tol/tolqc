@@ -23,6 +23,7 @@ from tolqc.report.queries.sequence_data import (
     pipeline_data_report_query,
 )
 from tolqc.report.queries.species_data import (
+    ena_assembly_data_report_query,
     ena_assembly_report_query,
     metagenome_bin_report_query,
     metagenome_report_query,
@@ -81,6 +82,7 @@ class ReportEngine:
 
     QUERY_FUNCS = {
         'ena-assembly': ena_assembly_report_query,
+        'ena-assembly-data': ena_assembly_data_report_query,
         'illumina-data': illumina_data_report_query,
         'metagenome': metagenome_report_query,
         'metagenome-bin': metagenome_bin_report_query,
