@@ -272,6 +272,7 @@ class LibraryType(Base):
     kit = mapped_column(String)
     enzymes = mapped_column(String)
     cut_sites = mapped_column(String)
+    is_pcr = mapped_column(Boolean, server_default=expression.false(), index=True)
 
     library = relationship('Library', back_populates='library_type')
 

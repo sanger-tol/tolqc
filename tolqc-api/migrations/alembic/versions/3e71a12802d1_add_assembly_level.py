@@ -45,6 +45,7 @@ def upgrade() -> None:
 
     # Drop `assembly_id` sequence to avoid it being trashed by alembic
     # `batch_alter_table()`
+    op.alter_column('assembly', 'assembly_id', server_default=None)
     seq = 'assembly_assembly_id_seq'
     op.execute(DropSequence(Sequence(seq)))
 

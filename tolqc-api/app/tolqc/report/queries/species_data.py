@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from typing import Any
+
 from sqlalchemy import Select, case, func, or_, select
 from sqlalchemy.orm import InstrumentedAttribute, aliased
 
@@ -13,7 +15,6 @@ from tolqc.schema.assembly_models import (
     Assembly,
     AssemblyDataset,
     AssemblyStatus,
-    Dataset,
     DatasetElement,
 )
 from tolqc.schema.metagenome_models import (
@@ -203,12 +204,8 @@ def species_bioproject_query(req_args: RequestArgs) -> Select:
         .select_from(Species)
         .outerjoin(umbrella_acc, Species.umbrella_accession)
         .outerjoin(data_acc, Species.data_accession)
-        .outerjoin(
-            project_cte, Species.umbrella_accession_id == project_cte.c.accession_id
-        )
-        .outerjoin(
-            product_cte, Species.umbrella_accession_id == product_cte.c.accession_id
-        )
+        .outerjoin(project_cte, Species.umbrella_accession_id == project_cte.c.accession_id)
+        .outerjoin(product_cte, Species.umbrella_accession_id == product_cte.c.accession_id)
         .group_by(*group_by)
     )
 
@@ -272,7 +269,7 @@ def ena_assembly_data_report_query(*_) -> Select:
                     'genome_accession_id',
                     Assembly.genome_accession_id,
                 )
-            ).label('assemblies')
+            ).label('assemblies'),
         )
         .select_from(AssemblyDataset)
         .join(AssemblyDataset.assembly)
@@ -293,7 +290,10 @@ def ena_assembly_data_report_query(*_) -> Select:
         .join(Library)
         .join(LibraryType)
         .outerjoin(Data.dataset_assn)
-        .outerjoin(dataset_assemblies, DatasetElement.dataset_id == dataset_assemblies.c.dataset_id)
+        .outerjoin(
+            dataset_assemblies,
+            DatasetElement.dataset_id == dataset_assemblies.c.dataset_id,
+        )
     )
 
 
@@ -305,24 +305,26 @@ def ena_assembly_report_query(*_) -> Select:
     """
 
     # CTE that only returns asssemblies and their ENA record fields which have
-    # the "ENA Public" status.
+    # either the "ENA Submitted" or "ENA Public" statuses in their history,
+    # using window functions to return the most recent one if they have
+    # both.
     gca_acc = (
         select(
             Specimen.specimen_id,
+            Assembly.assembly_id,
             Assembly.bioproject_accession_id.label('assembly_bioproject'),
             Assembly.genome_accession_id,
             Assembly.name,
             Assembly.description,
             Assembly.level,
-            AssemblyStatus.status_type_id.label('status'),
-            AssemblyStatus.status_time,
+            assembly_status_window('status', AssemblyStatus.status_type_id),
+            assembly_status_window('status_time', AssemblyStatus.status_time),
         )
         .select_from(Specimen)
         .join(Specimen.assemblies)
         .join(Assembly.status_history)
-        .where(
-            AssemblyStatus.status_type_id == 'ENA Public',
-        )
+        .where(AssemblyStatus.status_type_id.in_(['ENA Submitted', 'ENA Public']))
+        .distinct()
         .cte('gca_acc')
     )
 
@@ -330,6 +332,7 @@ def ena_assembly_report_query(*_) -> Select:
         select(
             Specimen.accession_id.label('specimen_biosample'),
             Specimen.specimen_id.label('specimen'),
+            gca_acc.c.assembly_id,
             gca_acc.c.assembly_bioproject,
             gca_acc.c.genome_accession_id,
             gca_acc.c.name,
@@ -342,6 +345,17 @@ def ena_assembly_report_query(*_) -> Select:
         .outerjoin(gca_acc, Specimen.specimen_id == gca_acc.c.specimen_id)
         .where(Specimen.accession_id != None)  # noqa: E711
         .order_by(Specimen.accession_id)
+    )
+
+
+def assembly_status_window(label: str, column: InstrumentedAttribute[Any]):
+    return (
+        func.first_value(column)
+        .over(
+            partition_by=Assembly.assembly_id,
+            order_by=AssemblyStatus.status_time.desc(),
+        )
+        .label(label)
     )
 
 
