@@ -45,7 +45,7 @@ from tolqc.schema.system_models import Metadata
 
 def test_data(token: str):
     return [
-        User(id=100, oidc_id='tester@sanger.ac.uk', name='tester', email='tester@sanger.ac.uk'),
+        User(id=100, name='tester', email='tester@sanger.ac.uk'),
         Token(token=token, user_id=100, id=200),
         Role(id=300, name='editor'),
         RoleBinding(user_id=100, role_id=300),
