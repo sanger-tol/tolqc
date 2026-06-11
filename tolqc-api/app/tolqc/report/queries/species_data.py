@@ -305,9 +305,8 @@ def ena_assembly_report_query(*_) -> Select:
     """
 
     # CTE that only returns asssemblies and their ENA record fields which have
-    # either the "ENA Submitted" or "ENA Public" statuses in their history,
-    # using window functions to return the most recent one if they have
-    # both.
+    # either the "Submitted" or "ENA Public" statuses in their history, using
+    # window functions to return the most recent one if they have both.
     gca_acc = (
         select(
             Specimen.specimen_id,
@@ -323,7 +322,7 @@ def ena_assembly_report_query(*_) -> Select:
         .select_from(Specimen)
         .join(Specimen.assemblies)
         .join(Assembly.status_history)
-        .where(AssemblyStatus.status_type_id.in_(['ENA Submitted', 'ENA Public']))
+        .where(AssemblyStatus.status_type_id.in_(['Submitted', 'ENA Public']))
         .distinct()
         .cte('gca_acc')
     )
