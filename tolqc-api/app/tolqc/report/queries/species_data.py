@@ -15,6 +15,7 @@ from tolqc.schema.assembly_models import (
     Assembly,
     AssemblyDataset,
     AssemblyStatus,
+    Dataset,
     DatasetElement,
 )
 from tolqc.schema.metagenome_models import (
@@ -282,7 +283,8 @@ def ena_assembly_data_report_query(*_) -> Select:
         select(
             Data.data_id,
             Data.accession_id.label('run_accession'),
-            DatasetElement.dataset_id,
+            Dataset.dataset_id,
+            Dataset.name.label('dataset_name'),
             LibraryType.reporting_category.label('data_type'),
             dataset_assemblies.c.assemblies,
         )
@@ -290,6 +292,7 @@ def ena_assembly_data_report_query(*_) -> Select:
         .join(Library)
         .join(LibraryType)
         .outerjoin(Data.dataset_assn)
+        .outerjoin(DatasetElement.dataset)
         .outerjoin(
             dataset_assemblies,
             DatasetElement.dataset_id == dataset_assemblies.c.dataset_id,
@@ -313,7 +316,7 @@ def ena_assembly_report_query(*_) -> Select:
             Assembly.assembly_id,
             Assembly.bioproject_accession_id.label('assembly_bioproject'),
             Assembly.genome_accession_id,
-            Assembly.name,
+            Assembly.name.label('assembly_name'),
             Assembly.description,
             Assembly.level,
             assembly_status_window('status', AssemblyStatus.status_type_id),
@@ -334,7 +337,7 @@ def ena_assembly_report_query(*_) -> Select:
             gca_acc.c.assembly_id,
             gca_acc.c.assembly_bioproject,
             gca_acc.c.genome_accession_id,
-            gca_acc.c.name,
+            gca_acc.c.assembly_name,
             gca_acc.c.description,
             gca_acc.c.level,
             gca_acc.c.status,
