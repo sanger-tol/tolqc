@@ -1,7 +1,7 @@
 """assembly.category and library.is_pcr
 
 Revision ID: 127e17ed1743
-Revises: d4fe96ab4445
+Revises: 7b92949913ed
 Create Date: 2026-06-10 11:55:33.789981
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.schema import CreateSequence, DropSequence, Sequence
 
 # revision identifiers, used by Alembic.
 revision = '127e17ed1743'
-down_revision = 'd4fe96ab4445'
+down_revision = '7b92949913ed'
 branch_labels = None
 depends_on = None
 
