@@ -283,6 +283,7 @@ def ena_assembly_data_report_query(*_) -> Select:
         select(
             Data.data_id,
             Data.accession_id.label('run_accession'),
+            Specimen.specimen_id.label('specimen'),
             Dataset.dataset_id,
             Dataset.name.label('dataset_name'),
             LibraryType.reporting_category.label('data_type'),
@@ -291,6 +292,8 @@ def ena_assembly_data_report_query(*_) -> Select:
         .select_from(Data)
         .join(Library)
         .join(LibraryType)
+        .outerjoin(Data.sample)
+        .outerjoin(Sample.specimen)
         .outerjoin(Data.dataset_assn)
         .outerjoin(DatasetElement.dataset)
         .outerjoin(
