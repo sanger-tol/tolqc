@@ -292,6 +292,20 @@ def test_ena_assembly_report(client, api_path):
     assert len(miss_gca) > 0
 
 
+def test_ena_assembly_data_report(client, api_path):
+    asm_data = report_response_json(
+        client,
+        api_path,
+        'ena-assembly-data',
+        {
+            'format': 'NDJSON',
+        },
+    )
+    assert len(asm_data) > 0
+    has_assemblies = [x for x in asm_data if x['assemblies'] is not None]
+    assert len(has_assemblies) > 0
+
+
 @pytest.fixture
 def max_bases(client, api_path):
     json_lines = report_response_json(

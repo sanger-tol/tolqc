@@ -12,9 +12,14 @@ from tolqc.schema.accession_models import (
 )
 from tolqc.schema.assembly_models import (
     Assembly,
+    AssemblyDataset,
     AssemblyLevelDict,
     AssemblyStatus,
     AssemblyStatusType,
+    Dataset,
+    DatasetElement,
+    DatasetStatus,
+    DatasetStatusType,
 )
 from tolqc.schema.folder_models import Folder, FolderLocation
 from tolqc.schema.sample_data_models import (
@@ -192,6 +197,11 @@ def test_data(token: str):
         AssemblyStatusType(
             status_type_id='ENA Public',
             description='Assembly is public with a GCA accession at the ENA',
+            assign_order=70,
+        ),
+        AssemblyStatusType(
+            status_type_id='Submitted',
+            description='Assembly has been passed to the Sanger data release team',
             assign_order=60,
         ),
         CategoryDict(category='transcriptomic_data'),
@@ -210,6 +220,25 @@ def test_data(token: str):
         ChemistryDict(chemistry='S/P4.1-C2/5.0-8M'),
         ChemistryDict(chemistry='S/P4-C2/5.0-8M'),
         ChemistryDict(chemistry='S/P5-C2/5.0-8M'),
+        DatasetStatusType(
+            status_type_id='Pending', description='New dataset awaiting QC', assign_order=10
+        ),
+        DatasetStatusType(
+            status_type_id='GenomeScope Pass',
+            description='Has passed GenomeScope QC checks',
+            assign_order=20,
+        ),
+        DatasetStatusType(
+            status_type_id='Barcode Check Pass',
+            description='Matches species in barcode database',
+            assign_order=30,
+        ),
+        DatasetStatusType(
+            status_type_id='QC Pass', description='Cleared for assembly', assign_order=40
+        ),
+        DatasetStatusType(
+            status_type_id='Failed', description='Not suitable for assembly', assign_order=50
+        ),
         FileTypeDict(file_type='BAM', description='Binary Alignment Map'),
         FileTypeDict(file_type='CRAM', description='Compressed Reference-oriented Alignment Map'),
         FileTypeDict(file_type='BNX', description='BioNano BNX'),
@@ -392,84 +421,91 @@ def test_data(token: str):
             library_type_id='Chromium genome',
             hierarchy_name='10x',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
-            library_type_id='Haplotagging', hierarchy_name='htag', default_category='genomic_data'
+            library_type_id='Haplotagging',
+            hierarchy_name='htag',
+            default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='HiSeqX PCR free',
             hierarchy_name='illumina',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='PacBio - IsoSeq',
             hierarchy_name='pacbio',
             default_category='transcriptomic_data',
+            is_pcr=False,
         ),
         LibraryType(
-            library_type_id='Standard', hierarchy_name='illumina', default_category='genomic_data'
+            library_type_id='Standard',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
+            is_pcr=False,
         ),
-        LibraryType(library_type_id='Custom'),
-        LibraryType(library_type_id='qPCR only'),
-        LibraryType(library_type_id='Pre-quality controlled'),
-        LibraryType(library_type_id='Manual Standard WGS (Plate)'),
-        LibraryType(library_type_id='Nextera dual index pre quality controlled'),
+        LibraryType(library_type_id='Custom', is_pcr=False),
+        LibraryType(library_type_id='qPCR only', is_pcr=False),
+        LibraryType(library_type_id='Pre-quality controlled', is_pcr=False),
+        LibraryType(library_type_id='Manual Standard WGS (Plate)', is_pcr=False),
+        LibraryType(library_type_id='Nextera dual index pre quality controlled', is_pcr=False),
         LibraryType(
             library_type_id='RNA PolyA',
             hierarchy_name='rna-seq',
             default_category='transcriptomic_data',
             reporting_category='rnaseq',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='RNA-seq dUTP eukaryotic',
             hierarchy_name='rna-seq',
             default_category='transcriptomic_data',
             reporting_category='rnaseq',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='RNA-seq dUTP prokaryotic',
             hierarchy_name='rna-seq',
             default_category='transcriptomic_data',
             reporting_category='rnaseq',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Small RNA (miRNA)',
             hierarchy_name='rna-seq',
             default_category='transcriptomic_data',
             reporting_category='rnaseq',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='PacBio - HiFi',
             hierarchy_name='pacbio',
             default_category='genomic_data',
             reporting_category='pacbio',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='PacBio - HiFi (Microbial)',
             hierarchy_name='pacbio',
             default_category='genomic_data',
             reporting_category='pacbio',
-        ),
-        LibraryType(
-            library_type_id='PacBio - HiFi (ULI)',
-            hierarchy_name='pacbio',
-            default_category='genomic_data',
-            reporting_category='pacbio',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C',
             hierarchy_name='hic',
             default_category='genomic_data',
             reporting_category='hic',
+            is_pcr=False,
         ),
         LibraryType(
-            library_type_id='PacBio - HiFi (PiMmS)',
-            hierarchy_name='pacbio',
+            library_type_id='ATAC-seq',
+            hierarchy_name='atac-seq',
             default_category='genomic_data',
-            reporting_category='pacbio',
-        ),
-        LibraryType(
-            library_type_id='ATAC-seq', hierarchy_name='atac-seq', default_category='genomic_data'
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C - Arima v1',
@@ -479,6 +515,7 @@ def test_data(token: str):
             kit='Arima v1',
             enzymes='HinfI,DpnII',
             cut_sites='^GATC,G^ANTC',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C - Arima v2',
@@ -488,6 +525,7 @@ def test_data(token: str):
             kit='Arima v2',
             enzymes='HinfI,DpnII,DdeI,MseI',
             cut_sites='^GATC,G^ANTC,C^TNAG,T^TAA',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C - Dovetail',
@@ -497,6 +535,7 @@ def test_data(token: str):
             kit='Dovetail - Hi-C',
             enzymes='DpnII',
             cut_sites='^GATC',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C - Qiagen',
@@ -506,6 +545,7 @@ def test_data(token: str):
             kit='Qiagen',
             enzymes='DpnII',
             cut_sites='^GATC',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C - DNAzoo (Csp6I,MseI)',
@@ -515,6 +555,7 @@ def test_data(token: str):
             kit='DNAzoo',
             enzymes='Csp6I,MseI',
             cut_sites='G^TAC,T^TAA',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C - DNAzoo (MboI,MseI)',
@@ -524,6 +565,7 @@ def test_data(token: str):
             kit='DNAzoo',
             enzymes='MboI,MseI',
             cut_sites='^GATC,T^TAA',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='BioNano - DLE1',
@@ -531,6 +573,7 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='bionano',
             enzymes='DLE1',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='BioNano - BssSI',
@@ -538,6 +581,7 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='bionano',
             enzymes='BssSI',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='BioNano - BspQI',
@@ -545,6 +589,7 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='bionano',
             enzymes='BspQI',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C - Phase',
@@ -552,117 +597,151 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='hic',
             kit='Phase',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Hi-C - Homebrew',
             hierarchy_name='hic-homebrew',
             default_category='genomic_data',
             reporting_category='hic',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='No PCR (Plate)',
             hierarchy_name='illumina',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Long range',
             hierarchy_name='illumina',
             default_category='genomic_data',
+            is_pcr=False,
         ),
-        LibraryType(library_type_id='RNA Ribo', hierarchy_name='rna-seq'),
-        LibraryType(library_type_id='PacBio - CLR', hierarchy_name='pacbio'),
+        LibraryType(library_type_id='RNA Ribo', hierarchy_name='rna-seq', is_pcr=False),
+        LibraryType(library_type_id='PacBio - CLR', hierarchy_name='pacbio', is_pcr=False),
         LibraryType(
             library_type_id='Hi-C - OmniC',
             hierarchy_name='hic-omnic',
             default_category='genomic_data',
             reporting_category='hic',
             kit='Dovetail - Omni-C',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Haplotagging (202103)',
             hierarchy_name='htag-202103',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Haplotagging (202106)',
             hierarchy_name='htag-202106',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Haplotagging (202110)',
             hierarchy_name='htag-202110',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Haplotagging (202203)',
             hierarchy_name='htag-202203',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Haplotagging (Sanger libraries)',
             hierarchy_name='htag-sanger',
             default_category='genomic_data',
+            is_pcr=False,
         ),
+        LibraryType(library_type_id='Rapid', is_pcr=False),
         LibraryType(
             library_type_id='Haplotagging (Marek libraries)',
             hierarchy_name='htag-marek',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Chicago - Dovetail',
             hierarchy_name='chicago-dovetail',
             default_category='genomic_data',
             kit='Dovetail',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='Haplotagging (202108)',
             hierarchy_name='htag-202108',
             default_category='genomic_data',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='PacBio - IsoSeq (Kinnex)',
             hierarchy_name='pacbio',
             default_category='transcriptomic_data',
+            is_pcr=False,
         ),
-        LibraryType(library_type_id='Ligation'),
-        LibraryType(library_type_id='Rapid'),
-        LibraryType(
-            library_type_id='PacBio - HiFi (Ampli-Fi)',
-            hierarchy_name='pacbio',
-            default_category='genomic_data',
-            reporting_category='pacbio',
-        ),
+        LibraryType(library_type_id='Ligation', is_pcr=False),
         LibraryType(
             library_type_id='ONT_GridIon',
             hierarchy_name='ont',
             default_category='genomic_data',
             reporting_category='ont',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='ONT_PromethIon',
             hierarchy_name='ont',
             default_category='genomic_data',
             reporting_category='ont',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='ONT_PromethIon_mplx',
             hierarchy_name='ont',
             default_category='genomic_data',
             reporting_category='ont',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='ONT_Ultralong',
             hierarchy_name='ont',
             default_category='genomic_data',
             reporting_category='ont',
+            is_pcr=False,
         ),
         LibraryType(
             library_type_id='PacBio - HiFi (Amplicon)',
             hierarchy_name='pacbio',
             default_category='genomic_data',
             reporting_category='pacbio',
+            is_pcr=False,
         ),
-        LibraryType(library_type_id='LCMB'),
+        LibraryType(library_type_id='LCMB', is_pcr=False),
+        LibraryType(
+            library_type_id='PacBio - HiFi (ULI)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+            is_pcr=True,
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (PiMmS)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+            is_pcr=True,
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (Ampli-Fi)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+            is_pcr=True,
+        ),
         LinkStatusDict(link_status='New', description='BioProject link newly created'),
         LinkStatusDict(
             link_status='Verified', description='BioProject link verified to exist at ENA'
@@ -860,6 +939,27 @@ def test_data(token: str):
                                             id=6966, project_id='tol', data_id='35344_1#1'
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=21916,
+                                            data_id='35344_1#1',
+                                            dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                                name='10x',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=15592,
+                                                        dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:34:35.257948+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                     folder=Folder(
                                         folder_ulid='01J8GNT7RDJNSEPWTKHG8QSHSB',
                                         folder_location_id='illumina_data_s3',
@@ -965,6 +1065,27 @@ def test_data(token: str):
                                             id=6970, project_id='tol', data_id='35344_1#2'
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=21917,
+                                            data_id='35344_1#2',
+                                            dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                                name='10x',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=15592,
+                                                        dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:34:35.257948+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                     folder=Folder(
                                         folder_ulid='01J8GNT901PKS6AZBX0QPJEP95',
                                         folder_location_id='illumina_data_s3',
@@ -1060,6 +1181,27 @@ def test_data(token: str):
                                         Allocation(
                                             id=6974, project_id='tol', data_id='35344_1#3'
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=21918,
+                                            data_id='35344_1#3',
+                                            dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                                name='10x',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=15592,
+                                                        dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:34:35.257948+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNTAE04KEY675Z4WX8KDK4',
@@ -1164,6 +1306,27 @@ def test_data(token: str):
                                         Allocation(
                                             id=6978, project_id='tol', data_id='35344_1#4'
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=21919,
+                                            data_id='35344_1#4',
+                                            dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                                name='10x',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=15592,
+                                                        dataset_id='01K6BJYB201CTC53DYQ1M674KK',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:34:35.257948+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GNTBMMYVA2RJZKYZCHZAAM',
@@ -1275,6 +1438,27 @@ def test_data(token: str):
                                         Allocation(
                                             id=7554, project_id='tol', data_id='35528_4#8'
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=15385,
+                                            data_id='35528_4#8',
+                                            dataset_id='01K6B5R10VC8F9XTXCVGXM50Q2',
+                                            dataset=Dataset(
+                                                dataset_id='01K6B5R10VC8F9XTXCVGXM50Q2',
+                                                name='hic-arima2',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=10911,
+                                                        dataset_id='01K6B5R10VC8F9XTXCVGXM50Q2',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T17:43:56.894702+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GP34MFJNAHCBM0X20TA8VF',
@@ -1423,6 +1607,27 @@ def test_data(token: str):
                                             project_id='tol',
                                             data_id='m64016_201115_112225#1022',
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=4666,
+                                            data_id='m64016_201115_112225#1022',
+                                            dataset_id='01K6AW4EBE124C2EEA91HFCA1E',
+                                            dataset=Dataset(
+                                                dataset_id='01K6AW4EBE124C2EEA91HFCA1E',
+                                                name='pacbio.ccs',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=3069,
+                                                        dataset_id='01K6AW4EBE124C2EEA91HFCA1E',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T14:55:57.986068+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                 ),
                                 Data(
@@ -1619,6 +1824,27 @@ def test_data(token: str):
                                             data_id='m64089e_210601_133425#1022',
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=4667,
+                                            data_id='m64089e_210601_133425#1022',
+                                            dataset_id='01K6AW4EBE124C2EEA91HFCA1E',
+                                            dataset=Dataset(
+                                                dataset_id='01K6AW4EBE124C2EEA91HFCA1E',
+                                                name='pacbio.ccs',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=3069,
+                                                        dataset_id='01K6AW4EBE124C2EEA91HFCA1E',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T14:55:57.986068+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                 ),
                             ],
                         ),
@@ -1694,6 +1920,27 @@ def test_data(token: str):
                                         Allocation(
                                             id=9438, project_id='tol', data_id='36703_5#4'
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=29976,
+                                            data_id='36703_5#4',
+                                            dataset_id='01K6BPZJ9ENAJP5C2VRA9KFY2A',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BPZJ9ENAJP5C2VRA9KFY2A',
+                                                name='rna-seq',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=19599,
+                                                        dataset_id='01K6BPZJ9ENAJP5C2VRA9KFY2A',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T22:45:09.729719+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ6KCY1QQ32TSMP7KRRT3Z',
@@ -1801,6 +2048,27 @@ def test_data(token: str):
                                             id=12851, project_id='tol', data_id='37939_1#2'
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=25832,
+                                            data_id='37939_1#2',
+                                            dataset_id='01K6BKWEJ26GQ6CTC5WW7A2HDG',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BKWEJ26GQ6CTC5WW7A2HDG',
+                                                name='htag-202106',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=16531,
+                                                        dataset_id='01K6BKWEJ26GQ6CTC5WW7A2HDG',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:51:01.879041+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                     folder=Folder(
                                         folder_ulid='01J8GSEF3JDHWEVBP5EWYD9QC8',
                                         folder_location_id='illumina_data_s3',
@@ -1903,6 +2171,27 @@ def test_data(token: str):
                                             data_id='36857#13',
                                         ),
                                         Allocation(id=9469, project_id='tol', data_id='36857#13'),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=25825,
+                                            data_id='36857#13',
+                                            dataset_id='01K6BKW5G6FD6N8R67M976W9V9',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BKW5G6FD6N8R67M976W9V9',
+                                                name='htag-202103',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=16524,
+                                                        dataset_id='01K6BKW5G6FD6N8R67M976W9V9',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:50:52.649160+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ93RN80BXDY4WTYJZYB24',
@@ -2167,27 +2456,33 @@ def test_data(token: str):
                                             data_id='m84309_250205_121831_s4#2076',
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=4668,
+                                            data_id='m84309_250205_121831_s4#2076',
+                                            dataset_id='01K6AW4FD9B0PHTZ6BGWV31K7M',
+                                            dataset=Dataset(
+                                                dataset_id='01K6AW4FD9B0PHTZ6BGWV31K7M',
+                                                name='pacbio.ccs',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=3070,
+                                                        dataset_id='01K6AW4FD9B0PHTZ6BGWV31K7M',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T14:55:59.067208+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                 )
                             ],
                         )
                     ],
                     accession=Accession(
                         accession_id='SAMEA12753558',
-                        accession_type_id='BioSample',
-                        is_deleted=False,
-                    ),
-                    location=Location(
-                        location_id=3113, path='6/c/c/f/1/b/Brachiomonas_submarina'
-                    ),
-                ),
-                Specimen(
-                    specimen_id='ucBraSubp1',
-                    location_id=3113,
-                    species_id='Brachiomonas submarina',
-                    accession_id='SAMEA7532740',
-                    ploidy='2',
-                    accession=Accession(
-                        accession_id='SAMEA7532740',
                         accession_type_id='BioSample',
                         is_deleted=False,
                     ),
@@ -2309,6 +2604,39 @@ def test_data(token: str):
                                             id=16989, project_id='tol', data_id='40666_2#2'
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=12480,
+                                            data_id='40666_2#2',
+                                            dataset_id='01K6B331TCWW21W4K60YFKMNRW',
+                                            dataset=Dataset(
+                                                dataset_id='01K6B331TCWW21W4K60YFKMNRW',
+                                                name='hic-arima2',
+                                                assembly_assn=[
+                                                    AssemblyDataset(
+                                                        id=13839,
+                                                        assembly_id=7103,
+                                                        dataset_id='01K6B331TCWW21W4K60YFKMNRW',
+                                                    ),
+                                                    AssemblyDataset(
+                                                        id=13842,
+                                                        assembly_id=7104,
+                                                        dataset_id='01K6B331TCWW21W4K60YFKMNRW',
+                                                    ),
+                                                ],
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=8206,
+                                                        dataset_id='01K6B331TCWW21W4K60YFKMNRW',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T16:57:32.418140+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                     folder=Folder(
                                         folder_ulid='01J8GVRDZR9KA1EXWZM48W09MZ',
                                         folder_location_id='illumina_data_s3',
@@ -2426,6 +2754,39 @@ def test_data(token: str):
                                             id=9236, project_id='tol', data_id='36691_2#5'
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=20160,
+                                            data_id='36691_2#5',
+                                            dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                name='10x',
+                                                assembly_assn=[
+                                                    AssemblyDataset(
+                                                        id=13838,
+                                                        assembly_id=7103,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                    ),
+                                                    AssemblyDataset(
+                                                        id=13841,
+                                                        assembly_id=7104,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                    ),
+                                                ],
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=15210,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:27:57.559761+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ31A3VN2XMDY7PP7XMFSV',
                                         folder_location_id='illumina_data_s3',
@@ -2530,6 +2891,39 @@ def test_data(token: str):
                                         Allocation(
                                             id=9239, project_id='tol', data_id='36691_2#6'
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=20161,
+                                            data_id='36691_2#6',
+                                            dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                name='10x',
+                                                assembly_assn=[
+                                                    AssemblyDataset(
+                                                        id=13838,
+                                                        assembly_id=7103,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                    ),
+                                                    AssemblyDataset(
+                                                        id=13841,
+                                                        assembly_id=7104,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                    ),
+                                                ],
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=15210,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:27:57.559761+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ32MZ3YKMTSPGRS5HWCD1',
@@ -2636,6 +3030,39 @@ def test_data(token: str):
                                             id=9242, project_id='tol', data_id='36691_2#7'
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=20162,
+                                            data_id='36691_2#7',
+                                            dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                name='10x',
+                                                assembly_assn=[
+                                                    AssemblyDataset(
+                                                        id=13838,
+                                                        assembly_id=7103,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                    ),
+                                                    AssemblyDataset(
+                                                        id=13841,
+                                                        assembly_id=7104,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                    ),
+                                                ],
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=15210,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:27:57.559761+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ33XK1D5AVJN9XCP7YQ84',
                                         folder_location_id='illumina_data_s3',
@@ -2740,6 +3167,39 @@ def test_data(token: str):
                                         Allocation(
                                             id=9245, project_id='tol', data_id='36691_2#8'
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=20163,
+                                            data_id='36691_2#8',
+                                            dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                name='10x',
+                                                assembly_assn=[
+                                                    AssemblyDataset(
+                                                        id=13838,
+                                                        assembly_id=7103,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                    ),
+                                                    AssemblyDataset(
+                                                        id=13841,
+                                                        assembly_id=7104,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                    ),
+                                                ],
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=15210,
+                                                        dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T21:27:57.559761+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GQ356P8AEKKAPW0VD2PJKD',
@@ -2945,6 +3405,39 @@ def test_data(token: str):
                                             data_id='m64097e_210221_172213#1019',
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=310,
+                                            data_id='m64097e_210221_172213#1019',
+                                            dataset_id='01K6AS7B9XT21VZZ2CWMV40V08',
+                                            dataset=Dataset(
+                                                dataset_id='01K6AS7B9XT21VZZ2CWMV40V08',
+                                                name='pacbio.ccs',
+                                                assembly_assn=[
+                                                    AssemblyDataset(
+                                                        id=13840,
+                                                        assembly_id=7103,
+                                                        dataset_id='01K6AS7B9XT21VZZ2CWMV40V08',
+                                                    ),
+                                                    AssemblyDataset(
+                                                        id=13843,
+                                                        assembly_id=7104,
+                                                        dataset_id='01K6AS7B9XT21VZZ2CWMV40V08',
+                                                    ),
+                                                ],
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=204,
+                                                        dataset_id='01K6AS7B9XT21VZZ2CWMV40V08',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T14:05:07.440053+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                 )
                             ],
                         ),
@@ -3027,6 +3520,27 @@ def test_data(token: str):
                                         Allocation(
                                             id=12800, project_id='tol', data_id='37935_8#13'
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=28564,
+                                            data_id='37935_8#13',
+                                            dataset_id='01K6BNNXDTQ6G48M1YDB0DQXYM',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BNNXDTQ6G48M1YDB0DQXYM',
+                                                name='rna-seq',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=18321,
+                                                        dataset_id='01K6BNNXDTQ6G48M1YDB0DQXYM',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T22:22:24.879947+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8GSDTKDZYAX2X2F8K7WD045',
@@ -3145,6 +3659,27 @@ def test_data(token: str):
                                             id=30345, project_id='tol', data_id='48593_1#25'
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=28565,
+                                            data_id='48593_1#25',
+                                            dataset_id='01K6BNNXDTQ6G48M1YDB0DQXYM',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BNNXDTQ6G48M1YDB0DQXYM',
+                                                name='rna-seq',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=18321,
+                                                        dataset_id='01K6BNNXDTQ6G48M1YDB0DQXYM',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T22:22:24.879947+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                     folder=Folder(
                                         folder_ulid='01J8HAZJY0CG2BHX6Q7TSA54DA',
                                         folder_location_id='illumina_data_s3',
@@ -3188,7 +3723,7 @@ def test_data(token: str):
                     location=Location(location_id=299, path='e/1/3/d/d/0/Juncus_effusus'),
                     assemblies=[
                         Assembly(
-                            assembly_id=7153,
+                            assembly_id=7103,
                             specimen_id='lpJunEffu1',
                             name='lpJunEffu1.1',
                             description='lpJunEffu1.1 assembly for Juncus effusus',
@@ -3223,15 +3758,15 @@ def test_data(token: str):
                             ),
                             status_history=[
                                 AssemblyStatus(
-                                    assembly_status_id=7153,
-                                    assembly_id=7153,
+                                    assembly_status_id=7103,
+                                    assembly_id=7103,
                                     status_type_id='ENA Public',
                                     status_time='2022-10-12T00:00:00+01:00',
                                 )
                             ],
                         ),
                         Assembly(
-                            assembly_id=7154,
+                            assembly_id=7104,
                             specimen_id='lpJunEffu1',
                             name='lpJunEffu1.1 alternate haplotype',
                             description=(
@@ -3271,8 +3806,8 @@ def test_data(token: str):
                             ),
                             status_history=[
                                 AssemblyStatus(
-                                    assembly_status_id=7154,
-                                    assembly_id=7154,
+                                    assembly_status_id=7104,
+                                    assembly_id=7104,
                                     status_type_id='ENA Public',
                                     status_time='2022-09-25T00:00:00+01:00',
                                 )
@@ -3580,6 +4115,39 @@ def test_data(token: str):
                                             id=30291, project_id='vgp', data_id='48587_5-6#2'
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=14051,
+                                            data_id='48587_5-6#2',
+                                            dataset_id='01K6B4HP8K8MDPQYB63C0HWT6G',
+                                            dataset=Dataset(
+                                                dataset_id='01K6B4HP8K8MDPQYB63C0HWT6G',
+                                                name='hic-arima2',
+                                                assembly_assn=[
+                                                    AssemblyDataset(
+                                                        id=245,
+                                                        assembly_id=156,
+                                                        dataset_id='01K6B4HP8K8MDPQYB63C0HWT6G',
+                                                    ),
+                                                    AssemblyDataset(
+                                                        id=247,
+                                                        assembly_id=157,
+                                                        dataset_id='01K6B4HP8K8MDPQYB63C0HWT6G',
+                                                    ),
+                                                ],
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=9685,
+                                                        dataset_id='01K6B4HP8K8MDPQYB63C0HWT6G',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T17:23:00.676255+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                     folder=Folder(
                                         folder_ulid='01J8HAY65YNTH7P0M2F65PMN39',
                                         folder_location_id='illumina_data_s3',
@@ -3860,6 +4428,39 @@ def test_data(token: str):
                                             data_id='m84047_240219_121238_s3#2089',
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=2620,
+                                            data_id='m84047_240219_121238_s3#2089',
+                                            dataset_id='01K6ATRHFGXCKPRYPQY2CBXN3W',
+                                            dataset=Dataset(
+                                                dataset_id='01K6ATRHFGXCKPRYPQY2CBXN3W',
+                                                name='pacbio.ccs',
+                                                assembly_assn=[
+                                                    AssemblyDataset(
+                                                        id=246,
+                                                        assembly_id=156,
+                                                        dataset_id='01K6ATRHFGXCKPRYPQY2CBXN3W',
+                                                    ),
+                                                    AssemblyDataset(
+                                                        id=248,
+                                                        assembly_id=157,
+                                                        dataset_id='01K6ATRHFGXCKPRYPQY2CBXN3W',
+                                                    ),
+                                                ],
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=1709,
+                                                        dataset_id='01K6ATRHFGXCKPRYPQY2CBXN3W',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T14:31:59.396275+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                 )
                             ],
                         ),
@@ -3962,6 +4563,27 @@ def test_data(token: str):
                                             data_id='ONTRUN-232#PBA64077#21',
                                         ),
                                     ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=32411,
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                            dataset_id='01K6X00XKNCBQSPYTG6WD0ABKJ',
+                                            dataset=Dataset(
+                                                dataset_id='01K6X00XKNCBQSPYTG6WD0ABKJ',
+                                                name='ont',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=21724,
+                                                        dataset_id='01K6X00XKNCBQSPYTG6WD0ABKJ',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-10-06T15:50:16.630054+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
+                                    ],
                                 )
                             ],
                         ),
@@ -4043,6 +4665,27 @@ def test_data(token: str):
                                             project_id='vgp',
                                             data_id='ONTRUN-304#PBE95016#21#NB09',
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=32412,
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                            dataset_id='01K6X00XKNCBQSPYTG6WD0ABKJ',
+                                            dataset=Dataset(
+                                                dataset_id='01K6X00XKNCBQSPYTG6WD0ABKJ',
+                                                name='ont',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=21724,
+                                                        dataset_id='01K6X00XKNCBQSPYTG6WD0ABKJ',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-10-06T15:50:16.630054+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                 )
                             ],
@@ -4135,6 +4778,27 @@ def test_data(token: str):
                                         Allocation(
                                             id=32661, project_id='vgp', data_id='49280_2#11'
                                         ),
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=29323,
+                                            data_id='49280_2#11',
+                                            dataset_id='01K6BPCJJEK063WK6NN58J0A0P',
+                                            dataset=Dataset(
+                                                dataset_id='01K6BPCJJEK063WK6NN58J0A0P',
+                                                name='rna-seq',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=19012,
+                                                        dataset_id='01K6BPCJJEK063WK6NN58J0A0P',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2025-09-29T22:34:47.427464+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        )
                                     ],
                                     folder=Folder(
                                         folder_ulid='01J8HD27D98F8FFYV5NDE4B10H',
@@ -4464,8 +5128,23 @@ def test_data(token: str):
             ),
             location=Location(location_id=824, path='3/b/5/0/1/e/Rallus_aquaticus'),
         ),
-        Assembly(assembly_id=7153, assembly_status_id=7153),
-        Assembly(assembly_id=7154, assembly_status_id=7154),
+        Assembly(assembly_id=7103, assembly_status_id=7103),
+        Assembly(assembly_id=7104, assembly_status_id=7104),
         Assembly(assembly_id=156, assembly_status_id=156),
         Assembly(assembly_id=157, assembly_status_id=157),
+        Dataset(dataset_id='01K6BJYB201CTC53DYQ1M674KK'),
+        Dataset(dataset_id='01K6B5R10VC8F9XTXCVGXM50Q2', dataset_status_id=10911),
+        Dataset(dataset_id='01K6AW4EBE124C2EEA91HFCA1E'),
+        Dataset(dataset_id='01K6BPZJ9ENAJP5C2VRA9KFY2A', dataset_status_id=19599),
+        Dataset(dataset_id='01K6BKWEJ26GQ6CTC5WW7A2HDG', dataset_status_id=16531),
+        Dataset(dataset_id='01K6BKW5G6FD6N8R67M976W9V9', dataset_status_id=16524),
+        Dataset(dataset_id='01K6AW4FD9B0PHTZ6BGWV31K7M', dataset_status_id=3070),
+        Dataset(dataset_id='01K6B331TCWW21W4K60YFKMNRW', dataset_status_id=8206),
+        Dataset(dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12'),
+        Dataset(dataset_id='01K6AS7B9XT21VZZ2CWMV40V08', dataset_status_id=204),
+        Dataset(dataset_id='01K6BNNXDTQ6G48M1YDB0DQXYM'),
+        Dataset(dataset_id='01K6B4HP8K8MDPQYB63C0HWT6G', dataset_status_id=9685),
+        Dataset(dataset_id='01K6ATRHFGXCKPRYPQY2CBXN3W', dataset_status_id=1709),
+        Dataset(dataset_id='01K6X00XKNCBQSPYTG6WD0ABKJ'),
+        Dataset(dataset_id='01K6BPCJJEK063WK6NN58J0A0P', dataset_status_id=19012),
     ]

@@ -15,6 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.sql import expression
 
 from tolqc.schema.base import Base, LogBase
 from tolqc.schema.folder_models import HasFolder
@@ -50,7 +51,11 @@ class Assembly(LogBase, HasFolder):
         String,
         ForeignKey('assembly_level_dict.level'),
     )
-    is_reference = mapped_column(Boolean, default=False, index=True)
+    category_id = mapped_column(
+        String,
+        ForeignKey('assembly_category.category_id'),
+    )
+    is_reference = mapped_column(Boolean, server_default=expression.false(), index=True)
     bioproject_accession_id = mapped_column(
         String,
         ForeignKey('accession.accession_id'),
@@ -102,6 +107,7 @@ class Assembly(LogBase, HasFolder):
     metrics = mapped_column(JSONB)
 
     specimen = relationship('Specimen', back_populates='assemblies')
+    category = relationship('AssemblyCategory', back_populates='assemblies')
 
     dataset_assn = relationship('AssemblyDataset', back_populates='assembly')
     datasets = association_proxy('dataset_assn', 'dataset')
@@ -168,6 +174,20 @@ class Assembly(LogBase, HasFolder):
         primaryjoin='Assembly.assigned_user_id == User.id',
         back_populates='assigned_assemblies',
     )
+
+
+class AssemblyCategory(Base):
+    __tablename__ = 'assembly_category'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'category_id'
+
+    category_id = mapped_column(String, primary_key=True)
+    hierarchy_name = mapped_column(String)
+    descrption = mapped_column(String)
+
+    assemblies = relationship('Assembly', back_populates='category')
 
 
 class AssemblyComponentType(Base):

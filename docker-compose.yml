@@ -133,11 +133,15 @@ services:
 
   tolqc-python-db:
     image: postgres:14
+    # Useful when debugging to show all SQL statements in the log:
+    command: ["postgres", "-c", "log_statement=all"]
     environment:
       - TZ=Europe/London
       - POSTGRES_USER=test-user
       - POSTGRES_PASSWORD=test-password
       - POSTGRES_DB=test-db
+    ports:
+      - 5437:5432
   
   tolqc-python-unit-test:
     build:

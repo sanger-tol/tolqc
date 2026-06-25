@@ -45,8 +45,9 @@ def upgrade() -> None:
 
     # Drop `assembly_id` sequence to avoid it being trashed by alembic
     # `batch_alter_table()`
-    seq = 'assembly_assembly_id_seq'
-    op.execute(DropSequence(Sequence(seq)))
+    op.alter_column('assembly', 'assembly_id', server_default=None)
+    sqn_name = 'assembly_assembly_id_seq'
+    op.execute(DropSequence(Sequence(sqn_name)))
 
     # Alter assembly table
     with op.batch_alter_table('assembly', recreate='always') as batch_op:
@@ -60,11 +61,17 @@ def upgrade() -> None:
         )
 
     # Recreate and reset `assembly_id` sequence
-    op.execute(CreateSequence(Sequence(seq)))
+    op.execute(CreateSequence(Sequence(sqn_name)))
     op.alter_column(
         'assembly',
         'assembly_id',
-        server_default=sa.text(f"nextval('{seq}'::regclass)"),
+        server_default=sa.text(f"nextval('{sqn_name}'::regclass)"),
+    )
+    op.execute(
+        sa.text(f"""
+          SELECT setval('{sqn_name}',
+            (SELECT MAX(assembly_id) FROM assembly))
+        """)  # noqa: S608
     )
 
     # Recreate assembly table foreign key constraints
@@ -91,7 +98,10 @@ def upgrade() -> None:
         ['level'],
     )
     op.create_index(
-        op.f('ix_assembly_is_reference'), 'assembly', ['is_reference'], unique=False
+        op.f('ix_assembly_is_reference'),
+        'assembly',
+        ['is_reference'],
+        unique=False,
     )
 
     # Add project.symlink_template

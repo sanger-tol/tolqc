@@ -253,9 +253,40 @@ class Library(Base):
         ForeignKey('library_type.library_type_id'),
     )
     lims_id = mapped_column(Integer)
+    description_template = mapped_column(String)
 
     data = relationship('Data', back_populates='library')
     library_type = relationship('LibraryType', back_populates='library')
+
+
+class LibrarySelectionDict(Base):
+    __tablename__ = 'library_selection_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'selection'
+
+    selection = mapped_column(String, primary_key=True)
+
+
+class LibrarySourceDict(Base):
+    __tablename__ = 'library_source_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'source'
+
+    source = mapped_column(String, primary_key=True)
+
+
+class LibraryStrategyDict(Base):
+    __tablename__ = 'library_strategy_dict'
+
+    @classmethod
+    def get_id_column_name(cls):
+        return 'strategy'
+
+    strategy = mapped_column(String, primary_key=True)
 
 
 class LibraryType(Base):
@@ -272,6 +303,11 @@ class LibraryType(Base):
     kit = mapped_column(String)
     enzymes = mapped_column(String)
     cut_sites = mapped_column(String)
+    is_pcr = mapped_column(Boolean, server_default=expression.false(), index=True)
+    source = mapped_column(String, ForeignKey('library_source_dict.source'))
+    selection = mapped_column(String, ForeignKey('library_selection_dict.selection'))
+    strategy = mapped_column(String, ForeignKey('library_strategy_dict.strategy'))
+    description_template = mapped_column(String)
 
     library = relationship('Library', back_populates='library_type')
 
@@ -424,6 +460,7 @@ class Project(LogBase):
         return 'project_id'
 
     project_id = mapped_column(String, primary_key=True)
+    sts_alias = mapped_column(String, index=True)
     name = mapped_column(String)
     description = mapped_column(String)
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
@@ -559,6 +596,7 @@ class Specimen(LogBase):
     supplied_name = mapped_column(String, index=True)
     sts_specimen = mapped_column(String, index=True)
     sts_priority = mapped_column(Integer, index=True)
+    priority = mapped_column(Integer, index=True)
     category = mapped_column(String, ForeignKey('specimen_category_dict.category'))
     accession_id = mapped_column(String, ForeignKey('accession.accession_id'))
     sex_id = mapped_column(String, ForeignKey('sex.sex_id'))

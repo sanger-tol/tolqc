@@ -105,6 +105,7 @@ def pipeline_data_report_query(req_args: RequestArgs) -> Select:
 
     top_data_columns = [
         *seq_data_header_cols(),
+        LibraryType.is_pcr,
         File.insdc_path,
         File.public_path,
         Specimen.sts_specimen,
@@ -177,6 +178,7 @@ def pipeline_data_report_query(req_args: RequestArgs) -> Select:
 def pacbio_data_report_query(req_args: RequestArgs) -> Select:
     data_columns = (
         *seq_data_header_cols(),
+        LibraryType.is_pcr,
         Run.run_id.label('movie_name'),
         Run.element.label('well'),
         Run.plex_count,
