@@ -185,7 +185,7 @@ class AssemblyCategory(Base):
 
     category_id = mapped_column(String, primary_key=True)
     hierarchy_name = mapped_column(String)
-    descrption = mapped_column(String)
+    description = mapped_column(String)
 
     assemblies = relationship('Assembly', back_populates='category')
 
