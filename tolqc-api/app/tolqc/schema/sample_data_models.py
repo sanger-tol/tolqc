@@ -253,7 +253,7 @@ class Library(Base):
         ForeignKey('library_type.library_type_id'),
     )
     lims_id = mapped_column(Integer)
-    description_template = mapped_column(String)
+    description = mapped_column(String)
 
     data = relationship('Data', back_populates='library')
     library_type = relationship('LibraryType', back_populates='library')
