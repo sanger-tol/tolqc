@@ -300,6 +300,7 @@ def ena_assembly_data_report_query(*_) -> Select:
             dataset_assemblies,
             DatasetElement.dataset_id == dataset_assemblies.c.dataset_id,
         )
+        .order_by(Data.data_id)
     )
 
 
@@ -337,6 +338,7 @@ def ena_assembly_report_query(*_) -> Select:
         select(
             Specimen.accession_id.label('specimen_biosample'),
             Specimen.specimen_id.label('specimen'),
+            Specimen.cobiont_specimen_id.label('cobiont_of'),
             gca_acc.c.assembly_id,
             gca_acc.c.assembly_bioproject,
             gca_acc.c.genome_accession_id,
