@@ -4,7 +4,7 @@
 
 from typing import Any
 
-from sqlalchemy import Select, case, func, or_, select
+from sqlalchemy import Select, and_, case, func, or_, select
 from sqlalchemy.orm import InstrumentedAttribute, aliased
 
 from tolqc.report.column_funcs import array_distinct_non_null
@@ -205,8 +205,14 @@ def species_bioproject_query(req_args: RequestArgs) -> Select:
         .select_from(Species)
         .outerjoin(umbrella_acc, Species.umbrella_accession)
         .outerjoin(data_acc, Species.data_accession)
-        .outerjoin(project_cte, Species.umbrella_accession_id == project_cte.c.accession_id)
-        .outerjoin(product_cte, Species.umbrella_accession_id == product_cte.c.accession_id)
+        .outerjoin(
+            project_cte,
+            Species.umbrella_accession_id == project_cte.c.accession_id,
+        )
+        .outerjoin(
+            product_cte,
+            Species.umbrella_accession_id == product_cte.c.accession_id,
+        )
         .group_by(*group_by)
     )
 
@@ -300,6 +306,22 @@ def ena_assembly_data_report_query(*_) -> Select:
             dataset_assemblies,
             DatasetElement.dataset_id == dataset_assemblies.c.dataset_id,
         )
+        .where(
+            # Ideally this WHERE clause would be `Data.qc == 'pass'`, but this
+            # column is NULL for most rows because the only QC descision
+            # recorded is 'fail'.
+            or_(
+                Data.qc == 'pass',
+                and_(
+                    Data.qc == None,  # noqa: E711
+                    or_(
+                        Data.lims_qc == 'pass',
+                        Data.lims_qc == None,  # noqa: E711
+                    ),
+                ),
+            )
+        )
+        .order_by(Data.data_id)
     )
 
 
@@ -337,6 +359,7 @@ def ena_assembly_report_query(*_) -> Select:
         select(
             Specimen.accession_id.label('specimen_biosample'),
             Specimen.specimen_id.label('specimen'),
+            Specimen.cobiont_specimen_id.label('cobiont_of'),
             gca_acc.c.assembly_id,
             gca_acc.c.assembly_bioproject,
             gca_acc.c.genome_accession_id,
