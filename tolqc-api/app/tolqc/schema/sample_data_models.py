@@ -143,6 +143,10 @@ class Data(LogBase, HasFolder):
     tiara_metrics = relationship('TiaraMetrics', back_populates='data')
     study = relationship('Study', back_populates='data')
 
+    lims_qc_state = relationship('QCDict', primaryjoin='Data.lims_qc == QCDict.qc_state')
+    auto_qc_state = relationship('QCDict', primaryjoin='Data.auto_qc == QCDict.qc_state')
+    qc_state = relationship('QCDict', primaryjoin='Data.qc == QCDict.qc_state')
+
     project_assn = relationship('Allocation', back_populates='data')
     projects = association_proxy('project_assn', 'project')
 

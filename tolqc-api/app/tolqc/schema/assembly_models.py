@@ -478,6 +478,7 @@ class GenomescopeMetrics(LogBase, HasFolder):
         'Pipeline',
         back_populates='genomescope_metrics',
     )
+    review = relationship('ReviewDict')
 
 
 class MarkerscanMetrics(Base):
