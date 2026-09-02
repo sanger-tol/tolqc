@@ -452,6 +452,7 @@ class Platform(Base):
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     name = mapped_column(String)
     model = mapped_column(String)
+    ena_name = mapped_column(String)
 
     run = relationship('Run', back_populates='platform')
 

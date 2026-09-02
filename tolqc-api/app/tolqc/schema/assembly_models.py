@@ -45,6 +45,10 @@ class Assembly(LogBase, HasFolder):
         String,
         ForeignKey('specimen.specimen_id'),
     )
+    centre_id = mapped_column(
+        Integer,
+        ForeignKey('centre.id'),
+    )
     name = mapped_column(String, index=True)
     description = mapped_column(String)
     level = mapped_column(
@@ -55,6 +59,7 @@ class Assembly(LogBase, HasFolder):
         String,
         ForeignKey('assembly_category.category_id'),
     )
+    file_path = mapped_column(String)
     is_reference = mapped_column(Boolean, server_default=expression.false(), index=True)
     bioproject_accession_id = mapped_column(
         String,
@@ -619,8 +624,8 @@ class SmudgeplotMetrics(LogBase, HasFolder):
 
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     dataset_id = mapped_column(String, ForeignKey('dataset.dataset_id'))
-    interpretation = mapped_column(
-        String, ForeignKey('smudgeplot_interpretation_dict.interpretation')
+    interpretation_id = mapped_column(
+        String, ForeignKey('smudgeplot_interpretation_dict.interpretation_id')
     )
     haploid_coverage = mapped_column(Float)
     error_fraction = mapped_column(Float)
@@ -632,6 +637,7 @@ class SmudgeplotMetrics(LogBase, HasFolder):
     )
 
     dataset = relationship('Dataset', back_populates='smudgeplot_metrics')
+    interpretation = relationship('SmudgeplotInterpretationDict')
     pipeline = relationship(
         'Pipeline',
         back_populates='smudgeplot_metrics',
@@ -643,9 +649,9 @@ class SmudgeplotInterpretationDict(Base):
 
     @classmethod
     def get_id_column_name(cls):
-        return 'interpretation'
+        return 'interpretation_id'
 
-    interpretation = mapped_column(String, primary_key=True)
+    interpretation_id = mapped_column(String, primary_key=True)
     description = mapped_column(String)
 
 
