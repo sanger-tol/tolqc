@@ -37,12 +37,12 @@ def load_seq_data_stream(
     centre = get_centre(session, centre_name)
     rspns = {}
     for row in ndjson_rows_from_stream(stream):
-        label, row = store_seq_data_row(session, centre, row)
-        if row:
+        label, data = store_seq_data_row(session, centre, row)
+        if data:
             rspns_row = (
-                updated_data_fields(row)
+                updated_data_fields(data)
                 if label == 'updated'
-                else headline_data_fields(row)
+                else headline_data_fields(data)
             )
             rspns.setdefault(label, []).append(rspns_row)
     return rspns
@@ -91,11 +91,11 @@ def updated_data_fields(data):
     return fields
 
 
-def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
+def store_seq_data_row(session, centre, row) -> tuple[str | None, Data | None]:
     data = get_data(session, row)
     if data:
         # The QC decisions *might* have changed so update these fields
-        data.lims_qc = row.get('lims_qc')
+        data.lims_qc_id = row.get('lims_qc')
         data.date = maybe_datetime(row, 'qc_date')
         if session.is_modified(data, include_collections=False):
             return 'updated', data
@@ -117,7 +117,7 @@ def store_seq_data_row(session, centre, row) -> (None | Data, None | Data):
     return 'new', data
 
 
-def build_data(session, centre, row):
+def build_data(session, centre, row) -> Data:
     data = Data(
         # Data fields
         data_id=row.get('data_id'),
@@ -126,7 +126,7 @@ def build_data(session, centre, row):
         tag1_id=row.get('tag1_id'),
         tag2_id=row.get('tag2_id'),
         pcr_adapter_id=row.get('pcr_adapter_id'),
-        lims_qc=row.get('lims_qc'),
+        lims_qc_id=row.get('lims_qc'),
         date=maybe_datetime(row, 'qc_date'),
     )
     if sample := build_sample(session, row):
@@ -354,7 +354,7 @@ def get_centre(session, centre_name):
     return session.scalars(select(Centre).where(Centre.name == centre_name)).one()
 
 
-def get_data(session, row):
+def get_data(session, row) -> Data | None:
     data_id = must_get_row_value(row, 'data_id')
     return session.get(Data, data_id)
 

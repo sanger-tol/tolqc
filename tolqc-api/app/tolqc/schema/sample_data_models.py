@@ -103,9 +103,9 @@ class Data(LogBase, HasFolder):
     tag2_id = mapped_column(String)
     pcr_adapter_id = mapped_column(String)
     date = mapped_column(DateTime(timezone=True))
-    lims_qc = mapped_column(String, ForeignKey('qc_dict.qc_state'))
-    auto_qc = mapped_column(String, ForeignKey('qc_dict.qc_state'))
-    qc = mapped_column(String, ForeignKey('qc_dict.qc_state'))
+    lims_qc_id = mapped_column(String, ForeignKey('qc_dict.qc_state'))
+    auto_qc_id = mapped_column(String, ForeignKey('qc_dict.qc_state'))
+    qc_id = mapped_column(String, ForeignKey('qc_dict.qc_state'))
     visibility = mapped_column(
         String,
         ForeignKey('visibility_dict.visibility'),
@@ -142,6 +142,10 @@ class Data(LogBase, HasFolder):
     mapping_metrics = relationship('MappingMetrics', back_populates='data')
     tiara_metrics = relationship('TiaraMetrics', back_populates='data')
     study = relationship('Study', back_populates='data')
+
+    lims_qc = relationship('QCDict', primaryjoin='Data.lims_qc_id == QCDict.qc_state')
+    auto_qc = relationship('QCDict', primaryjoin='Data.auto_qc_id == QCDict.qc_state')
+    qc = relationship('QCDict', primaryjoin='Data.qc_id == QCDict.qc_state')
 
     project_assn = relationship('Allocation', back_populates='data')
     projects = association_proxy('project_assn', 'project')
@@ -448,6 +452,7 @@ class Platform(Base):
     id = mapped_column(Integer, primary_key=True)  # noqa: A003
     name = mapped_column(String)
     model = mapped_column(String)
+    ena_name = mapped_column(String)
 
     run = relationship('Run', back_populates='platform')
 

@@ -311,12 +311,12 @@ def ena_assembly_data_report_query(*_) -> Select:
             # column is NULL for most rows because the only QC descision
             # recorded is 'fail'.
             or_(
-                Data.qc == 'pass',
+                Data.qc_id == 'pass',
                 and_(
-                    Data.qc == None,  # noqa: E711
+                    Data.qc_id == None,  # noqa: E711
                     or_(
-                        Data.lims_qc == 'pass',
-                        Data.lims_qc == None,  # noqa: E711
+                        Data.lims_qc_id == 'pass',
+                        Data.lims_qc_id == None,  # noqa: E711
                     ),
                 ),
             )
@@ -389,7 +389,7 @@ def assembly_status_window(label: str, column: InstrumentedAttribute[Any]):
 
 def specimen_status_report_query(req_args: RequestArgs) -> Select:
     # Filters on the `data` table
-    data_vals = req_args.pop_args_dict('processed', 'qc', 'visibility')
+    data_vals = req_args.pop_args_dict('processed', 'qc_id', 'visibility')
 
     # Filters on project name and assignee
     project = req_args.pop_arg('project')
