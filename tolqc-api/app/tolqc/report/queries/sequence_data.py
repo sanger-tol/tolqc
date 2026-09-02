@@ -45,7 +45,7 @@ def seq_data_header_cols():
         Platform.model,
         Run.instrument_name.label('instrument'),
         iso_date_col('date', func.coalesce(Run.complete, Run.start)),
-        Data.lims_qc,
+        Data.lims_qc_id.label('lims_qc'),
         Run.lims_id.label('run'),
         Specimen.accession_id.label('biospecimen_accession'),
         Sample.accession_id.label('biosample_accession'),
@@ -134,7 +134,7 @@ def pipeline_data_report_query(req_args: RequestArgs) -> Select:
         Species.umbrella_accession_id.label('umbrella_bioproject'),
         Data.study_id,
         Data.visibility,
-        Data.qc,
+        Data.qc_id.label('qc'),
         Data.processed,
     ]
 
@@ -324,7 +324,7 @@ def mlwh_data_report_query_select(*_) -> Select:
         iso_datetime_col('run_start', Run.start),
         iso_datetime_col('run_complete', Run.complete),
         Run.plex_count,
-        Data.lims_qc,
+        Data.lims_qc_id.label('lims_qc'),
         iso_datetime_col('qc_date', Data.date),
         Data.tag1_id,
         Data.tag2_id,

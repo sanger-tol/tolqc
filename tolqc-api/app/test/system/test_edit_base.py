@@ -70,19 +70,19 @@ def test_modify_data(logbase_db_session):
     date3 = datetime.fromisoformat('2023-08-22T10:32:06+01:00')
     dat = Data(
         data_id='test',
-        lims_qc='pass',
+        lims_qc_id='pass',
         date=date1,
     )
     logbase_db_session.add(dat)
     logbase_db_session.flush()
 
     # lims_qc changed to fail on second date
-    dat.lims_qc = 'fail'
+    dat.lims_qc_id = 'fail'
     dat.date = date2
     logbase_db_session.flush()
 
     # lims_qc changed back to pass on third date
-    dat.lims_qc = 'pass'
+    dat.lims_qc_id = 'pass'
     dat.date = date3
     logbase_db_session.flush()
 
@@ -95,11 +95,11 @@ def test_modify_data(logbase_db_session):
 
     # Check history entries for date and string are as expected
     edit2, edit1 = (h.changes for h in hist)
-    edited_keys = {'date', 'lims_qc'}
+    edited_keys = {'date', 'lims_qc_id'}
     assert edit1.keys() == edited_keys
     assert edit2.keys() == edited_keys
-    assert edit1['lims_qc'] == 'pass'
-    assert edit2['lims_qc'] == 'fail'
+    assert edit1['lims_qc_id'] == 'pass'
+    assert edit2['lims_qc_id'] == 'fail'
     assert datetime.fromisoformat(edit1['date']) == date1
     assert datetime.fromisoformat(edit2['date']) == date2
 
@@ -109,7 +109,7 @@ def test_edits_via_client(client, api_path):
         'type': 'data',
         'id': 'data#1001',
         'attributes': {
-            'qc': 'pass',
+            'qc_id': 'pass',
         },
     }
     upsrt = {'data': [obj_spec]}
@@ -119,7 +119,7 @@ def test_edits_via_client(client, api_path):
     assert response.status == '200 OK'
 
     # Change data.qc to "fail"
-    obj_spec['attributes']['qc'] = 'fail'
+    obj_spec['attributes']['qc_id'] = 'fail'
     response = client.post(api_path + '/data/data:upsert', json=upsrt)
     assert response.status == '200 OK'
 
@@ -138,5 +138,5 @@ def test_edits_via_client(client, api_path):
     # There should only be one change, containing the old qc value of "pass".
     # If the stringified ID is not turned back into a integer by the server's
     # DefaultDataObjectConverter then the `changes` list will be:
-    #   ['{"data_id":1001,"qc":"pass"}', '{"data_id":1001}']
-    assert changes == [{'qc': 'pass'}]
+    #   ['{"data_id":1001,"qc_id":"pass"}', '{"data_id":1001}']
+    assert changes == [{'qc_id': 'pass'}]

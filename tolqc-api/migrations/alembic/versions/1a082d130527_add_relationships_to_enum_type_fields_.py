@@ -18,11 +18,39 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # `data` table
+    data_cols = ('lims_qc', 'auto_qc', 'qc')
+    for col in data_cols:
+        new_col = f'{col}_id'
+        op.drop_constraint(f'data_{col}_fkey', 'data')
+        op.alter_column('data', col, new_column_name=new_col)
+        op.create_foreign_key(
+            None,
+            'data',
+            'qc_dict',
+            [new_col],
+            ['qc_state'],
+        )
+
     # `platform` table
     op.add_column(
         'platform',
         sa.Column('ena_name', sa.String(), nullable=True),
     )
+
+    # Update edit_data table to rename `...qc` JSON keys to `...qc_id` in the
+    # `changes` column.
+    for col in data_cols:
+        new_col = f'{col}_id'
+        sql = f"""
+          UPDATE edit_data
+          SET changes = jsonb_set(
+            changes #- '{{{col}}}',
+            '{{{new_col}}}', changes #> '{{{col}}}'
+          )
+          WHERE changes ? '{col}';
+        """  # noqa: S608
+        op.execute(sa.text(sql))
 
     # Smudgeplot interpretation
     op.drop_constraint(

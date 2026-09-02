@@ -323,24 +323,28 @@ def sum_species_data_bases(json_lines):
     return bases
 
 
-def specimen_status_param_combinations():
-    for param in (
-        {'processed': '1'},
-        {'processed': '0'},
-        {'processed': 'null'},
-        {'project': 'protist-microalgae'},
-        {'qc': 'pass'},
-        {'qc': 'null'},
-        {'visibility': 'Always'},
-        {'assignee': 'tester'},
-        {'assignee': 'null'},
-    ):
-        yield {'format': 'NDJSON', **param}
+specimen_status_param_combinations = [
+    {'processed': '1'},
+    {'processed': '0'},
+    {'processed': 'null'},
+    {'project': 'protist-microalgae'},
+    {'qc_id': 'pass'},
+    {'qc_id': 'null'},
+    {'visibility': 'Always'},
+    {'assignee': 'tester'},
+    {'assignee': 'null'},
+]
 
 
-@pytest.mark.parametrize('params', specimen_status_param_combinations())
+@pytest.mark.parametrize(
+    'params',
+    specimen_status_param_combinations,
+    ids=lambda x: str(x),
+)
 def test_specimen_status_report(max_bases, client, api_path, params):
-    json_lines = report_response_json(client, api_path, 'specimen-status', params)
+    json_lines = report_response_json(
+        client, api_path, 'specimen-status', {'format': 'NDJSON', **params}
+    )
 
     bases = sum_species_data_bases(json_lines)
     assert 0 < bases < max_bases

@@ -196,7 +196,7 @@ def test_seq_data_loader_update(client, api_path, row_data):
                 'sample': 'DTOL13630432',
                 'study': 'DTOL_Darwin Tree of Life',
                 'changes': {
-                    'lims_qc': ['pass', 'fail'],
+                    'lims_qc_id': ['pass', 'fail'],
                     'date': [
                         '2023-06-30T11:29:00+01:00',
                         '2023-07-02T10:45:00+01:00',
