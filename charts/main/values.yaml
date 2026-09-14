@@ -108,6 +108,7 @@ tolcore:
     probe_url: '/api/v1/system/healthz'
     path: '/api/v1'
     data_path: '/data'
+    auth_data_path: '/auth'
     boards_api_data_path: '/boards'
     token: ""
     extra_env:
@@ -127,6 +128,7 @@ tolcore:
       REACT_APP_PORTAL_URL: portal.url
       REACT_APP_PORTAL_API_PATH: portal.api_path
       REACT_APP_PORTAL_API_DATA_PATH: portal.api_data_path
+      REACT_APP_AUTH_API_DATA_PATH: api.auth_data_path
       REACT_APP_BOARDS_API_DATA_PATH: api.boards_api_data_path
   s3:
     uri: ""
