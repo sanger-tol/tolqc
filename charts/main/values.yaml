@@ -108,6 +108,7 @@ tolcore:
     probe_url: '/api/v1/system/healthz'
     path: '/api/v1'
     data_path: '/data'
+    boards_api_data_path: '/boards'
     token: ""
     extra_env:
       API_PATH: api.path
@@ -123,6 +124,10 @@ tolcore:
       REACT_APP_API_PATH: api.path
       REACT_APP_API_DATA_PATH: api.data_path
       REACT_APP_MATOMO_SITE_ID: ui.matomo_site_id
+      REACT_APP_PORTAL_URL: portal.url
+      REACT_APP_PORTAL_API_PATH: portal.api_path
+      REACT_APP_PORTAL_API_DATA_PATH: portal.api_data_path
+      REACT_APP_BOARDS_API_DATA_PATH: api.boards_api_data_path
   s3:
     uri: ""
     access_key: ""
