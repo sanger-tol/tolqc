@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM gitlab-registry.internal.sanger.ac.uk/tol/tol-core/api-base:2.0.0
+FROM gitlab-registry.internal.sanger.ac.uk/tol/tol-core/api-base:2.0.1
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV UWSGI_CHEAPER 4
