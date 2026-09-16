@@ -74,7 +74,6 @@ class Centre(Base):
     assemblies = relationship('Assembly', back_populates='centre')
 
 
-
 class ChemistryDict(Base):
     __tablename__ = 'chemistry_dict'
 
