@@ -112,6 +112,7 @@ class Assembly(LogBase, HasFolder):
     metrics = mapped_column(JSONB)
 
     specimen = relationship('Specimen', back_populates='assemblies')
+    centre = relationship('Centre', back_populates='assemblies')
     category = relationship('AssemblyCategory', back_populates='assemblies')
 
     dataset_assn = relationship('AssemblyDataset', back_populates='assembly')

@@ -71,6 +71,8 @@ class Centre(Base):
     hierarchy_name = mapped_column(String)
 
     run = relationship('Run', back_populates='centre')
+    assemblies = relationship('Assembly', back_populates='centre')
+
 
 
 class ChemistryDict(Base):
