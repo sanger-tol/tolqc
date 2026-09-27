@@ -60,6 +60,7 @@ class Assembly(LogBase, HasFolder):
         ForeignKey('assembly_category.category_id'),
     )
     file_path = mapped_column(String)
+    is_principal = mapped_column(Boolean, server_default=expression.false(), index=True)
     is_reference = mapped_column(Boolean, server_default=expression.false(), index=True)
     bioproject_accession_id = mapped_column(
         String,
