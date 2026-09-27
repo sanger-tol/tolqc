@@ -94,13 +94,6 @@ def upgrade() -> None:
         ['source_assembly_id'],
         ['assembly_id'],
     )
-    op.create_foreign_key(
-        None,
-        'assembly',
-        'assembly_category',
-        ['category_id'],
-        ['category_id'],
-    )
 
 
 def downgrade() -> None:
