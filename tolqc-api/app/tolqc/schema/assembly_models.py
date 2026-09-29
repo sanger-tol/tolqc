@@ -60,6 +60,7 @@ class Assembly(LogBase, HasFolder):
         ForeignKey('assembly_category.category_id'),
     )
     file_path = mapped_column(String)
+    is_principal = mapped_column(Boolean, server_default=expression.false(), index=True)
     is_reference = mapped_column(Boolean, server_default=expression.false(), index=True)
     bioproject_accession_id = mapped_column(
         String,
@@ -161,20 +162,20 @@ class Assembly(LogBase, HasFolder):
 
     # Sources are assemblies for which there is a row in assembly_source
     # with this instance's assembly_id
-    source_assembly_assn = relationship(
+    source_assn = relationship(
         'AssemblySource',
         primaryjoin='Assembly.assembly_id == AssemblySource.assembly_id',
         back_populates='component',
     )
-    sources = association_proxy('source_assembly_assn', 'source')
+    sources = association_proxy('source_assn', 'source')
 
     # Components are assemblies which have this assembly as their source
-    component_assembly_assn = relationship(
+    component_assn = relationship(
         'AssemblySource',
         primaryjoin='Assembly.assembly_id == AssemblySource.source_assembly_id',  # noqa: E501
         back_populates='source',
     )
-    components = association_proxy('component_assembly_assn', 'component')
+    components = association_proxy('component_assn', 'component')
     assignee = relationship(
         'User',
         primaryjoin='Assembly.assigned_user_id == User.id',
@@ -243,12 +244,12 @@ class AssemblySource(Base):
     source = relationship(
         'Assembly',
         foreign_keys=[source_assembly_id],
-        back_populates='component_assembly_assn',
+        back_populates='component_assn',
     )
     component = relationship(
         'Assembly',
         foreign_keys=[assembly_id],
-        back_populates='source_assembly_assn',
+        back_populates='source_assn',
     )
 
 
