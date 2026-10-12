@@ -100,7 +100,8 @@ def test_build_location():
     assert build_location(9627, 'Vulpes vulpes').path == '2/e/9/7/6/a/Vulpes_vulpes'
 
 
-def test_build_wospi_location():
+@pytest.fixture
+def mock_session():
     class MockSession:
         def __init__(self):
             self.data = {
@@ -113,12 +114,26 @@ def test_build_wospi_location():
         def get(self, cls, name):
             return self.data.get((cls, name))
 
-    session = MockSession()
+    return MockSession()
+
+
+def test_build_wospi_location(mock_session):
     row = {
         'sample_name': 'JaronRG15423711',
         'tol_specimen_id': 'idSAN96000277',
         'scientific_name': 'unidentified',
         'taxon_id': 32644,
     }
-    smpl = build_sample(session, row)
+    smpl = build_sample(mock_session, row)
     assert smpl.specimen.location.path == '1/a/4/c/5/5/idSAN96000277'
+
+
+def test_build_grouped_wospi_location(mock_session):
+    row = {
+        'sample_name': 'qqSAG12345678',
+        'tol_specimen_id': 'qqWGI00000001_SXX12345678',
+        'scientific_name': 'unidentified',
+        'taxon_id': 32644,
+    }
+    smpl = build_sample(mock_session, row)
+    assert smpl.specimen.location.path == '8/f/7/3/7/7/qqWGI00000001'
