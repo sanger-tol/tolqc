@@ -263,9 +263,15 @@ def build_sample(session, row):
     specimen_acc = None
     if spcmn_id := row.get('tol_specimen_id'):
         spcmn = session.get(Specimen, spcmn_id)
-        if not spcmn and re.match(r'[a-z]{1,2}([A-Z][a-z]|SAN\d+$)', spcmn_id):
-            # Beginning of specimen ID looks like a ToL ID;
-            # or is a WOSPI ID, e.g. "ttSAN90000012"
+        if not spcmn and (
+            # Beginning of specimen ID looks like a ToL ID or is a WOSPI ID,
+            # e.g. "ttSAN90000012" or "qqWGI00000001_SAG12345678"
+            m := re.search(
+                r'^[a-z]{1,2}[A-Z][a-z]|^[a-z]{2}SAN\d+$|^([a-z]{2}WGI\d+)_',
+                spcmn_id,
+            )
+        ):
+            spcmn_dir = m.group(1) or spcmn_id
             specimen_acc = accession_if_valid(
                 session,
                 'BioSpecimen',
@@ -277,7 +283,7 @@ def build_sample(session, row):
                 accession=specimen_acc,
                 supplied_name=row.get('supplier_name'),
                 species=species,
-                location=species.location or build_location(spcmn_id, spcmn_id),
+                location=species.location or build_location(spcmn_dir, spcmn_dir),
             )
 
     sample_acc = accession_if_valid(
@@ -319,7 +325,7 @@ def build_species(session, row):
     )
 
 
-def build_location(hash_me, sci_name):
+def build_location(hash_me: int | str, sci_name: str) -> Location | None:
     if hash_me and sci_name:
         dir_name = re.sub(r'\W+', '_', sci_name).strip('_')
         hash_prefix = md5(str(hash_me).encode()).hexdigest()[:6]  # noqa: S324
