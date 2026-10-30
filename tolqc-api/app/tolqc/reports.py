@@ -28,6 +28,7 @@ from tolqc.report.queries.species_data import (
     metagenome_bin_report_query,
     metagenome_report_query,
     species_bioproject_query,
+    specimen_assemblies_report_query,
     specimen_status_report_query,
 )
 from tolqc.report.request_args import RequestArgs
@@ -91,6 +92,7 @@ class ReportEngine:
         'pacbio-data': pacbio_data_report_query,
         'pipeline-data': pipeline_data_report_query,
         'species-bioproject': species_bioproject_query,
+        'specimen-assembly': specimen_assemblies_report_query,
         'specimen-status': specimen_status_report_query,
     }
 

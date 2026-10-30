@@ -5,6 +5,7 @@
 from typing import Any
 
 from sqlalchemy import Select, and_, case, func, or_, select
+from sqlalchemy.dialects.postgresql import aggregate_order_by
 from sqlalchemy.orm import InstrumentedAttribute, aliased
 
 from tolqc.report.column_funcs import array_distinct_non_null
@@ -13,7 +14,9 @@ from tolqc.schema import User
 from tolqc.schema.accession_models import Accession, BioprojectLink
 from tolqc.schema.assembly_models import (
     Assembly,
+    AssemblyCategory,
     AssemblyDataset,
+    AssemblySource,
     AssemblyStatus,
     Dataset,
     DatasetElement,
@@ -29,12 +32,14 @@ from tolqc.schema.sample_data_models import (
     Data,
     Library,
     LibraryType,
+    Location,
     Project,
     Sample,
     Species,
     Specimen,
     SpecimenStatus,
 )
+from tolqc.schema.system_models import Metadata
 
 
 def metagenome_report_query(*_) -> Select:
@@ -344,6 +349,7 @@ def ena_assembly_report_query(*_) -> Select:
             Assembly.name.label('assembly_name'),
             Assembly.description,
             Assembly.level,
+            Assembly.centre_id.label('centre'),
             assembly_status_window('status', AssemblyStatus.status_type_id),
             assembly_status_window('status_time', AssemblyStatus.status_time),
         )
@@ -366,6 +372,7 @@ def ena_assembly_report_query(*_) -> Select:
             gca_acc.c.assembly_name,
             gca_acc.c.description,
             gca_acc.c.level,
+            gca_acc.c.centre,
             gca_acc.c.status,
             gca_acc.c.status_time,
         )
@@ -384,6 +391,124 @@ def assembly_status_window(label: str, column: InstrumentedAttribute[Any]):
             order_by=AssemblyStatus.status_time.desc(),
         )
         .label(label)
+    )
+
+
+def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
+    asm_set = aliased(Assembly, name='asm_set')
+
+    asm_set_name = req_args.pop_arg('set_name')
+    if asm_set_name is NoArg:
+        set_filter = or_(
+            asm_set.component_type_id == 'set',
+            asm_set.component_type_id == None,  # noqa: E711
+        )
+    elif asm_set_name is None:
+        set_filter = asm_set.name == None  # noqa: E711
+    else:
+        set_filter = and_(
+            asm_set.component_type_id == 'set',
+            asm_set.name == asm_set_name,
+        )
+
+    return (
+        select(
+            asm_set.name.label('set_name'),
+            asm_set.assembly_id.label('set_id'),
+            Specimen.specimen_id.label('specimen'),
+            Specimen.species_id.label('species'),
+            asm_set.is_reference.label('set_is_reference'),
+            func.json_agg(
+                aggregate_order_by(
+                    func.json_build_object(
+                        'name',
+                        Assembly.name,
+                        'assembly_id',
+                        Assembly.assembly_id,
+                        'status',
+                        AssemblyStatus.status_type_id,
+                        'status_time',
+                        AssemblyStatus.status_time,
+                        'genome_accession',
+                        Assembly.genome_accession_id,
+                        'assembly_bioproject',
+                        Assembly.bioproject_accession_id,
+                        'component_type',
+                        Assembly.component_type_id,
+                        'category',
+                        Assembly.category_id,
+                        'level',
+                        Assembly.level,
+                        'is_principal',
+                        Assembly.is_principal,
+                        'is_reference',
+                        Assembly.is_reference,
+                        'bases',
+                        Assembly.bases,
+                        'contigs',
+                        Assembly.contigs,
+                        'contig_length',
+                        Assembly.contig_length,
+                        'contig_length_mean',
+                        Assembly.contig_length_mean,
+                        'contig_n50',
+                        Assembly.contig_n50,
+                        'contig_aun',
+                        Assembly.contig_aun,
+                        'scaffolds',
+                        Assembly.scaffolds,
+                        'scaffold_length',
+                        Assembly.scaffold_length,
+                        'scaffold_length_mean',
+                        Assembly.scaffold_length_mean,
+                        'scaffold_n50',
+                        Assembly.scaffold_n50,
+                        'scaffold_aun',
+                        Assembly.scaffold_aun,
+                        'gaps',
+                        Assembly.gaps,
+                        'path',
+                        case(
+                            (
+                                and_(
+                                    Metadata.string_value != None,  # noqa: E711
+                                    Location.path != None,  # noqa: E711
+                                    AssemblyCategory.hierarchy_name != None,  # noqa: E711
+                                    Assembly.file_path != None,  # noqa: E711
+                                ),
+                                func.concat_ws(
+                                    '/',
+                                    Metadata.string_value,
+                                    Location.path,
+                                    AssemblyCategory.hierarchy_name,
+                                    Assembly.file_path,
+                                ),
+                            )
+                        ),
+                    ),
+                    Assembly.name,
+                ),
+            ).label('components'),
+        )
+        .select_from(Assembly)
+        .outerjoin(Metadata, Metadata.name == 'location.root')
+        .outerjoin(Assembly.status)
+        .outerjoin(AssemblyStatus.status_type)
+        .outerjoin(Assembly.specimen)
+        .outerjoin(Specimen.location)
+        .outerjoin(Assembly.category)
+        .outerjoin(Assembly.source_assn)
+        .outerjoin(asm_set, AssemblySource.source)
+        .filter(Assembly.component_type_id != 'set')
+        .filter(set_filter)
+        .group_by(
+            asm_set.assembly_id,
+            Specimen.specimen_id,
+            Specimen.species_id,
+            asm_set.name,
+            asm_set.is_reference,
+        )
+        .order_by(Specimen.specimen_id, asm_set.name)
     )
 
 
