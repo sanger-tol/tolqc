@@ -20,13 +20,48 @@ depends_on = None
 def upgrade() -> None:
     op.alter_column('assembly', 'is_principal', server_default=None)
     op.alter_column('assembly', 'is_reference', server_default=None)
+
+    # Unset is_principal where it was set by the server default
     op.execute(
-        sa.text("""
-      UPDATE assembly
-      SET is_principal = NULL
-      WHERE is_principal = FALSE
-        AND is_reference IS NULL
-    """)
+        sa.text(
+            """
+            UPDATE assembly
+            SET is_principal = NULL
+            WHERE is_principal = FALSE
+              AND is_reference IS NULL
+            """
+        )
+    )
+
+    # Set is_reference for assembly sets where it is NULL
+    op.execute(
+        sa.text(
+            """
+            WITH
+              set_n AS (
+                SELECT
+                  assembly_id,
+                  row_number() OVER (
+                    PARTITION BY
+                      specimen_id
+                    ORDER BY
+                      name DESC
+                  ) AS n
+                FROM
+                  assembly
+                WHERE
+                  component_type_id = 'set'
+              )
+            UPDATE assembly
+            SET
+              is_reference = (set_n.n = 1)
+            FROM
+              set_n
+            WHERE
+              assembly.assembly_id = set_n.assembly_id
+              AND is_reference IS NULL;
+            """
+        )
     )
 
 
