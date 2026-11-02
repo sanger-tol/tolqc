@@ -30,6 +30,7 @@ from tolqc.schema.metagenome_models import (
 from tolqc.schema.sample_data_models import (
     Allocation,
     Data,
+    File,
     Library,
     LibraryType,
     Location,
@@ -274,8 +275,8 @@ def ena_assembly_data_report_query(*_) -> Select:
     dataset_assemblies = (
         select(
             AssemblyDataset.dataset_id,
-            func.jsonb_agg(
-                func.jsonb_build_object(
+            func.json_agg(
+                func.json_build_object(
                     'assembly_id',
                     Assembly.assembly_id,
                     'genome_accession_id',
@@ -411,6 +412,79 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
             asm_set.name == asm_set_name,
         )
 
+    set_datasets = (
+        select(
+            asm_set.assembly_id,
+            Dataset.dataset_id,
+            Dataset.name.label('dataset_name'),
+        )
+        .select_from(Assembly)
+        .join(Assembly.source_assn)
+        .join(asm_set, AssemblySource.source)
+        .join(Assembly.dataset_assn)
+        .join(AssemblyDataset.dataset)
+        .filter(asm_set.component_type_id == 'set')
+        .distinct()
+        .cte('set_datasets')
+    )
+
+    dataset_files = (
+        select(
+            set_datasets.c.assembly_id,
+            set_datasets.c.dataset_id,
+            set_datasets.c.dataset_name,
+            func.jsonb_agg(
+                aggregate_order_by(
+                    func.jsonb_build_object(
+                        'data_id',
+                        Data.data_id,
+                        'run_accession',
+                        Data.accession_id,
+                        'file_type',
+                        File.file_type,
+                        'remote_path',
+                        File.remote_path,
+                        'insdc_path',
+                        File.insdc_path,
+                    ),
+                    Data.data_id,
+                )
+            ).label('data_files'),
+        )
+        .select_from(set_datasets)
+        .join(DatasetElement, set_datasets.c.dataset_id == DatasetElement.dataset_id)
+        .join(DatasetElement.data)
+        .join(Data.files)
+        .group_by(
+            set_datasets.c.assembly_id,
+            set_datasets.c.dataset_id,
+            set_datasets.c.dataset_name,
+        )
+        .cte('dataset_files')
+    )
+
+    set_dataset_files = (
+        select(
+            dataset_files.c.assembly_id,
+            func.jsonb_agg(
+                aggregate_order_by(
+                    func.jsonb_build_object(
+                        'dataset_name',
+                        dataset_files.c.dataset_name,
+                        'dataset_id',
+                        dataset_files.c.dataset_id,
+                        'data_files',
+                        dataset_files.c.data_files,
+                    ),
+                    dataset_files.c.dataset_name,
+                ),
+            ).label('datasets'),
+        )
+        .select_from(dataset_files)
+        .group_by(dataset_files.c.assembly_id)
+        .cte('set_dataset_files')
+    )
+
     return (
         select(
             asm_set.name.label('set_name'),
@@ -489,16 +563,20 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
                     Assembly.name,
                 ),
             ).label('components'),
+            set_dataset_files.c.datasets,
         )
-        .select_from(Assembly)
+        .select_from(asm_set)
         .outerjoin(Metadata, Metadata.name == 'location.root')
+        .outerjoin(asm_set.component_assn)
+        .outerjoin(Assembly, AssemblySource.component)
+        .outerjoin(Assembly.category)
         .outerjoin(Assembly.status)
         .outerjoin(AssemblyStatus.status_type)
-        .outerjoin(Assembly.specimen)
+        .outerjoin(asm_set.specimen)
         .outerjoin(Specimen.location)
-        .outerjoin(Assembly.category)
-        .outerjoin(Assembly.source_assn)
-        .outerjoin(asm_set, AssemblySource.source)
+        .outerjoin(
+            set_dataset_files, asm_set.assembly_id == set_dataset_files.c.assembly_id
+        )
         .filter(Assembly.component_type_id != 'set')
         .filter(set_filter)
         .group_by(
@@ -507,6 +585,7 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
             Specimen.species_id,
             asm_set.name,
             asm_set.is_reference,
+            set_dataset_files.c.datasets,
         )
         .order_by(Specimen.specimen_id, asm_set.name)
     )
