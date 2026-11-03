@@ -34,7 +34,9 @@ from tolqc.schema.sample_data_models import (
     Library,
     LibraryType,
     Location,
+    Platform,
     Project,
+    Run,
     Sample,
     Species,
     Specimen,
@@ -446,6 +448,12 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
                         File.remote_path,
                         'insdc_path',
                         File.insdc_path,
+                        'pipeline',
+                        Library.library_type_id,
+                        'data_type',
+                        LibraryType.reporting_category,
+                        'platform',
+                        Platform.name,
                     ),
                     Data.data_id,
                 )
@@ -455,6 +463,10 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
         .join(DatasetElement, set_datasets.c.dataset_id == DatasetElement.dataset_id)
         .join(DatasetElement.data)
         .join(Data.files)
+        .outerjoin(Data.library)
+        .outerjoin(Library.library_type)
+        .outerjoin(Data.run)
+        .outerjoin(Run.platform)
         .group_by(
             set_datasets.c.assembly_id,
             set_datasets.c.dataset_id,
@@ -491,6 +503,10 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
             asm_set.assembly_id.label('set_id'),
             Specimen.specimen_id.label('specimen'),
             Specimen.species_id.label('species'),
+            Species.taxon_id,
+            Species.tolid_prefix,
+            Species.data_accession_id.label('data_bioproject'),
+            Species.umbrella_accession_id.label('umbrella_bioproject'),
             asm_set.is_reference.label('set_is_reference'),
             func.json_agg(
                 aggregate_order_by(
@@ -574,15 +590,18 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
         .outerjoin(AssemblyStatus.status_type)
         .outerjoin(asm_set.specimen)
         .outerjoin(Specimen.location)
-        .outerjoin(
-            set_dataset_files, asm_set.assembly_id == set_dataset_files.c.assembly_id
-        )
+        .outerjoin(Specimen.species)
+        .outerjoin(set_dataset_files, asm_set.assembly_id == set_dataset_files.c.assembly_id)
         .filter(Assembly.component_type_id != 'set')
         .filter(set_filter)
         .group_by(
             asm_set.assembly_id,
             Specimen.specimen_id,
             Specimen.species_id,
+            Species.taxon_id,
+            Species.tolid_prefix,
+            Species.data_accession_id,
+            Species.umbrella_accession_id,
             asm_set.name,
             asm_set.is_reference,
             set_dataset_files.c.datasets,
