@@ -8,7 +8,11 @@ from sqlalchemy import Select, and_, case, func, or_, select
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 from sqlalchemy.orm import InstrumentedAttribute, aliased
 
-from tolqc.report.column_funcs import array_distinct_non_null
+from tolqc.report.column_funcs import (
+    array_distinct_non_null,
+    build_json_object,
+    build_path_if_elements_not_null,
+)
 from tolqc.report.request_args import NoArg, RequestArgs
 from tolqc.schema import User
 from tolqc.schema.accession_models import Accession, BioprojectLink
@@ -248,28 +252,21 @@ def accession_struct(
     link_status: InstrumentedAttribute | None = None,
     col_list: list | None = None,
 ):
-    struct = [
-        'accession',
-        accn.accession_id,
-        'name',
+    accn_cols = [
+        ('accession', accn.accession_id),
         accn.name,
-        'title',
         accn.title,
-        'type',
-        accn.accession_type_id,
+        ('type', accn.accession_type_id),
     ]
     if link_status:
-        struct.extend(
-            [
-                'link_status',
-                link_status,
-            ]
-        )
+        accn_cols.append(link_status)
     if col_list:
-        col_list.extend([struct[i] for i in range(1, len(struct), 2)])
+        col_list.extend(x[1] if isinstance(x, tuple) else x for x in accn_cols)
     return case(
-        (accn.accession_id == None, None),  # noqa: E711
-        else_=func.jsonb_build_object(*struct),
+        (
+            accn.accession_id.isnot(None),
+            build_json_object(*accn_cols),
+        ),
     )
 
 
@@ -278,17 +275,15 @@ def ena_assembly_data_report_query(*_) -> Select:
         select(
             AssemblyDataset.dataset_id,
             func.json_agg(
-                func.json_build_object(
-                    'assembly_id',
+                build_json_object(
                     Assembly.assembly_id,
-                    'genome_accession_id',
                     Assembly.genome_accession_id,
                 )
             ).label('assemblies'),
         )
         .select_from(AssemblyDataset)
         .join(AssemblyDataset.assembly)
-        .filter(Assembly.genome_accession_id != None)  # noqa: E711
+        .filter(Assembly.genome_accession_id.isnot(None))
         .group_by(AssemblyDataset.dataset_id)
         .cte('dataset_assemblies')
     )
@@ -321,10 +316,10 @@ def ena_assembly_data_report_query(*_) -> Select:
             or_(
                 Data.qc_id == 'pass',
                 and_(
-                    Data.qc_id == None,  # noqa: E711
+                    Data.qc_id.is_(None),
                     or_(
                         Data.lims_qc_id == 'pass',
-                        Data.lims_qc_id == None,  # noqa: E711
+                        Data.lims_qc_id.is_(None),
                     ),
                 ),
             )
@@ -381,7 +376,7 @@ def ena_assembly_report_query(*_) -> Select:
         )
         .select_from(Specimen)
         .outerjoin(gca_acc, Specimen.specimen_id == gca_acc.c.specimen_id)
-        .where(Specimen.accession_id != None)  # noqa: E711
+        .where(Specimen.accession_id.isnot(None))
         .order_by(Specimen.accession_id)
     )
 
@@ -404,10 +399,10 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
     if asm_set_name is NoArg:
         set_filter = or_(
             asm_set.component_type_id == 'set',
-            asm_set.component_type_id == None,  # noqa: E711
+            asm_set.component_type_id.is_(None),
         )
     elif asm_set_name is None:
-        set_filter = asm_set.name == None  # noqa: E711
+        set_filter = asm_set.name.is_(None)
     else:
         set_filter = and_(
             asm_set.component_type_id == 'set',
@@ -438,23 +433,15 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
             set_data_ids.c.assembly_id,
             func.jsonb_agg(
                 aggregate_order_by(
-                    func.jsonb_build_object(
-                        'data_id',
+                    build_json_object(
                         Data.data_id,
-                        'run_accession',
-                        Data.accession_id,
-                        'file_type',
+                        ('run_accession', Data.accession_id),
                         File.file_type,
-                        'remote_path',
                         File.remote_path,
-                        'insdc_path',
                         File.insdc_path,
-                        'pipeline',
-                        Library.library_type_id,
-                        'data_type',
-                        LibraryType.reporting_category,
-                        'platform',
-                        Platform.name,
+                        ('pipeline', Library.library_type_id),
+                        ('data_type', LibraryType.reporting_category),
+                        ('platform', Platform.name),
                     ),
                     Library.library_type_id,
                     Data.data_id,
@@ -468,6 +455,8 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
         .outerjoin(Library.library_type)
         .outerjoin(Data.run)
         .outerjoin(Run.platform)
+        .filter(File.remote_path.isnot(None))
+        .filter(File.file_type.notlike('%_DIR'))
         .group_by(set_data_ids.c.assembly_id)
         .cte('asm_set_data_files')
     )
@@ -485,70 +474,38 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
             asm_set.is_reference.label('set_is_reference'),
             func.json_agg(
                 aggregate_order_by(
-                    func.json_build_object(
-                        'name',
+                    build_json_object(
                         Assembly.name,
-                        'assembly_id',
                         Assembly.assembly_id,
-                        'status',
-                        AssemblyStatus.status_type_id,
-                        'status_time',
+                        ('status', AssemblyStatus.status_type_id),
                         AssemblyStatus.status_time,
-                        'genome_accession',
-                        Assembly.genome_accession_id,
-                        'assembly_bioproject',
-                        Assembly.bioproject_accession_id,
-                        'component_type',
-                        Assembly.component_type_id,
-                        'category',
-                        Assembly.category_id,
-                        'level',
+                        ('genome_accession', Assembly.genome_accession_id),
+                        ('assembly_bioproject', Assembly.bioproject_accession_id),
+                        ('component_type', Assembly.component_type_id),
+                        ('category', Assembly.category_id),
                         Assembly.level,
-                        'is_principal',
                         Assembly.is_principal,
-                        'is_reference',
                         Assembly.is_reference,
-                        'bases',
                         Assembly.bases,
-                        'contigs',
                         Assembly.contigs,
-                        'contig_length',
                         Assembly.contig_length,
-                        'contig_length_mean',
                         Assembly.contig_length_mean,
-                        'contig_n50',
                         Assembly.contig_n50,
-                        'contig_aun',
                         Assembly.contig_aun,
-                        'scaffolds',
                         Assembly.scaffolds,
-                        'scaffold_length',
                         Assembly.scaffold_length,
-                        'scaffold_length_mean',
                         Assembly.scaffold_length_mean,
-                        'scaffold_n50',
                         Assembly.scaffold_n50,
-                        'scaffold_aun',
                         Assembly.scaffold_aun,
-                        'gaps',
                         Assembly.gaps,
-                        'path',
-                        case(
-                            (
-                                and_(
-                                    Metadata.string_value != None,  # noqa: E711
-                                    Location.path != None,  # noqa: E711
-                                    AssemblyCategory.hierarchy_name != None,  # noqa: E711
-                                    Assembly.file_path != None,  # noqa: E711
-                                ),
-                                func.concat_ws(
-                                    '/',
-                                    Metadata.string_value,
-                                    Location.path,
-                                    AssemblyCategory.hierarchy_name,
-                                    Assembly.file_path,
-                                ),
-                            )
+                        (
+                            'path',
+                            build_path_if_elements_not_null(
+                                Metadata.string_value,
+                                Location.path,
+                                AssemblyCategory.hierarchy_name,
+                                Assembly.file_path,
+                            ),
                         ),
                     ),
                     Assembly.name,
@@ -667,14 +624,10 @@ def specimen_status_report_query(req_args: RequestArgs) -> Select:
         select(
             species_data_type.c.species_id,
             func.jsonb_agg(
-                func.jsonb_build_object(
-                    'pipeline',
+                build_json_object(
                     species_data_type.c.pipeline,
-                    'specimen_id',
                     species_data_type.c.specimen_id,
-                    'reads',
                     species_data_type.c.reads,
-                    'bases',
                     species_data_type.c.bases,
                 )
             ).label('species_data'),
@@ -687,14 +640,10 @@ def specimen_status_report_query(req_args: RequestArgs) -> Select:
         select(
             wospi_data_type.c.specimen_id,
             func.jsonb_agg(
-                func.jsonb_build_object(
-                    'pipeline',
+                build_json_object(
                     wospi_data_type.c.pipeline,
-                    'specimen_id',
                     wospi_data_type.c.specimen_id,
-                    'reads',
                     wospi_data_type.c.reads,
-                    'bases',
                     wospi_data_type.c.bases,
                 )
             ).label('specimen_data'),
