@@ -317,6 +317,7 @@ def test_specimen_assembly_report(client, api_path):
     )
     assert [s['set_name'] for s in asm_sets] == ['bRalAqu1.1', 'lpJunEffu1.1']
     assert [len(s['components']) for s in asm_sets] == [2, 2]
+    assert [len(s['data_files']) for s in asm_sets] == [2, 6]
 
 
 @pytest.fixture
