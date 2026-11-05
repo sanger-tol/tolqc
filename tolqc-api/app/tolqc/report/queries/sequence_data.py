@@ -189,7 +189,9 @@ def pacbio_data_report_query(req_args: RequestArgs) -> Select:
         Data.read_length_n50,
         Data.read_length_longest,
         Data.read_length_shortest,
-        percent_col('reads_duplicated_pct', Data.reads_duplicated, Data.reads),
+        percent_col(
+            'reads_duplicated_pct', Data.reads_duplicated, (Data.reads + Data.reads_duplicated)
+        ),
         percent_col('reads_discarded_pct', Data.reads_discarded, Data.reads),
         percent_col('reads_trimmed_pct', Data.reads_trimmed, Data.reads),
         percent_col('bases_removed_pct', Data.bases_removed, Data.bases),
