@@ -17,6 +17,10 @@ from sqlalchemy import (
 from sqlalchemy.orm import InstrumentedAttribute
 
 
+# SQL column type arguments
+ColumnArg: TypeAlias = InstrumentedAttribute[Any] | ColumnElement[Any]  # noqa: UP040
+
+
 def array_distinct_non_null(label_txt, column):
     """
     Builds SQL for returning an array aggregate column of non-null distinct
@@ -43,19 +47,23 @@ def percent_col(label_txt, nominator, divisor, decimal_places=4):
     """
     Builds SQL for returning a column in %
     """
-    return func.round(100 * nominator / divisor, decimal_places).cast(Float).label(label_txt)
+    return (
+        func.round(100 * nominator / divisor, decimal_places)
+        .cast(Float)
+        .label(label_txt)
+    )
 
 
-def star_if_null_path(*path: InstrumentedAttribute):
+def star_if_null_path(*path: ColumnArg | str) -> Function[Any]:
     """
     Builds SQL for returning a file path, replacing any null element
     with "*".
     """
-    cols = [func.coalesce(x, '*') for x in path]
+    cols = [x if isinstance(x, str) else func.coalesce(x, '*') for x in path]
     return func.concat_ws('/', *cols)
 
 
-def build_path_if_elements_not_null(*path: InstrumentedAttribute) -> Case[Any]:
+def build_path_if_elements_not_null(*path: ColumnArg) -> Case[Any]:
     """
     Builds SQL for returning a file path when each of the elements in `path`
     is not null.
@@ -69,13 +77,7 @@ def build_path_if_elements_not_null(*path: InstrumentedAttribute) -> Case[Any]:
     )
 
 
-# Acceptable types for the list of columns provided to `build_json_object`
-BuildJsonColumn: TypeAlias = InstrumentedAttribute[Any] | ColumnElement[Any]  # noqa: UP040
-
-
-def build_json_object(
-    *col_list: BuildJsonColumn | tuple[str, BuildJsonColumn],
-) -> Function[Any]:
+def build_json_object(*col_list: ColumnArg | tuple[str, ColumnArg]) -> Function[Any]:
     """
     A more compact way to specify JSON object keys and values.
     """
