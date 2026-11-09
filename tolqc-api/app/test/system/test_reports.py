@@ -306,6 +306,20 @@ def test_ena_assembly_data_report(client, api_path):
     assert len(has_assemblies) > 0
 
 
+def test_specimen_assembly_report(client, api_path):
+    asm_sets = report_response_json(
+        client,
+        api_path,
+        'specimen-assembly',
+        {
+            'format': 'NDJSON',
+        },
+    )
+    assert [s['set_name'] for s in asm_sets] == ['bRalAqu1.1', 'lpJunEffu1.1']
+    assert [len(s['components']) for s in asm_sets] == [2, 2]
+    assert [len(s['data_files']) for s in asm_sets] == [2, 6]
+
+
 @pytest.fixture
 def max_bases(client, api_path):
     json_lines = report_response_json(

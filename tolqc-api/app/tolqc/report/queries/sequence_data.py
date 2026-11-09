@@ -87,7 +87,7 @@ def pipeline_data_report_query(req_args: RequestArgs) -> Select:
         case(
             (
                 # Include relative_path if set
-                File.relative_path != None,  # noqa: E711
+                File.relative_path.isnot(None),
                 func.concat_ws(
                     '/',
                     func.coalesce(LibraryType.hierarchy_name, '*'),
@@ -189,7 +189,9 @@ def pacbio_data_report_query(req_args: RequestArgs) -> Select:
         Data.read_length_n50,
         Data.read_length_longest,
         Data.read_length_shortest,
-        percent_col('reads_duplicated_pct', Data.reads_duplicated, Data.reads),
+        percent_col(
+            'reads_duplicated_pct', Data.reads_duplicated, (Data.reads + Data.reads_duplicated)
+        ),
         percent_col('reads_discarded_pct', Data.reads_discarded, Data.reads),
         percent_col('reads_trimmed_pct', Data.reads_trimmed, Data.reads),
         percent_col('bases_removed_pct', Data.bases_removed, Data.bases),
@@ -287,13 +289,13 @@ def mlwh_data_report_query(*_) -> Select:
         .outerjoin(File)
         .outerjoin(Library)
         .outerjoin(PacbioRunMetrics)
-        .where(Data.study_id != None)  # noqa: E711
+        .where(Data.study_id.isnot(None))
         .where(Platform.name.in_(('Illumina', 'PacBio')))
         .where(
             or_(
                 # Ignore file types other than BAM and CRAM, which are
                 # (currently) the only ones returned from querying the MLWH.
-                File.file_type == None,  # noqa: E711
+                File.file_type.is_(None),
                 File.file_type.in_(['BAM', 'CRAM']),
             )
         )

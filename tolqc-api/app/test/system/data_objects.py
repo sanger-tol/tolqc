@@ -12,8 +12,11 @@ from tolqc.schema.accession_models import (
 )
 from tolqc.schema.assembly_models import (
     Assembly,
+    AssemblyCategory,
+    AssemblyComponentType,
     AssemblyDataset,
     AssemblyLevelDict,
+    AssemblySource,
     AssemblyStatus,
     AssemblyStatusType,
     Dataset,
@@ -31,6 +34,9 @@ from tolqc.schema.sample_data_models import (
     File,
     FileTypeDict,
     Library,
+    LibrarySelectionDict,
+    LibrarySourceDict,
+    LibraryStrategyDict,
     LibraryType,
     Location,
     PacbioRunMetrics,
@@ -50,7 +56,7 @@ from tolqc.schema.system_models import Metadata
 
 def test_data(token: str):
     return [
-        User(id=100, name='tester', email='tester@sanger.ac.uk'),
+        User(id=100, email='tester@sanger.ac.uk', name='tester'),
         Token(token=token, user_id=100, id=200),
         Role(id=300, name='editor'),
         RoleBinding(user_id=100, role_id=300),
@@ -152,6 +158,87 @@ def test_data(token: str):
             regexp='^PRJ[A-Z]{2}\\d+$',
             url='https://www.ebi.ac.uk/ena/browser/view/{}',  # noqa: P103
         ),
+        AssemblyCategory(
+            category_id='draft',
+            hierarchy_name='assembly/draft',
+            description='Final assembly from the automated pipeline',
+        ),
+        AssemblyCategory(
+            category_id='curated',
+            hierarchy_name='assembly/curated',
+            description='Curated assemblies',
+        ),
+        AssemblyCategory(
+            category_id='release',
+            hierarchy_name='assembly/release',
+            description='Finished assemblies released to INSDC datbases',
+        ),
+        AssemblyCategory(
+            category_id='working',
+            hierarchy_name='working',
+            description='Automated assembly or manual curation in progress',
+        ),
+        AssemblyComponentType(
+            component_type_id='set', description='A set of haplotype assemblies for a specimen'
+        ),
+        AssemblyComponentType(
+            component_type_id='primary',
+            description=(
+                'The best, representative haplotype assembly for a specimen, including its'
+                ' organelle genomes'
+            ),
+        ),
+        AssemblyComponentType(
+            component_type_id='alternate',
+            description=(
+                'The alternate haplotype assembly for a specimen, usually less complete than the'
+                ' primary'
+            ),
+        ),
+        AssemblyComponentType(
+            component_type_id='mitochondrion', description='A mitochondrial genome'
+        ),
+        AssemblyComponentType(
+            component_type_id='chloroplast', description='A chloroplast genome'
+        ),
+        AssemblyComponentType(
+            component_type_id='polyploid', description='A haplotype from a polyploid genome'
+        ),
+        AssemblyComponentType(
+            component_type_id='haploid', description='Assembly of a haploid genome'
+        ),
+        AssemblyComponentType(
+            component_type_id='maternal',
+            description='The maternal haplotype assembled from a genome trio',
+        ),
+        AssemblyComponentType(
+            component_type_id='paternal',
+            description='The paternal haplotype assembled from a genome trio',
+        ),
+        AssemblyComponentType(component_type_id='hap2', description='Haplotype 2'),
+        AssemblyComponentType(component_type_id='hap3', description='Haplotype 3'),
+        AssemblyComponentType(component_type_id='hap4', description='Haplotype 4'),
+        AssemblyComponentType(component_type_id='hap5', description='Haplotype 5'),
+        AssemblyComponentType(component_type_id='hap6', description='Haplotype 6'),
+        AssemblyComponentType(component_type_id='hap7', description='Haplotype 7'),
+        AssemblyComponentType(component_type_id='hap8', description='Haplotype 8'),
+        AssemblyComponentType(component_type_id='hap9', description='Haplotype 9'),
+        AssemblyComponentType(component_type_id='hap10', description='Haplotype 10'),
+        AssemblyComponentType(component_type_id='hap11', description='Haplotype 11'),
+        AssemblyComponentType(component_type_id='hap12', description='Haplotype 12'),
+        AssemblyComponentType(
+            component_type_id='hap1',
+            description=(
+                'Haplotype 1. The best, representative haplotype assembly for a specimen'
+                ', including its organelle genomes'
+            ),
+        ),
+        AssemblyComponentType(
+            component_type_id='collapsed',
+            description=(
+                'Two or more haplotypes collapsed into a single set of chromosomes or scaffolds'
+            ),
+        ),
         AssemblyLevelDict(
             level='contig', description='A list of contiguous nucleotide sequences'
         ),
@@ -203,6 +290,16 @@ def test_data(token: str):
             status_type_id='Submitted',
             description='Assembly has been passed to the Sanger data release team',
             assign_order=60,
+        ),
+        AssemblyStatusType(
+            status_type_id='Downloaded',
+            description='Assembly has been downloaded onto the filesystem',
+            assign_order=80,
+        ),
+        AssemblyStatusType(
+            status_type_id='ENA Suppressed',
+            description='Previously public assembly at ENA is now withdrawn',
+            assign_order=80,
         ),
         CategoryDict(category='transcriptomic_data'),
         CategoryDict(category='genomic_data'),
@@ -417,93 +514,39 @@ def test_data(token: str):
                 ]
             },
         ),
-        LibraryType(
-            library_type_id='Chromium genome',
-            hierarchy_name='10x',
-            default_category='genomic_data',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='Haplotagging',
-            hierarchy_name='htag',
-            default_category='genomic_data',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='HiSeqX PCR free',
-            hierarchy_name='illumina',
-            default_category='genomic_data',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='PacBio - IsoSeq',
-            hierarchy_name='pacbio',
-            default_category='transcriptomic_data',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='Standard',
-            hierarchy_name='illumina',
-            default_category='genomic_data',
-            is_pcr=False,
-        ),
-        LibraryType(library_type_id='Custom', is_pcr=False),
-        LibraryType(library_type_id='qPCR only', is_pcr=False),
-        LibraryType(library_type_id='Pre-quality controlled', is_pcr=False),
-        LibraryType(library_type_id='Manual Standard WGS (Plate)', is_pcr=False),
-        LibraryType(library_type_id='Nextera dual index pre quality controlled', is_pcr=False),
-        LibraryType(
-            library_type_id='RNA PolyA',
-            hierarchy_name='rna-seq',
-            default_category='transcriptomic_data',
-            reporting_category='rnaseq',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='RNA-seq dUTP eukaryotic',
-            hierarchy_name='rna-seq',
-            default_category='transcriptomic_data',
-            reporting_category='rnaseq',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='RNA-seq dUTP prokaryotic',
-            hierarchy_name='rna-seq',
-            default_category='transcriptomic_data',
-            reporting_category='rnaseq',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='Small RNA (miRNA)',
-            hierarchy_name='rna-seq',
-            default_category='transcriptomic_data',
-            reporting_category='rnaseq',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='PacBio - HiFi',
-            hierarchy_name='pacbio',
-            default_category='genomic_data',
-            reporting_category='pacbio',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='PacBio - HiFi (Microbial)',
-            hierarchy_name='pacbio',
-            default_category='genomic_data',
-            reporting_category='pacbio',
-            is_pcr=False,
-        ),
+        LibrarySelectionDict(selection='PCR'),
+        LibrarySelectionDict(selection='PolyA'),
+        LibrarySelectionDict(selection='RANDOM'),
+        LibrarySelectionDict(selection='RANDOM PCR'),
+        LibrarySelectionDict(selection='Restriction Digest'),
+        LibrarySelectionDict(selection='cDNA'),
+        LibrarySourceDict(source='GENOMIC'),
+        LibrarySourceDict(source='TRANSCRIPTOMIC'),
+        LibraryStrategyDict(strategy='AMPLICON'),
+        LibraryStrategyDict(strategy='ATAC-seq'),
+        LibraryStrategyDict(strategy='Hi-C'),
+        LibraryStrategyDict(strategy='RNA-Seq'),
+        LibraryStrategyDict(strategy='WGS'),
+        LibraryStrategyDict(strategy='FL-cDNA'),
         LibraryType(
             library_type_id='Hi-C',
             hierarchy_name='hic',
             default_category='genomic_data',
             reporting_category='hic',
             is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
         ),
         LibraryType(
-            library_type_id='ATAC-seq',
-            hierarchy_name='atac-seq',
+            library_type_id='Haplotagging',
+            hierarchy_name='htag',
             default_category='genomic_data',
             is_pcr=False,
         ),
@@ -516,16 +559,16 @@ def test_data(token: str):
             enzymes='HinfI,DpnII',
             cut_sites='^GATC,G^ANTC',
             is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='Hi-C - Arima v2',
-            hierarchy_name='hic-arima2',
-            default_category='genomic_data',
-            reporting_category='hic',
-            kit='Arima v2',
-            enzymes='HinfI,DpnII,DdeI,MseI',
-            cut_sites='^GATC,G^ANTC,C^TNAG,T^TAA',
-            is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+            description_template=(
+                'Illumina sequencing of sample accession {biosample_accession} for study'
+                ' accession {bioproject_accession}.  This is part of an Illumina multiplexed'
+                ' sequencing run ({run}).  This submission includes reads tagged with the'
+                ' sequence {tag_sequence}. Library was made using a {library_type} kit with'
+                ' restriction enzyme motif {cut_sites}.'
+            ),
         ),
         LibraryType(
             library_type_id='Hi-C - Dovetail',
@@ -536,7 +579,54 @@ def test_data(token: str):
             enzymes='DpnII',
             cut_sites='^GATC',
             is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.  Library was made using a'
+                ' {library_type} kit with restriction enzyme motif {cut_sites}.'
+            ),
         ),
+        LibraryType(library_type_id='Custom', is_pcr=False),
+        LibraryType(
+            library_type_id='Hi-C - OmniC',
+            hierarchy_name='hic-omnic',
+            default_category='genomic_data',
+            reporting_category='hic',
+            kit='Dovetail - Omni-C',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+            description_template=(
+                'Illumina sequencing of sample accession {biosample_accession} for study'
+                ' accession {bioproject_accession}.  This is part of an Illumina multiplexed'
+                ' sequencing run ({run}).  This submission includes reads tagged with the'
+                ' sequence {tag_sequence}.  Library was made using a {library_type} kit with'
+                ' restriction enzyme motif {cut_sites}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Hi-C - Phase',
+            hierarchy_name='hic-phase',
+            default_category='genomic_data',
+            reporting_category='hic',
+            kit='Phase',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(library_type_id='Manual Standard WGS (Plate)', is_pcr=False),
         LibraryType(
             library_type_id='Hi-C - Qiagen',
             hierarchy_name='hic-qiagen',
@@ -546,6 +636,100 @@ def test_data(token: str):
             enzymes='DpnII',
             cut_sites='^GATC',
             is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+            description_template=(
+                'Illumina sequencing of sample accession {biosample_accession} for study'
+                ' accession {bioproject_accession}.  This is part of an Illumina multiplexed'
+                ' sequencing run ({run}).  This submission includes reads tagged with the'
+                ' sequence {tag_sequence}. Library was made using a {library_type} kit with'
+                ' restriction enzyme motif {cut_sites}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='HiSeqX PCR free',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Nextera dual index pre quality controlled',
+            is_pcr=False,
+            source='TRANSCRIPTOMIC',
+            selection='PolyA',
+            strategy='RNA-Seq',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='PacBio - CLR',
+            hierarchy_name='pacbio',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'PacBio sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='PacBio - IsoSeq',
+            hierarchy_name='pacbio',
+            default_category='transcriptomic_data',
+            is_pcr=False,
+            source='TRANSCRIPTOMIC',
+            selection='cDNA',
+            strategy='FL-cDNA',
+            description_template=(
+                'PacBio sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='RNA-seq dUTP eukaryotic',
+            hierarchy_name='rna-seq',
+            default_category='transcriptomic_data',
+            reporting_category='rnaseq',
+            is_pcr=False,
+            source='TRANSCRIPTOMIC',
+            selection='PolyA',
+            strategy='RNA-Seq',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Standard',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
         ),
         LibraryType(
             library_type_id='Hi-C - DNAzoo (Csp6I,MseI)',
@@ -592,46 +776,10 @@ def test_data(token: str):
             is_pcr=False,
         ),
         LibraryType(
-            library_type_id='Hi-C - Phase',
-            hierarchy_name='hic-phase',
-            default_category='genomic_data',
-            reporting_category='hic',
-            kit='Phase',
-            is_pcr=False,
-        ),
-        LibraryType(
             library_type_id='Hi-C - Homebrew',
             hierarchy_name='hic-homebrew',
             default_category='genomic_data',
             reporting_category='hic',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='No PCR (Plate)',
-            hierarchy_name='illumina',
-            default_category='genomic_data',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='Long range',
-            hierarchy_name='illumina',
-            default_category='genomic_data',
-            is_pcr=False,
-        ),
-        LibraryType(library_type_id='RNA Ribo', hierarchy_name='rna-seq', is_pcr=False),
-        LibraryType(library_type_id='PacBio - CLR', hierarchy_name='pacbio', is_pcr=False),
-        LibraryType(
-            library_type_id='Hi-C - OmniC',
-            hierarchy_name='hic-omnic',
-            default_category='genomic_data',
-            reporting_category='hic',
-            kit='Dovetail - Omni-C',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='Haplotagging (202103)',
-            hierarchy_name='htag-202103',
-            default_category='genomic_data',
             is_pcr=False,
         ),
         LibraryType(
@@ -647,18 +795,65 @@ def test_data(token: str):
             is_pcr=False,
         ),
         LibraryType(
-            library_type_id='Haplotagging (202203)',
-            hierarchy_name='htag-202203',
-            default_category='genomic_data',
-            is_pcr=False,
-        ),
-        LibraryType(
             library_type_id='Haplotagging (Sanger libraries)',
             hierarchy_name='htag-sanger',
             default_category='genomic_data',
             is_pcr=False,
         ),
         LibraryType(library_type_id='Rapid', is_pcr=False),
+        LibraryType(
+            library_type_id='Haplotagging (202203)',
+            hierarchy_name='htag-202203',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+        ),
+        LibraryType(
+            library_type_id='ATAC-seq',
+            hierarchy_name='atac-seq',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='PCR',
+            strategy='ATAC-seq',
+            description_template=(
+                'Illumina sequencing of sample accession {biosample_accession} for study'
+                ' accession {bioproject_accession}.  This submission includes reads tagged with'
+                ' the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Chromium genome',
+            hierarchy_name='10x',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Haplotagging (202103)',
+            hierarchy_name='htag-202103',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
         LibraryType(
             library_type_id='Haplotagging (Marek libraries)',
             hierarchy_name='htag-marek',
@@ -670,12 +865,6 @@ def test_data(token: str):
             hierarchy_name='chicago-dovetail',
             default_category='genomic_data',
             kit='Dovetail',
-            is_pcr=False,
-        ),
-        LibraryType(
-            library_type_id='Haplotagging (202108)',
-            hierarchy_name='htag-202108',
-            default_category='genomic_data',
             is_pcr=False,
         ),
         LibraryType(
@@ -692,19 +881,29 @@ def test_data(token: str):
             reporting_category='ont',
             is_pcr=False,
         ),
-        LibraryType(
-            library_type_id='ONT_PromethIon',
-            hierarchy_name='ont',
-            default_category='genomic_data',
-            reporting_category='ont',
-            is_pcr=False,
-        ),
+        LibraryType(library_type_id='LCMB', is_pcr=False),
         LibraryType(
             library_type_id='ONT_PromethIon_mplx',
             hierarchy_name='ont',
             default_category='genomic_data',
             reporting_category='ont',
             is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'ONT sequencing of sample accession {biosample_accession} for study accession'
+                ' {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Haplotagging (202108)',
+            hierarchy_name='htag-202108',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
         ),
         LibraryType(
             library_type_id='ONT_Ultralong',
@@ -712,28 +911,97 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='ont',
             is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'ONT sequencing of sample accession {biosample_accession} for study accession'
+                ' {bioproject_accession}.'
+            ),
         ),
         LibraryType(
-            library_type_id='PacBio - HiFi (Amplicon)',
+            library_type_id='PacBio - CiFi (Arima)',
+            hierarchy_name='pacbio-cifi-arima',
+            default_category='genomic_data',
+            reporting_category='cifi',
+            kit='Arima v2',
+            enzymes='HinfI,DpnII,DdeI,MseI',
+            cut_sites='^GATC,G^ANTC,C^TNAG,T^TAA',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+        ),
+        LibraryType(
+            library_type_id='PacBio - CiFi (Dennis et al. NlaIII)',
+            hierarchy_name='pacbio-cifi-dennis',
+            default_category='genomic_data',
+            reporting_category='cifi',
+            kit='Dennis et al.',
+            enzymes='NlaIII',
+            cut_sites='CATG^',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+        ),
+        LibraryType(
+            library_type_id='Long range',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='No PCR (Plate)',
+            hierarchy_name='illumina',
+            default_category='genomic_data',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='ONT_PromethIon',
+            hierarchy_name='ont',
+            default_category='genomic_data',
+            reporting_category='ont',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'ONT sequencing of sample accession {biosample_accession} for study accession'
+                ' {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi',
             hierarchy_name='pacbio',
             default_category='genomic_data',
             reporting_category='pacbio',
             is_pcr=False,
-        ),
-        LibraryType(library_type_id='LCMB', is_pcr=False),
-        LibraryType(
-            library_type_id='PacBio - HiFi (ULI)',
-            hierarchy_name='pacbio',
-            default_category='genomic_data',
-            reporting_category='pacbio',
-            is_pcr=True,
-        ),
-        LibraryType(
-            library_type_id='PacBio - HiFi (PiMmS)',
-            hierarchy_name='pacbio',
-            default_category='genomic_data',
-            reporting_category='pacbio',
-            is_pcr=True,
+            source='GENOMIC',
+            selection='RANDOM',
+            strategy='WGS',
+            description_template=(
+                'PacBio sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.'
+            ),
         ),
         LibraryType(
             library_type_id='PacBio - HiFi (Ampli-Fi)',
@@ -741,6 +1009,177 @@ def test_data(token: str):
             default_category='genomic_data',
             reporting_category='pacbio',
             is_pcr=True,
+            source='GENOMIC',
+            selection='RANDOM PCR',
+            strategy='WGS',
+            description_template=(
+                'PacBio sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (Amplicon)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+            is_pcr=True,
+            source='GENOMIC',
+            selection='RANDOM PCR',
+            strategy='AMPLICON',
+            description_template=(
+                'PacBio sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (Microbial)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='RANDOM PCR',
+            strategy='WGS',
+            description_template=(
+                'PacBio sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (PiMmS)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+            is_pcr=True,
+            source='GENOMIC',
+            selection='RANDOM PCR',
+            strategy='WGS',
+            description_template=(
+                'PacBio sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='PacBio - HiFi (ULI)',
+            hierarchy_name='pacbio',
+            default_category='genomic_data',
+            reporting_category='pacbio',
+            is_pcr=True,
+            source='GENOMIC',
+            selection='RANDOM PCR',
+            strategy='WGS',
+            description_template=(
+                'PacBio sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Pre-quality controlled',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='RNA PolyA',
+            hierarchy_name='rna-seq',
+            default_category='transcriptomic_data',
+            reporting_category='rnaseq',
+            is_pcr=False,
+            source='TRANSCRIPTOMIC',
+            selection='PolyA',
+            strategy='RNA-Seq',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='RNA Ribo',
+            hierarchy_name='rna-seq',
+            is_pcr=False,
+            source='TRANSCRIPTOMIC',
+            selection='PolyA',
+            strategy='RNA-Seq',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='RNA-seq dUTP prokaryotic',
+            hierarchy_name='rna-seq',
+            default_category='transcriptomic_data',
+            reporting_category='rnaseq',
+            is_pcr=False,
+            source='TRANSCRIPTOMIC',
+            selection='cDNA',
+            strategy='RNA-Seq',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Small RNA (miRNA)',
+            hierarchy_name='rna-seq',
+            default_category='transcriptomic_data',
+            reporting_category='rnaseq',
+            is_pcr=False,
+            source='TRANSCRIPTOMIC',
+            selection='PolyA',
+            strategy='RNA-Seq',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='qPCR only',
+            is_pcr=False,
+            source='TRANSCRIPTOMIC',
+            selection='PolyA',
+            strategy='RNA-Seq',
+            description_template=(
+                'Illumina sequencing of library {library_name}, constructed from sample accession'
+                ' {biosample_accession} for study accession {bioproject_accession}.  This is part'
+                ' of an Illumina multiplexed sequencing run ({run}).  This submission includes'
+                ' reads tagged with the sequence {tag_sequence}.'
+            ),
+        ),
+        LibraryType(
+            library_type_id='Hi-C - Arima v2',
+            hierarchy_name='hic-arima2',
+            default_category='genomic_data',
+            reporting_category='hic',
+            kit='Arima v2',
+            enzymes='HinfI,DpnII,DdeI,MseI',
+            cut_sites='^GATC,G^ANTC,C^TNAG,T^TAA',
+            is_pcr=False,
+            source='GENOMIC',
+            selection='Restriction Digest',
+            strategy='Hi-C',
+            description_template=(
+                'Illumina sequencing of sample accession {biosample_accession} for study'
+                ' accession {bioproject_accession}.  This is part of an Illumina multiplexed'
+                ' sequencing run ({run}).  This submission includes reads tagged with the'
+                ' sequence {tag_sequence}.  Library was made using a {library_type} kit with'
+                ' restriction enzyme motif {cut_sites}.'
+            ),
         ),
         LinkStatusDict(link_status='New', description='BioProject link newly created'),
         LinkStatusDict(
@@ -771,6 +1210,7 @@ def test_data(token: str):
         Platform(id=21, name='BioNano', model='Irys'),
         Platform(id=22, name='ONT', model='gridion'),
         Platform(id=23, name='ONT', model='promethion'),
+        Platform(id=24, name='ONT'),
         QCDict(qc_state='pass'),
         QCDict(qc_state='fail'),
         Sex(sex_id='Male'),
@@ -2614,12 +3054,12 @@ def test_data(token: str):
                                                 name='hic-arima2',
                                                 assembly_assn=[
                                                     AssemblyDataset(
-                                                        id=13839,
+                                                        id=14069,
                                                         assembly_id=7103,
                                                         dataset_id='01K6B331TCWW21W4K60YFKMNRW',
                                                     ),
                                                     AssemblyDataset(
-                                                        id=13842,
+                                                        id=14072,
                                                         assembly_id=7104,
                                                         dataset_id='01K6B331TCWW21W4K60YFKMNRW',
                                                     ),
@@ -2764,12 +3204,12 @@ def test_data(token: str):
                                                 name='10x',
                                                 assembly_assn=[
                                                     AssemblyDataset(
-                                                        id=13838,
+                                                        id=14068,
                                                         assembly_id=7103,
                                                         dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
                                                     ),
                                                     AssemblyDataset(
-                                                        id=13841,
+                                                        id=14071,
                                                         assembly_id=7104,
                                                         dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
                                                     ),
@@ -2902,12 +3342,12 @@ def test_data(token: str):
                                                 name='10x',
                                                 assembly_assn=[
                                                     AssemblyDataset(
-                                                        id=13838,
+                                                        id=14068,
                                                         assembly_id=7103,
                                                         dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
                                                     ),
                                                     AssemblyDataset(
-                                                        id=13841,
+                                                        id=14071,
                                                         assembly_id=7104,
                                                         dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
                                                     ),
@@ -3040,12 +3480,12 @@ def test_data(token: str):
                                                 name='10x',
                                                 assembly_assn=[
                                                     AssemblyDataset(
-                                                        id=13838,
+                                                        id=14068,
                                                         assembly_id=7103,
                                                         dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
                                                     ),
                                                     AssemblyDataset(
-                                                        id=13841,
+                                                        id=14071,
                                                         assembly_id=7104,
                                                         dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
                                                     ),
@@ -3178,12 +3618,12 @@ def test_data(token: str):
                                                 name='10x',
                                                 assembly_assn=[
                                                     AssemblyDataset(
-                                                        id=13838,
+                                                        id=14068,
                                                         assembly_id=7103,
                                                         dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
                                                     ),
                                                     AssemblyDataset(
-                                                        id=13841,
+                                                        id=14071,
                                                         assembly_id=7104,
                                                         dataset_id='01K6BJJ6NW4EXP9XBGYDJZED12',
                                                     ),
@@ -3415,12 +3855,12 @@ def test_data(token: str):
                                                 name='pacbio.ccs',
                                                 assembly_assn=[
                                                     AssemblyDataset(
-                                                        id=13840,
+                                                        id=14070,
                                                         assembly_id=7103,
                                                         dataset_id='01K6AS7B9XT21VZZ2CWMV40V08',
                                                     ),
                                                     AssemblyDataset(
-                                                        id=13843,
+                                                        id=14073,
                                                         assembly_id=7104,
                                                         dataset_id='01K6AS7B9XT21VZZ2CWMV40V08',
                                                     ),
@@ -3724,11 +4164,15 @@ def test_data(token: str):
                     assemblies=[
                         Assembly(
                             assembly_id=7103,
+                            component_type_id='primary',
                             specimen_id='lpJunEffu1',
                             name='lpJunEffu1.1',
                             description='lpJunEffu1.1 assembly for Juncus effusus',
                             level='chromosome',
-                            is_reference=False,
+                            category_id='release',
+                            file_path='GCA_946800655.1/insdc/GCA_946800655.1.fa.gz',
+                            is_principal=True,
+                            is_reference=True,
                             bioproject_accession_id='PRJEB55668',
                             genome_accession_id='GCA_946800655.1',
                             bioproject_accession=Accession(
@@ -3762,17 +4206,32 @@ def test_data(token: str):
                                     assembly_id=7103,
                                     status_type_id='ENA Public',
                                     status_time='2022-10-12T00:00:00+01:00',
+                                ),
+                                AssemblyStatus(
+                                    assembly_status_id=18373,
+                                    assembly_id=7103,
+                                    status_type_id='Downloaded',
+                                    status_time='2022-10-31T16:58:37+00:00',
+                                ),
+                            ],
+                            source_assn=[
+                                AssemblySource(
+                                    id=8617, assembly_id=7103, source_assembly_id=14662
                                 )
                             ],
                         ),
                         Assembly(
                             assembly_id=7104,
+                            component_type_id='alternate',
                             specimen_id='lpJunEffu1',
                             name='lpJunEffu1.1 alternate haplotype',
                             description=(
                                 'lpJunEffu1.1 alternate haplotype assembly for Juncus effusus'
                             ),
                             level='contig',
+                            category_id='release',
+                            file_path='GCA_946800645.1/insdc/GCA_946800645.1.fa.gz',
+                            is_principal=False,
                             is_reference=False,
                             bioproject_accession_id='PRJEB55669',
                             genome_accession_id='GCA_946800645.1',
@@ -3810,8 +4269,27 @@ def test_data(token: str):
                                     assembly_id=7104,
                                     status_type_id='ENA Public',
                                     status_time='2022-09-25T00:00:00+01:00',
+                                ),
+                                AssemblyStatus(
+                                    assembly_status_id=18374,
+                                    assembly_id=7104,
+                                    status_type_id='Downloaded',
+                                    status_time='2022-10-04T02:04:00+01:00',
+                                ),
+                            ],
+                            source_assn=[
+                                AssemblySource(
+                                    id=8618, assembly_id=7104, source_assembly_id=14662
                                 )
                             ],
+                        ),
+                        Assembly(
+                            assembly_id=14662,
+                            component_type_id='set',
+                            specimen_id='lpJunEffu1',
+                            name='lpJunEffu1.1',
+                            description='Assembly set lpJunEffu1.1',
+                            is_reference=True,
                         ),
                     ],
                 )
@@ -4258,6 +4736,9 @@ def test_data(token: str):
                                                 polymerase_read_bases=919164234856,
                                                 polymerase_num_reads=9917451,
                                                 polymerase_read_length_mean=92682.0,
+                                                polymerase_read_length_n50=170250,
+                                                insert_length_mean=13240.0,
+                                                insert_length_n50=15750,
                                                 unique_molecular_bases=117783101440,
                                                 productive_zmws_num=25165824,
                                                 p0_num=15179993,
@@ -4582,7 +5063,26 @@ def test_data(token: str):
                                                     )
                                                 ],
                                             ),
-                                        )
+                                        ),
+                                        DatasetElement(
+                                            id=44660,
+                                            data_id='ONTRUN-232#PBA64077#21',
+                                            dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                            dataset=Dataset(
+                                                dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                                name='ont',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=27823,
+                                                        dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2026-10-16T13:57:50.279210+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        ),
                                     ],
                                 )
                             ],
@@ -4603,10 +5103,11 @@ def test_data(token: str):
                                     category='genomic_data',
                                     sample_id='DTOL16058752',
                                     library_id='NT1863132U',
+                                    accession_id='ERR17875078',
                                     run_id='ONTRUN-304',
                                     processed=1,
                                     tag1_id='NB09',
-                                    date='2025-09-14T01:00:02+01:00',
+                                    date='2026-06-10T14:04:47+01:00',
                                     visibility='Always',
                                     reads=10585274,
                                     bases=16071581924,
@@ -4618,6 +5119,14 @@ def test_data(token: str):
                                         library_id='NT1863132U',
                                         library_type_id='ONT_PromethIon_mplx',
                                     ),
+                                    accession=Accession(
+                                        accession_id='ERR17875078',
+                                        accession_type_id='Run',
+                                        secondary='ERX17265631',
+                                        submission='ERA36968099',
+                                        date_submitted='2026-09-11T12:48:51+01:00',
+                                        is_deleted=False,
+                                    ),
                                     run=Run(
                                         run_id='ONTRUN-304',
                                         platform_id=23,
@@ -4626,6 +5135,16 @@ def test_data(token: str):
                                         start='2025-09-09T16:46:24+01:00',
                                     ),
                                     files=[
+                                        File(
+                                            id=161024,
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                            remote_path=(
+                                                'irods:/seq/ont/promethion/PC24B148/ONTRUN-304'
+                                                '/NT1863132U/20250909_1434_3E_PBE95016_2a80ed02'
+                                                '/bam_pass/barcode09'
+                                            ),
+                                            file_type='RAW_BAM_DIR',
+                                        ),
                                         File(
                                             id=154839,
                                             data_id='ONTRUN-304#PBE95016#21#NB09',
@@ -4637,7 +5156,31 @@ def test_data(token: str):
                                             ),
                                             file_type='RECALL_FASTQ_DIR',
                                             has_methylation=False,
-                                        )
+                                        ),
+                                        File(
+                                            id=160739,
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                            name=(
+                                                'ONTRUN'
+                                                '-304#PBE95016#21.dorado_7.6.8_sup_simplex_modified_5mcg_5hmcg_6ma_pass_barcode09_pass_merged.bam'  # noqa: E501
+                                            ),
+                                            remote_path=(
+                                                'irods:/seq/ont/promethion/offline-basecalls'
+                                                '/PC24B148/ONTRUN-304/NT1863132U'
+                                                '/20250909_1434_3E_PBE95016_2a80ed02/dorado/7.6.8'
+                                                '/sup/simplex/modified/5mcg_5hmcg_6ma/merged/pass'
+                                                '/barcode09/ONTRUN'
+                                                '-304#PBE95016#21.dorado_7.6.8_sup_simplex_modified_5mcg_5hmcg_6ma_pass_barcode09_pass_merged.bam'  # noqa: E501
+                                            ),
+                                            insdc_path=(
+                                                'https://ftp.sra.ebi.ac.uk/vol1/run/ERR178'
+                                                '/ERR17875078/ONTRUN-304%23PBE95016'
+                                                '%2321.dorado_7.6.8_sup_simplex_modified_5mcg_5hmcg_6ma_pass_barcode09_pass_merged.bam'  # noqa: E501
+                                            ),
+                                            size_bytes=22561612276,
+                                            md5='d47eeaa133be645eec47f6860e6f0456',
+                                            file_type='RECALL_BAM',
+                                        ),
                                     ],
                                     project_assn=[
                                         Allocation(
@@ -4681,6 +5224,104 @@ def test_data(token: str):
                                                         status_type_id='Pending',
                                                         status_time=(
                                                             '2025-10-06T15:50:16.630054+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        ),
+                                        DatasetElement(
+                                            id=44661,
+                                            data_id='ONTRUN-304#PBE95016#21#NB09',
+                                            dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                            dataset=Dataset(
+                                                dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                                name='ont',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=27823,
+                                                        dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2026-10-16T13:57:50.279210+01:00'
+                                                        ),
+                                                    )
+                                                ],
+                                            ),
+                                        ),
+                                    ],
+                                )
+                            ],
+                        ),
+                        Sample(
+                            sample_id='DTOL17042608',
+                            specimen_id='bRalAqu1',
+                            accession_id='SAMEA114299701',
+                            accession=Accession(
+                                accession_id='SAMEA114299701',
+                                accession_type_id='BioSample',
+                                is_deleted=False,
+                            ),
+                            data=[
+                                Data(
+                                    data_id='ONTRUN-374#PBO47882#15#NB10',
+                                    study_id=5901,
+                                    category='genomic_data',
+                                    sample_id='DTOL17042608',
+                                    library_id='NT1933527D',
+                                    run_id='ONTRUN-374',
+                                    processed=1,
+                                    tag1_id='NB10',
+                                    date='2026-09-27T12:35:49+01:00',
+                                    visibility='Always',
+                                    reads=32303175,
+                                    bases=38328184278,
+                                    read_length_mean=1186.51446113269,
+                                    read_length_n50=1604,
+                                    read_length_longest=150672,
+                                    read_length_shortest=45,
+                                    library=Library(
+                                        library_id='NT1933527D',
+                                        library_type_id='ONT_PromethIon_mplx',
+                                    ),
+                                    run=Run(
+                                        run_id='ONTRUN-374',
+                                        platform_id=24,
+                                        centre_id=2,
+                                        instrument_name='PC24B148',
+                                        start='2026-09-27T12:35:49+01:00',
+                                    ),
+                                    files=[
+                                        File(
+                                            id=165122,
+                                            data_id='ONTRUN-374#PBO47882#15#NB10',
+                                            name='barcode10_merged.bam',
+                                            remote_path=(
+                                                'irods:/seq/ont/promethion/offline-deplexes'
+                                                '/PC24B148/ONTRUN-374/NT1933527D'
+                                                '/20260923_1139_2G_PBO47882_41cfffc6/dorado'
+                                                '/7.11.2/sup/simplex/modified/5mcg_5hmcg/default'
+                                                '/pass/barcode10/barcode10_merged.bam'
+                                            ),
+                                            size_bytes=59104512477,
+                                            md5='45aceb175469b40e5ae570c47a02c838',
+                                            file_type='RECALL_BAM',
+                                        )
+                                    ],
+                                    dataset_assn=[
+                                        DatasetElement(
+                                            id=44662,
+                                            data_id='ONTRUN-374#PBO47882#15#NB10',
+                                            dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                            dataset=Dataset(
+                                                dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                                name='ont',
+                                                status_history=[
+                                                    DatasetStatus(
+                                                        dataset_status_id=27823,
+                                                        dataset_id='01M52CMHWJN29H65VC8GFK3XH4',
+                                                        status_type_id='Pending',
+                                                        status_time=(
+                                                            '2026-10-16T13:57:50.279210+01:00'
                                                         ),
                                                     )
                                                 ],
@@ -4844,11 +5485,15 @@ def test_data(token: str):
                     assemblies=[
                         Assembly(
                             assembly_id=156,
+                            component_type_id='primary',
                             specimen_id='bRalAqu1',
                             name='bRalAqu1.1',
                             description='bRalAqu1.1 assembly for Rallus aquaticus',
                             level='chromosome',
-                            is_reference=False,
+                            category_id='release',
+                            file_path='GCA_965250365.1/insdc/GCA_965250365.1.fa.gz',
+                            is_principal=True,
+                            is_reference=True,
                             bioproject_accession_id='PRJEB88631',
                             genome_accession_id='GCA_965250365.1',
                             bioproject_accession=Accession(
@@ -4879,17 +5524,30 @@ def test_data(token: str):
                                     assembly_id=156,
                                     status_type_id='ENA Public',
                                     status_time='2025-04-19T00:00:00+01:00',
-                                )
+                                ),
+                                AssemblyStatus(
+                                    assembly_status_id=11503,
+                                    assembly_id=156,
+                                    status_type_id='Downloaded',
+                                    status_time='2025-04-24T02:11:06+01:00',
+                                ),
+                            ],
+                            source_assn=[
+                                AssemblySource(id=178, assembly_id=156, source_assembly_id=10230)
                             ],
                         ),
                         Assembly(
                             assembly_id=157,
+                            component_type_id='alternate',
                             specimen_id='bRalAqu1',
                             name='bRalAqu1.1 alternate haplotype',
                             description=(
                                 'bRalAqu1.1 alternate haplotype assembly for Rallus aquaticus'
                             ),
                             level='contig',
+                            category_id='release',
+                            file_path='GCA_965250415.1/insdc/GCA_965250415.1.fa.gz',
+                            is_principal=False,
                             is_reference=False,
                             bioproject_accession_id='PRJEB88632',
                             genome_accession_id='GCA_965250415.1',
@@ -4921,15 +5579,32 @@ def test_data(token: str):
                                     assembly_id=157,
                                     status_type_id='ENA Public',
                                     status_time='2025-04-19T00:00:00+01:00',
-                                )
+                                ),
+                                AssemblyStatus(
+                                    assembly_status_id=11504,
+                                    assembly_id=157,
+                                    status_type_id='Downloaded',
+                                    status_time='2025-04-24T02:10:40+01:00',
+                                ),
                             ],
+                            source_assn=[
+                                AssemblySource(id=179, assembly_id=157, source_assembly_id=10230)
+                            ],
+                        ),
+                        Assembly(
+                            assembly_id=10230,
+                            component_type_id='set',
+                            specimen_id='bRalAqu1',
+                            name='bRalAqu1.1',
+                            description='Assembly set bRalAqu1.1',
+                            is_reference=True,
                         ),
                     ],
                 )
             ],
             data_accession=Accession(
                 accession_id='PRJEB75638',
-                accession_type_id='BioProject - Species Data',
+                accession_type_id='BioProject',
                 secondary='ERP160198',
                 submission='ERA29771179',
                 date_submitted='2024-05-12T00:00:00+01:00',
@@ -5018,7 +5693,7 @@ def test_data(token: str):
                         link_status='New',
                         child=Accession(
                             accession_id='PRJEB75638',
-                            accession_type_id='BioProject - Species Data',
+                            accession_type_id='BioProject',
                             secondary='ERP160198',
                             submission='ERA29771179',
                             date_submitted='2024-05-12T00:00:00+01:00',
@@ -5128,10 +5803,12 @@ def test_data(token: str):
             ),
             location=Location(location_id=824, path='3/b/5/0/1/e/Rallus_aquaticus'),
         ),
-        Assembly(assembly_id=7103, assembly_status_id=7103),
-        Assembly(assembly_id=7104, assembly_status_id=7104),
-        Assembly(assembly_id=156, assembly_status_id=156),
-        Assembly(assembly_id=157, assembly_status_id=157),
+        Assembly(assembly_id=7103, assembly_status_id=18373),
+        Assembly(assembly_id=7104, assembly_status_id=18374),
+        Assembly(assembly_id=14662),
+        Assembly(assembly_id=156, assembly_status_id=11503),
+        Assembly(assembly_id=157, assembly_status_id=11504),
+        Assembly(assembly_id=10230),
         Dataset(dataset_id='01K6BJYB201CTC53DYQ1M674KK'),
         Dataset(dataset_id='01K6B5R10VC8F9XTXCVGXM50Q2', dataset_status_id=10911),
         Dataset(dataset_id='01K6AW4EBE124C2EEA91HFCA1E'),
@@ -5146,5 +5823,6 @@ def test_data(token: str):
         Dataset(dataset_id='01K6B4HP8K8MDPQYB63C0HWT6G', dataset_status_id=9685),
         Dataset(dataset_id='01K6ATRHFGXCKPRYPQY2CBXN3W', dataset_status_id=1709),
         Dataset(dataset_id='01K6X00XKNCBQSPYTG6WD0ABKJ'),
+        Dataset(dataset_id='01M52CMHWJN29H65VC8GFK3XH4'),
         Dataset(dataset_id='01K6BPCJJEK063WK6NN58J0A0P', dataset_status_id=19012),
     ]

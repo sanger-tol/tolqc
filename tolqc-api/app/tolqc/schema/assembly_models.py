@@ -15,7 +15,6 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapped_column, relationship
-from sqlalchemy.sql import expression
 
 from tolqc.schema.base import Base, LogBase
 from tolqc.schema.folder_models import HasFolder
@@ -60,8 +59,8 @@ class Assembly(LogBase, HasFolder):
         ForeignKey('assembly_category.category_id'),
     )
     file_path = mapped_column(String)
-    is_principal = mapped_column(Boolean, server_default=expression.false(), index=True)
-    is_reference = mapped_column(Boolean, server_default=expression.false(), index=True)
+    is_principal = mapped_column(Boolean, index=True)
+    is_reference = mapped_column(Boolean, index=True)
     bioproject_accession_id = mapped_column(
         String,
         ForeignKey('accession.accession_id'),
