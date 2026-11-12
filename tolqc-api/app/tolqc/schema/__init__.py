@@ -30,6 +30,7 @@ auth_models = create_models(
     role_mixin_class=action_models._role_mixin,
     token_expiry_delta=timedelta(days=7),
     prefix_with_name=False,
+    keycloak_registration=False,
 )
 Role = auth_models.role_class
 RoleBinding = auth_models.role_binding_class
