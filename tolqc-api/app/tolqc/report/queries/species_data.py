@@ -395,20 +395,6 @@ def assembly_status_window(label: str, column: InstrumentedAttribute[Any]):
 def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
     asm_set = aliased(Assembly, name='asm_set')
 
-    asm_set_name = req_args.pop_arg('set_name')
-    if asm_set_name is NoArg:
-        set_filter = or_(
-            asm_set.component_type_id == 'set',
-            asm_set.component_type_id.is_(None),
-        )
-    elif asm_set_name is None:
-        set_filter = asm_set.name.is_(None)
-    else:
-        set_filter = and_(
-            asm_set.component_type_id == 'set',
-            asm_set.name == asm_set_name,
-        )
-
     # Every data_id linked to each assembly set
     set_data_ids = (
         select(
@@ -461,11 +447,12 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
         .cte('asm_set_data_files')
     )
 
-    return (
+    query = (
         select(
             asm_set.name.label('set_name'),
             asm_set.assembly_id.label('set_id'),
             Specimen.specimen_id.label('specimen'),
+            Specimen.accession_id.label('biospecimen_accession'),
             Specimen.species_id.label('species'),
             Species.taxon_id,
             Species.tolid_prefix,
@@ -524,8 +511,8 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
         .outerjoin(Specimen.location)
         .outerjoin(Specimen.species)
         .outerjoin(asm_set_data_files, asm_set.assembly_id == asm_set_data_files.c.assembly_id)
+        .filter(asm_set.component_type_id == 'set')
         .filter(Assembly.component_type_id != 'set')
-        .filter(set_filter)
         .group_by(
             asm_set.assembly_id,
             Specimen.specimen_id,
@@ -540,6 +527,26 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
         )
         .order_by(Specimen.specimen_id, asm_set.name)
     )
+
+    # fmt: off
+    asm_set_name = req_args.pop_arg('set_name')
+    if asm_set_name is not NoArg:
+        query = query.filter(
+            asm_set.name.is_(None)
+            if asm_set_name is None
+            else asm_set.name == asm_set_name
+        )
+
+    asm_set_id = req_args.pop_arg('set_id')
+    if asm_set_id is not NoArg:
+        query = query.filter(
+            asm_set.assembly_id.is_(None)
+            if asm_set_id is None
+            else asm_set.assembly_id == asm_set_id
+        )
+    # fmt: on
+
+    return query
 
 
 def specimen_status_report_query(req_args: RequestArgs) -> Select:

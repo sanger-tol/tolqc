@@ -6,6 +6,8 @@
 
 services:
   tolqc-db:
+    # Useful when debugging to show all SQL statements in the log:
+    command: ["postgres", "-c", "log_statement=all"]
     image: postgres:18
     environment:
       - TZ=Europe/London
@@ -141,7 +143,7 @@ services:
       - ./tolqc-api/migrations/alembic/versions:/migrations/alembic/versions
 
   tolqc-python-db:
-    image: postgres:14
+    image: postgres:18
     # Useful when debugging to show all SQL statements in the log:
     command: ["postgres", "-c", "log_statement=all"]
     environment:
