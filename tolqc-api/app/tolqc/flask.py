@@ -27,7 +27,7 @@ from tol.core import (
     OperableDataSource,
 )
 from tol.core.operator import Inserter
-from tol.sources.portaldb import portaldb
+from tol.sources.quasar import quasar
 from tol.sql.auth.blueprint import DbAuthBlueprint, DbAuthManager
 from tol.sql.session import create_session_factory
 
@@ -138,10 +138,10 @@ def application(session_factory=None):
     # instance during each Flask request.
     database_factory, session_factory = build_database_factory(session_factory, models)
 
-    portaldb_ds = portaldb()
-    portaldb_ds.page_size = 500
+    quasar_ds = quasar()
+    quasar_ds.page_size = 500
     instance_name = 'tolqc_internal'
-    tolqc_datasource_instance = portaldb_ds.get_one('data_source_instance', instance_name)
+    tolqc_datasource_instance = quasar_ds.get_one('data_source_instance', instance_name)
     if not tolqc_datasource_instance:
         msg = f"Failed to get data_source_instance = '{instance_name}'"
         raise ValueError(msg)

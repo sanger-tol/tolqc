@@ -4,7 +4,7 @@
 
 # This is used for a production build
 # stage 1 as builder
-FROM node:18.16.0-alpine as builder
+FROM node:24.22.3-alpine as builder
 
 RUN apk add yarn
 RUN mkdir /workspace

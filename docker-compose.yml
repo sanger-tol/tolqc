@@ -6,7 +6,7 @@
 
 services:
   tolqc-db:
-    image: postgres:14
+    image: postgres:18
     environment:
       - TZ=Europe/London
       - POSTGRES_USER
@@ -28,8 +28,10 @@ services:
       - API_PATH
       - API_DATA_PATH
       - API_TOKEN
-      - PORTAL_URL
-      - PORTAL_API_PATH
+      - QUASAR_URL
+      - QUASAR_API_PATH
+      - QUASAR_API_DATA_PATH
+      - QUASAR_DATASPACE
       - OIDC_CLIENT_ID
       - OIDC_CLIENT_SECRET
       - OIDC_REDIRECT_URI
@@ -60,6 +62,10 @@ services:
       - REACT_APP_API_DATA_PATH=${API_DATA_PATH}
       - REACT_APP_MATOMO_SITE_ID=${MATOMO_SITE_ID}
       - LOCAL_TOLUI=${LOCAL_TOLUI}
+      - REACT_APP_QUASAR_URL=${QUASAR_URL}
+      - REACT_APP_QUASAR_API_PATH=${QUASAR_API_PATH}
+      - REACT_APP_QUASAR_API_DATA_PATH=${QUASAR_API_DATA_PATH}
+      - REACT_APP_QUASAR_DATASPACE=${QUASAR_DATASPACE}
       - REACT_APP_BOARDS_API_DATA_PATH=${BOARDS_API_DATA_PATH}
       - REACT_APP_AUTH_API_DATA_PATH=${AUTH_API_DATA_PATH}
       - REACT_APP_LOCAL_API_DATA_PATH=${LOCAL_API_DATA_PATH}
@@ -108,7 +114,7 @@ services:
       - '/usr/src/app/node_modules'
   
   tolqc-dbutils:
-    image: gitlab-registry.internal.sanger.ac.uk/tol/tol-core/dbutils:1.0.10
+    image: gitlab-registry.internal.sanger.ac.uk/tol/tol-core/dbutils:1.1.0
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
