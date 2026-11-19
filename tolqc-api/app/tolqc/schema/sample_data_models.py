@@ -72,6 +72,7 @@ class Centre(Base):
 
     run = relationship('Run', back_populates='centre')
     assemblies = relationship('Assembly', back_populates='centre')
+    submitters = relationship('SubmitterDict', back_populates='centre')
 
 
 class ChemistryDict(Base):

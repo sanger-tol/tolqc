@@ -207,5 +207,7 @@ class SubmitterDict(Base):
     submitter_id = mapped_column(String, primary_key=True)
     webin_account = mapped_column(String)
     description = mapped_column(String)
+    centre_id = mapped_column(Integer, ForeignKey('centre.id'))
 
     accessions = relationship('Accession', back_populates='submitter')
+    centre = relationship('Centre', back_populates='submitters')
