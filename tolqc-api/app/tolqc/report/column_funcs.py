@@ -21,6 +21,14 @@ from sqlalchemy.orm import InstrumentedAttribute
 ColumnArg: TypeAlias = InstrumentedAttribute[Any] | ColumnElement[Any]  # noqa: UP040
 
 
+def any_value_label(column):
+    """
+    Return the column wrapped in the `any_value` aggregate function, and with
+    its name as the label.
+    """
+    return func.any_value(column).label(column.name)
+
+
 def array_distinct_non_null(label_txt, column):
     """
     Builds SQL for returning an array aggregate column of non-null distinct

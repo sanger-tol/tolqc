@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import aggregate_order_by
 from sqlalchemy.orm import InstrumentedAttribute, aliased
 
 from tolqc.report.column_funcs import (
+    any_value_label,
     array_distinct_non_null,
     build_json_object,
     build_path_if_elements_not_null,
@@ -160,7 +161,7 @@ def linked_accessions_json(
     query = (
         select(
             Accession.accession_id,
-            func.jsonb_agg(
+            func.json_agg(
                 accession_struct(
                     linked_acc,
                     link_status=BioprojectLink.link_status,
@@ -195,8 +196,6 @@ def species_bioproject_query(req_args: RequestArgs) -> Select:
         Species.species_id,
         Species.taxon_id,
         Species.tolid_prefix,
-        project_cte.c.project_accessions,
-        product_cte.c.product_accessions,
     ]
     query = (
         select(
@@ -211,8 +210,8 @@ def species_bioproject_query(req_args: RequestArgs) -> Select:
                 data_acc,
                 col_list=group_by,
             ).label('data_accession'),
-            project_cte.c.project_accessions,
-            product_cte.c.product_accessions,
+            any_value_label(project_cte.c.project_accessions),
+            any_value_label(product_cte.c.product_accessions),
         )
         .select_from(Species)
         .outerjoin(umbrella_acc, Species.umbrella_accession)
@@ -417,7 +416,7 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
     asm_set_data_files = (
         select(
             set_data_ids.c.assembly_id,
-            func.jsonb_agg(
+            func.json_agg(
                 aggregate_order_by(
                     build_json_object(
                         Data.data_id,
@@ -498,7 +497,7 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
                     Assembly.name,
                 ),
             ).label('components'),
-            asm_set_data_files.c.data_files,
+            any_value_label(asm_set_data_files.c.data_files),
         )
         .select_from(asm_set)
         .outerjoin(Metadata, Metadata.name == 'location.root')
@@ -512,7 +511,7 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
         .outerjoin(Specimen.species)
         .outerjoin(asm_set_data_files, asm_set.assembly_id == asm_set_data_files.c.assembly_id)
         .filter(asm_set.component_type_id == 'set')
-        .filter(Assembly.component_type_id != 'set')
+        .filter(or_(Assembly.component_type_id != 'set', Assembly.component_type_id.is_(None)))
         .group_by(
             asm_set.assembly_id,
             Specimen.specimen_id,
@@ -523,7 +522,6 @@ def specimen_assemblies_report_query(req_args: RequestArgs) -> Select:
             Species.umbrella_accession_id,
             asm_set.name,
             asm_set.is_reference,
-            asm_set_data_files.c.data_files,
         )
         .order_by(Specimen.specimen_id, asm_set.name)
     )
@@ -630,7 +628,7 @@ def specimen_status_report_query(req_args: RequestArgs) -> Select:
     specimen_pipeline = (
         select(
             species_data_type.c.species_id,
-            func.jsonb_agg(
+            func.json_agg(
                 build_json_object(
                     species_data_type.c.pipeline,
                     species_data_type.c.specimen_id,
@@ -646,7 +644,7 @@ def specimen_status_report_query(req_args: RequestArgs) -> Select:
     wospi_pipeline = (
         select(
             wospi_data_type.c.specimen_id,
-            func.jsonb_agg(
+            func.json_agg(
                 build_json_object(
                     wospi_data_type.c.pipeline,
                     wospi_data_type.c.specimen_id,
@@ -686,11 +684,8 @@ def specimen_status_report_query(req_args: RequestArgs) -> Select:
             Species.data_accession_id.label('data_bioproject'),
             User.name.label('assignee'),
             func.coalesce(
-                # Will be able to use any_value() aggregate function and
-                # remove these columns from the GROUP BY once the server is
-                # PostgreSQL >= 16
-                specimen_pipeline.c.species_data,
-                wospi_pipeline.c.specimen_data,
+                func.any_value(specimen_pipeline.c.species_data),
+                func.any_value(wospi_pipeline.c.specimen_data),
             ).label('species_data'),
         )
         .select_from(Specimen)
@@ -727,8 +722,6 @@ def specimen_status_report_query(req_args: RequestArgs) -> Select:
             Species.umbrella_accession_id,
             Species.data_accession_id,
             User.name,
-            specimen_pipeline.c.species_data,
-            wospi_pipeline.c.specimen_data,
         )
         .order_by(
             Specimen.specimen_id,
